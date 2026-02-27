@@ -188,8 +188,22 @@ function App() {
     }));
   };
 
-  const nextStep = () => setCurrentStep(prev => Math.min(prev + 1, 5));
-  const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 1));
+  const scrollToTop = () => {
+    // Scroll the main column container back to top
+    const mainCol = document.querySelector('.onboarding-main-column');
+    if (mainCol) mainCol.scrollTop = 0;
+    // Also scroll window in case of mobile layout
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const nextStep = () => {
+    setCurrentStep(prev => Math.min(prev + 1, 5));
+    scrollToTop();
+  };
+  const prevStep = () => {
+    setCurrentStep(prev => Math.max(prev - 1, 1));
+    scrollToTop();
+  };
 
   const submitFinal = () => {
     console.log('Final Submission Data:', formData);
