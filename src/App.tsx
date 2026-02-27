@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Routes, Route, useNavigate, Navigate, Link } from 'react-router-dom';
 import './App.css';
 
 interface FormData {
@@ -36,6 +37,8 @@ interface FormData {
 }
 
 function App() {
+  const navigate = useNavigate();
+
   // Create Account (Signup) State
   const [mobile, setMobile] = useState('');
   const [otp, setOtp] = useState('');
@@ -53,9 +56,9 @@ function App() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Screen & Step State
-  const [currentScreen, setCurrentScreen] = useState<'login' | 'signup' | 'onboarding' | 'success'>(() => {
+  const [currentScreen, setCurrentScreen] = useState<'login' | 'signup' | 'onboarding' | 'success' | 'dashboard'>(() => {
     const savedScreen = localStorage.getItem('onboardingScreen');
-    return (savedScreen as 'login' | 'signup' | 'onboarding' | 'success') || 'login';
+    return (savedScreen as 'login' | 'signup' | 'onboarding' | 'success' | 'dashboard') || 'login';
   });
   const [currentStep, setCurrentStep] = useState(1);
 
@@ -111,6 +114,8 @@ function App() {
   useEffect(() => {
     localStorage.setItem('onboardingFormData', JSON.stringify(formData));
   }, [formData]);
+
+  // Signup (Create Account) Logic
 
   // Signup (Create Account) Logic
   useEffect(() => {
@@ -843,6 +848,111 @@ function App() {
     );
   }
 
+  const renderDashboard = () => {
+    const sidebarItems = [
+      {
+        id: 'dashboard', label: 'Dashboard', icon: (
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+          </svg>
+        )
+      },
+      {
+        id: 'orders', label: 'Orders', icon: (
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <path d="M16 10a4 4 0 0 1-8 0"></path>
+          </svg>
+        )
+      },
+      {
+        id: 'customers', label: 'Customers', icon: (
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+        )
+      },
+      {
+        id: 'reports', label: 'Reports', icon: (
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="18" y1="20" x2="18" y2="10"></line>
+            <line x1="12" y1="20" x2="12" y2="4"></line>
+            <line x1="6" y1="20" x2="6" y2="14"></line>
+          </svg>
+        )
+      },
+      {
+        id: 'settings', label: 'Settings', icon: (
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1Z"></path>
+          </svg>
+        )
+      },
+    ];
+
+    return (
+      <div className="dashboard-layout">
+        <aside className="dashboard-sidebar">
+          <div className="dashboard-sidebar-header">
+            <svg width="28" height="28" viewBox="0 0 24 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M0 0H12L24 12V20L12 8H0V0Z" fill="#0077ff" />
+              <path d="M0 12H12L24 24V32L12 20H0V12Z" fill="#0077ff" fillOpacity="0.7" />
+            </svg>
+            <span className="dashboard-brand-name">MyPartner</span>
+          </div>
+          <nav className="dashboard-nav">
+            {sidebarItems.map(item => (
+              <a key={item.id} href="#" className={`dashboard-nav-item ${item.id === 'dashboard' ? 'active' : ''}`}>
+                <span className="nav-icon">{item.icon}</span>
+                <span className="nav-label">{item.label}</span>
+              </a>
+            ))}
+          </nav>
+          <div className="dashboard-sidebar-footer">
+            <button className="logout-btn" onClick={() => { navigate('/login'); localStorage.removeItem('onboardingScreen'); }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+              <span>Logout</span>
+            </button>
+          </div>
+        </aside>
+        <main className="dashboard-main">
+          <header className="dashboard-header">
+            <h1 className="dashboard-title">Overview</h1>
+            <div className="dashboard-user-profile">
+              <div className="user-info">
+                <span className="user-name">John Doe</span>
+                <span className="user-role">Partner</span>
+              </div>
+              <div className="user-avatar">JD</div>
+            </div>
+          </header>
+          <div className="dashboard-content">
+            <div className="dashboard-welcome-card">
+              <h2>Welcome to your Dashboard!</h2>
+              <p>Everything you need to manage your business in one place.</p>
+            </div>
+            <div className="dashboard-grid">
+              <div className="dashboard-stats-card">Stats coming soon...</div>
+              <div className="dashboard-stats-card">Recent Activity...</div>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   const renderAuthLayout = (children: React.ReactNode) => (
     <div className="login-page">
       <div className="login-panel-left">
@@ -890,83 +1000,163 @@ function App() {
       </div>
     </div>
   );
+  const SignupPage = () => renderAuthLayout(
+    <>
+      <div className="login-form-header">
+        <h1 className="login-form-title">Create Account</h1>
+        <p className="login-form-subtitle">Enter your details to get started</p>
+      </div>
 
-  if (currentScreen === 'signup') {
-    return renderAuthLayout(
-      <>
-        <div className="login-form-header">
-          <h1 className="login-form-title">Create Account</h1>
-          <p className="login-form-subtitle">Enter your details to get started</p>
-        </div>
-
-        <form onSubmit={(e) => { e.preventDefault(); setCurrentScreen('onboarding'); }} className="login-form">
-          <div className="form-group">
-            <label className="input-label" htmlFor="signupMobile">Mobile Number</label>
-            <div className="input-group-with-icon">
-              <input
-                type="tel"
-                id="signupMobile"
-                className="input-field"
-                placeholder="Enter 10-digit mobile"
-                value={mobile}
-                onChange={handleMobileChange}
-                maxLength={10}
-              />
-              <button
-                type="button"
-                className={`otp-inside-btn ${(mobile.length !== 10 || isTimerActive) ? 'disabled' : ''}`}
-                onClick={handleSendOtp}
-                disabled={mobile.length !== 10 || isTimerActive}
-              >
-                {isTimerActive ? `0:${timer < 10 ? '0' : ''}${timer}` : hasSentOtp ? 'Resend' : 'Send'}
-              </button>
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label className="input-label" htmlFor="signupOtp">OTP</label>
+      <form onSubmit={(e) => { e.preventDefault(); navigate('/dashboard'); }} className="login-form">
+        <div className="form-group">
+          <label className="input-label" htmlFor="signupMobile">Mobile Number</label>
+          <div className="input-group-with-icon">
             <input
-              type="text"
-              id="signupOtp"
+              type="tel"
+              id="signupMobile"
               className="input-field"
-              placeholder="Enter 6-digit OTP"
-              value={otp}
-              onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-              maxLength={6}
+              placeholder="Enter 10-digit mobile"
+              value={mobile}
+              onChange={handleMobileChange}
+              maxLength={10}
             />
+            <button
+              type="button"
+              className={`otp-inside-btn ${(mobile.length !== 10 || isTimerActive) ? 'disabled' : ''}`}
+              onClick={handleSendOtp}
+              disabled={mobile.length !== 10 || isTimerActive}
+            >
+              {isTimerActive ? `0:${timer < 10 ? '0' : ''}${timer}` : hasSentOtp ? 'Resend' : 'Send'}
+            </button>
           </div>
-
-          <button
-            type="submit"
-            className="btn btn-primary-blue login-submit-btn"
-            disabled={mobile.length !== 10 || otp.length !== 6}
-          >
-            Create Account
-          </button>
-
-          <p className="signup-agreement-text">
-            By clicking you agree to our <a href="#">Terms & Conditions</a> and <a href="#">Privacy Policy</a>
-          </p>
-        </form>
-        <div className="login-footer-text-wrap">
-          <p className="login-register-text">
-            Already have an account?{' '}
-            <a href="#" onClick={(e) => { e.preventDefault(); setCurrentScreen('login'); }}>Login</a>
-          </p>
         </div>
-      </>
-    );
-  }
 
-  // Default: Login screen
-  return renderAuthLayout(
+        <div className="form-group">
+          <label className="input-label" htmlFor="signupOtp">OTP</label>
+          <input
+            type="text"
+            id="signupOtp"
+            className="input-field"
+            placeholder="Enter 6-digit OTP"
+            value={otp}
+            onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+            maxLength={6}
+          />
+        </div>
+
+        <button
+          type="submit"
+          className="btn btn-primary-blue login-submit-btn"
+          disabled={mobile.length !== 10 || otp.length !== 6}
+        >
+          Create Account
+        </button>
+
+        <p className="signup-agreement-text">
+          By clicking you agree to our <a href="#">Terms & Conditions</a> and <a href="#">Privacy Policy</a>
+        </p>
+      </form>
+      <div className="login-card-footer">
+        <p className="login-register-text">
+          Already have an account?{' '}
+          <Link to="/login" className="create-account-link">Login</Link>
+        </p>
+      </div>
+    </>
+  );
+
+  const OnboardingPage = () => (
+    <div className="onboarding-layout">
+      <div className="onboarding-sidebar">
+        <div className="onboarding-logo-container">
+          <div className="onboarding-logo">
+            <svg width="24" height="24" viewBox="0 0 24 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M0 0H12L24 12V20L12 8H0V0Z" fill="#0077ff" />
+              <path d="M0 12H12L24 24V32L12 20H0V12Z" fill="#0077ff" fillOpacity="0.7" />
+            </svg>
+          </div>
+          <span className="onboarding-logo-text">MyPartner</span>
+        </div>
+
+        {renderStepIndicator()}
+
+        <div className="sidebar-footer">
+          <p>Need help? Contact support</p>
+        </div>
+      </div>
+
+      <div className="onboarding-main-column">
+        <div className="mobile-only-header">
+          <div className="mobile-header-top">
+            <div className="mobile-header-left">
+              <div className="mobile-logo">
+                <svg width="20" height="20" viewBox="0 0 24 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M0 0H12L24 12V20L12 8H0V0Z" fill="#0077ff" />
+                  <path d="M0 12H12L24 24V32L12 20H0V12Z" fill="#0077ff" fillOpacity="0.7" />
+                </svg>
+              </div>
+              <span className="mobile-brand-name">MyPartner</span>
+            </div>
+            <button className="mobile-login-btn" onClick={() => navigate('/login')}>Login</button>
+          </div>
+          <div className="mobile-header-progress-line"></div>
+          <div className="mobile-only mobile-step-progress-row">
+            {[1, 2, 3, 4, 5].map((s, index) => (
+              <div key={s} className="mobile-step-pill-wrapper">
+                <div className={`mobile-step-circle ${currentStep === s ? 'active' : currentStep > s ? 'completed' : ''}`}>
+                  {s}
+                </div>
+                {index < 4 && (
+                  <div className={`mobile-step-connecting-line ${currentStep > s ? 'active' : ''}`} />
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="onboarding-content-card">
+          {currentStep === 1 && renderStep1()}
+          {currentStep === 2 && renderStep2()}
+          {currentStep === 3 && renderStep3()}
+          {currentStep === 4 && renderStep4()}
+          {currentStep === 5 && renderStep5()}
+        </div>
+
+        <div className="onboarding-actions-bottom">
+          <div className="onboarding-actions-wrapper">
+            <button
+              className="btn btn-secondary-gray btn-wide"
+              onClick={prevStep}
+              style={{ visibility: currentStep === 1 ? 'hidden' : 'visible' }}>
+              Back
+            </button>
+
+            {currentStep < 5 ? (
+              <button className="btn btn-primary-blue btn-wide" onClick={nextStep}>
+                Next
+              </button>
+            ) : (
+              <button
+                className={`btn btn-primary-blue btn-wide ${!formData.partnershipAgreed ? 'disabled' : ''}`}
+                onClick={submitFinal}
+                disabled={!formData.partnershipAgreed}>
+                Create Account
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const LoginPage = () => renderAuthLayout(
     <>
       <div className="login-form-header">
         <h1 className="login-form-title">Welcome back</h1>
         <p className="login-form-subtitle">Sign in to your partner account</p>
       </div>
 
-      <form onSubmit={(e) => { e.preventDefault(); setCurrentScreen('onboarding'); }} className="login-form">
+      <form onSubmit={(e) => { e.preventDefault(); navigate('/dashboard'); }} className="login-form">
         <div className="form-group">
           <label className="input-label" htmlFor="loginId">Mobile Number / Email ID / Partner ID</label>
           <input
@@ -976,14 +1166,11 @@ function App() {
             placeholder="Enter mobile, email or partner ID"
             value={loginId}
             onChange={(e) => setLoginId(e.target.value)}
-            autoComplete="username"
           />
         </div>
 
         <div className="form-group">
-          <div className="login-label-row">
-            <label className="input-label" htmlFor="loginPassword">Password</label>
-          </div>
+          <label className="input-label" htmlFor="loginPassword">Password</label>
           <div className="input-group-with-icon">
             <input
               type={showLoginPassword ? 'text' : 'password'}
@@ -992,48 +1179,56 @@ function App() {
               placeholder="Enter your password"
               value={loginPassword}
               onChange={(e) => setLoginPassword(e.target.value)}
-              autoComplete="current-password"
             />
             <button
               type="button"
-              className="password-toggle"
-              onClick={() => setShowLoginPassword(p => !p)}
-              tabIndex={-1}
+              className="password-toggle-btn"
+              onClick={() => setShowLoginPassword(!showLoginPassword)}
             >
               {showLoginPassword ? (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
                   <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
                   <line x1="1" y1="1" x2="23" y2="23" />
                 </svg>
               ) : (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                   <circle cx="12" cy="12" r="3" />
                 </svg>
               )}
             </button>
           </div>
-          <div className="forgot-password-container">
+          <div className="forgot-password-wrap">
             <a href="#" className="forgot-password-link">Forgot password?</a>
           </div>
         </div>
 
         <button
           type="submit"
-          className="btn btn-primary-blue login-submit-btn"
+          className={`btn btn-primary-blue login-submit-btn ${(!loginId.trim() || !loginPassword.trim()) ? 'disabled' : ''}`}
           disabled={!loginId.trim() || !loginPassword.trim()}
         >
           Login
         </button>
       </form>
-      <div className="login-footer-text-wrap">
+      <div className="login-card-footer">
         <p className="login-register-text">
           Don't have an account?{' '}
-          <a href="#" onClick={(e) => { e.preventDefault(); setCurrentScreen('signup'); }}>Create Account</a>
+          <Link to="/signup" className="create-account-link">Create Account</Link>
         </p>
       </div>
     </>
+  );
+
+  return (
+    <Routes>
+      <Route path="/" element={<Navigate to="/login" replace />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/signup" element={<SignupPage />} />
+      <Route path="/onboarding" element={<OnboardingPage />} />
+      <Route path="/dashboard" element={renderDashboard()} />
+    </Routes>
   );
 }
 
