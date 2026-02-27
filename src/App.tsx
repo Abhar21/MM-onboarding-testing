@@ -876,6 +876,13 @@ function App() {
       </div>
       <div className="login-panel-right">
         <div className="login-right-inner">
+          <div className="mobile-only mobile-login-branding">
+            <svg width="28" height="28" viewBox="0 0 24 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M0 0H12L24 12V20L12 8H0V0Z" fill="#0077ff" />
+              <path d="M0 12H12L24 24V32L12 20H0V12Z" fill="#0077ff" fillOpacity="0.7" />
+            </svg>
+            <span className="onboarding-brand-name mobile-brand-name">MyPartner</span>
+          </div>
           <div className="login-form-box">
             {children}
           </div>
@@ -1019,12 +1026,13 @@ function App() {
         >
           Login
         </button>
-
+      </form>
+      <div className="login-footer-text-wrap">
         <p className="login-register-text">
           Don't have an account?{' '}
           <a href="#" onClick={(e) => { e.preventDefault(); setCurrentScreen('signup'); }}>Create Account</a>
         </p>
-      </form>
+      </div>
     </>
   );
 }

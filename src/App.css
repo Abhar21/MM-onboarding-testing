@@ -1,7 +1,7 @@
 .login-container {
   display: flex;
   width: 100%;
-  max-width: 600px;
+  max-width: 520px;
   background: white;
   justify-content: center;
   align-items: center;
@@ -1595,9 +1595,16 @@ input[type="file"].input-field::file-selector-button:hover {
   background: #f8fafc;
 }
 
+.login-right-inner {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .login-form-box {
   width: 100%;
-  max-width: 440px;
+  max-width: 520px;
   background: white;
   border-radius: 20px;
   padding: 3rem 2.5rem;
@@ -1675,7 +1682,7 @@ input[type="file"].input-field::file-selector-button:hover {
 }
 
 .forgot-password-link {
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   color: #0077ff;
   text-decoration: none;
   font-weight: 600;
@@ -1712,10 +1719,11 @@ input[type="file"].input-field::file-selector-button:hover {
 
 .login-register-text {
   text-align: center;
-  font-size: 0.9rem;
+  font-size: 0.82rem;
   color: #64748b;
   margin: 0;
   font-weight: 500;
+  line-height: normal;
 }
 
 .login-footer-text-wrap {
@@ -1793,6 +1801,39 @@ input[type="file"].input-field::file-selector-button:hover {
   .login-form-box {
     padding: 2.5rem 1.5rem;
     border-radius: 16px;
+  }
+
+  .login-register-text {
+    font-size: 0.82rem !important;
+    margin-top: 0 !important;
+  }
+
+  .forgot-password-link {
+    font-size: 0.82rem !important;
+  }
+
+  .login-footer-text-wrap {
+    width: calc(100% + 3rem) !important;
+    margin-left: -1.5rem !important;
+    margin-right: -1.5rem !important;
+    margin-bottom: -2.5rem !important;
+    margin-top: 1.25rem !important;
+  }
+
+  .mobile-login-branding {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .mobile-login-branding .mobile-brand-name {
+    color: #1e293b !important;
+    font-size: 1.3rem !important;
+    font-weight: 700;
+    margin: 0;
   }
 }
 
