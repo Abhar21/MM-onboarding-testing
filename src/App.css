@@ -988,3 +988,208 @@ input[type="file"].input-field::file-selector-button:hover {
   background-color: #e2e8f0;
   color: #ef4444;
 }
+
+/* =============================================
+   MOBILE RESPONSIVE STYLES
+   ============================================= */
+
+/* ---- Tablet (max 1024px) ---- */
+@media (max-width: 1024px) {
+  .onboarding-sidebar-column {
+    width: 260px !important;
+  }
+
+  .onboarding-main-column {
+    padding: 2rem 2.5rem 4rem 2.5rem !important;
+  }
+
+  .onboarding-actions-bottom {
+    left: 260px !important;
+    padding: 0.75rem 2.5rem !important;
+  }
+
+  .step-two-preview {
+    position: static !important;
+    width: 100% !important;
+    max-width: 500px !important;
+    margin-top: 1.5rem !important;
+  }
+}
+
+/* ---- Mobile (max 768px) ---- */
+@media (max-width: 768px) {
+
+  /* === Login Page === */
+  .login-container {
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+
+  .login-left {
+    padding: 2rem 1.5rem 5rem !important;
+  }
+
+  .login-form-container {
+    max-width: 100% !important;
+  }
+
+  /* === Onboarding: Stack sidebar on top of content === */
+  .onboarding-full-layout {
+    flex-direction: column !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* Sidebar becomes a horizontal step bar at top */
+  .onboarding-sidebar-column {
+    width: 100% !important;
+    min-width: 0 !important;
+    height: auto !important;
+    flex-direction: row !important;
+    padding: 0.75rem 1rem !important;
+    border-right: none !important;
+    border-bottom: 1px solid var(--border) !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 200 !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+  }
+
+  .onboarding-sidebar-header {
+    display: none !important;
+  }
+
+  .onboarding-sidebar-content {
+    flex: none !important;
+    padding: 0 !important;
+    width: 100% !important;
+    overflow: visible !important;
+  }
+
+  /* Step pills lay out horizontally */
+  .vertical-step-indicator {
+    flex-direction: row !important;
+    gap: 0.75rem !important;
+    margin-bottom: 0 !important;
+    overflow-x: auto !important;
+    padding-bottom: 4px !important;
+    white-space: nowrap !important;
+  }
+
+  .vertical-step-item {
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    min-height: unset !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* Hide the vertical connector line */
+  .vertical-step-connector,
+  .vertical-step-icon-container>*:not(.vertical-step-circle) {
+    display: none !important;
+  }
+
+  /* Hide step titles and descriptions in mobile sidebar */
+  .vertical-step-text {
+    display: none !important;
+  }
+
+  .sidebar-footer {
+    display: none !important;
+  }
+
+  /* === Main Content === */
+  .onboarding-main-column {
+    padding: 1.5rem 1.25rem 5rem !important;
+    height: auto !important;
+    overflow-y: visible !important;
+    min-height: 0 !important;
+    width: 100% !important;
+  }
+
+  .onboarding-main-content {
+    max-width: 100% !important;
+    padding-bottom: 80px !important;
+  }
+
+  /* === Step Two: stack form + preview === */
+  .step-two-layout {
+    flex-direction: column !important;
+    width: 100% !important;
+    gap: 1.5rem !important;
+    margin-top: 1rem !important;
+  }
+
+  .step-two-form {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+
+  .step-two-preview {
+    position: static !important;
+    width: 100% !important;
+    margin-top: 1.5rem !important;
+    margin-left: 0 !important;
+    top: auto !important;
+  }
+
+  /* Side-by-side rows stack vertically */
+  .form-row.side-by-side {
+    flex-direction: column !important;
+    gap: 0 !important;
+  }
+
+  /* === Bottom Action Bar: full width === */
+  .onboarding-actions-bottom {
+    left: 0 !important;
+    padding: 0.75rem 1.25rem !important;
+  }
+
+  .onboarding-actions-wrapper {
+    max-width: 100% !important;
+  }
+
+  .btn-wide {
+    max-width: 100% !important;
+    font-size: 0.9rem !important;
+  }
+
+  /* Typography */
+  .step-title {
+    font-size: 1.2rem !important;
+  }
+
+  .step-description {
+    font-size: 0.875rem !important;
+  }
+}
+
+/* ---- Small Mobile (max 480px) ---- */
+@media (max-width: 480px) {
+  .login-left {
+    padding: 1.5rem 1rem 5rem !important;
+  }
+
+  .login-title {
+    font-size: 1.5rem !important;
+  }
+
+  .onboarding-main-column {
+    padding: 1rem 1rem 6rem !important;
+  }
+
+  .step-title {
+    font-size: 1.1rem !important;
+  }
+
+  .vertical-step-circle {
+    width: 28px !important;
+    height: 28px !important;
+    font-size: 0.7rem !important;
+    min-width: 28px !important;
+  }
+}
