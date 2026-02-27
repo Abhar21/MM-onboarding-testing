@@ -47,9 +47,9 @@ function App() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Screen & Step State
-  const [currentScreen, setCurrentScreen] = useState<'login' | 'onboarding'>(() => {
+  const [currentScreen, setCurrentScreen] = useState<'login' | 'onboarding' | 'success'>(() => {
     const savedScreen = localStorage.getItem('onboardingScreen');
-    return (savedScreen as 'login' | 'onboarding') || 'login';
+    return (savedScreen as 'login' | 'onboarding' | 'success') || 'login';
   });
   const [currentStep, setCurrentStep] = useState(1);
 
@@ -193,16 +193,11 @@ function App() {
 
   const submitFinal = () => {
     console.log('Final Submission Data:', formData);
-    alert('Account Created Successfully!');
     // Clear persisted data upon success
     localStorage.removeItem('onboardingScreen');
     localStorage.removeItem('onboardingStep');
     localStorage.removeItem('onboardingFormData');
-    setCurrentScreen('login');
-    setCurrentStep(1);
-    setIsTimerActive(false);
-    setTimer(59);
-    setHasSentOtp(false);
+    setCurrentScreen('success');
   };
 
   const renderStepIndicator = () => {
@@ -259,6 +254,7 @@ function App() {
       <div className="form-group">
         <label className="input-label">Company Email ID</label>
         <input type="email" name="companyEmail" className="input-field" value={formData.companyEmail} onChange={handleInputChange} placeholder="hello@company.com" />
+        <p className="field-helper-text">⚠️ Please provide the correct email ID — invoices, credit notes and all communications will be sent to this email.</p>
       </div>
       <div className="form-group">
         <label className="input-label">Password</label>
@@ -552,6 +548,14 @@ function App() {
           <div className="form-separator">Catering Specific Details</div>
           <div className="form-group">
             <label className="input-label">FSSAI Number</label>
+            <div className="requirements-info-box">
+              <p className="requirements-title">Requirements</p>
+              <ul className="requirements-list">
+                <li>The FSSAI certificate should either match the name of the restaurant or the owner</li>
+                <li>The address on FSSAI certificate should match the address of the restaurant</li>
+                <li>The FSSAI certificate should not be expiring before 30 days</li>
+              </ul>
+            </div>
             <input type="text" name="fssaiNumber" className="input-field" value={formData.fssaiNumber} onChange={handleInputChange} placeholder="FSSAI License Number" />
           </div>
           <div className="form-group">
@@ -696,6 +700,37 @@ function App() {
     </div>
   );
 
+  if (currentScreen === 'success') {
+    return (
+      <div className="success-screen">
+        <div className="success-card">
+          <div className="success-icon-wrapper">
+            <svg className="success-tick" viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="26" cy="26" r="26" fill="#22c55e" />
+              <path fill="none" stroke="white" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" d="M14 27l8 8 16-16" />
+            </svg>
+          </div>
+          <h2 className="success-title">Submission Successful!</h2>
+          <p className="success-message">
+            Our team will review your documents, and your account will be activated within <strong>12–48 hours</strong>.
+          </p>
+          <button
+            className="btn btn-primary-blue success-home-btn"
+            onClick={() => {
+              setCurrentScreen('login');
+              setCurrentStep(1);
+              setIsTimerActive(false);
+              setTimer(59);
+              setHasSentOtp(false);
+            }}
+          >
+            Back to Home
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   if (currentScreen === 'onboarding') {
     return (
       <div className="onboarding-full-layout">
@@ -707,6 +742,20 @@ function App() {
 
           <div className="onboarding-sidebar-content">
             {renderStepIndicator()}
+          </div>
+
+          {/* Mobile-only login link in top bar */}
+          <div className="mobile-login-link-bar">
+            <a href="#" onClick={(e) => { e.preventDefault(); setCurrentScreen('login'); }}>
+              Login
+            </a>
+          </div>
+
+          <div className="sidebar-login-footer">
+            <p className="sidebar-login-text">
+              Already have an account?{' '}
+              <a href="#" onClick={(e) => { e.preventDefault(); setCurrentScreen('login'); }}>Login</a>
+            </p>
           </div>
         </div>
 
@@ -826,6 +875,9 @@ function App() {
             >
               Create Account
             </button>
+            <p className="login-link-text">
+              Already have an account? <a href="#">Login</a>
+            </p>
           </form>
         </div>
 
