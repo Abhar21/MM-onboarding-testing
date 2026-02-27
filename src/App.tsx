@@ -188,22 +188,15 @@ function App() {
     }));
   };
 
-  const scrollToTop = () => {
-    // Scroll the main column container back to top
+  // Scroll to top on every step change — runs AFTER re-render
+  useEffect(() => {
     const mainCol = document.querySelector('.onboarding-main-column');
     if (mainCol) mainCol.scrollTop = 0;
-    // Also scroll window in case of mobile layout
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+  }, [currentStep]);
 
-  const nextStep = () => {
-    setCurrentStep(prev => Math.min(prev + 1, 5));
-    scrollToTop();
-  };
-  const prevStep = () => {
-    setCurrentStep(prev => Math.max(prev - 1, 1));
-    scrollToTop();
-  };
+  const nextStep = () => setCurrentStep(prev => Math.min(prev + 1, 5));
+  const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 1));
 
   const submitFinal = () => {
     console.log('Final Submission Data:', formData);
@@ -559,7 +552,7 @@ function App() {
 
       {formData.businessService === 'catering' && (
         <>
-          <div className="form-separator">Catering Specific Details</div>
+          <div className="form-separator">Specific Details</div>
           <div className="form-group">
             <label className="input-label">FSSAI Number</label>
             <div className="requirements-info-box">
