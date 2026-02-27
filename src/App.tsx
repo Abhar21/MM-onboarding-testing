@@ -36,20 +36,26 @@ interface FormData {
 }
 
 function App() {
-  // Login State
+  // Create Account (Signup) State
   const [mobile, setMobile] = useState('');
   const [otp, setOtp] = useState('');
-  const [agreed, setAgreed] = useState(false);
   const [timer, setTimer] = useState(0);
   const [isTimerActive, setIsTimerActive] = useState(false);
   const [hasSentOtp, setHasSentOtp] = useState(false);
+
+  // Login State
+  const [loginId, setLoginId] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
+
+  // Password visibility toggles for onboarding Step 1
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Screen & Step State
-  const [currentScreen, setCurrentScreen] = useState<'login' | 'onboarding' | 'success'>(() => {
+  const [currentScreen, setCurrentScreen] = useState<'login' | 'signup' | 'onboarding' | 'success'>(() => {
     const savedScreen = localStorage.getItem('onboardingScreen');
-    return (savedScreen as 'login' | 'onboarding' | 'success') || 'login';
+    return (savedScreen as 'login' | 'signup' | 'onboarding' | 'success') || 'login';
   });
   const [currentStep, setCurrentStep] = useState(1);
 
@@ -106,10 +112,7 @@ function App() {
     localStorage.setItem('onboardingFormData', JSON.stringify(formData));
   }, [formData]);
 
-  // Check if login form is fully valid to enable clicking 'Create Account'
-  const isMobileValid = mobile.length === 10;
-  const isSignUpValid = isMobileValid && otp.trim() !== '' && agreed;
-
+  // Signup (Create Account) Logic
   useEffect(() => {
     let interval: ReturnType<typeof setInterval>;
     if (isTimerActive && timer > 0) {
@@ -123,9 +126,11 @@ function App() {
   }, [isTimerActive, timer]);
 
   const handleSendOtp = () => {
-    setTimer(59);
-    setIsTimerActive(true);
-    setHasSentOtp(true);
+    if (mobile.length === 10) {
+      setTimer(59);
+      setIsTimerActive(true);
+      setHasSentOtp(true);
+    }
   };
 
   const handleMobileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -744,10 +749,19 @@ function App() {
         {/* Left Side: Sidebar */}
         <div className="onboarding-sidebar-column">
           <div className="onboarding-sidebar-header">
-            <p className="sidebar-subtitle">MyPartner Onboarding</p>
+            {/* Desktop Brand */}
+            <p className="sidebar-subtitle desktop-only">MyPartner Onboarding</p>
+            {/* Mobile Brand */}
+            <div className="mobile-brand-container mobile-only">
+              <svg width="28" height="28" viewBox="0 0 24 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0 0H12L24 12V20L12 8H0V0Z" fill="#0077ff" />
+                <path d="M0 12H12L24 24V32L12 20H0V12Z" fill="#0077ff" fillOpacity="0.7" />
+              </svg>
+              <span className="mobile-brand-name">MyPartner</span>
+            </div>
           </div>
 
-          <div className="onboarding-sidebar-content">
+          <div className="onboarding-sidebar-content desktop-only">
             {renderStepIndicator()}
           </div>
 
@@ -758,7 +772,7 @@ function App() {
             </a>
           </div>
 
-          <div className="sidebar-login-footer">
+          <div className="sidebar-login-footer desktop-only">
             <p className="sidebar-login-text">
               Already have an account?{' '}
               <a href="#" onClick={(e) => { e.preventDefault(); setCurrentScreen('login'); }}>Login</a>
@@ -769,6 +783,15 @@ function App() {
         {/* Right Side: Main Form */}
         <div className="onboarding-main-column">
           <div className={`onboarding-main-content ${currentStep === 2 ? 'wide' : ''}`}>
+            {/* Mobile-only Step Numbers below the header line */}
+            <div className="mobile-only mobile-step-progress-row">
+              {[1, 2, 3, 4, 5].map(s => (
+                <div key={s} className={`mobile-step-circle ${currentStep === s ? 'active' : currentStep > s ? 'completed' : ''}`}>
+                  {s}
+                </div>
+              ))}
+            </div>
+
             <div className="onboarding-step-form-area">
               {currentStep === 1 && renderStep1()}
               {currentStep === 2 && renderStep2()}
@@ -806,90 +829,186 @@ function App() {
     );
   }
 
-  return (
-    <div className="login-container">
-      {/* Left Form Side */}
-      <div className="login-left">
-        <div className="logo-container">
-          <svg width="32" height="32" viewBox="0 0 24 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0 0H12L24 12V20L12 8H0V0Z" fill="#1e293b" />
-            <path d="M0 12H12L24 24V32L12 20H0V12Z" fill="#1e293b" />
-          </svg>
-        </div>
-
-        <div className="login-form-container">
-          <h1 className="login-title">Get Started Now</h1>
-          <p className="login-subtitle">Enter your credentials to access your account</p>
-
-          <form onSubmit={(e) => { e.preventDefault(); setCurrentScreen('onboarding'); }}>
-            <div className="form-group">
-              <label className="input-label" htmlFor="mobile">Mobile Number</label>
-              <div className="flex" style={{ gap: '0.75rem' }}>
-                <div className="input-group" style={{ flex: 1 }}>
-                  <span className="input-prefix">+91</span>
-                  <input
-                    type="tel"
-                    id="mobile"
-                    className="input-field"
-                    placeholder="234 567 8900"
-                    value={mobile}
-                    onChange={handleMobileChange}
-                  />
-                </div>
-                <button
-                  type="button"
-                  className={`btn send-otp-btn ${!isMobileValid || isTimerActive ? 'disabled' : ''}`}
-                  disabled={!isMobileValid || isTimerActive}
-                  onClick={handleSendOtp}
-                  style={{ width: '120px' }}
-                >
-                  {isTimerActive
-                    ? `0:${timer < 10 ? '0' : ''}${timer}`
-                    : hasSentOtp
-                      ? 'Send Again'
-                      : 'Send OTP'}
-                </button>
+  const renderAuthLayout = (children: React.ReactNode) => (
+    <div className="login-page">
+      <div className="login-panel-left">
+        <div className="login-panel-content">
+          <div className="login-brand">
+            <svg width="36" height="36" viewBox="0 0 24 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M0 0H12L24 12V20L12 8H0V0Z" fill="white" />
+              <path d="M0 12H12L24 24V32L12 20H0V12Z" fill="white" fillOpacity="0.7" />
+            </svg>
+            <span className="login-brand-name">MyPartner</span>
+          </div>
+          <div className="login-panel-hero">
+            <h2>{currentScreen === 'login' ? 'Grow your business with MyPartner' : 'Join the MyPartner community'}</h2>
+            <p>{currentScreen === 'login' ? 'Join thousands of restaurant and catering partners delivering great experiences' : 'Start your journey today and reach more customers than ever before'}</p>
+            <div className="login-panel-stats">
+              <div className="login-stat">
+                <span className="login-stat-number">10K+</span>
+                <span className="login-stat-label">Partners</span>
+              </div>
+              <div className="login-stat">
+                <span className="login-stat-number">50+</span>
+                <span className="login-stat-label">Cities</span>
+              </div>
+              <div className="login-stat">
+                <span className="login-stat-number">4.8★</span>
+                <span className="login-stat-label">Rating</span>
               </div>
             </div>
-
-            <div className="form-group">
-              <label className="input-label" htmlFor="otp">OTP</label>
-              <input
-                type="text"
-                id="otp"
-                className="input-field"
-                placeholder="Enter 6-digit OTP"
-                value={otp}
-                onChange={(e) => setOtp(e.target.value)}
-              />
-            </div>
-
-            <div className="checkbox-group">
-              <input
-                type="checkbox"
-                id="terms"
-                checked={agreed}
-                onChange={(e) => setAgreed(e.target.checked)}
-              />
-              <label htmlFor="terms">I agree to the <a href="#">Terms &amp; Privacy</a></label>
-            </div>
-
-            <button
-              type="submit"
-              className={`btn create-account-btn ${!isSignUpValid ? 'disabled' : ''}`}
-              style={{ marginTop: '0.5rem', height: '48px' }}
-              disabled={!isSignUpValid}
-            >
-              Create Account
-            </button>
-            <p className="login-link-text">
-              Already have an account? <a href="#">Login</a>
-            </p>
-          </form>
+          </div>
         </div>
-
+      </div>
+      <div className="login-panel-right">
+        <div className="login-form-box">
+          {children}
+        </div>
       </div>
     </div>
+  );
+
+  if (currentScreen === 'signup') {
+    return renderAuthLayout(
+      <>
+        <div className="login-form-header">
+          <h1 className="login-form-title">Create Account</h1>
+          <p className="login-form-subtitle">Enter your details to get started</p>
+        </div>
+
+        <form onSubmit={(e) => { e.preventDefault(); setCurrentScreen('onboarding'); }} className="login-form">
+          <div className="form-group">
+            <label className="input-label" htmlFor="signupMobile">Mobile Number</label>
+            <div className="input-group-with-icon">
+              <input
+                type="tel"
+                id="signupMobile"
+                className="input-field"
+                placeholder="Enter 10-digit mobile"
+                value={mobile}
+                onChange={handleMobileChange}
+                maxLength={10}
+              />
+              <button
+                type="button"
+                className={`otp-inside-btn ${(mobile.length !== 10 || isTimerActive) ? 'disabled' : ''}`}
+                onClick={handleSendOtp}
+                disabled={mobile.length !== 10 || isTimerActive}
+              >
+                {isTimerActive ? `0:${timer < 10 ? '0' : ''}${timer}` : hasSentOtp ? 'Resend' : 'Send'}
+              </button>
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label className="input-label" htmlFor="signupOtp">OTP</label>
+            <input
+              type="text"
+              id="signupOtp"
+              className="input-field"
+              placeholder="Enter 6-digit OTP"
+              value={otp}
+              onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+              maxLength={6}
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="btn btn-primary-blue login-submit-btn"
+            disabled={mobile.length !== 10 || otp.length !== 6}
+          >
+            Create Account
+          </button>
+
+          <p className="signup-agreement-text">
+            By clicking you agree to our <a href="#">Terms & Conditions</a> and <a href="#">Privacy Policy</a>
+          </p>
+
+          <p className="login-register-text">
+            Already have an account?{' '}
+            <a href="#" onClick={(e) => { e.preventDefault(); setCurrentScreen('login'); }}>Login</a>
+          </p>
+        </form>
+      </>
+    );
+  }
+
+  // Default: Login screen
+  return renderAuthLayout(
+    <>
+      <div className="login-form-header">
+        <h1 className="login-form-title">Welcome back</h1>
+        <p className="login-form-subtitle">Sign in to your partner account</p>
+      </div>
+
+      <form onSubmit={(e) => { e.preventDefault(); setCurrentScreen('onboarding'); }} className="login-form">
+        <div className="form-group">
+          <label className="input-label" htmlFor="loginId">Mobile Number / Email ID / Partner ID</label>
+          <input
+            type="text"
+            id="loginId"
+            className="input-field"
+            placeholder="Enter mobile, email or partner ID"
+            value={loginId}
+            onChange={(e) => setLoginId(e.target.value)}
+            autoComplete="username"
+          />
+        </div>
+
+        <div className="form-group">
+          <div className="login-label-row">
+            <label className="input-label" htmlFor="loginPassword">Password</label>
+          </div>
+          <div className="input-group-with-icon">
+            <input
+              type={showLoginPassword ? 'text' : 'password'}
+              id="loginPassword"
+              className="input-field"
+              placeholder="Enter your password"
+              value={loginPassword}
+              onChange={(e) => setLoginPassword(e.target.value)}
+              autoComplete="current-password"
+            />
+            <button
+              type="button"
+              className="password-toggle"
+              onClick={() => setShowLoginPassword(p => !p)}
+              tabIndex={-1}
+            >
+              {showLoginPassword ? (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
+                  <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
+                  <line x1="1" y1="1" x2="23" y2="23" />
+                </svg>
+              ) : (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+              )}
+            </button>
+          </div>
+          <div className="forgot-password-container">
+            <a href="#" className="forgot-password-link">Forgot password?</a>
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          className="btn btn-primary-blue login-submit-btn"
+          disabled={!loginId.trim() || !loginPassword.trim()}
+        >
+          Login
+        </button>
+
+        <p className="login-register-text">
+          Don't have an account?{' '}
+          <a href="#" onClick={(e) => { e.preventDefault(); setCurrentScreen('signup'); }}>Create Account</a>
+        </p>
+      </form>
+    </>
   );
 }
 

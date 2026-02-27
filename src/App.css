@@ -1449,3 +1449,460 @@ input[type="file"].input-field::file-selector-button:hover {
 .requirements-list li:last-child {
   margin-bottom: 0;
 }
+
+/* ============================================================
+   LOGIN PAGE — Two-Panel Layout
+   ============================================================ */
+.login-page {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* Left decorative panel */
+.login-panel-left {
+  width: 42%;
+  background: linear-gradient(145deg, #1e3a5f 0%, #1a56db 60%, #0ea5e9 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.login-panel-left::before {
+  content: '';
+  position: absolute;
+  top: -80px;
+  right: -80px;
+  width: 320px;
+  height: 320px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 50%;
+}
+
+.login-panel-left::after {
+  content: '';
+  position: absolute;
+  bottom: -100px;
+  left: -60px;
+  width: 280px;
+  height: 280px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 50%;
+}
+
+.login-panel-content {
+  position: relative;
+  z-index: 1;
+  color: white;
+  width: 100%;
+  max-width: 340px;
+}
+
+.login-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 3rem;
+}
+
+.login-brand-name {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: white;
+  letter-spacing: -0.02em;
+}
+
+.login-panel-hero h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: white;
+  margin-bottom: 0.85rem;
+}
+
+.login-panel-hero>p {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.75);
+  line-height: 1.6;
+  margin-bottom: 2.5rem;
+}
+
+.login-panel-stats {
+  display: flex;
+  gap: 2rem;
+}
+
+.login-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.login-stat-number {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: white;
+}
+
+.login-stat-label {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.65);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Right form panel */
+.login-panel-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 2.5rem;
+  background: #f8fafc;
+}
+
+.login-form-box {
+  width: 100%;
+  max-width: 440px;
+  background: white;
+  border-radius: 20px;
+  padding: 3rem 2.5rem;
+  box-shadow: 0 4px 40px rgba(0, 0, 0, 0.06);
+}
+
+.login-form-header {
+  margin-bottom: 2rem;
+}
+
+.login-form-title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #1e293b;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.03em;
+}
+
+.login-form-subtitle {
+  font-size: 0.95rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.login-form .form-group {
+  margin-bottom: 1.5rem;
+}
+
+.login-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.login-label-row .input-label {
+  margin-bottom: 0;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.input-group-with-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-group-with-icon .input-field {
+  padding-right: 48px;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 12px;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  transition: color 0.2s;
+}
+
+.password-toggle:hover {
+  color: #64748b;
+}
+
+.forgot-password-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.5rem;
+}
+
+.forgot-password-link {
+  font-size: 0.85rem;
+  color: #0077ff;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.forgot-password-link:hover {
+  text-decoration: underline;
+}
+
+.login-submit-btn {
+  width: 100%;
+  height: 52px;
+  margin-top: 1rem;
+  font-size: 1rem;
+  font-weight: 700;
+  border-radius: 12px;
+  background: #e2e8f0;
+  color: #94a3b8;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.login-submit-btn:not(:disabled) {
+  background: #0077ff;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 119, 255, 0.2);
+}
+
+.login-submit-btn:not(:disabled):hover {
+  background: #0066dd;
+  transform: translateY(-1px);
+}
+
+.login-register-text {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #64748b;
+  margin-top: 2rem;
+  font-weight: 500;
+}
+
+.login-register-text a {
+  color: #0077ff;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.login-register-text a:hover {
+  text-decoration: underline;
+}
+
+.input-field {
+  width: 100%;
+  height: 48px;
+  padding: 0.75rem 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  color: #1e293b;
+  background: white;
+  transition: all 0.2s;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: #0077ff;
+  box-shadow: 0 0 0 3px rgba(0, 119, 255, 0.1);
+}
+
+.input-field::placeholder {
+  color: #94a3b8;
+}
+
+/* Mobile responsive for login page */
+@media (max-width: 768px) {
+  .login-page {
+    flex-direction: column;
+  }
+
+  .login-panel-left {
+    display: none;
+    /* Removed the top hero section on mobile */
+  }
+
+  .login-brand {
+    margin-bottom: 1.5rem;
+  }
+
+  .login-panel-hero>p {
+    margin-bottom: 2rem;
+  }
+
+  .login-panel-right {
+    padding: 2rem 1rem;
+    background: #f8fafc;
+  }
+
+  .login-form-box {
+    padding: 2.5rem 1.5rem;
+    border-radius: 16px;
+  }
+}
+
+/* Signup Specific Styles */
+.otp-inside-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: #0077ff;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 8px 16px;
+  /* Added more padding as requested */
+  border-radius: 8px;
+  transition: all 0.2s;
+  z-index: 2;
+}
+
+.otp-inside-btn:hover:not(.disabled) {
+  background: rgba(0, 119, 255, 0.05);
+}
+
+.otp-inside-btn.disabled {
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.signup-agreement-text {
+  text-align: center;
+  font-size: 0.75rem;
+  /* Reduced for a more subtle look */
+  color: #64748b;
+  margin-top: 1.25rem;
+  line-height: 1.5;
+}
+
+.signup-agreement-text a {
+  color: #0077ff;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.signup-agreement-text a:hover {
+  text-decoration: underline;
+}
+
+/* Ensure padding-right on input field to accommodate the button */
+.input-group-with-icon .input-field {
+  padding-right: 100px;
+  /* Increased for wider button */
+}
+
+/* Step Indicator Refinement (Mobile) */
+.desktop-only {
+  display: block;
+}
+
+.mobile-only {
+  display: none;
+}
+
+.mobile-brand-container {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.mobile-brand-name {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #1e293b;
+  letter-spacing: -0.02em;
+}
+
+.mobile-step-progress-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  /* Reduced top gap */
+  margin-bottom: 1.5rem;
+  /* Slightly reduced bottom gap */
+  /* padding-bottom and border-bottom removed */
+}
+
+.mobile-step-circle {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1.5px solid #cbd5e1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #64748b;
+  background: white;
+  transition: all 0.2s;
+}
+
+.mobile-step-circle.active {
+  border-color: #0077ff;
+  background: #f0f7ff;
+  color: #0077ff;
+}
+
+.mobile-step-circle.completed {
+  background: #0077ff;
+  border-color: #0077ff;
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .desktop-only {
+    display: none !important;
+  }
+
+  .mobile-only {
+    display: flex !important;
+  }
+
+  .onboarding-sidebar-column {
+    padding: 0.75rem 1rem !important;
+    height: 60px !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    background: white !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 1000 !important;
+  }
+
+  .onboarding-sidebar-header {
+    margin-bottom: 0 !important;
+  }
+
+  .onboarding-main-column {
+    padding-top: 60px !important;
+  }
+
+  .onboarding-main-content {
+    padding: 1.5rem 1rem !important;
+  }
+
+  .onboarding-step-form-area {
+    margin-top: 0 !important;
+  }
+}
