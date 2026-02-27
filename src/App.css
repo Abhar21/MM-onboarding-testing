@@ -433,7 +433,8 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 3rem 0;
+  padding: 2.25rem 0 0 0;
+  /* Reduced top gap, removed bottom padding for footer alignment */
   position: sticky;
   top: 0;
   height: 100vh;
@@ -1042,58 +1043,18 @@ input[type="file"].input-field::file-selector-button:hover {
     overflow: visible !important;
   }
 
-  /* Sidebar becomes a horizontal step bar at top */
-  .onboarding-sidebar-column {
-    width: 100% !important;
-    min-width: 0 !important;
-    height: auto !important;
-    flex-direction: row !important;
-    padding: 0.6rem 1rem !important;
-    border-right: none !important;
-    border-bottom: 1px solid var(--border) !important;
-    position: sticky !important;
-    top: 0 !important;
-    z-index: 200 !important;
-    overflow: visible !important;
-    justify-content: flex-start !important;
-    align-items: center !important;
-  }
-
+  /* Sidebar content / step indicator elements - hidden on mobile */
   .onboarding-sidebar-header {
     display: none !important;
   }
 
   .onboarding-sidebar-content {
-    flex: none !important;
-    padding: 0 !important;
-    width: 100% !important;
-    overflow: visible !important;
+    display: none !important;
   }
 
-  /* Step pills lay out horizontally */
+  /* Step pills not used in mobile (uses mobile-step-progress-row instead) */
   .vertical-step-indicator {
-    flex-direction: row !important;
-    gap: 0.4rem !important;
-    margin-bottom: 0 !important;
-    overflow: visible !important;
-    padding-bottom: 0 !important;
-    white-space: normal !important;
-    flex-shrink: 1 !important;
-  }
-
-  .vertical-step-item {
-    flex-direction: row !important;
-    align-items: center !important;
-    gap: 0.25rem !important;
-    min-height: unset !important;
-    flex-shrink: 1 !important;
-  }
-
-  .vertical-step-circle {
-    width: 32px !important;
-    height: 32px !important;
-    font-size: 0.75rem !important;
-    min-width: 32px !important;
+    display: none !important;
   }
 
   /* Hide the vertical connector line */
@@ -1115,8 +1076,7 @@ input[type="file"].input-field::file-selector-button:hover {
   .onboarding-main-column {
     padding: 1.5rem 1.25rem 5rem !important;
     height: auto !important;
-    overflow-y: visible !important;
-    min-height: 0 !important;
+    overflow-y: auto !important;
     width: 100% !important;
   }
 
@@ -1329,27 +1289,46 @@ input[type="file"].input-field::file-selector-button:hover {
   text-decoration: underline;
 }
 
-/* Sidebar Login Footer */
+/* Sidebar Branding & Footer */
+.onboarding-brand-group {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Horizontally centered side-by-side */
+  gap: 1rem;
+  padding: 0 0.5rem 1.5rem 0.5rem;
+}
+
+.onboarding-brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.onboarding-brand-name {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #1e293b;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
 .sidebar-login-footer {
   position: fixed;
   bottom: 0;
   left: 0;
   width: 320px;
   height: 61px;
-  padding: 0 2rem;
   border-top: 1px solid var(--border);
-  border-right: 1px solid var(--border);
   background-color: var(--background-secondary);
   text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  line-height: 61px;
   z-index: 1000;
 }
 
 .sidebar-login-text {
-  font-size: 0.8rem;
-  color: var(--text-secondary);
+  font-size: 0.85rem;
+  color: #64748b;
+  vertical-align: middle;
 }
 
 .sidebar-login-text a {
@@ -1369,24 +1348,75 @@ input[type="file"].input-field::file-selector-button:hover {
   }
 }
 
-/* Mobile-only Login Link in Top Bar */
-.mobile-login-link-bar {
+/* Ensure mobile progress row is strictly hidden on desktop */
+.mobile-step-progress-row.mobile-only {
+  display: none !important;
+}
+
+@media (max-width: 768px) {
+  .mobile-step-progress-row.mobile-only {
+    display: flex !important;
+    justify-content: center !important;
+    padding: 1.25rem 1rem !important;
+    gap: 0 !important;
+    /* Circles and lines handle their own spacing */
+  }
+
+  .mobile-step-pill-wrapper {
+    display: flex;
+    align-items: center;
+    position: relative;
+    /* Circles + lines loop */
+  }
+
+  .mobile-step-connecting-line {
+    width: 35px;
+    /* Adjust length to fit circles naturally */
+    height: 2px;
+    background-color: #e2e8f0;
+    transition: all 0.3s ease;
+  }
+
+  .mobile-step-connecting-line.active {
+    background-color: #0077ff;
+  }
+}
+
+/* Mobile Top Header: Brand & Login */
+.mobile-top-nav {
   display: none;
 }
 
 @media (max-width: 768px) {
-  .mobile-login-link-bar {
+  .mobile-top-nav {
     display: flex !important;
+    width: 100%;
+    justify-content: space-between;
     align-items: center;
-    position: absolute;
-    right: 1rem;
-    top: 50%;
-    transform: translateY(-50%);
-    flex-shrink: 0;
-    z-index: 10;
+    padding: 0.5rem 1rem;
+    background-color: white;
+    position: relative;
+    z-index: 100;
   }
 
-  .mobile-login-link-bar a {
+  .mobile-branding {
+    display: flex !important;
+    justify-content: flex-start !important;
+    padding: 0 !important;
+    gap: 0.5rem !important;
+  }
+
+  .mobile-brand-name {
+    font-size: 1.1rem !important;
+    font-weight: 700 !important;
+  }
+
+  .mobile-login-link-container {
+    display: flex;
+    align-items: center;
+  }
+
+  .mobile-login-btn {
     font-size: 0.75rem;
     font-weight: 600;
     color: var(--primary);
@@ -1396,9 +1426,10 @@ input[type="file"].input-field::file-selector-button:hover {
     border-radius: 6px;
     padding: 0.25rem 0.6rem;
     background: white;
+    transition: all 0.2s ease;
   }
 
-  .mobile-login-link-bar a:hover {
+  .mobile-login-btn:hover {
     background-color: var(--primary);
     color: white;
   }
@@ -1683,8 +1714,24 @@ input[type="file"].input-field::file-selector-button:hover {
   text-align: center;
   font-size: 0.9rem;
   color: #64748b;
-  margin-top: 2rem;
+  margin: 0;
   font-weight: 500;
+}
+
+.login-footer-text-wrap {
+  width: calc(100% + 5rem);
+  /* Extends past the card padding (2.5rem * 2) */
+  height: 61px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-top: 1px solid #e2e8f0;
+  background: #f8fafc;
+  margin-left: -2.5rem;
+  margin-right: -2.5rem;
+  margin-bottom: -3rem;
+  margin-top: 1.5rem;
+  border-radius: 0 0 20px 20px;
 }
 
 .login-register-text a {
@@ -1840,8 +1887,8 @@ input[type="file"].input-field::file-selector-button:hover {
 }
 
 .mobile-step-circle {
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   border: 1.5px solid #cbd5e1;
   display: flex;
@@ -1851,12 +1898,14 @@ input[type="file"].input-field::file-selector-button:hover {
   font-weight: 700;
   color: #64748b;
   background: white;
-  transition: all 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 2;
+  position: relative;
 }
 
 .mobile-step-circle.active {
   border-color: #0077ff;
-  background: #f0f7ff;
+  background: white;
   color: #0077ff;
 }
 
@@ -1878,16 +1927,21 @@ input[type="file"].input-field::file-selector-button:hover {
   .onboarding-sidebar-column {
     padding: 0.75rem 1rem !important;
     height: 60px !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    box-sizing: border-box !important;
     flex-direction: row !important;
     align-items: center !important;
     justify-content: space-between !important;
     border-bottom: 1px solid #e2e8f0 !important;
+    border-right: none !important;
     background: white !important;
     position: fixed !important;
     top: 0 !important;
     left: 0 !important;
     right: 0 !important;
     z-index: 1000 !important;
+    overflow: hidden !important;
   }
 
   .onboarding-sidebar-header {

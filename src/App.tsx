@@ -749,15 +749,15 @@ function App() {
         {/* Left Side: Sidebar */}
         <div className="onboarding-sidebar-column">
           <div className="onboarding-sidebar-header">
-            {/* Desktop Brand */}
-            <p className="sidebar-subtitle desktop-only">MyPartner Onboarding</p>
-            {/* Mobile Brand */}
-            <div className="mobile-brand-container mobile-only">
+            {/* Main Brand Logo & Name (Shown on both or just desktop sidebar) */}
+            <div className="onboarding-brand-group">
               <svg width="28" height="28" viewBox="0 0 24 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M0 0H12L24 12V20L12 8H0V0Z" fill="#0077ff" />
                 <path d="M0 12H12L24 24V32L12 20H0V12Z" fill="#0077ff" fillOpacity="0.7" />
               </svg>
-              <span className="mobile-brand-name">MyPartner</span>
+              <div className="onboarding-brand-text">
+                <span className="onboarding-brand-name">MyPartner</span>
+              </div>
             </div>
           </div>
 
@@ -765,18 +765,27 @@ function App() {
             {renderStepIndicator()}
           </div>
 
-          {/* Mobile-only login link in top bar */}
-          <div className="mobile-login-link-bar">
-            <a href="#" onClick={(e) => { e.preventDefault(); setCurrentScreen('login'); }}>
-              Login
-            </a>
+          {/* Mobile Top Header: Brand (Left) & Login (Right) */}
+          <div className="mobile-only mobile-top-nav">
+            <div className="onboarding-brand-group mobile-branding">
+              <svg width="22" height="22" viewBox="0 0 24 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0 0H12L24 12V20L12 8H0V0Z" fill="#0077ff" />
+                <path d="M0 12H12L24 24V32L12 20H0V12Z" fill="#0077ff" fillOpacity="0.7" />
+              </svg>
+              <span className="onboarding-brand-name mobile-brand-name">MyPartner</span>
+            </div>
+            <div className="mobile-login-link-container">
+              <a href="#" className="mobile-login-btn" onClick={(e) => { e.preventDefault(); setCurrentScreen('login'); }}>
+                Login
+              </a>
+            </div>
           </div>
 
           <div className="sidebar-login-footer desktop-only">
-            <p className="sidebar-login-text">
+            <span className="sidebar-login-text">
               Already have an account?{' '}
               <a href="#" onClick={(e) => { e.preventDefault(); setCurrentScreen('login'); }}>Login</a>
-            </p>
+            </span>
           </div>
         </div>
 
@@ -785,9 +794,14 @@ function App() {
           <div className={`onboarding-main-content ${currentStep === 2 ? 'wide' : ''}`}>
             {/* Mobile-only Step Numbers below the header line */}
             <div className="mobile-only mobile-step-progress-row">
-              {[1, 2, 3, 4, 5].map(s => (
-                <div key={s} className={`mobile-step-circle ${currentStep === s ? 'active' : currentStep > s ? 'completed' : ''}`}>
-                  {s}
+              {[1, 2, 3, 4, 5].map((s, index) => (
+                <div key={s} className="mobile-step-pill-wrapper">
+                  <div className={`mobile-step-circle ${currentStep === s ? 'active' : currentStep > s ? 'completed' : ''}`}>
+                    {s}
+                  </div>
+                  {index < 4 && (
+                    <div className={`mobile-step-connecting-line ${currentStep > s ? 'active' : ''}`} />
+                  )}
                 </div>
               ))}
             </div>
@@ -861,8 +875,10 @@ function App() {
         </div>
       </div>
       <div className="login-panel-right">
-        <div className="login-form-box">
-          {children}
+        <div className="login-right-inner">
+          <div className="login-form-box">
+            {children}
+          </div>
         </div>
       </div>
     </div>
@@ -924,12 +940,13 @@ function App() {
           <p className="signup-agreement-text">
             By clicking you agree to our <a href="#">Terms & Conditions</a> and <a href="#">Privacy Policy</a>
           </p>
-
+        </form>
+        <div className="login-footer-text-wrap">
           <p className="login-register-text">
             Already have an account?{' '}
             <a href="#" onClick={(e) => { e.preventDefault(); setCurrentScreen('login'); }}>Login</a>
           </p>
-        </form>
+        </div>
       </>
     );
   }
