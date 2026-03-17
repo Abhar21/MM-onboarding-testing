@@ -901,6 +901,7 @@ const ServiceSettings = () => {
   const [sectionEditingIndex, setSectionEditingIndex] = useState<number | null>(null);
   const [menuActionId, setMenuActionId] = useState<number | null>(null);
   const [selectedMenuAction, setSelectedMenuAction] = useState<'hide' | 'delete' | null>(null);
+  const [menuEditingId, setMenuEditingId] = useState<number | null>(null);
 
   // States for item-level creation
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -947,6 +948,7 @@ const ServiceSettings = () => {
     setCurrentSection({ name: '', type: 'All Included', items: [], limit: 0 });
     setIsAddingSection(false);
     setSectionEditingIndex(null);
+    setMenuEditingId(null);
   };
 
   const currentSettings = settings[activeCategory as keyof typeof settings];
@@ -1150,6 +1152,7 @@ const ServiceSettings = () => {
                             image: menu.image
                           });
                           setSections([...menu.sections]);
+                          setMenuEditingId(menu.id);
                           setMenuStep(1);
                           setIsAddingMenu(true);
                         }}
@@ -1277,8 +1280,10 @@ const ServiceSettings = () => {
                 <div className="modal-container medium-large">
                   <div className="modal-header">
                     <div className="modal-title-group">
-                      <h3 className="modal-title">Create New Menu</h3>
-                      <p className="modal-subtitle">Create menu basics before adding food sections</p>
+                      <h3 className="modal-title">{menuEditingId ? 'Edit Menu' : 'Create New Menu'}</h3>
+                      <p className="modal-subtitle">
+                        {menuEditingId ? 'Update menu basics and food sections' : 'Create menu basics before adding food sections'}
+                      </p>
                     </div>
                     <button className="close-modal" onClick={resetAddMenu}>
                       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
@@ -1707,19 +1712,32 @@ const ServiceSettings = () => {
                         <button
                           className="btn btn-primary-blue"
                           onClick={() => {
-                            const newMenuObj = {
-                              id: menus.length + 1,
-                              name: menuIdentity.name,
-                              price: parseInt(menuIdentity.price) || 0,
-                              status: 'Active',
-                              category: activeCategory,
-                              minMembers: menuIdentity.minMembers,
-                              maxMembers: menuIdentity.maxMembers,
-                              foodType: menuIdentity.foodType,
-                              image: menuIdentity.image,
-                              sections: [...sections]
-                            };
-                            setMenus(prev => [...prev, newMenuObj]);
+                            if (menuEditingId) {
+                              setMenus(prev => prev.map(m => m.id === menuEditingId ? {
+                                ...m,
+                                name: menuIdentity.name,
+                                price: parseInt(menuIdentity.price) || 0,
+                                minMembers: menuIdentity.minMembers,
+                                maxMembers: menuIdentity.maxMembers,
+                                foodType: menuIdentity.foodType,
+                                image: menuIdentity.image,
+                                sections: [...sections]
+                              } : m));
+                            } else {
+                              const newMenuObj = {
+                                id: menus.length + 1,
+                                name: menuIdentity.name,
+                                price: parseInt(menuIdentity.price) || 0,
+                                status: 'Active',
+                                category: activeCategory,
+                                minMembers: menuIdentity.minMembers,
+                                maxMembers: menuIdentity.maxMembers,
+                                foodType: menuIdentity.foodType,
+                                image: menuIdentity.image,
+                                sections: [...sections]
+                              };
+                              setMenus(prev => [...prev, newMenuObj]);
+                            }
                             resetAddMenu();
                           }}
                         >
