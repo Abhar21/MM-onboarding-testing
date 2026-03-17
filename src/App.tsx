@@ -843,6 +843,178 @@ const Documents = () => {
   );
 };
 
+const Settings = () => {
+  const [activeTab, setActiveTab] = useState('account');
+
+  const tabs = [
+    { id: 'account', label: 'Account' },
+    { id: 'subscription', label: 'Subscription' },
+    { id: 'security', label: 'Security' },
+    { id: 'danger', label: 'Danger Zone' },
+  ];
+
+  const billingHistory = [
+    { id: 'INV-102', date: 'Mar 01, 2026', amount: '₹1,999', status: 'Paid' },
+    { id: 'INV-091', date: 'Feb 01, 2026', amount: '₹1,999', status: 'Paid' },
+    { id: 'INV-084', date: 'Jan 01, 2026', amount: '₹1,999', status: 'Paid' },
+  ];
+
+  return (
+    <div className="settings-container-v4">
+      <div className="section-header">
+        <h2 className="section-title">Settings</h2>
+        <p className="section-subtitle">Manage your account preferences, subscription, and security.</p>
+      </div>
+
+      <div className="settings-content-v4">
+        <div className="settings-tabs-v4">
+          {tabs.map(tab => (
+            <button
+              key={tab.id}
+              className={`settings-tab-btn-v4 ${activeTab === tab.id ? 'active' : ''} ${tab.id === 'danger' ? 'danger-tab' : ''}`}
+              onClick={() => setActiveTab(tab.id)}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="settings-panel-v4">
+          {activeTab === 'account' && (
+            <div className="settings-pane-v4">
+              <h3 className="pane-title">Account Settings</h3>
+              <div className="settings-form-v4">
+                <div className="form-group">
+                  <label className="input-label">Mobile Number</label>
+                  <div className="input-with-action-v4">
+                    <input type="text" className="input-field" value="+91 98765 43210" readOnly />
+                    <button className="settings-action-link-v4">Change</button>
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label className="input-label">Email Address</label>
+                  <div className="input-with-action-v4">
+                    <input type="email" className="input-field" value="contact@cateringbiz.com" readOnly />
+                    <button className="settings-action-link-v4">Change</button>
+                  </div>
+                </div>
+                <div className="form-group">
+                  <div className="notification-settings-v4">
+                    <h4 className="sub-title">Notification Preferences</h4>
+                    <div className="toggle-row-v4">
+                      <span>Order Updates (WhatsApp)</span>
+                      <label className="switch-v4">
+                        <input type="checkbox" defaultChecked />
+                        <span className="slider-v4 round"></span>
+                      </label>
+                    </div>
+                    <div className="toggle-row-v4">
+                      <span>Marketing Emails</span>
+                      <label className="switch-v4">
+                        <input type="checkbox" />
+                        <span className="slider-v4 round"></span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <button className="btn btn-primary-blue save-settings-btn-v4">Save Changes</button>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'subscription' && (
+            <div className="settings-pane-v4">
+              <h3 className="pane-title">Subscription Plan</h3>
+              <div className="subscription-card-v4">
+                <div className="plan-info-v4">
+                  <div className="plan-badge-v4">Premium Plan</div>
+                  <div className="plan-price-v4">₹1,999 <span className="period-v4">/ month</span></div>
+                  <p className="renewal-date-v4">Next renewal: <strong>April 01, 2026</strong></p>
+                </div>
+                <button className="upgrade-plan-btn-v4">Upgrade Plan</button>
+              </div>
+
+              <h4 className="sub-title-margin">Billing History</h4>
+              <div className="table-responsive">
+                <table className="settings-table-v4">
+                  <thead>
+                    <tr>
+                      <th>Invoice ID</th>
+                      <th>Date</th>
+                      <th>Amount</th>
+                      <th>Status</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {billingHistory.map(inv => (
+                      <tr key={inv.id}>
+                        <td className="inv-id-v4">{inv.id}</td>
+                        <td>{inv.date}</td>
+                        <td>{inv.amount}</td>
+                        <td><span className="status-paid-v4">{inv.status}</span></td>
+                        <td><button className="download-inv-v4">Download</button></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'security' && (
+            <div className="settings-pane-v4">
+              <h3 className="pane-title">Security</h3>
+              <div className="security-section-v4">
+                <div className="security-row-v4">
+                  <div className="security-info-v4">
+                    <strong>Password</strong>
+                    <span>Last changed 3 months ago</span>
+                  </div>
+                  <button className="btn-secondary-v4">Change Password</button>
+                </div>
+                <div className="security-divider-v4"></div>
+                <div className="security-row-v4">
+                  <div className="security-info-v4">
+                    <strong>Last Login</strong>
+                    <span>March 17, 2026 • 10:45 AM (Bengaluru, India)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'danger' && (
+            <div className="settings-pane-v4">
+              <h3 className="pane-title danger-title">Danger Zone</h3>
+              <div className="danger-box-v4">
+                <div className="danger-item-v4">
+                  <div className="danger-info-v4">
+                    <strong>Deactivate Account</strong>
+                    <span>Temporarily hide your business from the platform. You can reactivate anytime.</span>
+                  </div>
+                  <button className="danger-action-btn-v4">Deactivate</button>
+                </div>
+                <div className="danger-divider-v4"></div>
+                <div className="danger-item-v4">
+                  <div className="danger-info-v4">
+                    <strong>Request Account Closure</strong>
+                    <span>Permanently close your partner account. This action cannot be undone.</span>
+                  </div>
+                  <button className="danger-action-btn-v4 closure">Request Closure</button>
+                </div>
+                <p className="danger-notice-v4">
+                  Note: For security reasons, direct account deletion is not allowed. Please contact support if you need immediate assistance.
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const ServiceSettings = () => {
   const [activeCategory, setActiveCategory] = useState('breakfast');
 
@@ -1829,37 +2001,85 @@ const VendorProfile = () => {
     fileName: ''
   });
 
+  const [showEditProfileModal, setShowEditProfileModal] = useState(false);
+  const [profileForm, setProfileForm] = useState({
+    mobile: '',
+    email: '',
+    address: '',
+    businessImage: null as File | null,
+    businessImageName: ''
+  });
+
+  const [verification, setVerification] = useState({
+    mobileOtpSent: false,
+    mobileOtp: '',
+    mobileVerified: false,
+    emailOtpSent: false,
+    emailOtp: '',
+    emailVerified: false
+  });
+
+
+  const handleOpenEditProfile = () => {
+    setProfileForm({
+      mobile: profileData.owner.mobile,
+      email: profileData.owner.email,
+      address: profileData.business.address,
+      businessImage: null,
+      businessImageName: ''
+    });
+    setVerification({
+      mobileOtpSent: false,
+      mobileOtp: '',
+      mobileVerified: true, // Initially true as it's the current number
+      emailOtpSent: false,
+      emailOtp: '',
+      emailVerified: true // Initially true
+    });
+    setShowEditProfileModal(true);
+  };
+
   return (
     <div className="profile-v4-container">
       {/* Top Fixed Header */}
       <div className="profile-top-header-v4">
-        <h1 className="biz-name-v4">{profileData.header.name}</h1>
-        
-        <div className="header-meta-row-v4">
-          <div className="v-id-badge-v4">{profileData.header.id}</div>
-          
-          <div className="status-pill-v4">
-            <span className="status-dot-v4"></span>
-            <span className="status-text-v4">{profileData.header.status}</span>
+        <div className="header-main-row-v4">
+          <div className="header-left-v4">
+            <h1 className="biz-name-v4">{profileData.header.name}</h1>
+            
+            <div className="header-meta-row-v4">
+              <div className="v-id-badge-v4">{profileData.header.id}</div>
+              
+              <div className="status-pill-v4">
+                <span className="status-dot-v4"></span>
+                <span className="status-text-v4">{profileData.header.status}</span>
+              </div>
+              
+              <div className="meta-divider-v4"></div>
+              
+              <div className="meta-item-v4">
+                <span className="m-label-v4">Joined:</span>
+                <span className="m-value-v4">{profileData.header.joined}</span>
+              </div>
+              
+              <div className="meta-item-v4">
+                <span className="m-label-v4">GST Type:</span>
+                <span className="m-value-v4 gst-regular-v4">{profileData.header.gstType}</span>
+              </div>
+              
+              <div className="meta-divider-v4"></div>
+              
+              <div className="meta-item-v4">
+                <span className="m-label-v4">Service:</span>
+                <span className="m-value-v4 service-type-v4">{profileData.header.service}</span>
+              </div>
+            </div>
           </div>
-          
-          <div className="meta-divider-v4"></div>
-          
-          <div className="meta-item-v4">
-            <span className="m-label-v4">Joined:</span>
-            <span className="m-value-v4">{profileData.header.joined}</span>
-          </div>
-          
-          <div className="meta-item-v4">
-            <span className="m-label-v4">GST Type:</span>
-            <span className="m-value-v4 gst-regular-v4">{profileData.header.gstType}</span>
-          </div>
-          
-          <div className="meta-divider-v4"></div>
-          
-          <div className="meta-item-v4">
-            <span className="m-label-v4">Service:</span>
-            <span className="m-value-v4 service-type-v4">{profileData.header.service}</span>
+          <div className="header-right-v4">
+            <button className="edit-profile-btn-v4" onClick={handleOpenEditProfile}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+              Edit Profile
+            </button>
           </div>
         </div>
       </div>
@@ -2137,6 +2357,7 @@ const VendorProfile = () => {
 
       {/* Secure Bank Edit Modal */}
       {showBankEditModal && (
+        // ... (existing bank modal logic remains same, just ensuring div closures)
         <div className="bank-modal-overlay-v4">
           <div className="bank-modal-v4">
             <div className="modal-header-v4">
@@ -2268,6 +2489,167 @@ const VendorProfile = () => {
           </div>
         </div>
       )}
+
+      {/* Edit Profile Modal */}
+      {showEditProfileModal && (
+        <div className="bank-modal-overlay-v4">
+          <div className="profile-edit-modal-v4 centered-modal-v4">
+            <div className="modal-header-v4">
+              <div className="modal-title-group-v4">
+                <div className="modal-icon-v4 profile-edit-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                </div>
+                <div>
+                  <h3>Edit Profile</h3>
+                  <p>Update your basic profile information.</p>
+                </div>
+              </div>
+              <button className="modal-close-v4" onClick={() => setShowEditProfileModal(false)}>×</button>
+            </div>
+
+            <div className="modal-body-v4">
+              <div className="profile-edit-vertical-v4">
+                <div className="form-group-v4">
+                  <label>Business Image</label>
+                  <div className="biz-image-upload-v4">
+                    <input 
+                      type="file" 
+                      id="biz-image-input" 
+                      className="bank-hidden-file-input-v4"
+                      accept="image/*"
+                      onChange={(e) => {
+                        if (e.target.files && e.target.files[0]) {
+                          setProfileForm({...profileForm, businessImage: e.target.files[0], businessImageName: e.target.files[0].name});
+                        }
+                      }}
+                    />
+                    <label htmlFor="biz-image-input" className="biz-image-label-v4">
+                      {profileForm.businessImageName ? (
+                        <div className="biz-image-preview-v4">
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
+                          <span>{profileForm.businessImageName}</span>
+                        </div>
+                      ) : (
+                        <div className="biz-image-placeholder-v4">
+                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                          <span>Click to change business image</span>
+                        </div>
+                      )}
+                    </label>
+                  </div>
+                </div>
+
+                <div className="form-group-v4">
+                  <label>Mobile Number</label>
+                  <div className="integrated-input-v4">
+                    <input 
+                      type="text" 
+                      placeholder="Enter 10-digit mobile"
+                      value={profileForm.mobile}
+                      onChange={(e) => {
+                        setProfileForm({...profileForm, mobile: e.target.value});
+                        if (e.target.value !== profileData.owner.mobile) {
+                          setVerification({...verification, mobileVerified: false});
+                        }
+                      }}
+                    />
+                    {!verification.mobileVerified && !verification.mobileOtpSent && profileForm.mobile.length >= 10 && (
+                      <button className="send-btn-v4" onClick={() => setVerification({...verification, mobileOtpSent: true})}>Send</button>
+                    )}
+                    {verification.mobileVerified && (
+                      <span className="verified-status-v4">Verified</span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="form-group-v4">
+                  <label>Email Address</label>
+                  <div className="integrated-input-v4">
+                    <input 
+                      type="email" 
+                      placeholder="Enter email address"
+                      value={profileForm.email}
+                      onChange={(e) => {
+                        setProfileForm({...profileForm, email: e.target.value});
+                        if (e.target.value !== profileData.owner.email) {
+                          setVerification({...verification, emailVerified: false});
+                        }
+                      }}
+                    />
+                    {!verification.emailVerified && !verification.emailOtpSent && profileForm.email.includes('@') && (
+                      <button className="send-btn-v4" onClick={() => setVerification({...verification, emailOtpSent: true})}>Send</button>
+                    )}
+                    {verification.emailVerified && (
+                      <span className="verified-status-v4">Verified</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* OTP Verfication Pop-up Overlay (scoped to modal body) */}
+              {(verification.mobileOtpSent || verification.emailOtpSent) && (
+                <div className="otp-popup-overlay-v4">
+                  <div className="otp-popup-card-v4">
+                    <h3>Enter OTP</h3>
+                    <p>Enter the code sent to your {verification.mobileOtpSent ? 'Mobile' : 'Email'}</p>
+                    <div className="otp-input-row-v4">
+                      <input 
+                        type="text" 
+                        maxLength={6}
+                        placeholder="••••••"
+                        value={verification.mobileOtpSent ? verification.mobileOtp : verification.emailOtp}
+                        onChange={(e) => {
+                          if (verification.mobileOtpSent) {
+                            setVerification({...verification, mobileOtp: e.target.value});
+                          } else {
+                            setVerification({...verification, emailOtp: e.target.value});
+                          }
+                        }}
+                      />
+                    </div>
+                    <div className="otp-actions-v4">
+                      <button className="otp-cancel-v4" onClick={() => setVerification({...verification, mobileOtpSent: false, emailOtpSent: false, mobileOtp: '', emailOtp: ''})}>Cancel</button>
+                      <button 
+                        className="otp-verify-v4" 
+                        onClick={() => {
+                          if (verification.mobileOtpSent) {
+                            setVerification({...verification, mobileVerified: true, mobileOtpSent: false});
+                          } else {
+                            setVerification({...verification, emailVerified: true, emailOtpSent: false});
+                          }
+                        }}
+                      >
+                        Verify
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="modal-footer-v4 pt-0">
+              <button className="cancel-btn-v4" onClick={() => setShowEditProfileModal(false)}>Cancel</button>
+              <button 
+                className="submit-btn-v4"
+                disabled={!verification.mobileVerified && !verification.emailVerified}
+                onClick={() => {
+                  setProfileData(prev => ({
+                    ...prev,
+                    owner: {
+                      ...prev.owner,
+                      mobile: profileForm.mobile,
+                      email: profileForm.email
+                    }
+                  }));
+                  setShowEditProfileModal(false);
+                }}
+              >
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -2374,6 +2756,14 @@ const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
               <circle cx="12" cy="7" r="4"></circle>
             </svg>
           )
+        },
+        {
+          id: 'settings', label: 'Settings', icon: (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1Z"></path>
+            </svg>
+          )
         }
       ]
     }
@@ -2440,7 +2830,8 @@ const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
           {activeTab === 'documents' && <Documents />}
           {activeTab === 'service-settings' && <ServiceSettings />}
           {activeTab === 'profile' && <VendorProfile />}
-          {!['dashboard', 'tickets', 'documents', 'service-settings', 'profile'].includes(activeTab) && (
+          {activeTab === 'settings' && <Settings />}
+          {!['dashboard', 'tickets', 'documents', 'service-settings', 'profile', 'settings'].includes(activeTab) && (
             <div className="placeholder-screen">
               <h2>{activeTab.charAt(0).toUpperCase() + activeTab.slice(1).replace('-', ' ')}</h2>
               <p>This screen is coming soon.</p>
