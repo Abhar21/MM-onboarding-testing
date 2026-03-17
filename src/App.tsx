@@ -1168,51 +1168,95 @@ const ServiceSettings = () => {
                         Delete / Hide
                       </button>
 
-                      {menuActionId === menu.id && (
-                        <div className="menu-actions-popup selection-mode">
-                          <div className="popup-title">Manage Menu</div>
-                          <div className="action-options">
-                            <label className={`action-option ${selectedMenuAction === 'hide' ? 'selected' : ''}`} onClick={() => setSelectedMenuAction('hide')}>
-                              <div className="radio-dot"></div>
-                              <span>{menu.status === 'Disabled' ? 'Show Menu' : 'Hide Menu'}</span>
-                            </label>
-                            <label className={`action-option ${selectedMenuAction === 'delete' ? 'selected' : ''}`} onClick={() => setSelectedMenuAction('delete')}>
-                              <div className="radio-dot"></div>
-                              <span>Delete Menu</span>
-                            </label>
-                          </div>
-                          <div className="popup-actions">
-                            <button 
-                              className="popup-btn reset" 
-                              onClick={() => {
-                                setMenuActionId(null);
-                                setSelectedMenuAction(null);
-                              }}
-                            >
-                              Cancel
-                            </button>
-                            <button 
-                              className="popup-btn confirm"
-                              disabled={!selectedMenuAction}
-                              onClick={() => {
-                                if (selectedMenuAction === 'hide') {
-                                  setMenus(menus.map(m => m.id === menu.id ? { ...m, status: m.status === 'Disabled' ? 'Active' : 'Disabled' } : m));
-                                } else if (selectedMenuAction === 'delete') {
-                                  setMenus(menus.filter(m => m.id !== menu.id));
-                                }
-                                setMenuActionId(null);
-                                setSelectedMenuAction(null);
-                              }}
-                            >
-                              Okay
-                            </button>
-                          </div>
-                        </div>
-                      )}
+                      {/* Existing Edit/Delete buttons */}
                     </div>
                   </div>
                 </div>
               ))}
+
+              {menuActionId && (
+                <div className="modal-overlay" onClick={() => {
+                  setMenuActionId(null);
+                  setSelectedMenuAction(null);
+                }}>
+                  <div className="modal-container mini" onClick={e => e.stopPropagation()}>
+                    <div className="modal-header">
+                      <div className="modal-title-group">
+                        <h3 className="modal-title">Manage Menu</h3>
+                        <p className="modal-subtitle">Choose an action for this menu</p>
+                      </div>
+                      <button className="close-modal" onClick={() => {
+                        setMenuActionId(null);
+                        setSelectedMenuAction(null);
+                      }}>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                      </button>
+                    </div>
+
+                    <div className="modal-content" style={{ padding: '0 1.5rem 1.5rem' }}>
+                      <div className="action-options-modal">
+                        {(() => {
+                          const menu = menus.find(m => m.id === menuActionId);
+                          if (!menu) return null;
+                          return (
+                            <>
+                              <label className={`action-option-v2 ${selectedMenuAction === 'hide' ? 'selected' : ''}`} onClick={() => setSelectedMenuAction('hide')}>
+                                <div className="option-radio">
+                                  <div className="radio-inner"></div>
+                                </div>
+                                <div className="option-info">
+                                  <span className="option-label">{menu.status === 'Disabled' ? 'Show Menu' : 'Hide Menu'}</span>
+                                  <span className="option-desc">{menu.status === 'Disabled' ? 'Make this menu visible to customers' : 'Temporarily hide this menu from customers'}</span>
+                                </div>
+                              </label>
+
+                              <label className={`action-option-v2 ${selectedMenuAction === 'delete' ? 'selected' : ''}`} onClick={() => setSelectedMenuAction('delete')}>
+                                <div className="option-radio">
+                                  <div className="radio-inner"></div>
+                                </div>
+                                <div className="option-info">
+                                  <span className="option-label delete">Delete Menu</span>
+                                  <span className="option-desc">Permanently remove this menu and its sections</span>
+                                </div>
+                              </label>
+                            </>
+                          );
+                        })()}
+                      </div>
+                    </div>
+
+                    <div className="modal-footer" style={{ borderTop: '1px solid #f1f5f9', padding: '1.25rem 1.5rem' }}>
+                      <div className="footer-right" style={{ width: '100%', justifyContent: 'flex-end', gap: '0.75rem' }}>
+                        <button 
+                          className="btn btn-ghost" 
+                          onClick={() => {
+                            setMenuActionId(null);
+                            setSelectedMenuAction(null);
+                          }}
+                        >
+                          Cancel
+                        </button>
+                        <button 
+                          className="btn btn-primary-blue"
+                          disabled={!selectedMenuAction}
+                          style={{ minWidth: '100px' }}
+                          onClick={() => {
+                            if (selectedMenuAction === 'hide') {
+                              setMenus(menus.map(m => m.id === menuActionId ? { ...m, status: m.status === 'Disabled' ? 'Active' : 'Disabled' } : m));
+                            } else if (selectedMenuAction === 'delete') {
+                              setMenus(menus.filter(m => m.id !== menuActionId));
+                            }
+                            setMenuActionId(null);
+                            setSelectedMenuAction(null);
+                          }}
+                        >
+                          Okay
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
               {menus.filter(m => m.category === activeCategory).length === 0 && (
                 <div className="empty-menu-state">
                   <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z"></path><path d="M3 9V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4"></path><path d="M13 13h4"></path><path d="M13 17h4"></path><path d="M7 13h2v4H7z"></path></svg>
