@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, Fragment } from 'react';
 import { Routes, Route, useNavigate, Navigate, Link } from 'react-router-dom';
 import './App.css';
 
@@ -595,55 +595,1163 @@ const AuthLayout = ({ children, currentScreen }: { children: React.ReactNode, cu
   </div>
 );
 
-const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
-  const sidebarItems = [
-    {
-      id: 'dashboard', label: 'Dashboard', icon: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <rect x="3" y="3" width="7" height="7"></rect>
-          <rect x="14" y="3" width="7" height="7"></rect>
-          <rect x="14" y="14" width="7" height="7"></rect>
-          <rect x="3" y="14" width="7" height="7"></rect>
-        </svg>
-      )
-    },
-    {
-      id: 'orders', label: 'Orders', icon: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
-          <line x1="3" y1="6" x2="21" y2="6"></line>
-          <path d="M16 10a4 4 0 0 1-8 0"></path>
-        </svg>
-      )
-    },
-    {
-      id: 'customers', label: 'Customers', icon: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-          <circle cx="9" cy="7" r="4"></circle>
-          <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-        </svg>
-      )
-    },
-    {
-      id: 'reports', label: 'Reports', icon: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <line x1="18" y1="20" x2="18" y2="10"></line>
-          <line x1="12" y1="20" x2="12" y2="4"></line>
-          <line x1="6" y1="20" x2="6" y2="14"></line>
-        </svg>
-      )
-    },
-    {
-      id: 'settings', label: 'Settings', icon: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="12" cy="12" r="3"></circle>
-          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1Z"></path>
-        </svg>
-      )
-    },
+const Tickets = () => {
+  const [category, setCategory] = useState('');
+  const [bookingId, setBookingId] = useState('');
+  const [description, setDescription] = useState('');
+  const [files, setFiles] = useState<File[]>([]);
+  const [tickets, setTickets] = useState([
+    { id: 'TKT-8842', category: 'Payment / Payout Issue', date: 'Oct 24, 2023', status: 'In Review' },
+    { id: 'TKT-8711', category: 'Technical Issue', date: 'Oct 20, 2023', status: 'Resolved' },
+    { id: 'TKT-8605', category: 'Booking Issue', date: 'Oct 15, 2023', status: 'Resolved' },
+  ]);
+
+  const categories = [
+    'Booking Issue',
+    'Payment / Payout Issue',
+    'Customer Dispute',
+    'Technical Issue',
+    'Document Issue',
+    'Other'
   ];
+
+  const recentBookings = [
+    { id: 'BK-5521', customer: 'Amit Sharma', date: 'Oct 28, 2023' },
+    { id: 'BK-5489', customer: 'Priya Verma', date: 'Oct 25, 2023' },
+    { id: 'BK-5430', customer: 'Suresh Raina', date: 'Oct 22, 2023' },
+  ];
+
+  const showBookingId = ['Booking Issue', 'Payment / Payout Issue', 'Customer Dispute'].includes(category);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const selectedFiles = Array.from(e.target.files);
+      if (files.length + selectedFiles.length > 5) {
+        alert('Max 5 files allowed');
+        return;
+      }
+      setFiles(prev => [...prev, ...selectedFiles]);
+    }
+  };
+
+  const removeFile = (index: number) => {
+    setFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const newTicket = {
+      id: `TKT-${Math.floor(1000 + Math.random() * 9000)}`,
+      category,
+      date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      status: 'Open'
+    };
+    setTickets([newTicket, ...tickets]);
+    // Reset form
+    setCategory('');
+    setBookingId('');
+    setDescription('');
+    setFiles([]);
+    alert('Ticket submitted successfully!');
+  };
+
+  return (
+    <div className="tickets-container">
+      <div className="section-header">
+        <h2 className="section-title">Support Tickets</h2>
+        <p className="section-subtitle">Raise a new issue or track your recent support requests.</p>
+      </div>
+
+      <div className="ticket-grid">
+        <div className="ticket-form-card">
+          <h3 className="card-title">Create New Ticket</h3>
+          <form onSubmit={handleSubmit} className="ticket-form">
+            <div className="form-group">
+              <label className="input-label">Issue Category</label>
+              <select
+                className="input-field"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                required
+              >
+                <option value="">Select Category</option>
+                {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+              </select>
+            </div>
+
+            <div className={`form-group ${!showBookingId ? 'disabled-group' : ''}`}>
+              <label className="input-label">Booking ID</label>
+              <select
+                className="input-field"
+                value={bookingId}
+                onChange={(e) => setBookingId(e.target.value)}
+                required={showBookingId}
+                disabled={!showBookingId}
+              >
+                <option value="">{showBookingId ? 'Select Recent Booking' : 'Not applicable for this category'}</option>
+                {recentBookings.map(b => (
+                  <option key={b.id} value={b.id}>
+                    {b.id} — {b.customer} ({b.date})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label className="input-label">Describe Your Issue</label>
+              <textarea
+                className="input-field textarea-field"
+                placeholder="Tell us more about the problem you're facing..."
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                required
+              ></textarea>
+            </div>
+
+            <div className="form-group">
+              <label className="input-label">Proof Upload</label>
+              <div className="file-upload-wrapper">
+                <input
+                  type="file"
+                  id="ticket-files"
+                  multiple
+                  className="hidden-file-input"
+                  onChange={handleFileChange}
+                  accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                />
+                <label htmlFor="ticket-files" className="file-upload-dropzone">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                  <span>Click to upload or drag & drop</span>
+                  <p>Images, PDF, or DOC (Max 5 files, 10MB each)</p>
+                </label>
+              </div>
+              {files.length > 0 && (
+                <div className="ticket-file-list">
+                  {files.map((file, idx) => (
+                    <div key={idx} className="ticket-file-item">
+                      <span className="file-name">{file.name}</span>
+                      <button type="button" onClick={() => removeFile(idx)} className="remove-file-x">×</button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <button type="submit" className="btn btn-primary-blue submit-ticket-btn">
+              Submit Ticket
+            </button>
+          </form>
+        </div>
+
+        <div className="recent-tickets-card">
+          <h3 className="card-title">Recent Tickets</h3>
+          <div className="table-responsive">
+            <table className="tickets-table">
+              <thead>
+                <tr>
+                  <th>Ticket ID</th>
+                  <th>Category</th>
+                  <th>Created On</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {tickets.map(tkt => (
+                  <tr key={tkt.id}>
+                    <td className="ticket-id-cell">{tkt.id}</td>
+                    <td>{tkt.category}</td>
+                    <td>{tkt.date}</td>
+                    <td>
+                      <span className={`status-badge ${tkt.status.toLowerCase().replace(/\s/g, '-')}`}>
+                        {tkt.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const Documents = () => {
+  const platformPolicies = [
+    { name: 'Terms & Conditions', updated: '22 Jan 2026' },
+    { name: 'Privacy Policy', updated: '15 Feb 2026' },
+    { name: 'Refund & Cancellation Policy', updated: '10 Jan 2026' },
+    { name: 'TDS Policy', updated: '01 Mar 2026' },
+  ];
+
+  const vendorAgreement = { name: 'Vendor Agreement', accepted: '03 Mar 2026' };
+
+  return (
+    <div className="documents-container">
+      <div className="section-header">
+        <h2 className="section-title">Documents</h2>
+        <p className="section-subtitle">View and download your platform policies and signed agreements.</p>
+      </div>
+
+      <div className="documents-grid">
+        <div className="documents-card">
+          <h3 className="card-title">Platform Policies</h3>
+          <div className="document-list">
+            {platformPolicies.map((doc, idx) => (
+              <div key={idx} className="document-row">
+                <div className="doc-info">
+                  <div className="doc-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                  </div>
+                  <div>
+                    <span className="doc-name">{doc.name}</span>
+                    <span className="doc-date">Last Updated: {doc.updated}</span>
+                  </div>
+                </div>
+                <div className="doc-actions">
+                  <button className="doc-btn view-btn">View</button>
+                  <button className="doc-btn download-btn">Download</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="documents-card">
+          <h3 className="card-title">Vendor Agreement</h3>
+          <div className="document-list">
+            <div className="document-row">
+              <div className="doc-info">
+                <div className="doc-icon agreement-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><polyline points="17 11 19 13 23 9"></polyline></svg>
+                </div>
+                <div>
+                  <span className="doc-name">{vendorAgreement.name}</span>
+                  <span className="doc-date">Accepted on {vendorAgreement.accepted}</span>
+                </div>
+              </div>
+              <div className="doc-actions">
+                <button className="doc-btn view-btn">View</button>
+                <button className="doc-btn download-btn">Download</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const ServiceSettings = () => {
+  const [activeCategory, setActiveCategory] = useState('breakfast');
+
+  const categories = [
+    { id: 'breakfast', label: 'Breakfast', count: 3, status: 'Active' },
+    { id: 'lunch', label: 'Lunch', count: 3, status: 'Active' },
+    { id: 'snacks', label: 'Snacks', count: 3, status: 'Active' },
+    { id: 'dinner', label: 'Dinner', count: 3, status: 'Active' },
+  ];
+
+  const [settings, setSettings] = useState({
+    breakfast: { startTime: '07:00', endTime: '11:00', acceptingOrders: true, stopOrdersValue: '2', stopOrdersUnit: 'Hours', style: ['Buffet Service'] },
+    lunch: { startTime: '12:00', endTime: '15:30', acceptingOrders: true, stopOrdersValue: '4', stopOrdersUnit: 'Hours', style: ['Buffet Service', 'Sit-down Service'] },
+    snacks: { startTime: '16:00', endTime: '18:30', acceptingOrders: false, stopOrdersValue: '2', stopOrdersUnit: 'Hours', style: ['Buffet Service'] },
+    dinner: { startTime: '19:00', endTime: '23:00', acceptingOrders: true, stopOrdersValue: '1', stopOrdersUnit: 'Days', style: ['Buffet Service', 'Sit-down Service'] },
+  });
+
+  const [menus, setMenus] = useState([
+    {
+      id: 1, name: 'Standard Breakfast', price: 250, status: 'Active', category: 'breakfast',
+      minMembers: '20', maxMembers: '100', foodType: 'Veg', image: null as string | null,
+      sections: [
+        { name: 'Starters', type: 'All Included', limit: 0, items: [{ name: 'Idli', description: 'Steamed rice cakes', image: null as string | null }] }
+      ]
+    },
+    {
+      id: 2, name: 'Premium Lunch Buffet', price: 650, status: 'Active', category: 'lunch',
+      minMembers: '50', maxMembers: '200', foodType: 'Veg', image: null as string | null,
+      sections: []
+    },
+    {
+      id: 3, name: 'Evening Hi-Tea', price: 180, status: 'Disabled', category: 'snacks',
+      minMembers: '15', maxMembers: '50', foodType: 'Veg', image: null as string | null,
+      sections: []
+    },
+  ]);
+
+  const [isAddingMenu, setIsAddingMenu] = useState(false);
+  const [menuIdentity, setMenuIdentity] = useState({
+    name: '',
+    image: null as string | null,
+    foodType: 'Veg',
+    price: '',
+    minMembers: '',
+    maxMembers: ''
+  });
+  const [sections, setSections] = useState<any[]>([]);
+  const [currentSection, setCurrentSection] = useState({
+    name: '',
+    type: 'All Included',
+    items: [] as any[], // Changed to array of objects
+    limit: 0
+  });
+  const [isAddingSection, setIsAddingSection] = useState(false);
+  const [menuStep, setMenuStep] = useState(1);
+  const [sectionEditingIndex, setSectionEditingIndex] = useState<number | null>(null);
+
+  // States for item-level creation
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setMenuIdentity(prev => ({ ...prev, image: reader.result as string }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+
+  const handleSaveSection = () => {
+    if (sectionEditingIndex !== null) {
+      setSections(prev => {
+        const newSections = [...prev];
+        newSections[sectionEditingIndex] = currentSection;
+        return newSections;
+      });
+    } else {
+      setSections(prev => [...prev, currentSection]);
+    }
+    setCurrentSection({ name: '', type: 'All Included', items: [], limit: 0 });
+    setIsAddingSection(false);
+    setSectionEditingIndex(null);
+  };
+
+  const resetAddMenu = () => {
+    setIsAddingMenu(false);
+    setMenuStep(1);
+    setMenuIdentity({
+      name: '',
+      image: null,
+      foodType: 'Veg',
+      price: '',
+      minMembers: '',
+      maxMembers: ''
+    });
+    setSections([]);
+    setCurrentSection({ name: '', type: 'All Included', items: [], limit: 0 });
+    setIsAddingSection(false);
+    setSectionEditingIndex(null);
+  };
+
+  const currentSettings = settings[activeCategory as keyof typeof settings];
+
+  const handleToggle = () => {
+    setSettings(prev => ({
+      ...prev,
+      [activeCategory]: {
+        ...prev[activeCategory as keyof typeof prev],
+        acceptingOrders: !prev[activeCategory as keyof typeof prev].acceptingOrders
+      }
+    }));
+  };
+
+  const updateSetting = (field: string, value: any) => {
+    setSettings(prev => ({
+      ...prev,
+      [activeCategory]: {
+        ...prev[activeCategory as keyof typeof prev],
+        [field]: value
+      }
+    }));
+  };
+
+  return (
+    <div className="service-settings-container">
+      <div className="section-header">
+        <h2 className="section-title">Service Settings</h2>
+        <p className="section-subtitle">Manage your service timings, styles, and menu builder.</p>
+      </div>
+
+      <div className="service-settings-main">
+        <div className="category-sidebar-wrapper">
+          <div className="sidebar-header">
+            <h3 className="sidebar-section-title">Services</h3>
+          </div>
+          <div className="category-sidebar">
+            <div className="category-cards">
+              {categories.map(cat => (
+                <button
+                  key={cat.id}
+                  className={`category-card-btn ${activeCategory === cat.id ? 'active' : ''}`}
+                  onClick={() => setActiveCategory(cat.id)}
+                >
+                  <div className="cat-card-main">
+                    <div className="cat-info">
+                      <span className="cat-label">{cat.label}</span>
+                      <span className="cat-count">{cat.count} items</span>
+                    </div>
+                    <span className="cat-status-badge">Active</span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+        <div className="settings-content">
+          <div className="content-category-header">
+            <h3 className="category-title">{activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1)}</h3>
+            <div className="service-toggle-wrapper">
+              <span className="service-toggle-label">{currentSettings.acceptingOrders ? 'Accepting Orders' : 'Paused Orders'}</span>
+              <label className="service-switch">
+                <input type="checkbox" checked={currentSettings.acceptingOrders} onChange={handleToggle} />
+                <span className="service-slider round"></span>
+              </label>
+            </div>
+          </div>
+
+          <div className="settings-card">
+            <div className="settings-grid-rows">
+              <div className="settings-row">
+                <div className="form-group">
+                  <label className="input-label">Start Time</label>
+                  <input type="time" className="input-field" value={currentSettings.startTime} onChange={(e) => updateSetting('startTime', e.target.value)} />
+                </div>
+                <div className="form-group">
+                  <label className="input-label">End Time</label>
+                  <input type="time" className="input-field" value={currentSettings.endTime} onChange={(e) => updateSetting('endTime', e.target.value)} />
+                </div>
+              </div>
+
+              <div className="settings-row">
+                <div className="form-group">
+                  <label className="input-label">Manage Bookings</label>
+                  <input type="number" className="input-field" placeholder="Enter booking limit..." />
+                </div>
+                <div className="form-group">
+                  <label className="input-label">Stop Orders Before</label>
+                  <div className="stop-orders-wrapper">
+                    <input
+                      type="number"
+                      className="input-field stop-value"
+                      value={currentSettings.stopOrdersValue}
+                      onChange={(e) => updateSetting('stopOrdersValue', e.target.value)}
+                      min="1"
+                    />
+                    <select
+                      className="input-field stop-unit"
+                      value={currentSettings.stopOrdersUnit}
+                      onChange={(e) => updateSetting('stopOrdersUnit', e.target.value)}
+                    >
+                      <option>Hours</option>
+                      <option>Days</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="service-style-section">
+              <label className="input-label">Service Style Supported</label>
+              <div className="service-style-cards">
+                <div
+                  className={`style-card ${currentSettings.style.includes('Buffet Service') ? 'active' : ''}`}
+                  onClick={() => {
+                    const newStyles = currentSettings.style.includes('Buffet Service')
+                      ? currentSettings.style.filter(s => s !== 'Buffet Service')
+                      : [...currentSettings.style, 'Buffet Service'];
+                    updateSetting('style', newStyles);
+                  }}
+                >
+                  <div className="style-icon-wrapper">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path><path d="M7 2v20"></path><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"></path></svg>
+                  </div>
+                  <div className="style-info">
+                    <span className="style-name">Buffet Service</span>
+                    <span className="style-desc">Self-service meal style</span>
+                  </div>
+                  <div className="style-checkbox">
+                    {currentSettings.style.includes('Buffet Service') && <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>}
+                  </div>
+                </div>
+
+                <div
+                  className={`style-card ${currentSettings.style.includes('Sit-down Service') ? 'active' : ''}`}
+                  onClick={() => {
+                    const newStyles = currentSettings.style.includes('Sit-down Service')
+                      ? currentSettings.style.filter(s => s !== 'Sit-down Service')
+                      : [...currentSettings.style, 'Sit-down Service'];
+                    updateSetting('style', newStyles);
+                  }}
+                >
+                  <div className="style-icon-wrapper">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M7 21v-7a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v7"></path><path d="M4 11V4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v7"></path><path d="M12 2v10"></path></svg>
+                  </div>
+                  <div className="style-info">
+                    <span className="style-name">Sit-down Service</span>
+                    <span className="style-desc">Wait-staff table service</span>
+                  </div>
+                  <div className="style-checkbox">
+                    {currentSettings.style.includes('Sit-down Service') && <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="menu-builder-section">
+            <div className="menu-builder-header">
+              <h3 className="builder-title">Menu Builder</h3>
+              <button
+                className="btn btn-primary-blue add-menu-btn"
+                onClick={() => setIsAddingMenu(true)}
+              >
+                + Add Menu
+              </button>
+            </div>
+
+            <div className="menu-list">
+              {menus.filter(m => m.category === activeCategory).map(menu => (
+                <div key={menu.id} className="menu-card">
+                  <div className="menu-card-header">
+                    <div className="menu-header-left">
+                      <div className="menu-card-image-wrapper">
+                        {menu.image ? (
+                          <img src={menu.image} alt={menu.name} className="header-menu-image" />
+                        ) : (
+                          <div className="menu-image-placeholder">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                          </div>
+                        )}
+                      </div>
+                      <div className="menu-main-info">
+                        <h4>{menu.name}</h4>
+                        <div className="menu-meta">
+                          <span className="menu-price">₹{menu.price} per plate</span>
+                          <span className={`status-badge ${menu.status.toLowerCase()}`}>{menu.status}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="menu-actions">
+                      <button
+                        className="icon-btn edit-btn"
+                        onClick={() => {
+                          setMenuIdentity({
+                            name: menu.name,
+                            price: menu.price.toString(),
+                            minMembers: menu.minMembers,
+                            maxMembers: menu.maxMembers,
+                            foodType: menu.foodType,
+                            image: menu.image
+                          });
+                          setSections([...menu.sections]);
+                          setMenuStep(1);
+                          setIsAddingMenu(true);
+                        }}
+                      >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                        Edit
+                      </button>
+                      <button className="icon-btn disable-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>
+                        Disable
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              {menus.filter(m => m.category === activeCategory).length === 0 && (
+                <div className="empty-menu-state">
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z"></path><path d="M3 9V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4"></path><path d="M13 13h4"></path><path d="M13 17h4"></path><path d="M7 13h2v4H7z"></path></svg>
+                  <p>No menus added for this category yet.</p>
+                  <button
+                    className="btn btn-outline"
+                    style={{ marginTop: '1rem' }}
+                    onClick={() => setIsAddingMenu(true)}
+                  >
+                    Create First Menu
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {isAddingMenu && (
+              <div className="modal-overlay">
+                <div className="modal-container medium-large">
+                  <div className="modal-header">
+                    <div className="modal-title-group">
+                      <h3 className="modal-title">Create New Menu</h3>
+                      <p className="modal-subtitle">Create menu basics before adding food sections</p>
+                    </div>
+                    <button className="close-modal" onClick={resetAddMenu}>
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                  </div>
+
+                  <div className="modal-content">
+                    {menuStep === 1 && (
+                      <div className="step-content">
+                        <div className="commercial-setup-grid">
+                          {/* Block 1: Menu Identity */}
+                          <div className="form-section-flat">
+                            <h4 className="block-title">Menu Identity</h4>
+                            <div className="form-group full-width">
+                              <label className="input-label">Menu Name</label>
+                              <input
+                                type="text"
+                                className="input-field"
+                                placeholder="e.g. Standard Breakfast"
+                                value={menuIdentity.name}
+                                onChange={(e) => setMenuIdentity(prev => ({ ...prev, name: e.target.value }))}
+                              />
+                            </div>
+                          </div>
+
+                          <div className="form-section-flat">
+                            <div className="form-group" style={{ marginBottom: '1.5rem' }}>
+                              <label className="input-label">Food Type</label>
+                              <div className="radio-group-pills">
+                                {['Veg', 'Non-Veg'].map(type => (
+                                  <button
+                                    key={type}
+                                    className={`pill-btn ${type === 'Veg' ? 'pill-veg' : 'pill-non-veg'} ${menuIdentity.foodType === type ? 'active' : ''}`}
+                                    onClick={() => setMenuIdentity(prev => ({ ...prev, foodType: type }))}
+                                  >
+                                    <span className="pill-icon">
+                                      {type === 'Veg' ? (
+                                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="0.5" y="0.5" width="11" height="11" rx="1.5" stroke="currentColor" /><circle cx="6" cy="6" r="3" fill="currentColor" /></svg>
+                                      ) : (
+                                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="0.5" y="0.5" width="11" height="11" rx="1.5" stroke="currentColor" /><circle cx="6" cy="6" r="3" fill="currentColor" /></svg>
+                                      )}
+                                    </span>
+                                    {type}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+
+                            <div className="form-group" style={{ maxWidth: '320px', marginBottom: '1.5rem' }}>
+                              <label className="input-label">Price Per Person</label>
+                              <div className="input-with-prefix-fixed">
+                                <span className="prefix-fixed">₹</span>
+                                <input
+                                  type="number"
+                                  className="input-field pill-input"
+                                  placeholder="0"
+                                  value={menuIdentity.price}
+                                  onChange={(e) => setMenuIdentity(prev => ({ ...prev, price: e.target.value }))}
+                                />
+                              </div>
+                            </div>
+
+                            <div className="form-row-2" style={{ marginBottom: '1.5rem' }}>
+                              <div className="form-group">
+                                <label className="input-label">Minimum Members</label>
+                                <input
+                                  type="number"
+                                  className="input-field"
+                                  placeholder="Min pax"
+                                  value={menuIdentity.minMembers}
+                                  onChange={(e) => setMenuIdentity(prev => ({ ...prev, minMembers: e.target.value }))}
+                                />
+                                <span className="helper-text-label">Applicable booking size for this menu</span>
+                              </div>
+                              <div className="form-group">
+                                <label className="input-label">Maximum Members</label>
+                                <input
+                                  type="number"
+                                  className="input-field"
+                                  placeholder="Max pax"
+                                  value={menuIdentity.maxMembers}
+                                  onChange={(e) => setMenuIdentity(prev => ({ ...prev, maxMembers: e.target.value }))}
+                                />
+                                <span className="helper-text-label">Applicable booking size for this menu</span>
+                              </div>
+                            </div>
+
+                            <div className="form-group full-width">
+                              <label className="input-label">Menu Image</label>
+                              <input
+                                type="file"
+                                ref={fileInputRef}
+                                style={{ display: 'none' }}
+                                accept="image/*"
+                                onChange={handleImageUpload}
+                              />
+                              <div className="image-dashed-upload-v2" onClick={() => fileInputRef.current?.click()}>
+                                {menuIdentity.image ? (
+                                  <div className="upload-preview-container">
+                                    <img src={menuIdentity.image} alt="Menu Preview" className="upload-preview-img" />
+                                    <div className="upload-overlay-v2">
+                                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M23 4v6h-6"></path><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                                      <span>Change Image</span>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <>
+                                    <div className="upload-icon-circle">
+                                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                                    </div>
+                                    <div className="upload-texts">
+                                      <span className="upload-main">Click to upload menu image</span>
+                                      <span className="upload-sub">PNG, JPG or WebP (Max 5MB)</span>
+                                    </div>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {menuStep === 2 && (
+                      <div className="step-content">
+                        <h5 className="block-title" style={{ marginBottom: '0.75rem' }}>Example</h5>
+                        <div className="builder-helper-minimal" style={{ marginBottom: '1.5rem', background: '#f8fafc', padding: '1.25rem', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: 'none', minHeight: '140px' }}>
+                        </div>
+
+                        <div className="builder-header-minimal">
+                          <h4 className="builder-main-title">Sections</h4>
+                          <p className="builder-helper-text">Build food groups inside this menu</p>
+                          <div className="menu-status-hint">
+                            Menu was created you can customise or edit from dashboard
+                          </div>
+                        </div>
+
+                        {!isAddingSection && sections.length === 0 && (
+                          <div className="builder-empty-state">
+                            <div className="empty-state-card">
+                              <div className="empty-icon-wrap">
+                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20v-6M9 20V10M15 20V4"></path></svg>
+                              </div>
+                              <h5>No sections added yet</h5>
+                              <p>Start by creating your first food group like Starters or Main Course</p>
+                              <button
+                                className="btn btn-primary"
+                                onClick={() => {
+                                  setCurrentSection({ name: '', type: 'All Included', limit: 0, items: [{ name: '', description: '', image: null }] });
+                                  setIsAddingSection(true);
+                                }}
+                              >
+                                + Add First Section
+                              </button>
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="saved-sections-list">
+                          {sections.map((sec, idx) => {
+                            if (idx === sectionEditingIndex) return null;
+                            return (
+                              <div key={idx} className="section-summary-card">
+                              <div className="sec-sum-info">
+                                <span className="sec-sum-name">{sec.name}</span>
+                                <span className="sec-sum-rule">
+                                  {sec.type === 'All Included' ? 'All items included' : `Choose any ${sec.limit} from ${sec.items.length} items`}
+                                </span>
+                              </div>
+                              <div className="section-actions-inline">
+                                <button className="icon-btn edit-btn" onClick={() => {
+                                  setCurrentSection({ ...sec });
+                                  setSectionEditingIndex(idx);
+                                  setIsAddingSection(true);
+                                }}>
+                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                </button>
+                                <button className="icon-btn delete-btn" onClick={() => {
+                                  setSections(sections.filter((_, i) => i !== idx));
+                                }}>
+                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })}
+                        </div>
+
+                        {!isAddingSection && sections.length > 0 && (
+                          <div className="add-sec-bar-inline">
+                            <button
+                              className="btn btn-outline btn-sm"
+                              onClick={() => {
+                                setCurrentSection({ name: '', type: 'All Included', limit: 0, items: [{ name: '', description: '', image: null }] });
+                                setIsAddingSection(true);
+                              }}
+                            >
+                              + Add Another Section
+                            </button>
+                          </div>
+                        )}
+
+                        {isAddingSection && (
+                          <div className="section-inline-editor">
+                            <div className="section-form-top">
+                              <div className="form-group full-width">
+                                <label className="input-label">Section Name</label>
+                                <input
+                                  type="text"
+                                  className="input-field"
+                                  placeholder="e.g. Starters"
+                                  value={currentSection.name}
+                                  onChange={(e) => setCurrentSection(prev => ({ ...prev, name: e.target.value }))}
+                                />
+                              </div>
+
+                              <div className="selection-type-row">
+                                <div className="form-group flex-1">
+                                  <label className="input-label">Selection Type</label>
+                                  <select
+                                    className="input-field"
+                                    value={currentSection.type}
+                                    onChange={(e) => setCurrentSection(prev => ({ ...prev, type: e.target.value }))}
+                                  >
+                                    <option>All Included</option>
+                                    <option>Limited Selection</option>
+                                  </select>
+                                </div>
+                                <div className="form-group mini-limit">
+                                  <label className="input-label">Choose Any</label>
+                                  <input
+                                    type="number"
+                                    className="input-field"
+                                    placeholder="0"
+                                    disabled={currentSection.type === 'All Included'}
+                                    value={currentSection.limit || ''}
+                                    onChange={(e) => setCurrentSection(prev => ({ ...prev, limit: parseInt(e.target.value) || 0 }))}
+                                  />
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="items-area-inline">
+                              <label className="input-label">Items in this Section</label>
+                              <div className="item-cards-list">
+                                {currentSection.items.map((item, i) => (
+                                  <div key={i} className="item-input-card">
+                                    <div className="item-form-grid">
+                                      <div className="item-form-image">
+                                        <div className="item-upload-mini" onClick={() => {
+                                          const input = document.createElement('input');
+                                          input.type = 'file';
+                                          input.accept = 'image/*';
+                                          input.onchange = (e) => {
+                                            const file = (e.target as HTMLInputElement).files?.[0];
+                                            if (file) {
+                                              const reader = new FileReader();
+                                              reader.onloadend = () => {
+                                                const newItems = [...currentSection.items];
+                                                newItems[i].image = reader.result as string;
+                                                setCurrentSection(prev => ({ ...prev, items: newItems }));
+                                              };
+                                              reader.readAsDataURL(file);
+                                            }
+                                          };
+                                          input.click();
+                                        }}>
+                                          {item.image ? (
+                                            <img src={item.image} alt="Item" className="uploaded-mini-thumb" />
+                                          ) : (
+                                            <div className="upload-placeholder-mini">
+                                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                                              <span>Photo</span>
+                                            </div>
+                                          )}
+                                        </div>
+                                      </div>
+                                      <div className="item-form-details">
+                                        <div className="form-group">
+                                          <input
+                                            type="text"
+                                            className="input-field item-name-field"
+                                            placeholder="Item Name"
+                                            value={item.name}
+                                            onChange={(e) => {
+                                              const newItems = [...currentSection.items];
+                                              newItems[i].name = e.target.value;
+                                              setCurrentSection(prev => ({ ...prev, items: newItems }));
+                                            }}
+                                          />
+                                        </div>
+                                        <div className="form-group">
+                                          <textarea
+                                            className="input-field item-desc-field"
+                                            placeholder="Short Description (max 1000 chars)"
+                                            maxLength={1000}
+                                            value={item.description}
+                                            onChange={(e) => {
+                                              const newItems = [...currentSection.items];
+                                              newItems[i].description = e.target.value;
+                                              setCurrentSection(prev => ({ ...prev, items: newItems }));
+                                            }}
+                                          />
+                                        </div>
+                                      </div>
+                                    </div>
+                                    {currentSection.items.length > 1 && (
+                                      <button className="item-remove-btn" onClick={() => {
+                                        setCurrentSection(prev => ({ ...prev, items: prev.items.filter((_, idx) => idx !== i) }));
+                                      }}>
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                      </button>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+
+                              <button
+                                className="add-item-btn-inline"
+                                onClick={() => {
+                                  setCurrentSection(prev => ({
+                                    ...prev,
+                                    items: [...prev.items, { name: '', description: '', image: null }]
+                                  }));
+                                }}
+                              >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                Add Another Item
+                              </button>
+                            </div>
+
+                            <div className="section-builder-actions">
+                              <button className="btn btn-ghost" onClick={() => setIsAddingSection(false)}>Cancel</button>
+                              <button
+                                className="btn btn-primary-blue"
+                                disabled={!currentSection.name || currentSection.items.length === 0}
+                                onClick={handleSaveSection}
+                              >
+                                Save Section
+                              </button>
+                            </div>
+                            <div className="section-save-hint">
+                              save the current section to create the new section
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {menuStep === 3 && (
+                      <div className="step-content">
+                        <div className="preview-card">
+                          <div className="preview-identity">
+                            <div className="preview-img-box">
+                              <img
+                                src={menuIdentity.image || "https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?w=160&h=160&fit=crop"}
+                                alt="Menu Preview"
+                                className="thumbnail-80"
+                              />
+                            </div>
+                            <div className="preview-info">
+                              <h4 className="preview-menu-name">{menuIdentity.name || 'Untitled Menu'}</h4>
+                              <div className="preview-sub-meta">
+                                <span className="preview-category-count">
+                                  {activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1)} • {sections.length} Sections
+                                </span>
+                                <span className={`food-type-tag ${menuIdentity.foodType.toLowerCase()}`}>
+                                  <span className="p-type-icon">
+                                    {menuIdentity.foodType === 'Veg' ? (
+                                      <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><rect x="0.5" y="0.5" width="11" height="11" rx="1.5" stroke="currentColor" /><circle cx="6" cy="6" r="3" fill="currentColor" /></svg>
+                                    ) : (
+                                      <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><rect x="0.5" y="0.5" width="11" height="11" rx="1.5" stroke="currentColor" /><circle cx="6" cy="6" r="3" fill="currentColor" /></svg>
+                                    )}
+                                  </span>
+                                  {menuIdentity.foodType}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="preview-sections-v2">
+                            {sections.map((sec, idx) => (
+                              <Fragment key={idx}>
+                                <div className="preview-section-item-flat">
+                                  <div className="p-sec-header">
+                                    <span className="p-sec-name">{sec.name}</span>
+                                    <span className="p-sec-summary">
+                                      {sec.type?.toLowerCase().trim() === 'all included' ? '→ all included' : `→ choose any ${sec.limit} from ${sec.items.length} items`}
+                                    </span>
+                                  </div>
+                                  <div className="p-sec-items-detailed-list">
+                                    {sec.items.map((item: any, i: number) => (
+                                      <div key={i} className="p-item-detail">
+                                        <span className="p-item-name">{item.name}</span>
+                                        {item.description && <span className="p-item-desc">• {item.description}</span>}
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                                {idx < sections.length - 1 && <div className="section-divider"></div>}
+                              </Fragment>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="modal-footer">
+                    <div className="footer-left">
+                      <span className="step-counter-badge">Step {menuStep}/3</span>
+                    </div>
+                    <div className="footer-right">
+                      {menuStep > 1 && (
+                        <button className="btn btn-outline" onClick={() => setMenuStep(prev => prev - 1)}>Back</button>
+                      )}
+
+                      {menuStep < 3 ? (
+                        <button
+                          className="btn btn-primary-blue"
+                          onClick={() => setMenuStep(prev => prev + 1)}
+                          disabled={menuStep === 1 && !menuIdentity.name}
+                        >
+                          Next
+                        </button>
+                      ) : (
+                        <button
+                          className="btn btn-primary-blue"
+                          onClick={() => {
+                            const newMenuObj = {
+                              id: menus.length + 1,
+                              name: menuIdentity.name,
+                              price: parseInt(menuIdentity.price) || 0,
+                              status: 'Active',
+                              category: activeCategory,
+                              minMembers: menuIdentity.minMembers,
+                              maxMembers: menuIdentity.maxMembers,
+                              foodType: menuIdentity.foodType,
+                              image: menuIdentity.image,
+                              sections: [...sections]
+                            };
+                            setMenus(prev => [...prev, newMenuObj]);
+                            resetAddMenu();
+                          }}
+                        >
+                          Save Menu
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
+  const navigationGroups = [
+    {
+      title: 'Business',
+      items: [
+        {
+          id: 'dashboard', label: 'Dashboard', icon: (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="3" width="7" height="7"></rect>
+              <rect x="14" y="3" width="7" height="7"></rect>
+              <rect x="14" y="14" width="7" height="7"></rect>
+              <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+          )
+        },
+        {
+          id: 'bookings', label: 'Bookings', icon: (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+          )
+        },
+        {
+          id: 'revenue', label: 'Revenue', icon: (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="12" y1="1" x2="12" y2="23"></line>
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+            </svg>
+          )
+        },
+        {
+          id: 'reports', label: 'Reports', icon: (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="20" x2="18" y2="10"></line>
+              <line x1="12" y1="20" x2="12" y2="4"></line>
+              <line x1="6" y1="20" x2="6" y2="14"></line>
+            </svg>
+          )
+        }
+      ]
+    },
+    {
+      title: 'Operations',
+      items: [
+        {
+          id: 'service-settings', label: 'Service Settings', icon: (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1Z"></path>
+            </svg>
+          )
+        },
+        {
+          id: 'coupons', label: 'Coupons', icon: (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M15 5v2"></path>
+              <path d="M15 11v2"></path>
+              <path d="M15 17v2"></path>
+              <path d="M5 5h14a2 2 0 0 1 2 2v3a2 2 0 0 0 0 4v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-3a2 2 0 0 0 0-4V7a2 2 0 0 1 2-2z"></path>
+            </svg>
+          )
+        },
+        {
+          id: 'ratings', label: 'Ratings', icon: (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+            </svg>
+          )
+        },
+        {
+          id: 'tickets', label: 'Tickets', icon: (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"></path>
+              <path d="M13 5v2"></path>
+              <path d="M13 17v2"></path>
+              <path d="M13 11v2"></path>
+            </svg>
+          )
+        }
+      ]
+    },
+    {
+      title: 'Account',
+      items: [
+        {
+          id: 'documents', label: 'Documents', icon: (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+            </svg>
+          )
+        },
+        {
+          id: 'profile', label: 'Profile', icon: (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          )
+        }
+      ]
+    }
+  ];
+
+  const [activeTab, setActiveTab] = useState('dashboard');
 
   return (
     <div className="dashboard-layout">
@@ -656,11 +1764,23 @@ const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
           <span className="dashboard-brand-name">MyPartner</span>
         </div>
         <nav className="dashboard-nav">
-          {sidebarItems.map(item => (
-            <a key={item.id} href="#" className={`dashboard-nav-item ${item.id === 'dashboard' ? 'active' : ''}`}>
-              <span className="nav-icon">{item.icon}</span>
-              <span className="nav-label">{item.label}</span>
-            </a>
+          {navigationGroups.map(group => (
+            <div key={group.title} className="nav-group">
+              <h3 className="nav-group-title">{group.title}</h3>
+              <div className="nav-group-list">
+                {group.items.map(item => (
+                  <a
+                    key={item.id}
+                    href="#"
+                    className={`dashboard-nav-item ${activeTab === item.id ? 'active' : ''}`}
+                    onClick={(e) => { e.preventDefault(); setActiveTab(item.id); }}
+                  >
+                    <span className="nav-icon">{item.icon}</span>
+                    <span className="nav-label">{item.label}</span>
+                  </a>
+                ))}
+              </div>
+            </div>
           ))}
         </nav>
         <div className="dashboard-sidebar-footer">
@@ -675,25 +1795,28 @@ const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
         </div>
       </aside>
       <main className="dashboard-main">
-        <header className="dashboard-header">
-          <h1 className="dashboard-title">Overview</h1>
-          <div className="dashboard-user-profile">
-            <div className="user-info">
-              <span className="user-name">John Doe</span>
-              <span className="user-role">Partner</span>
+        <div className="dashboard-content no-header">
+          {activeTab === 'dashboard' && (
+            <>
+              <div className="dashboard-welcome-card">
+                <h2>Welcome to your Dashboard!</h2>
+                <p>Everything you need to manage your business in one place.</p>
+              </div>
+              <div className="dashboard-grid">
+                <div className="dashboard-stats-card">Stats coming soon...</div>
+                <div className="dashboard-stats-card">Recent Activity...</div>
+              </div>
+            </>
+          )}
+          {activeTab === 'tickets' && <Tickets />}
+          {activeTab === 'documents' && <Documents />}
+          {activeTab === 'service-settings' && <ServiceSettings />}
+          {!['dashboard', 'tickets', 'documents', 'service-settings'].includes(activeTab) && (
+            <div className="placeholder-screen">
+              <h2>{activeTab.charAt(0).toUpperCase() + activeTab.slice(1).replace('-', ' ')}</h2>
+              <p>This screen is coming soon.</p>
             </div>
-            <div className="user-avatar">JD</div>
-          </div>
-        </header>
-        <div className="dashboard-content">
-          <div className="dashboard-welcome-card">
-            <h2>Welcome to your Dashboard!</h2>
-            <p>Everything you need to manage your business in one place.</p>
-          </div>
-          <div className="dashboard-grid">
-            <div className="dashboard-stats-card">Stats coming soon...</div>
-            <div className="dashboard-stats-card">Recent Activity...</div>
-          </div>
+          )}
         </div>
       </main>
     </div>
