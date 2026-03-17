@@ -1870,14 +1870,14 @@ const VendorProfile = () => {
             <div className="summary-split-layout-v4">
               <div className="summary-left-v4">
                 <div className="summary-card-v4">
-                  <div className="summary-card-stacked-v4">
+                  <div className="summary-card-grid-v4">
                     {/* Personal Details Group */}
                     <div className="summary-group-v4">
                       <div className="group-title-v4">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                         Personal Details
                       </div>
-                      <div className="group-content-v4-horizontal">
+                      <div className="group-content-v4">
                         <div className="summary-item-v4">
                           <label>Owner Name</label>
                           <span>{profileData.owner.name}</span>
@@ -1893,7 +1893,7 @@ const VendorProfile = () => {
                       </div>
                     </div>
 
-                    <div className="summary-h-divider-v4"></div>
+                    <div className="summary-v-divider-v4"></div>
 
                     {/* Business Details Group */}
                     <div className="summary-group-v4">
@@ -1901,7 +1901,7 @@ const VendorProfile = () => {
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
                         Business Details
                       </div>
-                      <div className="group-content-v4-horizontal">
+                      <div className="group-content-v4">
                         <div className="summary-item-v4">
                           <label>Business Name</label>
                           <span>{profileData.header.name}</span>
