@@ -900,6 +900,7 @@ const ServiceSettings = () => {
   const [menuStep, setMenuStep] = useState(1);
   const [sectionEditingIndex, setSectionEditingIndex] = useState<number | null>(null);
   const [menuActionId, setMenuActionId] = useState<number | null>(null);
+  const [selectedMenuAction, setSelectedMenuAction] = useState<'hide' | 'delete' | null>(null);
 
   // States for item-level creation
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -1168,23 +1169,44 @@ const ServiceSettings = () => {
                       </button>
 
                       {menuActionId === menu.id && (
-                        <div className="menu-actions-popup">
-                          <button className="menu-action-item" onClick={() => {
-                            setMenus(menus.map(m => m.id === menu.id ? { ...m, status: m.status === 'Disabled' ? 'Active' : 'Disabled' } : m));
-                            setMenuActionId(null);
-                          }}>
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
-                            {menu.status === 'Disabled' ? 'Show Menu' : 'Hide Menu'}
-                          </button>
-                          <button className="menu-action-item delete" onClick={() => {
-                            if (window.confirm('Are you sure you want to delete this menu?')) {
-                              setMenus(menus.filter(m => m.id !== menu.id));
-                              setMenuActionId(null);
-                            }
-                          }}>
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                            Delete Menu
-                          </button>
+                        <div className="menu-actions-popup selection-mode">
+                          <div className="popup-title">Manage Menu</div>
+                          <div className="action-options">
+                            <label className={`action-option ${selectedMenuAction === 'hide' ? 'selected' : ''}`} onClick={() => setSelectedMenuAction('hide')}>
+                              <div className="radio-dot"></div>
+                              <span>{menu.status === 'Disabled' ? 'Show Menu' : 'Hide Menu'}</span>
+                            </label>
+                            <label className={`action-option ${selectedMenuAction === 'delete' ? 'selected' : ''}`} onClick={() => setSelectedMenuAction('delete')}>
+                              <div className="radio-dot"></div>
+                              <span>Delete Menu</span>
+                            </label>
+                          </div>
+                          <div className="popup-actions">
+                            <button 
+                              className="popup-btn reset" 
+                              onClick={() => {
+                                setMenuActionId(null);
+                                setSelectedMenuAction(null);
+                              }}
+                            >
+                              Cancel
+                            </button>
+                            <button 
+                              className="popup-btn confirm"
+                              disabled={!selectedMenuAction}
+                              onClick={() => {
+                                if (selectedMenuAction === 'hide') {
+                                  setMenus(menus.map(m => m.id === menu.id ? { ...m, status: m.status === 'Disabled' ? 'Active' : 'Disabled' } : m));
+                                } else if (selectedMenuAction === 'delete') {
+                                  setMenus(menus.filter(m => m.id !== menu.id));
+                                }
+                                setMenuActionId(null);
+                                setSelectedMenuAction(null);
+                              }}
+                            >
+                              Okay
+                            </button>
+                          </div>
                         </div>
                       )}
                     </div>
