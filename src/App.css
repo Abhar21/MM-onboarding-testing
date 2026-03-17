@@ -5832,6 +5832,33 @@ input:checked + .service-slider:before {
   }
 }
 
+/* Summary Stacked Layout */
+.summary-card-stacked-v4 {
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.group-content-v4-horizontal {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.summary-h-divider-v4 {
+  height: 1px;
+  background: #f1f5f9;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .group-content-v4-horizontal {
+    flex-direction: column;
+    gap: 20px;
+  }
+}
+
 /* Summary Split Layout */
 .summary-split-layout-v4 {
   display: flex;
