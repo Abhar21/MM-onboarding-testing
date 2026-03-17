@@ -1765,7 +1765,7 @@ const VendorProfile = () => {
     { id: 'Bank Details', label: 'Bank Details' }
   ];
 
-  const profileData = {
+  const [profileData, setProfileData] = useState({
     header: {
       name: 'Catering Enterprise 3',
       id: 'MYMCATKAR0003',
@@ -1811,9 +1811,23 @@ const VendorProfile = () => {
       ifsc: 'HDFC0001234',
       accountType: 'Savings Account',
       status: 'Verified',
-      lastUpdated: '14 Feb 2026'
+      lastUpdated: '14 Feb 2026',
+      rejectionReason: null as string | null,
+      pendingSubmission: null as any
     }
-  };
+  });
+
+  const [showBankEditModal, setShowBankEditModal] = useState(false);
+  const [bankForm, setBankForm] = useState({
+    bankName: '',
+    holderName: '',
+    accountNumber: '',
+    confirmAccountNumber: '',
+    ifsc: '',
+    accountType: 'savings',
+    file: null as File | null,
+    fileName: ''
+  });
 
   return (
     <div className="profile-v4-container">
@@ -1995,6 +2009,68 @@ const VendorProfile = () => {
 
         {activeTab === 'Bank Details' && (
           <div className="bank-tab-v4">
+            {profileData.bank.status === 'Pending Verification' && (
+              <div className="bank-status-banner-v4 success-pending">
+                <div className="banner-icon-v4">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                </div>
+                <div className="banner-content-v4">
+                  <strong>Submitted successfully!</strong>
+                  <p>New bank details submitted takes 12-24 hours for the approval. Current bank remains active for payouts during this period.</p>
+                </div>
+              </div>
+            )}
+
+            {profileData.bank.status === 'Pending Verification' && profileData.bank.pendingSubmission && (
+              <div className="submitted-details-card-v4">
+                <div className="sd-header-v4">
+                  <h4>Details Submitted for Verification</h4>
+                  <span className="sd-tag-v4">Pending Review</span>
+                </div>
+                <div className="sd-grid-v4">
+                  <div className="sd-item-v4">
+                    <label>BANK NAME</label>
+                    <span>{profileData.bank.pendingSubmission.bankName}</span>
+                  </div>
+                  <div className="sd-item-v4">
+                    <label>ACCOUNT TYPE</label>
+                    <span className="capitalize-v4">{profileData.bank.pendingSubmission.accountType} Account</span>
+                  </div>
+                  <div className="sd-item-v4">
+                    <label>IFSC CODE</label>
+                    <span>{profileData.bank.pendingSubmission.ifsc}</span>
+                  </div>
+                  <div className="sd-item-v4">
+                    <label>HOLDER NAME</label>
+                    <span>{profileData.bank.pendingSubmission.holderName}</span>
+                  </div>
+                  <div className="sd-item-v4">
+                    <label>ACCOUNT NUMBER</label>
+                    <span className="font-mono">
+                      {profileData.bank.pendingSubmission.accountNumber.replace(/.(?=.{4})/g, '*')}
+                    </span>
+                  </div>
+                  <div className="sd-item-v4">
+                    <label>ATTACHMENT</label>
+                    <div className="sd-file-v4">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
+                      <span>{profileData.bank.pendingSubmission.fileName}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {profileData.bank.status === 'Rejected' && (
+              <div className="bank-status-banner-v4 rejected">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                <div className="rejected-content-v4">
+                  <strong>Bank Details Rejected</strong>
+                  <p>{profileData.bank.rejectionReason || 'Please check your submitted documents and try again.'}</p>
+                </div>
+              </div>
+            )}
+
             <div className="bank-details-card-v4">
               <div className="bank-card-top-v4">
                 <div className="bc-header-left-v4">
@@ -2004,7 +2080,9 @@ const VendorProfile = () => {
                   <div className="bc-title-wrap-v4">
                     <div className="bc-title-row-v4">
                       <h3>Bank Account Details</h3>
-                      <span className="v-status-badge-v4 verified">Verified</span>
+                      <span className={`v-status-badge-v4 ${profileData.bank.status.toLowerCase().replace(' ', '-')}`}>
+                        {profileData.bank.status}
+                      </span>
                     </div>
                     <p className="bc-subtitle-v4">Payouts will be sent to this account.</p>
                   </div>
@@ -2040,10 +2118,156 @@ const VendorProfile = () => {
                   </div>
                 </div>
               </div>
+
+              {(profileData.bank.status === 'Verified' || profileData.bank.status === 'Rejected') && (
+                <div className="bank-card-footer-v4">
+                  <button 
+                    className="change-bank-btn-v4"
+                    onClick={() => setShowBankEditModal(true)}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                    Change Bank Details
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         )}
       </div>
+
+      {/* Secure Bank Edit Modal */}
+      {showBankEditModal && (
+        <div className="bank-modal-overlay-v4">
+          <div className="bank-modal-v4">
+            <div className="modal-header-v4">
+              <div className="modal-title-group-v4">
+                <div className="modal-icon-v4 secure">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                </div>
+                <div>
+                  <h3>Change Bank Details</h3>
+                  <p>Submit new account details for verification.</p>
+                </div>
+              </div>
+              <button className="modal-close-v4" onClick={() => setShowBankEditModal(false)}>×</button>
+            </div>
+
+            <div className="modal-body-v4">
+              <div className="bank-form-grid-v4">
+                <div className="form-group-v4">
+                  <label>BANK NAME</label>
+                  <input 
+                    type="text" 
+                    placeholder="e.g. HDFC Bank"
+                    value={bankForm.bankName}
+                    onChange={(e) => setBankForm({...bankForm, bankName: e.target.value})}
+                  />
+                </div>
+                <div className="form-group-v4">
+                  <label>ACCOUNT TYPE</label>
+                  <select 
+                    value={bankForm.accountType}
+                    onChange={(e) => setBankForm({...bankForm, accountType: e.target.value})}
+                  >
+                    <option value="savings">Savings Account</option>
+                    <option value="current">Current Account</option>
+                  </select>
+                </div>
+                <div className="form-group-v4">
+                  <label>ACCOUNT HOLDER NAME</label>
+                  <input 
+                    type="text" 
+                    placeholder="Name as on passbook"
+                    value={bankForm.holderName}
+                    onChange={(e) => setBankForm({...bankForm, holderName: e.target.value})}
+                  />
+                </div>
+                <div className="form-group-v4">
+                  <label>IFSC CODE</label>
+                  <input 
+                    type="text" 
+                    placeholder="e.g. HDFC0001234"
+                    value={bankForm.ifsc}
+                    onChange={(e) => setBankForm({...bankForm, ifsc: e.target.value.toUpperCase()})}
+                  />
+                </div>
+                <div className="form-group-v4">
+                  <label>ACCOUNT NUMBER</label>
+                  <input 
+                    type="password" 
+                    placeholder="Enter account number"
+                    value={bankForm.accountNumber}
+                    onChange={(e) => setBankForm({...bankForm, accountNumber: e.target.value})}
+                  />
+                </div>
+                <div className="form-group-v4">
+                  <label>CONFIRM ACCOUNT NUMBER</label>
+                  <input 
+                    type="text" 
+                    placeholder="Re-enter account number"
+                    value={bankForm.confirmAccountNumber}
+                    onChange={(e) => setBankForm({...bankForm, confirmAccountNumber: e.target.value})}
+                  />
+                </div>
+              </div>
+
+              <div className="form-group-v4 full-width-v4">
+                <label>UPLOAD PASSBOOK / CANCELLED CHEQUE</label>
+                <div className="modal-upload-zone-v4">
+                  <input 
+                    type="file" 
+                    id="bank-file-upload" 
+                    className="bank-hidden-file-input-v4"
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files[0]) {
+                        setBankForm({...bankForm, file: e.target.files[0], fileName: e.target.files[0].name});
+                      }
+                    }}
+                  />
+                  <label htmlFor="bank-file-upload" className="upload-label-v4">
+                    {bankForm.fileName ? (
+                      <div className="file-preview-v4">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
+                        <span>{bankForm.fileName}</span>
+                        <button className="remove-file-v4" onClick={(e) => {
+                          e.preventDefault();
+                          setBankForm({...bankForm, file: null, fileName: ''});
+                        }}>Remove</button>
+                      </div>
+                    ) : (
+                      <div className="upload-placeholder-v4">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                        <span>Click to upload PDF or Image</span>
+                      </div>
+                    )}
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div className="modal-footer-v4">
+              <button className="cancel-btn-v4" onClick={() => setShowBankEditModal(false)}>Cancel</button>
+              <button 
+                className="submit-btn-v4"
+                disabled={!bankForm.bankName || !bankForm.accountNumber || !bankForm.fileName || bankForm.accountNumber !== bankForm.confirmAccountNumber}
+                onClick={() => {
+                  setProfileData(prev => ({
+                    ...prev,
+                    bank: {
+                      ...prev.bank,
+                      status: 'Pending Verification',
+                      pendingSubmission: { ...bankForm }
+                    }
+                  }));
+                  setShowBankEditModal(false);
+                }}
+              >
+                Submit for Verification
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
