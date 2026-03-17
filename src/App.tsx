@@ -1274,6 +1274,8 @@ const ServiceSettings = () => {
                 </div>
               )}
             </div>
+          </div>
+        </div>
 
             {isAddingMenu && (
               <div className="modal-overlay">
@@ -1749,8 +1751,298 @@ const ServiceSettings = () => {
                 </div>
               </div>
             )}
+        </div>
+    </div>
+  );
+};
+
+const VendorProfile = () => {
+  const [activeTab, setActiveTab] = useState('Summary');
+
+  const tabs = [
+    { id: 'Summary', label: 'Summary' },
+    { id: 'Documents', label: 'Documents' },
+    { id: 'Bank Details', label: 'Bank Details' }
+  ];
+
+  const profileData = {
+    header: {
+      name: 'Catering Enterprise 3',
+      id: 'MYMCATKAR0003',
+      status: 'Active',
+      joined: '18 Nov 2024',
+      gstType: 'Regular',
+      service: 'Catering'
+    },
+    owner: {
+      name: 'Bhargav Reddy',
+      email: 'contact@cateringent3.com',
+      mobile: '+91 98765 43210'
+    },
+    business: {
+      category: 'Enterprise Catering',
+      displayName: 'Catering Enterprise 3 Services',
+      address: 'Plot 45, Jubilee Hills, Road No. 36',
+      city: 'Hyderabad',
+      state: 'Telangana',
+      radius: '50km Radius'
+    },
+    identity: {
+      pan: 'ABCDE1234F',
+      gst: '36AAAAA0000A1Z5',
+      fssai: '12345678901234'
+    },
+    partnership: {
+      joinedDate: '18 Nov 2024',
+      plan: 'Pro Plan',
+      gstType: 'Regular Taxpayer',
+      agreement: 'Accepted'
+    },
+    documents: [
+      { type: 'GST Certificate', identifier: '29ABCDE1234F103Z5', date: '14 Feb 2026', status: 'Verified' },
+      { type: 'PAN Card', identifier: 'ABCDE1234F', date: '14 Feb 2026', status: 'Verified' },
+      { type: 'FSSAI License', identifier: '12345678901234', date: '14 Feb 2026', status: 'Verified' },
+      { type: 'Cancelled Cheque', identifier: 'A/C: ****9012', date: '14 Feb 2026', status: 'Verified' }
+    ],
+    bank: {
+      bankName: 'HDFC Bank',
+      holderName: 'User 3',
+      accountNumber: 'XXXX  XXXX  9012',
+      ifsc: 'HDFC0001234',
+      accountType: 'Savings Account',
+      status: 'Verified',
+      lastUpdated: '14 Feb 2026'
+    }
+  };
+
+  return (
+    <div className="profile-v4-container">
+      {/* Top Fixed Header */}
+      <div className="profile-top-header-v4">
+        <h1 className="biz-name-v4">{profileData.header.name}</h1>
+        
+        <div className="header-meta-row-v4">
+          <div className="v-id-badge-v4">{profileData.header.id}</div>
+          
+          <div className="status-pill-v4">
+            <span className="status-dot-v4"></span>
+            <span className="status-text-v4">{profileData.header.status}</span>
+          </div>
+          
+          <div className="meta-divider-v4"></div>
+          
+          <div className="meta-item-v4">
+            <span className="m-label-v4">Joined:</span>
+            <span className="m-value-v4">{profileData.header.joined}</span>
+          </div>
+          
+          <div className="meta-item-v4">
+            <span className="m-label-v4">GST Type:</span>
+            <span className="m-value-v4 gst-regular-v4">{profileData.header.gstType}</span>
+          </div>
+          
+          <div className="meta-divider-v4"></div>
+          
+          <div className="meta-item-v4">
+            <span className="m-label-v4">Service:</span>
+            <span className="m-value-v4 service-type-v4">{profileData.header.service}</span>
           </div>
         </div>
+      </div>
+
+      {/* Primary Tabs */}
+      <div className="profile-tabs-nav-v4">
+        {tabs.map(tab => (
+          <button
+            key={tab.id}
+            className={`tab-btn-v4 ${activeTab === tab.id ? 'active' : ''}`}
+            onClick={() => setActiveTab(tab.id)}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Tab Content */}
+      <div className="profile-tab-content-v4">
+        {activeTab === 'Summary' && (
+          <div className="summary-tab-v4">
+            <div className="summary-split-layout-v4">
+              <div className="summary-left-v4">
+                <div className="summary-card-v4">
+                  <div className="summary-card-grid-v4">
+                    {/* Personal Details Group */}
+                    <div className="summary-group-v4">
+                      <div className="group-title-v4">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                        Personal Details
+                      </div>
+                      <div className="group-content-v4">
+                        <div className="summary-item-v4">
+                          <label>Owner Name</label>
+                          <span>{profileData.owner.name}</span>
+                        </div>
+                        <div className="summary-item-v4">
+                          <label>Mobile Number</label>
+                          <span>{profileData.owner.mobile}</span>
+                        </div>
+                        <div className="summary-item-v4">
+                          <label>Mail ID</label>
+                          <span>{profileData.owner.email}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="summary-v-divider-v4"></div>
+
+                    {/* Business Details Group */}
+                    <div className="summary-group-v4">
+                      <div className="group-title-v4">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                        Business Details
+                      </div>
+                      <div className="group-content-v4">
+                        <div className="summary-item-v4">
+                          <label>Business Name</label>
+                          <span>{profileData.header.name}</span>
+                        </div>
+                        <div className="summary-item-v4">
+                          <label>Service Category</label>
+                          <span>{profileData.business.category}</span>
+                        </div>
+                        <div className="summary-item-v4">
+                          <label>Address</label>
+                          <span>{profileData.business.address}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="summary-right-v4">
+                <div className="business-preview-container-v4">
+                  <h4 className="preview-label-v4">Business Preview</h4>
+                  <div className="customer-card-preview-v4">
+                    <div className="preview-image-placeholder-v4">
+                      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                        <polyline points="21 15 16 10 5 21"></polyline>
+                      </svg>
+                    </div>
+                    <div className="preview-info-v4">
+                      <h4 className="preview-business-name-v4">{profileData.header.name}</h4>
+                      <div className="preview-tags-v4">
+                        <span className="preview-tag-v4">{profileData.business.category}</span>
+                        <span className="preview-tag-v4 star-v4">★ 4.8 (120+)</span>
+                      </div>
+                      <p className="preview-location-v4">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                        {profileData.business.city}, {profileData.business.state}
+                      </p>
+                    </div>
+                  </div>
+                  <p className="preview-note-v4">This is how your business appears to customers.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'Documents' && (
+          <div className="documents-tab-v4">
+            <div className="docs-card-v4">
+              <div className="docs-card-header-v4">
+                <div className="d-title-group-v4">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{color: '#64748b'}}><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                  <h3>Uploaded Documents</h3>
+                </div>
+              </div>
+              <div className="docs-table-wrapper-v4">
+                <table className="docs-table-v4">
+                  <thead>
+                    <tr>
+                      <th>DOCUMENT TYPE</th>
+                      <th>IDENTIFIER</th>
+                      <th>UPLOAD DATE</th>
+                      <th>STATUS</th>
+                      <th>ACTIONS</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {profileData.documents.map((doc, idx) => (
+                      <tr key={idx}>
+                        <td className="doc-type-cell-v4">{doc.type}</td>
+                        <td className="doc-id-cell-v4">{doc.identifier}</td>
+                        <td className="doc-date-cell-v4">{doc.date}</td>
+                        <td>
+                          <span className="v-status-badge-v4 verified">{doc.status}</span>
+                        </td>
+                        <td>
+                          <button className="view-doc-icon-btn-v4">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'Bank Details' && (
+          <div className="bank-tab-v4">
+            <div className="bank-details-card-v4">
+              <div className="bank-card-top-v4">
+                <div className="bc-header-left-v4">
+                  <div className="bc-icon-v4">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 21h18"></path><path d="M3 10h18"></path><path d="M5 21V10"></path><path d="M9 21V10"></path><path d="M13 21V10"></path><path d="M17 21V10"></path><path d="M2 5l10-3 10 3"></path></svg>
+                  </div>
+                  <div className="bc-title-wrap-v4">
+                    <div className="bc-title-row-v4">
+                      <h3>Bank Account Details</h3>
+                      <span className="v-status-badge-v4 verified">Verified</span>
+                    </div>
+                    <p className="bc-subtitle-v4">Payouts will be sent to this account.</p>
+                  </div>
+                </div>
+                <div className="bc-header-right-v4">
+                  <span className="last-updated-v4">Last updated: {profileData.bank.lastUpdated}</span>
+                </div>
+              </div>
+
+              <div className="bank-info-grid-inner-v4">
+                <div className="bi-column-v4">
+                  <div className="bi-item-v4">
+                    <label>BANK NAME</label>
+                    <span>{profileData.bank.bankName}</span>
+                  </div>
+                  <div className="bi-item-v4">
+                    <label>ACCOUNT NUMBER</label>
+                    <span className="font-mono">{profileData.bank.accountNumber}</span>
+                  </div>
+                  <div className="bi-item-v4">
+                    <label>ACCOUNT TYPE</label>
+                    <span>{profileData.bank.accountType}</span>
+                  </div>
+                </div>
+                <div className="bi-column-v4">
+                  <div className="bi-item-v4">
+                    <label>ACCOUNT HOLDER NAME</label>
+                    <span>{profileData.bank.holderName}</span>
+                  </div>
+                  <div className="bi-item-v4">
+                    <label>IFSC CODE</label>
+                    <span>{profileData.bank.ifsc}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -1923,7 +2215,8 @@ const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
           {activeTab === 'tickets' && <Tickets />}
           {activeTab === 'documents' && <Documents />}
           {activeTab === 'service-settings' && <ServiceSettings />}
-          {!['dashboard', 'tickets', 'documents', 'service-settings'].includes(activeTab) && (
+          {activeTab === 'profile' && <VendorProfile />}
+          {!['dashboard', 'tickets', 'documents', 'service-settings', 'profile'].includes(activeTab) && (
             <div className="placeholder-screen">
               <h2>{activeTab.charAt(0).toUpperCase() + activeTab.slice(1).replace('-', ' ')}</h2>
               <p>This screen is coming soon.</p>
