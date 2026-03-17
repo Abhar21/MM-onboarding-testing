@@ -1210,7 +1210,7 @@ const ServiceSettings = () => {
                                 </div>
                               </label>
 
-                              <label className={`action-option-v2 ${selectedMenuAction === 'delete' ? 'selected' : ''}`} onClick={() => setSelectedMenuAction('delete')}>
+                              <label className={`action-option-v2 ${selectedMenuAction === 'delete' ? 'selected delete-selected' : ''}`} onClick={() => setSelectedMenuAction('delete')}>
                                 <div className="option-radio">
                                   <div className="radio-inner"></div>
                                 </div>
@@ -1237,9 +1237,9 @@ const ServiceSettings = () => {
                           Cancel
                         </button>
                         <button 
-                          className="btn btn-primary-blue"
+                          className={`btn ${selectedMenuAction === 'delete' ? 'btn-primary-red' : 'btn-primary-blue'}`}
                           disabled={!selectedMenuAction}
-                          style={{ minWidth: '100px' }}
+                          style={{ minWidth: '120px' }}
                           onClick={() => {
                             if (selectedMenuAction === 'hide') {
                               setMenus(menus.map(m => m.id === menuActionId ? { ...m, status: m.status === 'Disabled' ? 'Active' : 'Disabled' } : m));
@@ -1250,7 +1250,7 @@ const ServiceSettings = () => {
                             setSelectedMenuAction(null);
                           }}
                         >
-                          Okay
+                          {!selectedMenuAction ? 'Okay' : (selectedMenuAction === 'delete' ? 'Delete Menu' : (menus.find(m => m.id === menuActionId)?.status === 'Disabled' ? 'Show Menu' : 'Hide Menu'))}
                         </button>
                       </div>
                     </div>

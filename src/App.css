@@ -4659,6 +4659,11 @@ input:checked + .service-slider:before {
   background: #f0f7ff;
 }
 
+.action-option-v2.selected.delete-selected {
+  border-color: #ef4444;
+  background: #fff5f5;
+}
+
 .option-radio {
   width: 20px;
   height: 20px;
@@ -4675,6 +4680,11 @@ input:checked + .service-slider:before {
 .action-option-v2.selected .option-radio {
   border-color: #0077ff;
   background: #0077ff;
+}
+
+.action-option-v2.selected.delete-selected .option-radio {
+  border-color: #ef4444;
+  background: #ef4444;
 }
 
 .radio-inner {
@@ -4710,6 +4720,24 @@ input:checked + .service-slider:before {
   font-size: 0.85rem;
   color: #64748b;
   line-height: 1.4;
+}
+
+.btn-primary-red {
+  background: #ef4444;
+  color: white;
+  border: 1px solid #ef4444;
+}
+
+.btn-primary-red:hover {
+  background: #dc2626;
+  border-color: #dc2626;
+}
+
+.btn-primary-red:disabled {
+  background: #f87171;
+  border-color: #f87171;
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .empty-menu-state {
