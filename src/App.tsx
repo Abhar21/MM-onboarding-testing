@@ -2070,9 +2070,9 @@ const ServiceSettings = () => {
         )}
       </div>
       ) : (
-        <div className="settings-card" style={{ width: '100%' }}>
-          <div className="content-category-header" style={{ marginBottom: '1.5rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h3 className="category-title">Weekly Schedule</h3>
+        <div className="availability-card">
+          <div className="availability-header-v4">
+            <h3 className="availability-title-v4">Weekly Schedule</h3>
             <button 
               className="btn btn-sm" 
               onClick={() => applyToAllOpenDays(0)}
@@ -2084,10 +2084,10 @@ const ServiceSettings = () => {
           
           <div className="availability-list">
             {weeklySchedule.map((day, index) => (
-              <div key={day.day} className="availability-row" style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem 0', borderBottom: index < 6 ? '1px solid #f1f5f9' : 'none', flexWrap: 'wrap' }}>
-                <div style={{ width: '120px', fontWeight: '600', color: '#1e293b' }}>{day.day}</div>
+              <div key={day.day} className="availability-row-v4">
+                <div className="day-label-v4">{day.day}</div>
                 
-                <div style={{ width: '100px', display: 'flex', alignItems: 'center' }}>
+                <div className="status-toggle-wrapper-v4">
                   <label className="service-switch">
                     <input type="checkbox" checked={day.isOpen} onChange={(e) => handleScheduleChange(index, 'isOpen', e.target.checked)} />
                     <span className="service-slider round"></span>
@@ -2097,7 +2097,7 @@ const ServiceSettings = () => {
                   </span>
                 </div>
 
-                <div style={{ flex: 1, display: 'flex', gap: '0.75rem', opacity: day.isOpen ? 1 : 0.5, pointerEvents: day.isOpen ? 'auto' : 'none', alignItems: 'center', minWidth: '200px' }}>
+                <div className="time-inputs-wrapper-v4" style={{ opacity: day.isOpen ? 1 : 0.5, pointerEvents: day.isOpen ? 'auto' : 'none' }}>
                   <input 
                     type="time" 
                     className="input-field" 
