@@ -3431,8 +3431,8 @@ input[type="file"].input-field::file-selector-button:hover {
 }
 
 .stop-unit {
-  width: 150px;
-  flex: none;
+  width: 150px !important;
+  flex: none !important;
 }
 
 .settings-grid-rows {
@@ -7262,8 +7262,8 @@ input:checked + .slider-v4:before {
   }
 
   .stop-unit {
-    width: 110px;
-    flex: none;
+    width: 110px !important;
+    flex: none !important;
   }
 
   .service-settings-container {
