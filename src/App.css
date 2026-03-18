@@ -7226,6 +7226,37 @@ input:checked + .slider-v4:before {
     gap: 1.5rem;
   }
 
+  .category-sidebar-wrapper {
+    width: 100%;
+  }
+
+  .category-sidebar {
+    width: 100%;
+    min-width: unset;
+    border-radius: 0;
+    border: none;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .settings-row {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .stop-orders-wrapper {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .stop-value {
+    width: 100% !important;
+  }
+
+  .cat-card-main {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
   /* Tickets Table */
   .tickets-table th {
     font-size: 0.65rem;
@@ -7245,15 +7276,6 @@ input:checked + .slider-v4:before {
   /* Cards & Sections */
   .card-title {
     font-size: 1.1rem;
-  }
-
-  .category-sidebar {
-    width: 100%;
-    min-width: unset;
-  }
-
-  .service-config-area {
-    width: 100%;
   }
 
   /* Tickets */
