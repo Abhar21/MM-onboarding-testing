@@ -7216,8 +7216,7 @@ input:checked + .slider-v4:before {
   }
 
   .doc-btn {
-    width: auto;
-    min-width: 80px;
+    flex: 1;
     justify-content: center;
   }
 
