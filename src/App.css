@@ -2185,6 +2185,85 @@ input[type="file"].input-field::file-selector-button:hover {
   padding-top: 2.5rem; /* Add more top padding since there's no header */
 }
 
+/* Mobile Header */
+.mobile-header {
+  display: none;
+  height: 64px;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 0 1.5rem;
+  align-items: center;
+  gap: 1rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.menu-toggle-btn {
+  background: none;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.menu-toggle-btn:hover {
+  background: #f1f5f9;
+  color: #0077ff;
+}
+
+.mobile-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Responsive Layout */
+@media (max-width: 768px) {
+  .dashboard-layout {
+    flex-direction: column;
+  }
+
+  .mobile-header {
+    display: flex;
+  }
+
+  .dashboard-sidebar {
+    position: fixed;
+    top: 64px;
+    left: -100%;
+    width: 280px;
+    height: calc(100vh - 64px);
+    z-index: 99;
+    transition: left 0.3s ease;
+    background: white;
+    box-shadow: 10px 0 15px -3px rgba(0, 0, 0, 0.1);
+  }
+
+  .dashboard-sidebar.open {
+    left: 0;
+  }
+
+  .dashboard-main {
+    width: 100%;
+    min-height: calc(100vh - 64px);
+    margin-left: 0 !important;
+  }
+
+  .dashboard-content {
+    padding: 1rem;
+  }
+
+  .dashboard-content.no-header {
+    padding-top: 1.5rem;
+  }
+}
+
 .dashboard-welcome-card {
   background-color: #0077ff;
   color: white;
@@ -7061,3 +7140,124 @@ input:checked + .slider-v4:before {
   font-weight: 500;
 }
 
+
+/* === Final Responsiveness Refinements === */
+
+@media (max-width: 768px) {
+  /* Profile Header */
+  .header-main-row-v4 {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  
+  .header-right-v4 {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+  }
+
+  /* Profile Summary */
+  .summary-card-header-v4 {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 20px;
+  }
+
+  .summary-card-grid-v4 {
+    flex-direction: column;
+    padding: 20px;
+    gap: 30px;
+  }
+
+  .summary-v-divider-v4 {
+    display: none;
+  }
+
+  /* Bank Details */
+  .bank-info-grid-inner-v4 {
+    grid-template-columns: 1fr;
+    padding: 20px;
+    gap: 24px;
+  }
+
+  /* Documents Table */
+  .docs-table-wrapper-v4 {
+    margin: 0 -20px;
+    padding: 0 20px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .docs-table-v4 {
+    min-width: 600px;
+  }
+
+  /* Service Settings */
+  .service-settings-main {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .category-sidebar {
+    width: 100%;
+    min-width: unset;
+  }
+
+  .service-config-area {
+    width: 100%;
+  }
+
+  /* Tickets */
+  .ticket-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  /* Settings */
+  .settings-content-v4 {
+    flex-direction: column;
+    min-height: unset;
+  }
+
+  .settings-tabs-v4 {
+    width: 100%;
+    flex-direction: row;
+    overflow-x: auto;
+    border-right: none;
+    border-bottom: 1px solid #f1f5f9;
+    padding: 0;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .settings-tab-btn-v4 {
+    padding: 12px 20px;
+    flex: 1;
+    text-align: center;
+  }
+
+  .settings-tab-btn-v4.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: #0077ff;
+  }
+
+  .settings-panel-v4 {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .section-title {
+    font-size: 1.5rem;
+  }
+  
+  .dashboard-content {
+    padding: 0.75rem;
+  }
+}
