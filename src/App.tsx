@@ -2070,7 +2070,7 @@ const ServiceSettings = () => {
         )}
       </div>
       ) : (
-        <div className="settings-card" style={{ maxWidth: '800px', margin: '0 auto', width: '100%' }}>
+        <div className="settings-card" style={{ width: '100%' }}>
           <div className="content-category-header" style={{ marginBottom: '1.5rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h3 className="category-title">Weekly Schedule</h3>
             <button className="btn btn-outline btn-sm" onClick={() => applyToAllOpenDays(0)}>
