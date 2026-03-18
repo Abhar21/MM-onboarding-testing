@@ -2259,11 +2259,11 @@ input[type="file"].input-field::file-selector-button:hover {
   }
 
   .dashboard-content {
-    padding: 1.25rem;
+    padding: 1rem;
   }
 
   .dashboard-content.no-header {
-    padding-top: 1.25rem;
+    padding-top: 1rem;
   }
 }
 
@@ -7244,17 +7244,103 @@ input:checked + .slider-v4:before {
   }
 
   .stop-orders-wrapper {
-    flex-direction: column;
+    flex-direction: row;
     width: 100%;
+    gap: 0.5rem;
   }
 
   .stop-value {
-    width: 100% !important;
+    width: 80px !important;
+    min-width: 80px !important;
+    flex: none !important;
+  }
+
+  .stop-unit {
+    flex: 1;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .service-settings-container {
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .settings-content {
+    max-width: 100%;
+    width: 100%;
   }
 
   .cat-card-main {
     flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .cat-label {
+    font-size: 0.95rem;
+  }
+
+  .cat-count {
+    font-size: 0.8rem;
+  }
+
+  .content-category-header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
     gap: 0.5rem;
+    height: auto;
+    margin-bottom: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .category-title {
+    font-size: 1.15rem;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+    flex: 1;
+  }
+
+  .service-toggle-wrapper {
+    flex-direction: row;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+  }
+
+  .settings-card {
+    padding: 1rem;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+
+  .service-toggle-wrapper {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .service-toggle-label {
+    font-size: 0.8rem;
+    font-weight: 500;
+  }
+
+  .input-label {
+    font-size: 0.8rem;
+  }
+
+  .input-field {
+    font-size: 0.85rem;
+    padding: 0.5rem 0.75rem;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   /* Tickets Table */
