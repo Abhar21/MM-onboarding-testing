@@ -7347,6 +7347,15 @@ input:checked + .slider-v4:before {
     box-sizing: border-box;
   }
 
+  .selection-type-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .mini-limit {
+    width: 100%;
+  }
+
   /* Menu Builder Mobile Actions */
   .add-menu-btn {
     padding: 0.4rem 0.8rem !important;
