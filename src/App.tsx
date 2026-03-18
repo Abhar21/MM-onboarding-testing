@@ -1117,6 +1117,36 @@ const Settings = ({
 const ServiceSettings = () => {
   const [activeCategory, setActiveCategory] = useState('breakfast');
 
+  const [activeSettingsTab, setActiveSettingsTab] = useState('services');
+  const [weeklySchedule, setWeeklySchedule] = useState([
+    { day: 'Monday', isOpen: true, openTime: '09:00', closeTime: '21:00' },
+    { day: 'Tuesday', isOpen: true, openTime: '09:00', closeTime: '21:00' },
+    { day: 'Wednesday', isOpen: true, openTime: '09:00', closeTime: '21:00' },
+    { day: 'Thursday', isOpen: true, openTime: '09:00', closeTime: '21:00' },
+    { day: 'Friday', isOpen: true, openTime: '09:00', closeTime: '21:00' },
+    { day: 'Saturday', isOpen: true, openTime: '09:00', closeTime: '21:00' },
+    { day: 'Sunday', isOpen: false, openTime: '09:00', closeTime: '21:00' },
+  ]);
+
+  const handleScheduleChange = (index: number, field: string, value: any) => {
+    const newSchedule = [...weeklySchedule];
+    newSchedule[index] = { ...newSchedule[index], [field]: value };
+    setWeeklySchedule(newSchedule);
+  };
+
+  const applyToAllOpenDays = (sourceIndex: number) => {
+    const source = weeklySchedule[sourceIndex];
+    if (!source.isOpen) return;
+    setWeeklySchedule(weeklySchedule.map((day, idx) => {
+      if (idx === sourceIndex) return day;
+      return {
+        ...day,
+        openTime: source.openTime,
+        closeTime: source.closeTime
+      };
+    }));
+  };
+
   const categories = [
     { id: 'breakfast', label: 'Breakfast', count: 3, status: 'Active' },
     { id: 'lunch', label: 'Lunch', count: 3, status: 'Active' },
@@ -1251,7 +1281,25 @@ const ServiceSettings = () => {
         <p className="section-subtitle">Manage your service timings, styles, and menu builder.</p>
       </div>
 
-      <div className="service-settings-main">
+      <div className="settings-tabs-v4" style={{ marginBottom: '1.5rem', display: 'flex', gap: '1rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '0' }}>
+        <button 
+          className={`settings-tab-btn-v4 ${activeSettingsTab === 'services' ? 'active' : ''}`}
+          onClick={() => setActiveSettingsTab('services')}
+          style={{ background: 'none', border: 'none', borderBottom: activeSettingsTab === 'services' ? '2px solid #0077ff' : '2px solid transparent', color: activeSettingsTab === 'services' ? '#0077ff' : '#64748b', padding: '0.75rem 1rem', fontWeight: 600, cursor: 'pointer', fontSize: '1rem' }}
+        >
+          Services
+        </button>
+        <button 
+          className={`settings-tab-btn-v4 ${activeSettingsTab === 'availability' ? 'active' : ''}`}
+          onClick={() => setActiveSettingsTab('availability')}
+          style={{ background: 'none', border: 'none', borderBottom: activeSettingsTab === 'availability' ? '2px solid #0077ff' : '2px solid transparent', color: activeSettingsTab === 'availability' ? '#0077ff' : '#64748b', padding: '0.75rem 1rem', fontWeight: 600, cursor: 'pointer', fontSize: '1rem' }}
+        >
+          Availability
+        </button>
+      </div>
+
+      {activeSettingsTab === 'services' ? (
+        <div className="service-settings-main">
         <div className="category-sidebar-wrapper">
           <div className="sidebar-header">
             <h3 className="sidebar-section-title">Services</h3>
@@ -2023,6 +2071,50 @@ const ServiceSettings = () => {
           </div>
         )}
       </div>
+      ) : (
+        <div className="settings-card" style={{ maxWidth: '800px', margin: '0 auto', width: '100%' }}>
+          <div className="content-category-header" style={{ marginBottom: '1.5rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h3 className="category-title">Weekly Schedule</h3>
+            <button className="btn btn-outline btn-sm" onClick={() => applyToAllOpenDays(0)}>
+              Apply Mon to All
+            </button>
+          </div>
+          
+          <div className="availability-list">
+            {weeklySchedule.map((day, index) => (
+              <div key={day.day} className="availability-row" style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem 0', borderBottom: index < 6 ? '1px solid #f1f5f9' : 'none', flexWrap: 'wrap' }}>
+                <div style={{ width: '120px', fontWeight: '600', color: '#1e293b' }}>{day.day}</div>
+                
+                <div style={{ width: '100px', display: 'flex', alignItems: 'center' }}>
+                  <label className="service-switch">
+                    <input type="checkbox" checked={day.isOpen} onChange={(e) => handleScheduleChange(index, 'isOpen', e.target.checked)} />
+                    <span className="service-slider round"></span>
+                  </label>
+                  <span style={{ marginLeft: '10px', fontSize: '0.85rem', color: day.isOpen ? '#22c55e' : '#94a3b8', fontWeight: '500' }}>
+                    {day.isOpen ? 'Open' : 'Closed'}
+                  </span>
+                </div>
+
+                <div style={{ flex: 1, display: 'flex', gap: '0.75rem', opacity: day.isOpen ? 1 : 0.5, pointerEvents: day.isOpen ? 'auto' : 'none', alignItems: 'center', minWidth: '200px' }}>
+                  <input 
+                    type="time" 
+                    className="input-field" 
+                    value={day.openTime} 
+                    onChange={(e) => handleScheduleChange(index, 'openTime', e.target.value)} 
+                  />
+                  <span style={{ color: '#64748b' }}>to</span>
+                  <input 
+                    type="time" 
+                    className="input-field" 
+                    value={day.closeTime} 
+                    onChange={(e) => handleScheduleChange(index, 'closeTime', e.target.value)} 
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
