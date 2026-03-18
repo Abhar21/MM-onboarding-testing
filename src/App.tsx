@@ -2257,7 +2257,7 @@ const VendorProfile = ({
                     </tr>
                   </thead>
                   <tbody>
-                    {profileData.documents.map((doc, idx) => (
+                    {profileData.documents.map((doc: ProfileDocument, idx: number) => (
                       <tr key={idx}>
                         <td className="doc-type-cell-v4">{doc.type}</td>
                         <td className="doc-id-cell-v4">{doc.identifier}</td>
@@ -2524,7 +2524,7 @@ const VendorProfile = ({
                 className="submit-btn-v4"
                 disabled={!bankForm.bankName || !bankForm.accountNumber || !bankForm.fileName || bankForm.accountNumber !== bankForm.confirmAccountNumber}
                 onClick={() => {
-                  setProfileData(prev => ({
+                  setProfileData((prev: ProfileData) => ({
                     ...prev,
                     bank: {
                       ...prev.bank,
@@ -2656,8 +2656,65 @@ const VendorProfile = ({
   );
 };
 
+interface ProfileDocument {
+  type: string;
+  identifier: string;
+  date: string;
+  status: string;
+}
+
+interface ProfileData {
+  header: {
+    name: string;
+    id: string;
+    status: string;
+    joined: string;
+    gstType: string;
+    service: string;
+  };
+  owner: {
+    name: string;
+    email: string;
+    mobile: string;
+    profilePic: any;
+  };
+  business: {
+    category: string;
+    displayName: string;
+    address: string;
+    city: string;
+    state: string;
+    radius: string;
+    gstRegistered: boolean;
+    fssai: string;
+  };
+  identity: {
+    pan: string;
+    gst: string;
+    fssai: string;
+  };
+  partnership: {
+    joinedDate: string;
+    plan: string;
+    gstType: string;
+    agreement: string;
+  };
+  documents: ProfileDocument[];
+  bank: {
+    bankName: string;
+    holderName: string;
+    accountNumber: string;
+    ifsc: string;
+    accountType: string;
+    status: string;
+    lastUpdated: string;
+    rejectionReason: string | null;
+    pendingSubmission: any;
+  };
+}
+
 const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
-  const [profileData, setProfileData] = useState({
+  const [profileData, setProfileData] = useState<ProfileData>({
     header: {
       name: 'Catering Enterprise 3',
       id: 'MYMCATKAR0003',
