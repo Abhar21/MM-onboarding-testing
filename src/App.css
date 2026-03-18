@@ -7184,7 +7184,7 @@ input:checked + .slider-v4:before {
     gap: 24px;
   }
 
-  /* Documents Table */
+  /* Documents Table & Rows */
   .docs-table-wrapper-v4 {
     margin: 0 -20px;
     padding: 0 20px;
@@ -7194,6 +7194,28 @@ input:checked + .slider-v4:before {
 
   .docs-table-v4 {
     min-width: 600px;
+  }
+
+  .document-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.25rem;
+    padding: 1.5rem 0;
+  }
+
+  .doc-info {
+    width: 100%;
+  }
+
+  .doc-actions {
+    width: 100%;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .doc-btn {
+    width: 100%;
+    justify-content: center;
   }
 
   /* Service Settings */
