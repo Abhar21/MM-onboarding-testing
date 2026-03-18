@@ -2073,7 +2073,11 @@ const ServiceSettings = () => {
         <div className="settings-card" style={{ width: '100%' }}>
           <div className="content-category-header" style={{ marginBottom: '1.5rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h3 className="category-title">Weekly Schedule</h3>
-            <button className="btn btn-outline btn-sm" onClick={() => applyToAllOpenDays(0)}>
+            <button 
+              className="btn btn-sm" 
+              onClick={() => applyToAllOpenDays(0)}
+              style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem', color: '#0077ff', border: '1px solid #0077ff', backgroundColor: 'transparent', borderRadius: '6px' }}
+            >
               Apply Mon to All
             </button>
           </div>
