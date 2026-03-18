@@ -843,7 +843,21 @@ const Documents = () => {
   );
 };
 
-const Settings = () => {
+const Settings = ({
+  profileData,
+  setProfileData,
+  profileForm,
+  setProfileForm,
+  verification,
+  setVerification
+}: {
+  profileData: any,
+  setProfileData: any,
+  profileForm: any,
+  setProfileForm: any,
+  verification: any,
+  setVerification: any
+}) => {
   const [activeTab, setActiveTab] = useState('account');
 
   const tabs = [
@@ -886,18 +900,89 @@ const Settings = () => {
               <div className="settings-form-v4">
                 <div className="form-group">
                   <label className="input-label">Mobile Number</label>
-                  <div className="input-with-action-v4">
-                    <input type="text" className="input-field" value="+91 98765 43210" readOnly />
-                    <button className="settings-action-link-v4">Change</button>
+                  <div className="integrated-input-v4">
+                    <input
+                      type="text"
+                      className="input-field"
+                      value={profileForm.mobile}
+                      onChange={(e) => {
+                        setProfileForm({ ...profileForm, mobile: e.target.value });
+                        if (e.target.value !== profileData.owner.mobile) {
+                          setVerification({ ...verification, mobileVerified: false });
+                        }
+                      }}
+                    />
+                    {!verification.mobileVerified && !verification.mobileOtpSent && profileForm.mobile.length >= 10 && (
+                      <button className="settings-action-link-v4" onClick={() => setVerification({ ...verification, mobileOtpSent: true })}>Verify</button>
+                    )}
+                    {verification.mobileVerified && (
+                      <span className="verified-status-v4">Verified</span>
+                    )}
                   </div>
                 </div>
                 <div className="form-group">
                   <label className="input-label">Email Address</label>
-                  <div className="input-with-action-v4">
-                    <input type="email" className="input-field" value="contact@cateringbiz.com" readOnly />
-                    <button className="settings-action-link-v4">Change</button>
+                  <div className="integrated-input-v4">
+                    <input
+                      type="email"
+                      className="input-field"
+                      value={profileForm.email}
+                      onChange={(e) => {
+                        setProfileForm({ ...profileForm, email: e.target.value });
+                        if (e.target.value !== profileData.owner.email) {
+                          setVerification({ ...verification, emailVerified: false });
+                        }
+                      }}
+                    />
+                    {!verification.emailVerified && !verification.emailOtpSent && profileForm.email.includes('@') && (
+                      <button className="settings-action-link-v4" onClick={() => setVerification({ ...verification, emailOtpSent: true })}>Verify</button>
+                    )}
+                    {verification.emailVerified && (
+                      <span className="verified-status-v4">Verified</span>
+                    )}
                   </div>
                 </div>
+
+                {/* Account Settings OTP Overlay */}
+                {(verification.mobileOtpSent || verification.emailOtpSent) && (
+                  <div className="otp-popup-overlay-v4 settings-otp-overlay">
+                    <div className="otp-popup-card-v4">
+                      <h3>Enter OTP</h3>
+                      <p>Enter the code sent to your {verification.mobileOtpSent ? 'Mobile' : 'Email'}</p>
+                      <div className="otp-input-row-v4">
+                        <input
+                          type="text"
+                          maxLength={6}
+                          placeholder="••••••"
+                          value={verification.mobileOtpSent ? verification.mobileOtp : verification.emailOtp}
+                          onChange={(e) => {
+                            if (verification.mobileOtpSent) {
+                              setVerification({ ...verification, mobileOtp: e.target.value });
+                            } else {
+                              setVerification({ ...verification, emailOtp: e.target.value });
+                            }
+                          }}
+                        />
+                      </div>
+                      <div className="otp-actions-v4">
+                        <button className="otp-cancel-v4" onClick={() => setVerification({ ...verification, mobileOtpSent: false, emailOtpSent: false, mobileOtp: '', emailOtp: '' })}>Cancel</button>
+                        <button
+                          className="otp-verify-v4"
+                          onClick={() => {
+                            if (verification.mobileOtpSent) {
+                              setVerification({ ...verification, mobileVerified: true, mobileOtpSent: false });
+                            } else {
+                              setVerification({ ...verification, emailVerified: true, emailOtpSent: false });
+                            }
+                          }}
+                        >
+                          Verify
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 <div className="form-group">
                   <div className="notification-settings-v4">
                     <h4 className="sub-title">Notification Preferences</h4>
@@ -917,7 +1002,21 @@ const Settings = () => {
                     </div>
                   </div>
                 </div>
-                <button className="btn btn-primary-blue save-settings-btn-v4">Save Changes</button>
+                <button
+                  className="btn btn-primary-blue save-settings-btn-v4"
+                  onClick={() => {
+                    setProfileData((prev: any) => ({
+                      ...prev,
+                      owner: {
+                        ...prev.owner,
+                        mobile: profileForm.mobile,
+                        email: profileForm.email
+                      }
+                    }));
+                  }}
+                >
+                  Save Changes
+                </button>
               </div>
             </div>
           )}
@@ -1402,8 +1501,8 @@ const ServiceSettings = () => {
 
                     <div className="modal-footer" style={{ borderTop: '1px solid #f1f5f9', padding: '1.25rem 1.5rem' }}>
                       <div className="footer-right" style={{ width: '100%', justifyContent: 'flex-end', gap: '0.75rem' }}>
-                        <button 
-                          className="btn btn-ghost" 
+                        <button
+                          className="btn btn-ghost"
                           onClick={() => {
                             setMenuActionId(null);
                             setSelectedMenuAction(null);
@@ -1411,7 +1510,7 @@ const ServiceSettings = () => {
                         >
                           Cancel
                         </button>
-                        <button 
+                        <button
                           className={`btn ${selectedMenuAction === 'delete' ? 'btn-primary-red' : 'btn-primary-blue'}`}
                           disabled={!selectedMenuAction}
                           style={{ minWidth: '120px' }}
@@ -1449,486 +1548,504 @@ const ServiceSettings = () => {
           </div>
         </div>
 
-            {isAddingMenu && (
-              <div className="modal-overlay">
-                <div className="modal-container medium-large">
-                  <div className="modal-header">
-                    <div className="modal-title-group">
-                      <h3 className="modal-title">{menuEditingId ? 'Edit Menu' : 'Create New Menu'}</h3>
-                      <p className="modal-subtitle">
-                        {menuEditingId ? 'Update menu basics and food sections' : 'Create menu basics before adding food sections'}
-                      </p>
-                    </div>
-                    <button className="close-modal" onClick={resetAddMenu}>
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                    </button>
-                  </div>
+        {isAddingMenu && (
+          <div className="modal-overlay">
+            <div className="modal-container medium-large">
+              <div className="modal-header">
+                <div className="modal-title-group">
+                  <h3 className="modal-title">{menuEditingId ? 'Edit Menu' : 'Create New Menu'}</h3>
+                  <p className="modal-subtitle">
+                    {menuEditingId ? 'Update menu basics and food sections' : 'Create menu basics before adding food sections'}
+                  </p>
+                </div>
+                <button className="close-modal" onClick={resetAddMenu}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+              </div>
 
-                  <div className="modal-content">
-                    {menuStep === 1 && (
-                      <div className="step-content">
-                        <div className="commercial-setup-grid">
-                          {/* Block 1: Menu Identity */}
-                          <div className="form-section-flat">
-                            <h4 className="block-title">Menu Identity</h4>
-                            <div className="form-group full-width">
-                              <label className="input-label">Menu Name</label>
-                              <input
-                                type="text"
-                                className="input-field"
-                                placeholder="e.g. Standard Breakfast"
-                                value={menuIdentity.name}
-                                onChange={(e) => setMenuIdentity(prev => ({ ...prev, name: e.target.value }))}
-                              />
-                            </div>
-                          </div>
-
-                          <div className="form-section-flat">
-                            <div className="form-group" style={{ marginBottom: '1.5rem' }}>
-                              <label className="input-label">Food Type</label>
-                              <div className="radio-group-pills">
-                                {['Veg', 'Non-Veg'].map(type => (
-                                  <button
-                                    key={type}
-                                    className={`pill-btn ${type === 'Veg' ? 'pill-veg' : 'pill-non-veg'} ${menuIdentity.foodType === type ? 'active' : ''}`}
-                                    onClick={() => setMenuIdentity(prev => ({ ...prev, foodType: type }))}
-                                  >
-                                    <span className="pill-icon">
-                                      {type === 'Veg' ? (
-                                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="0.5" y="0.5" width="11" height="11" rx="1.5" stroke="currentColor" /><circle cx="6" cy="6" r="3" fill="currentColor" /></svg>
-                                      ) : (
-                                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="0.5" y="0.5" width="11" height="11" rx="1.5" stroke="currentColor" /><circle cx="6" cy="6" r="3" fill="currentColor" /></svg>
-                                      )}
-                                    </span>
-                                    {type}
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
-
-                            <div className="form-group" style={{ maxWidth: '320px', marginBottom: '1.5rem' }}>
-                              <label className="input-label">Price Per Person</label>
-                              <div className="input-with-prefix-fixed">
-                                <span className="prefix-fixed">₹</span>
-                                <input
-                                  type="number"
-                                  className="input-field pill-input"
-                                  placeholder="0"
-                                  value={menuIdentity.price}
-                                  onChange={(e) => setMenuIdentity(prev => ({ ...prev, price: e.target.value }))}
-                                />
-                              </div>
-                            </div>
-
-                            <div className="form-row-2" style={{ marginBottom: '1.5rem' }}>
-                              <div className="form-group">
-                                <label className="input-label">Minimum Members</label>
-                                <input
-                                  type="number"
-                                  className="input-field"
-                                  placeholder="Min pax"
-                                  value={menuIdentity.minMembers}
-                                  onChange={(e) => setMenuIdentity(prev => ({ ...prev, minMembers: e.target.value }))}
-                                />
-                                <span className="helper-text-label">Applicable booking size for this menu</span>
-                              </div>
-                              <div className="form-group">
-                                <label className="input-label">Maximum Members</label>
-                                <input
-                                  type="number"
-                                  className="input-field"
-                                  placeholder="Max pax"
-                                  value={menuIdentity.maxMembers}
-                                  onChange={(e) => setMenuIdentity(prev => ({ ...prev, maxMembers: e.target.value }))}
-                                />
-                                <span className="helper-text-label">Applicable booking size for this menu</span>
-                              </div>
-                            </div>
-
-                            <div className="form-group full-width">
-                              <label className="input-label">Menu Image</label>
-                              <input
-                                type="file"
-                                ref={fileInputRef}
-                                style={{ display: 'none' }}
-                                accept="image/*"
-                                onChange={handleImageUpload}
-                              />
-                              <div className="image-dashed-upload-v2" onClick={() => fileInputRef.current?.click()}>
-                                {menuIdentity.image ? (
-                                  <div className="upload-preview-container">
-                                    <img src={menuIdentity.image} alt="Menu Preview" className="upload-preview-img" />
-                                    <div className="upload-overlay-v2">
-                                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M23 4v6h-6"></path><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
-                                      <span>Change Image</span>
-                                    </div>
-                                  </div>
-                                ) : (
-                                  <>
-                                    <div className="upload-icon-circle">
-                                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-                                    </div>
-                                    <div className="upload-texts">
-                                      <span className="upload-main">Click to upload menu image</span>
-                                      <span className="upload-sub">PNG, JPG or WebP (Max 5MB)</span>
-                                    </div>
-                                  </>
-                                )}
-                              </div>
-                            </div>
-                          </div>
+              <div className="modal-content">
+                {menuStep === 1 && (
+                  <div className="step-content">
+                    <div className="commercial-setup-grid">
+                      {/* Block 1: Menu Identity */}
+                      <div className="form-section-flat">
+                        <h4 className="block-title">Menu Identity</h4>
+                        <div className="form-group full-width">
+                          <label className="input-label">Menu Name</label>
+                          <input
+                            type="text"
+                            className="input-field"
+                            placeholder="e.g. Standard Breakfast"
+                            value={menuIdentity.name}
+                            onChange={(e) => setMenuIdentity(prev => ({ ...prev, name: e.target.value }))}
+                          />
                         </div>
                       </div>
-                    )}
 
-                    {menuStep === 2 && (
-                      <div className="step-content">
-                        <h5 className="block-title" style={{ marginBottom: '0.75rem' }}>Example</h5>
-                        <div className="builder-helper-minimal" style={{ marginBottom: '1.5rem', background: '#f8fafc', padding: '1.25rem', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: 'none', minHeight: '140px' }}>
-                        </div>
-
-                        <div className="builder-header-minimal">
-                          <h4 className="builder-main-title">Sections</h4>
-                          <p className="builder-helper-text">Build food groups inside this menu</p>
-                          <div className="menu-status-hint">
-                            Menu was created you can customise or edit from dashboard
-                          </div>
-                        </div>
-
-                        {!isAddingSection && sections.length === 0 && (
-                          <div className="builder-empty-state">
-                            <div className="empty-state-card">
-                              <div className="empty-icon-wrap">
-                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20v-6M9 20V10M15 20V4"></path></svg>
-                              </div>
-                              <h5>No sections added yet</h5>
-                              <p>Start by creating your first food group like Starters or Main Course</p>
+                      <div className="form-section-flat">
+                        <div className="form-group" style={{ marginBottom: '1.5rem' }}>
+                          <label className="input-label">Food Type</label>
+                          <div className="radio-group-pills">
+                            {['Veg', 'Non-Veg'].map(type => (
                               <button
-                                className="btn btn-primary"
-                                onClick={() => {
-                                  setCurrentSection({ name: '', type: 'All Included', limit: 0, items: [{ name: '', description: '', image: null }] });
-                                  setIsAddingSection(true);
-                                }}
+                                key={type}
+                                className={`pill-btn ${type === 'Veg' ? 'pill-veg' : 'pill-non-veg'} ${menuIdentity.foodType === type ? 'active' : ''}`}
+                                onClick={() => setMenuIdentity(prev => ({ ...prev, foodType: type }))}
                               >
-                                + Add First Section
-                              </button>
-                            </div>
-                          </div>
-                        )}
-
-                        <div className="saved-sections-list">
-                          {sections.map((sec, idx) => {
-                            if (idx === sectionEditingIndex) return null;
-                            return (
-                              <div key={idx} className="section-summary-card">
-                              <div className="sec-sum-info">
-                                <span className="sec-sum-name">{sec.name}</span>
-                                <span className="sec-sum-rule">
-                                  {sec.type === 'All Included' ? 'All items included' : `Choose any ${sec.limit} from ${sec.items.length} items`}
+                                <span className="pill-icon">
+                                  {type === 'Veg' ? (
+                                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="0.5" y="0.5" width="11" height="11" rx="1.5" stroke="currentColor" /><circle cx="6" cy="6" r="3" fill="currentColor" /></svg>
+                                  ) : (
+                                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="0.5" y="0.5" width="11" height="11" rx="1.5" stroke="currentColor" /><circle cx="6" cy="6" r="3" fill="currentColor" /></svg>
+                                  )}
                                 </span>
-                              </div>
-                              <div className="section-actions-inline">
-                                <button className="icon-btn edit-btn" onClick={() => {
-                                  setCurrentSection({ ...sec });
-                                  setSectionEditingIndex(idx);
-                                  setIsAddingSection(true);
-                                }}>
-                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                                </button>
-                                <button className="icon-btn delete-btn" onClick={() => {
-                                  setSections(sections.filter((_, i) => i !== idx));
-                                }}>
-                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                                </button>
-                              </div>
-                            </div>
-                          );
-                        })}
-                        </div>
-
-                        {!isAddingSection && sections.length > 0 && (
-                          <div className="add-sec-bar-inline">
-                            <button
-                              className="btn btn-outline btn-sm"
-                              onClick={() => {
-                                setCurrentSection({ name: '', type: 'All Included', limit: 0, items: [{ name: '', description: '', image: null }] });
-                                setIsAddingSection(true);
-                              }}
-                            >
-                              + Add Another Section
-                            </button>
-                          </div>
-                        )}
-
-                        {isAddingSection && (
-                          <div className="section-inline-editor">
-                            <div className="section-form-top">
-                              <div className="form-group full-width">
-                                <label className="input-label">Section Name</label>
-                                <input
-                                  type="text"
-                                  className="input-field"
-                                  placeholder="e.g. Starters"
-                                  value={currentSection.name}
-                                  onChange={(e) => setCurrentSection(prev => ({ ...prev, name: e.target.value }))}
-                                />
-                              </div>
-
-                              <div className="selection-type-row">
-                                <div className="form-group flex-1">
-                                  <label className="input-label">Selection Type</label>
-                                  <select
-                                    className="input-field"
-                                    value={currentSection.type}
-                                    onChange={(e) => setCurrentSection(prev => ({ ...prev, type: e.target.value }))}
-                                  >
-                                    <option>All Included</option>
-                                    <option>Limited Selection</option>
-                                  </select>
-                                </div>
-                                <div className="form-group mini-limit">
-                                  <label className="input-label">Choose Any</label>
-                                  <input
-                                    type="number"
-                                    className="input-field"
-                                    placeholder="0"
-                                    disabled={currentSection.type === 'All Included'}
-                                    value={currentSection.limit || ''}
-                                    onChange={(e) => setCurrentSection(prev => ({ ...prev, limit: parseInt(e.target.value) || 0 }))}
-                                  />
-                                </div>
-                              </div>
-                            </div>
-
-                            <div className="items-area-inline">
-                              <label className="input-label">Items in this Section</label>
-                              <div className="item-cards-list">
-                                {currentSection.items.map((item, i) => (
-                                  <div key={i} className="item-input-card">
-                                    <div className="item-form-grid">
-                                      <div className="item-form-image">
-                                        <div className="item-upload-mini" onClick={() => {
-                                          const input = document.createElement('input');
-                                          input.type = 'file';
-                                          input.accept = 'image/*';
-                                          input.onchange = (e) => {
-                                            const file = (e.target as HTMLInputElement).files?.[0];
-                                            if (file) {
-                                              const reader = new FileReader();
-                                              reader.onloadend = () => {
-                                                const newItems = [...currentSection.items];
-                                                newItems[i].image = reader.result as string;
-                                                setCurrentSection(prev => ({ ...prev, items: newItems }));
-                                              };
-                                              reader.readAsDataURL(file);
-                                            }
-                                          };
-                                          input.click();
-                                        }}>
-                                          {item.image ? (
-                                            <img src={item.image} alt="Item" className="uploaded-mini-thumb" />
-                                          ) : (
-                                            <div className="upload-placeholder-mini">
-                                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                                              <span>Photo</span>
-                                            </div>
-                                          )}
-                                        </div>
-                                      </div>
-                                      <div className="item-form-details">
-                                        <div className="form-group">
-                                          <input
-                                            type="text"
-                                            className="input-field item-name-field"
-                                            placeholder="Item Name"
-                                            value={item.name}
-                                            onChange={(e) => {
-                                              const newItems = [...currentSection.items];
-                                              newItems[i].name = e.target.value;
-                                              setCurrentSection(prev => ({ ...prev, items: newItems }));
-                                            }}
-                                          />
-                                        </div>
-                                        <div className="form-group">
-                                          <textarea
-                                            className="input-field item-desc-field"
-                                            placeholder="Short Description (max 1000 chars)"
-                                            maxLength={1000}
-                                            value={item.description}
-                                            onChange={(e) => {
-                                              const newItems = [...currentSection.items];
-                                              newItems[i].description = e.target.value;
-                                              setCurrentSection(prev => ({ ...prev, items: newItems }));
-                                            }}
-                                          />
-                                        </div>
-                                      </div>
-                                    </div>
-                                    {currentSection.items.length > 1 && (
-                                      <button className="item-remove-btn" onClick={() => {
-                                        setCurrentSection(prev => ({ ...prev, items: prev.items.filter((_, idx) => idx !== i) }));
-                                      }}>
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                                      </button>
-                                    )}
-                                  </div>
-                                ))}
-                              </div>
-
-                              <button
-                                className="add-item-btn-inline"
-                                onClick={() => {
-                                  setCurrentSection(prev => ({
-                                    ...prev,
-                                    items: [...prev.items, { name: '', description: '', image: null }]
-                                  }));
-                                }}
-                              >
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                                Add Another Item
+                                {type}
                               </button>
-                            </div>
-
-                            <div className="section-builder-actions">
-                              <button className="btn btn-ghost" onClick={() => setIsAddingSection(false)}>Cancel</button>
-                              <button
-                                className="btn btn-primary-blue"
-                                disabled={!currentSection.name || currentSection.items.length === 0}
-                                onClick={handleSaveSection}
-                              >
-                                Save Section
-                              </button>
-                            </div>
-                            <div className="section-save-hint">
-                              save the current section to create the new section
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    {menuStep === 3 && (
-                      <div className="step-content">
-                        <div className="preview-card">
-                          <div className="preview-identity">
-                            <div className="preview-img-box">
-                              <img
-                                src={menuIdentity.image || "https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?w=160&h=160&fit=crop"}
-                                alt="Menu Preview"
-                                className="thumbnail-80"
-                              />
-                            </div>
-                            <div className="preview-info">
-                              <h4 className="preview-menu-name">{menuIdentity.name || 'Untitled Menu'}</h4>
-                              <div className="preview-sub-meta">
-                                <span className="preview-category-count">
-                                  {activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1)} • {sections.length} Sections
-                                </span>
-                                <span className={`food-type-tag ${menuIdentity.foodType.toLowerCase()}`}>
-                                  <span className="p-type-icon">
-                                    {menuIdentity.foodType === 'Veg' ? (
-                                      <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><rect x="0.5" y="0.5" width="11" height="11" rx="1.5" stroke="currentColor" /><circle cx="6" cy="6" r="3" fill="currentColor" /></svg>
-                                    ) : (
-                                      <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><rect x="0.5" y="0.5" width="11" height="11" rx="1.5" stroke="currentColor" /><circle cx="6" cy="6" r="3" fill="currentColor" /></svg>
-                                    )}
-                                  </span>
-                                  {menuIdentity.foodType}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="preview-sections-v2">
-                            {sections.map((sec, idx) => (
-                              <Fragment key={idx}>
-                                <div className="preview-section-item-flat">
-                                  <div className="p-sec-header">
-                                    <span className="p-sec-name">{sec.name}</span>
-                                    <span className="p-sec-summary">
-                                      {sec.type?.toLowerCase().trim() === 'all included' ? '→ all included' : `→ choose any ${sec.limit} from ${sec.items.length} items`}
-                                    </span>
-                                  </div>
-                                  <div className="p-sec-items-detailed-list">
-                                    {sec.items.map((item: any, i: number) => (
-                                      <div key={i} className="p-item-detail">
-                                        <span className="p-item-name">{item.name}</span>
-                                        {item.description && <span className="p-item-desc">• {item.description}</span>}
-                                      </div>
-                                    ))}
-                                  </div>
-                                </div>
-                                {idx < sections.length - 1 && <div className="section-divider"></div>}
-                              </Fragment>
                             ))}
                           </div>
                         </div>
+
+                        <div className="form-group" style={{ maxWidth: '320px', marginBottom: '1.5rem' }}>
+                          <label className="input-label">Price Per Person</label>
+                          <div className="input-with-prefix-fixed">
+                            <span className="prefix-fixed">₹</span>
+                            <input
+                              type="number"
+                              className="input-field pill-input"
+                              placeholder="0"
+                              value={menuIdentity.price}
+                              onChange={(e) => setMenuIdentity(prev => ({ ...prev, price: e.target.value }))}
+                            />
+                          </div>
+                        </div>
+
+                        <div className="form-row-2" style={{ marginBottom: '1.5rem' }}>
+                          <div className="form-group">
+                            <label className="input-label">Minimum Members</label>
+                            <input
+                              type="number"
+                              className="input-field"
+                              placeholder="Min pax"
+                              value={menuIdentity.minMembers}
+                              onChange={(e) => setMenuIdentity(prev => ({ ...prev, minMembers: e.target.value }))}
+                            />
+                            <span className="helper-text-label">Applicable booking size for this menu</span>
+                          </div>
+                          <div className="form-group">
+                            <label className="input-label">Maximum Members</label>
+                            <input
+                              type="number"
+                              className="input-field"
+                              placeholder="Max pax"
+                              value={menuIdentity.maxMembers}
+                              onChange={(e) => setMenuIdentity(prev => ({ ...prev, maxMembers: e.target.value }))}
+                            />
+                            <span className="helper-text-label">Applicable booking size for this menu</span>
+                          </div>
+                        </div>
+
+                        <div className="form-group full-width">
+                          <label className="input-label">Menu Image</label>
+                          <input
+                            type="file"
+                            ref={fileInputRef}
+                            style={{ display: 'none' }}
+                            accept="image/*"
+                            onChange={handleImageUpload}
+                          />
+                          <div className="image-dashed-upload-v2" onClick={() => fileInputRef.current?.click()}>
+                            {menuIdentity.image ? (
+                              <div className="upload-preview-container">
+                                <img src={menuIdentity.image} alt="Menu Preview" className="upload-preview-img" />
+                                <div className="upload-overlay-v2">
+                                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M23 4v6h-6"></path><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                                  <span>Change Image</span>
+                                </div>
+                              </div>
+                            ) : (
+                              <>
+                                <div className="upload-icon-circle">
+                                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                                </div>
+                                <div className="upload-texts">
+                                  <span className="upload-main">Click to upload menu image</span>
+                                  <span className="upload-sub">PNG, JPG or WebP (Max 5MB)</span>
+                                </div>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {menuStep === 2 && (
+                  <div className="step-content">
+                    <h5 className="block-title" style={{ marginBottom: '0.75rem' }}>Example</h5>
+                    <div className="builder-helper-minimal" style={{ marginBottom: '1.5rem', background: '#f8fafc', padding: '1.25rem', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: 'none', minHeight: '140px' }}>
+                    </div>
+
+                    <div className="builder-header-minimal">
+                      <h4 className="builder-main-title">Sections</h4>
+                      <p className="builder-helper-text">Build food groups inside this menu</p>
+                      <div className="menu-status-hint">
+                        Menu was created you can customise or edit from dashboard
+                      </div>
+                    </div>
+
+                    {!isAddingSection && sections.length === 0 && (
+                      <div className="builder-empty-state">
+                        <div className="empty-state-card">
+                          <div className="empty-icon-wrap">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20v-6M9 20V10M15 20V4"></path></svg>
+                          </div>
+                          <h5>No sections added yet</h5>
+                          <p>Start by creating your first food group like Starters or Main Course</p>
+                          <button
+                            className="btn btn-primary"
+                            onClick={() => {
+                              setCurrentSection({ name: '', type: 'All Included', limit: 0, items: [{ name: '', description: '', image: null }] });
+                              setIsAddingSection(true);
+                            }}
+                          >
+                            + Add First Section
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="saved-sections-list">
+                      {sections.map((sec, idx) => {
+                        if (idx === sectionEditingIndex) return null;
+                        return (
+                          <div key={idx} className="section-summary-card">
+                            <div className="sec-sum-info">
+                              <span className="sec-sum-name">{sec.name}</span>
+                              <span className="sec-sum-rule">
+                                {sec.type === 'All Included' ? 'All items included' : `Choose any ${sec.limit} from ${sec.items.length} items`}
+                              </span>
+                            </div>
+                            <div className="section-actions-inline">
+                              <button className="icon-btn edit-btn" onClick={() => {
+                                setCurrentSection({ ...sec });
+                                setSectionEditingIndex(idx);
+                                setIsAddingSection(true);
+                              }}>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                              </button>
+                              <button className="icon-btn delete-btn" onClick={() => {
+                                setSections(sections.filter((_, i) => i !== idx));
+                              }}>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {!isAddingSection && sections.length > 0 && (
+                      <div className="add-sec-bar-inline">
+                        <button
+                          className="btn btn-outline btn-sm"
+                          onClick={() => {
+                            setCurrentSection({ name: '', type: 'All Included', limit: 0, items: [{ name: '', description: '', image: null }] });
+                            setIsAddingSection(true);
+                          }}
+                        >
+                          + Add Another Section
+                        </button>
+                      </div>
+                    )}
+
+                    {isAddingSection && (
+                      <div className="section-inline-editor">
+                        <div className="section-form-top">
+                          <div className="form-group full-width">
+                            <label className="input-label">Section Name</label>
+                            <input
+                              type="text"
+                              className="input-field"
+                              placeholder="e.g. Starters"
+                              value={currentSection.name}
+                              onChange={(e) => setCurrentSection(prev => ({ ...prev, name: e.target.value }))}
+                            />
+                          </div>
+
+                          <div className="selection-type-row">
+                            <div className="form-group flex-1">
+                              <label className="input-label">Selection Type</label>
+                              <select
+                                className="input-field"
+                                value={currentSection.type}
+                                onChange={(e) => setCurrentSection(prev => ({ ...prev, type: e.target.value }))}
+                              >
+                                <option>All Included</option>
+                                <option>Limited Selection</option>
+                              </select>
+                            </div>
+                            <div className="form-group mini-limit">
+                              <label className="input-label">Choose Any</label>
+                              <input
+                                type="number"
+                                className="input-field"
+                                placeholder="0"
+                                disabled={currentSection.type === 'All Included'}
+                                value={currentSection.limit || ''}
+                                onChange={(e) => setCurrentSection(prev => ({ ...prev, limit: parseInt(e.target.value) || 0 }))}
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="items-area-inline">
+                          <label className="input-label">Items in this Section</label>
+                          <div className="item-cards-list">
+                            {currentSection.items.map((item, i) => (
+                              <div key={i} className="item-input-card">
+                                <div className="item-form-grid">
+                                  <div className="item-form-image">
+                                    <div className="item-upload-mini" onClick={() => {
+                                      const input = document.createElement('input');
+                                      input.type = 'file';
+                                      input.accept = 'image/*';
+                                      input.onchange = (e) => {
+                                        const file = (e.target as HTMLInputElement).files?.[0];
+                                        if (file) {
+                                          const reader = new FileReader();
+                                          reader.onloadend = () => {
+                                            const newItems = [...currentSection.items];
+                                            newItems[i].image = reader.result as string;
+                                            setCurrentSection(prev => ({ ...prev, items: newItems }));
+                                          };
+                                          reader.readAsDataURL(file);
+                                        }
+                                      };
+                                      input.click();
+                                    }}>
+                                      {item.image ? (
+                                        <img src={item.image} alt="Item" className="uploaded-mini-thumb" />
+                                      ) : (
+                                        <div className="upload-placeholder-mini">
+                                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                                          <span>Photo</span>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                  <div className="item-form-details">
+                                    <div className="form-group">
+                                      <input
+                                        type="text"
+                                        className="input-field item-name-field"
+                                        placeholder="Item Name"
+                                        value={item.name}
+                                        onChange={(e) => {
+                                          const newItems = [...currentSection.items];
+                                          newItems[i].name = e.target.value;
+                                          setCurrentSection(prev => ({ ...prev, items: newItems }));
+                                        }}
+                                      />
+                                    </div>
+                                    <div className="form-group">
+                                      <textarea
+                                        className="input-field item-desc-field"
+                                        placeholder="Short Description (max 1000 chars)"
+                                        maxLength={1000}
+                                        value={item.description}
+                                        onChange={(e) => {
+                                          const newItems = [...currentSection.items];
+                                          newItems[i].description = e.target.value;
+                                          setCurrentSection(prev => ({ ...prev, items: newItems }));
+                                        }}
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                                {currentSection.items.length > 1 && (
+                                  <button className="item-remove-btn" onClick={() => {
+                                    setCurrentSection(prev => ({ ...prev, items: prev.items.filter((_, idx) => idx !== i) }));
+                                  }}>
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                  </button>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+
+                          <button
+                            className="add-item-btn-inline"
+                            onClick={() => {
+                              setCurrentSection(prev => ({
+                                ...prev,
+                                items: [...prev.items, { name: '', description: '', image: null }]
+                              }));
+                            }}
+                          >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                            Add Another Item
+                          </button>
+                        </div>
+
+                        <div className="section-builder-actions">
+                          <button className="btn btn-ghost" onClick={() => setIsAddingSection(false)}>Cancel</button>
+                          <button
+                            className="btn btn-primary-blue"
+                            disabled={!currentSection.name || currentSection.items.length === 0}
+                            onClick={handleSaveSection}
+                          >
+                            Save Section
+                          </button>
+                        </div>
+                        <div className="section-save-hint">
+                          save the current section to create the new section
+                        </div>
                       </div>
                     )}
                   </div>
+                )}
 
-                  <div className="modal-footer">
-                    <div className="footer-left">
-                      <span className="step-counter-badge">Step {menuStep}/3</span>
-                    </div>
-                    <div className="footer-right">
-                      {menuStep > 1 && (
-                        <button className="btn btn-outline" onClick={() => setMenuStep(prev => prev - 1)}>Back</button>
-                      )}
-
-                      {menuStep < 3 ? (
-                        <button
-                          className="btn btn-primary-blue"
-                          onClick={() => setMenuStep(prev => prev + 1)}
-                          disabled={menuStep === 1 && !menuIdentity.name}
-                        >
-                          Next
-                        </button>
-                      ) : (
-                        <button
-                          className="btn btn-primary-blue"
-                          onClick={() => {
-                            if (menuEditingId) {
-                              setMenus(prev => prev.map(m => m.id === menuEditingId ? {
-                                ...m,
-                                name: menuIdentity.name,
-                                price: parseInt(menuIdentity.price) || 0,
-                                minMembers: menuIdentity.minMembers,
-                                maxMembers: menuIdentity.maxMembers,
-                                foodType: menuIdentity.foodType,
-                                image: menuIdentity.image,
-                                sections: [...sections]
-                              } : m));
-                            } else {
-                              const newMenuObj = {
-                                id: menus.length + 1,
-                                name: menuIdentity.name,
-                                price: parseInt(menuIdentity.price) || 0,
-                                status: 'Active',
-                                category: activeCategory,
-                                minMembers: menuIdentity.minMembers,
-                                maxMembers: menuIdentity.maxMembers,
-                                foodType: menuIdentity.foodType,
-                                image: menuIdentity.image,
-                                sections: [...sections]
-                              };
-                              setMenus(prev => [...prev, newMenuObj]);
-                            }
-                            resetAddMenu();
-                          }}
-                        >
-                          Save Menu
-                        </button>
-                      )}
+                {menuStep === 3 && (
+                  <div className="step-content">
+                    <div className="preview-card">
+                      <div className="preview-identity">
+                        <div className="preview-img-box">
+                          <img
+                            src={menuIdentity.image || "https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?w=160&h=160&fit=crop"}
+                            alt="Menu Preview"
+                            className="thumbnail-80"
+                          />
+                        </div>
+                        <div className="preview-info">
+                          <h4 className="preview-menu-name">{menuIdentity.name || 'Untitled Menu'}</h4>
+                          <div className="preview-sub-meta">
+                            <span className="preview-category-count">
+                              {activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1)} • {sections.length} Sections
+                            </span>
+                            <span className={`food-type-tag ${menuIdentity.foodType.toLowerCase()}`}>
+                              <span className="p-type-icon">
+                                {menuIdentity.foodType === 'Veg' ? (
+                                  <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><rect x="0.5" y="0.5" width="11" height="11" rx="1.5" stroke="currentColor" /><circle cx="6" cy="6" r="3" fill="currentColor" /></svg>
+                                ) : (
+                                  <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><rect x="0.5" y="0.5" width="11" height="11" rx="1.5" stroke="currentColor" /><circle cx="6" cy="6" r="3" fill="currentColor" /></svg>
+                                )}
+                              </span>
+                              {menuIdentity.foodType}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="preview-sections-v2">
+                        {sections.map((sec, idx) => (
+                          <Fragment key={idx}>
+                            <div className="preview-section-item-flat">
+                              <div className="p-sec-header">
+                                <span className="p-sec-name">{sec.name}</span>
+                                <span className="p-sec-summary">
+                                  {sec.type?.toLowerCase().trim() === 'all included' ? '→ all included' : `→ choose any ${sec.limit} from ${sec.items.length} items`}
+                                </span>
+                              </div>
+                              <div className="p-sec-items-detailed-list">
+                                {sec.items.map((item: any, i: number) => (
+                                  <div key={i} className="p-item-detail">
+                                    <span className="p-item-name">{item.name}</span>
+                                    {item.description && <span className="p-item-desc">• {item.description}</span>}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                            {idx < sections.length - 1 && <div className="section-divider"></div>}
+                          </Fragment>
+                        ))}
+                      </div>
                     </div>
                   </div>
+                )}
+              </div>
+
+              <div className="modal-footer">
+                <div className="footer-left">
+                  <span className="step-counter-badge">Step {menuStep}/3</span>
+                </div>
+                <div className="footer-right">
+                  {menuStep > 1 && (
+                    <button className="btn btn-outline" onClick={() => setMenuStep(prev => prev - 1)}>Back</button>
+                  )}
+
+                  {menuStep < 3 ? (
+                    <button
+                      className="btn btn-primary-blue"
+                      onClick={() => setMenuStep(prev => prev + 1)}
+                      disabled={menuStep === 1 && !menuIdentity.name}
+                    >
+                      Next
+                    </button>
+                  ) : (
+                    <button
+                      className="btn btn-primary-blue"
+                      onClick={() => {
+                        if (menuEditingId) {
+                          setMenus(prev => prev.map(m => m.id === menuEditingId ? {
+                            ...m,
+                            name: menuIdentity.name,
+                            price: parseInt(menuIdentity.price) || 0,
+                            minMembers: menuIdentity.minMembers,
+                            maxMembers: menuIdentity.maxMembers,
+                            foodType: menuIdentity.foodType,
+                            image: menuIdentity.image,
+                            sections: [...sections]
+                          } : m));
+                        } else {
+                          const newMenuObj = {
+                            id: menus.length + 1,
+                            name: menuIdentity.name,
+                            price: parseInt(menuIdentity.price) || 0,
+                            status: 'Active',
+                            category: activeCategory,
+                            minMembers: menuIdentity.minMembers,
+                            maxMembers: menuIdentity.maxMembers,
+                            foodType: menuIdentity.foodType,
+                            image: menuIdentity.image,
+                            sections: [...sections]
+                          };
+                          setMenus(prev => [...prev, newMenuObj]);
+                        }
+                        resetAddMenu();
+                      }}
+                    >
+                      Save Menu
+                    </button>
+                  )}
                 </div>
               </div>
-            )}
-        </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
 
-const VendorProfile = () => {
+const VendorProfile = ({
+  profileData,
+  setProfileData,
+  profileForm,
+  setProfileForm,
+  verification,
+  setVerification,
+  showEditProfileModal,
+  setShowEditProfileModal
+}: {
+  profileData: any,
+  setProfileData: any,
+  profileForm: any,
+  setProfileForm: any,
+  verification: any,
+  setVerification: any,
+  showEditProfileModal: boolean,
+  setShowEditProfileModal: any
+}) => {
   const [activeTab, setActiveTab] = useState('Summary');
 
   const tabs = [
@@ -1936,58 +2053,6 @@ const VendorProfile = () => {
     { id: 'Documents', label: 'Documents' },
     { id: 'Bank Details', label: 'Bank Details' }
   ];
-
-  const [profileData, setProfileData] = useState({
-    header: {
-      name: 'Catering Enterprise 3',
-      id: 'MYMCATKAR0003',
-      status: 'Active',
-      joined: '18 Nov 2024',
-      gstType: 'Regular',
-      service: 'Catering'
-    },
-    owner: {
-      name: 'Bhargav Reddy',
-      email: 'contact@cateringent3.com',
-      mobile: '+91 98765 43210'
-    },
-    business: {
-      category: 'Enterprise Catering',
-      displayName: 'Catering Enterprise 3 Services',
-      address: 'Plot 45, Jubilee Hills, Road No. 36',
-      city: 'Hyderabad',
-      state: 'Telangana',
-      radius: '50km Radius'
-    },
-    identity: {
-      pan: 'ABCDE1234F',
-      gst: '36AAAAA0000A1Z5',
-      fssai: '12345678901234'
-    },
-    partnership: {
-      joinedDate: '18 Nov 2024',
-      plan: 'Pro Plan',
-      gstType: 'Regular Taxpayer',
-      agreement: 'Accepted'
-    },
-    documents: [
-      { type: 'GST Certificate', identifier: '29ABCDE1234F103Z5', date: '14 Feb 2026', status: 'Verified' },
-      { type: 'PAN Card', identifier: 'ABCDE1234F', date: '14 Feb 2026', status: 'Verified' },
-      { type: 'FSSAI License', identifier: '12345678901234', date: '14 Feb 2026', status: 'Verified' },
-      { type: 'Cancelled Cheque', identifier: 'A/C: ****9012', date: '14 Feb 2026', status: 'Verified' }
-    ],
-    bank: {
-      bankName: 'HDFC Bank',
-      holderName: 'User 3',
-      accountNumber: 'XXXX  XXXX  9012',
-      ifsc: 'HDFC0001234',
-      accountType: 'Savings Account',
-      status: 'Verified',
-      lastUpdated: '14 Feb 2026',
-      rejectionReason: null as string | null,
-      pendingSubmission: null as any
-    }
-  });
 
   const [showBankEditModal, setShowBankEditModal] = useState(false);
   const [bankForm, setBankForm] = useState({
@@ -2000,25 +2065,6 @@ const VendorProfile = () => {
     file: null as File | null,
     fileName: ''
   });
-
-  const [showEditProfileModal, setShowEditProfileModal] = useState(false);
-  const [profileForm, setProfileForm] = useState({
-    mobile: '',
-    email: '',
-    address: '',
-    businessImage: null as File | null,
-    businessImageName: ''
-  });
-
-  const [verification, setVerification] = useState({
-    mobileOtpSent: false,
-    mobileOtp: '',
-    mobileVerified: false,
-    emailOtpSent: false,
-    emailOtp: '',
-    emailVerified: false
-  });
-
 
   const handleOpenEditProfile = () => {
     setProfileForm({
@@ -2046,29 +2092,29 @@ const VendorProfile = () => {
         <div className="header-main-row-v4">
           <div className="header-left-v4">
             <h1 className="biz-name-v4">{profileData.header.name}</h1>
-            
+
             <div className="header-meta-row-v4">
               <div className="v-id-badge-v4">{profileData.header.id}</div>
-              
+
               <div className="status-pill-v4">
                 <span className="status-dot-v4"></span>
                 <span className="status-text-v4">{profileData.header.status}</span>
               </div>
-              
+
               <div className="meta-divider-v4"></div>
-              
+
               <div className="meta-item-v4">
                 <span className="m-label-v4">Joined:</span>
                 <span className="m-value-v4">{profileData.header.joined}</span>
               </div>
-              
+
               <div className="meta-item-v4">
                 <span className="m-label-v4">GST Type:</span>
                 <span className="m-value-v4 gst-regular-v4">{profileData.header.gstType}</span>
               </div>
-              
+
               <div className="meta-divider-v4"></div>
-              
+
               <div className="meta-item-v4">
                 <span className="m-label-v4">Service:</span>
                 <span className="m-value-v4 service-type-v4">{profileData.header.service}</span>
@@ -2115,6 +2161,7 @@ const VendorProfile = () => {
                         <div className="summary-item-v4">
                           <label>Owner Name</label>
                           <span>{profileData.owner.name}</span>
+                          <div className="verification-source-v4">verified from PAN</div>
                         </div>
                         <div className="summary-item-v4">
                           <label>Mobile Number</label>
@@ -2139,6 +2186,7 @@ const VendorProfile = () => {
                         <div className="summary-item-v4">
                           <label>Business Name</label>
                           <span>{profileData.header.name}</span>
+                          <div className="verification-source-v4">verified from FSSAI</div>
                         </div>
                         <div className="summary-item-v4">
                           <label>Service Category</label>
@@ -2147,9 +2195,13 @@ const VendorProfile = () => {
                         <div className="summary-item-v4">
                           <label>Address</label>
                           <span>{profileData.business.address}</span>
+                          <div className="verification-source-v4">verified from FSSAI</div>
                         </div>
                       </div>
                     </div>
+                  </div>
+                  <div className="summary-footer-note-v4">
+                    Details verified by the GST, FSSAI, PAN can't be editable
                   </div>
                 </div>
               </div>
@@ -2189,7 +2241,7 @@ const VendorProfile = () => {
             <div className="docs-card-v4">
               <div className="docs-card-header-v4">
                 <div className="d-title-group-v4">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{color: '#64748b'}}><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#64748b' }}><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
                   <h3>Uploaded Documents</h3>
                 </div>
               </div>
@@ -2341,7 +2393,7 @@ const VendorProfile = () => {
 
               {(profileData.bank.status === 'Verified' || profileData.bank.status === 'Rejected') && (
                 <div className="bank-card-footer-v4">
-                  <button 
+                  <button
                     className="change-bank-btn-v4"
                     onClick={() => setShowBankEditModal(true)}
                   >
@@ -2377,18 +2429,18 @@ const VendorProfile = () => {
               <div className="bank-form-grid-v4">
                 <div className="form-group-v4">
                   <label>BANK NAME</label>
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     placeholder="e.g. HDFC Bank"
                     value={bankForm.bankName}
-                    onChange={(e) => setBankForm({...bankForm, bankName: e.target.value})}
+                    onChange={(e) => setBankForm({ ...bankForm, bankName: e.target.value })}
                   />
                 </div>
                 <div className="form-group-v4">
                   <label>ACCOUNT TYPE</label>
-                  <select 
+                  <select
                     value={bankForm.accountType}
-                    onChange={(e) => setBankForm({...bankForm, accountType: e.target.value})}
+                    onChange={(e) => setBankForm({ ...bankForm, accountType: e.target.value })}
                   >
                     <option value="savings">Savings Account</option>
                     <option value="current">Current Account</option>
@@ -2396,38 +2448,38 @@ const VendorProfile = () => {
                 </div>
                 <div className="form-group-v4">
                   <label>ACCOUNT HOLDER NAME</label>
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     placeholder="Name as on passbook"
                     value={bankForm.holderName}
-                    onChange={(e) => setBankForm({...bankForm, holderName: e.target.value})}
+                    onChange={(e) => setBankForm({ ...bankForm, holderName: e.target.value })}
                   />
                 </div>
                 <div className="form-group-v4">
                   <label>IFSC CODE</label>
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     placeholder="e.g. HDFC0001234"
                     value={bankForm.ifsc}
-                    onChange={(e) => setBankForm({...bankForm, ifsc: e.target.value.toUpperCase()})}
+                    onChange={(e) => setBankForm({ ...bankForm, ifsc: e.target.value.toUpperCase() })}
                   />
                 </div>
                 <div className="form-group-v4">
                   <label>ACCOUNT NUMBER</label>
-                  <input 
-                    type="password" 
+                  <input
+                    type="password"
                     placeholder="Enter account number"
                     value={bankForm.accountNumber}
-                    onChange={(e) => setBankForm({...bankForm, accountNumber: e.target.value})}
+                    onChange={(e) => setBankForm({ ...bankForm, accountNumber: e.target.value })}
                   />
                 </div>
                 <div className="form-group-v4">
                   <label>CONFIRM ACCOUNT NUMBER</label>
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     placeholder="Re-enter account number"
                     value={bankForm.confirmAccountNumber}
-                    onChange={(e) => setBankForm({...bankForm, confirmAccountNumber: e.target.value})}
+                    onChange={(e) => setBankForm({ ...bankForm, confirmAccountNumber: e.target.value })}
                   />
                 </div>
               </div>
@@ -2435,13 +2487,13 @@ const VendorProfile = () => {
               <div className="form-group-v4 full-width-v4">
                 <label>UPLOAD PASSBOOK / CANCELLED CHEQUE</label>
                 <div className="modal-upload-zone-v4">
-                  <input 
-                    type="file" 
-                    id="bank-file-upload" 
+                  <input
+                    type="file"
+                    id="bank-file-upload"
                     className="bank-hidden-file-input-v4"
                     onChange={(e) => {
                       if (e.target.files && e.target.files[0]) {
-                        setBankForm({...bankForm, file: e.target.files[0], fileName: e.target.files[0].name});
+                        setBankForm({ ...bankForm, file: e.target.files[0], fileName: e.target.files[0].name });
                       }
                     }}
                   />
@@ -2452,7 +2504,7 @@ const VendorProfile = () => {
                         <span>{bankForm.fileName}</span>
                         <button className="remove-file-v4" onClick={(e) => {
                           e.preventDefault();
-                          setBankForm({...bankForm, file: null, fileName: ''});
+                          setBankForm({ ...bankForm, file: null, fileName: '' });
                         }}>Remove</button>
                       </div>
                     ) : (
@@ -2468,7 +2520,7 @@ const VendorProfile = () => {
 
             <div className="modal-footer-v4">
               <button className="cancel-btn-v4" onClick={() => setShowBankEditModal(false)}>Cancel</button>
-              <button 
+              <button
                 className="submit-btn-v4"
                 disabled={!bankForm.bankName || !bankForm.accountNumber || !bankForm.fileName || bankForm.accountNumber !== bankForm.confirmAccountNumber}
                 onClick={() => {
@@ -2512,14 +2564,14 @@ const VendorProfile = () => {
                 <div className="form-group-v4">
                   <label>Business Image</label>
                   <div className="biz-image-upload-v4">
-                    <input 
-                      type="file" 
-                      id="biz-image-input" 
+                    <input
+                      type="file"
+                      id="biz-image-input"
                       className="bank-hidden-file-input-v4"
                       accept="image/*"
                       onChange={(e) => {
                         if (e.target.files && e.target.files[0]) {
-                          setProfileForm({...profileForm, businessImage: e.target.files[0], businessImageName: e.target.files[0].name});
+                          setProfileForm({ ...profileForm, businessImage: e.target.files[0], businessImageName: e.target.files[0].name });
                         }
                       }}
                     />
@@ -2539,50 +2591,8 @@ const VendorProfile = () => {
                   </div>
                 </div>
 
-                <div className="form-group-v4">
-                  <label>Mobile Number</label>
-                  <div className="integrated-input-v4">
-                    <input 
-                      type="text" 
-                      placeholder="Enter 10-digit mobile"
-                      value={profileForm.mobile}
-                      onChange={(e) => {
-                        setProfileForm({...profileForm, mobile: e.target.value});
-                        if (e.target.value !== profileData.owner.mobile) {
-                          setVerification({...verification, mobileVerified: false});
-                        }
-                      }}
-                    />
-                    {!verification.mobileVerified && !verification.mobileOtpSent && profileForm.mobile.length >= 10 && (
-                      <button className="send-btn-v4" onClick={() => setVerification({...verification, mobileOtpSent: true})}>Send</button>
-                    )}
-                    {verification.mobileVerified && (
-                      <span className="verified-status-v4">Verified</span>
-                    )}
-                  </div>
-                </div>
-
-                <div className="form-group-v4">
-                  <label>Email Address</label>
-                  <div className="integrated-input-v4">
-                    <input 
-                      type="email" 
-                      placeholder="Enter email address"
-                      value={profileForm.email}
-                      onChange={(e) => {
-                        setProfileForm({...profileForm, email: e.target.value});
-                        if (e.target.value !== profileData.owner.email) {
-                          setVerification({...verification, emailVerified: false});
-                        }
-                      }}
-                    />
-                    {!verification.emailVerified && !verification.emailOtpSent && profileForm.email.includes('@') && (
-                      <button className="send-btn-v4" onClick={() => setVerification({...verification, emailOtpSent: true})}>Send</button>
-                    )}
-                    {verification.emailVerified && (
-                      <span className="verified-status-v4">Verified</span>
-                    )}
-                  </div>
+                <div className="settings-notice-v4">
+                  <p>To change your Mobile Number or Email Address, please go to <strong>Settings &gt; Account</strong>.</p>
                 </div>
               </div>
 
@@ -2593,29 +2603,29 @@ const VendorProfile = () => {
                     <h3>Enter OTP</h3>
                     <p>Enter the code sent to your {verification.mobileOtpSent ? 'Mobile' : 'Email'}</p>
                     <div className="otp-input-row-v4">
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         maxLength={6}
                         placeholder="••••••"
                         value={verification.mobileOtpSent ? verification.mobileOtp : verification.emailOtp}
                         onChange={(e) => {
                           if (verification.mobileOtpSent) {
-                            setVerification({...verification, mobileOtp: e.target.value});
+                            setVerification({ ...verification, mobileOtp: e.target.value });
                           } else {
-                            setVerification({...verification, emailOtp: e.target.value});
+                            setVerification({ ...verification, emailOtp: e.target.value });
                           }
                         }}
                       />
                     </div>
                     <div className="otp-actions-v4">
-                      <button className="otp-cancel-v4" onClick={() => setVerification({...verification, mobileOtpSent: false, emailOtpSent: false, mobileOtp: '', emailOtp: ''})}>Cancel</button>
-                      <button 
-                        className="otp-verify-v4" 
+                      <button className="otp-cancel-v4" onClick={() => setVerification({ ...verification, mobileOtpSent: false, emailOtpSent: false, mobileOtp: '', emailOtp: '' })}>Cancel</button>
+                      <button
+                        className="otp-verify-v4"
                         onClick={() => {
                           if (verification.mobileOtpSent) {
-                            setVerification({...verification, mobileVerified: true, mobileOtpSent: false});
+                            setVerification({ ...verification, mobileVerified: true, mobileOtpSent: false });
                           } else {
-                            setVerification({...verification, emailVerified: true, emailOtpSent: false});
+                            setVerification({ ...verification, emailVerified: true, emailOtpSent: false });
                           }
                         }}
                       >
@@ -2629,18 +2639,10 @@ const VendorProfile = () => {
 
             <div className="modal-footer-v4 pt-0">
               <button className="cancel-btn-v4" onClick={() => setShowEditProfileModal(false)}>Cancel</button>
-              <button 
+              <button
                 className="submit-btn-v4"
-                disabled={!verification.mobileVerified && !verification.emailVerified}
                 onClick={() => {
-                  setProfileData(prev => ({
-                    ...prev,
-                    owner: {
-                      ...prev.owner,
-                      mobile: profileForm.mobile,
-                      email: profileForm.email
-                    }
-                  }));
+                  // Business image saving logic would go here
                   setShowEditProfileModal(false);
                 }}
               >
@@ -2655,6 +2657,81 @@ const VendorProfile = () => {
 };
 
 const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
+  const [profileData, setProfileData] = useState({
+    header: {
+      name: 'Catering Enterprise 3',
+      id: 'MYMCATKAR0003',
+      status: 'Active',
+      joined: '18 Nov 2024',
+      gstType: 'Regular',
+      service: 'Catering'
+    },
+    owner: {
+      name: 'Bhargav',
+      email: 'contact@cateringent3.com',
+      mobile: '+91 96000 00001',
+      profilePic: null
+    },
+    business: {
+      category: 'Catering',
+      displayName: 'Catering Enterprise 3 Services',
+      address: 'Plot No. 42, Sector 5, HSR Layout, Bengaluru, Karnataka 560102',
+      city: 'Hyderabad',
+      state: 'Telangana',
+      radius: '50km Radius',
+      gstRegistered: true,
+      fssai: '12345678901234'
+    },
+    identity: {
+      pan: 'ABCDE1234F',
+      gst: '36AAAAA0000A1Z5',
+      fssai: '12345678901234'
+    },
+    partnership: {
+      joinedDate: '18 Nov 2024',
+      plan: 'Pro Plan',
+      gstType: 'Regular Taxpayer',
+      agreement: 'Accepted'
+    },
+    documents: [
+      { type: 'GST Certificate', identifier: '29ABCDE1234F103Z5', date: '14 Feb 2026', status: 'Verified' },
+      { type: 'PAN Card', identifier: 'ABCDE1234F', date: '14 Feb 2026', status: 'Verified' },
+      { type: 'FSSAI License', identifier: '12345678901234', date: '14 Feb 2026', status: 'Verified' },
+      { type: 'Cancelled Cheque', identifier: 'A/C: ****9012', date: '14 Feb 2026', status: 'Verified' }
+    ],
+    bank: {
+      bankName: 'HDFC Bank',
+      holderName: 'User 3',
+      accountNumber: 'XXXX  XXXX  9012',
+      ifsc: 'HDFC0001234',
+      accountType: 'Savings Account',
+      status: 'Verified',
+      lastUpdated: '14 Feb 2026',
+      rejectionReason: null as string | null,
+      pendingSubmission: null as any
+    }
+  });
+
+  const [showEditProfileModal, setShowEditProfileModal] = useState(false);
+  const [profileForm, setProfileForm] = useState({
+    mobile: '9600000001',
+    email: 'contact@cateringent3.com',
+    address: '',
+    businessImage: null as File | null,
+    businessImageName: ''
+  });
+
+  const [verification, setVerification] = useState({
+    mobileOtpSent: false,
+    mobileOtp: '',
+    mobileVerified: true,
+    emailOtpSent: false,
+    emailOtp: '',
+    emailVerified: true
+  });
+
+  const [activeTab, setActiveTab] = useState('dashboard');
+
   const navigationGroups = [
     {
       title: 'Business',
@@ -2769,8 +2846,6 @@ const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
     }
   ];
 
-  const [activeTab, setActiveTab] = useState('dashboard');
-
   return (
     <div className="dashboard-layout">
       <aside className="dashboard-sidebar">
@@ -2829,8 +2904,28 @@ const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
           {activeTab === 'tickets' && <Tickets />}
           {activeTab === 'documents' && <Documents />}
           {activeTab === 'service-settings' && <ServiceSettings />}
-          {activeTab === 'profile' && <VendorProfile />}
-          {activeTab === 'settings' && <Settings />}
+          {activeTab === 'profile' && (
+            <VendorProfile
+              profileData={profileData}
+              setProfileData={setProfileData}
+              profileForm={profileForm}
+              setProfileForm={setProfileForm}
+              verification={verification}
+              setVerification={setVerification}
+              showEditProfileModal={showEditProfileModal}
+              setShowEditProfileModal={setShowEditProfileModal}
+            />
+          )}
+          {activeTab === 'settings' && (
+            <Settings
+              profileData={profileData}
+              setProfileData={setProfileData}
+              profileForm={profileForm}
+              setProfileForm={setProfileForm}
+              verification={verification}
+              setVerification={setVerification}
+            />
+          )}
           {!['dashboard', 'tickets', 'documents', 'service-settings', 'profile', 'settings'].includes(activeTab) && (
             <div className="placeholder-screen">
               <h2>{activeTab.charAt(0).toUpperCase() + activeTab.slice(1).replace('-', ' ')}</h2>
