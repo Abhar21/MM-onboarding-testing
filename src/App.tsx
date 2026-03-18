@@ -2788,7 +2788,6 @@ const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
   });
 
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const navigationGroups = [
     {
@@ -2905,35 +2904,8 @@ const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
   ];
 
   return (
-    <div className={`dashboard-layout ${isSidebarOpen ? 'sidebar-open' : ''}`}>
-      {/* Mobile Header */}
-      <div className="mobile-header">
-        <button className="menu-toggle-btn" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            {isSidebarOpen ? (
-              <>
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-              </>
-            ) : (
-              <>
-                <line x1="3" y1="12" x2="21" y2="12"></line>
-                <line x1="3" y1="6" x2="21" y2="6"></line>
-                <line x1="3" y1="18" x2="21" y2="18"></line>
-              </>
-            )}
-          </svg>
-        </button>
-        <div className="mobile-brand">
-          <svg width="24" height="24" viewBox="0 0 24 32" fill="none">
-            <path d="M0 0H12L24 12V20L12 8H0V0Z" fill="#0077ff" />
-            <path d="M0 12H12L24 24V32L12 20H0V12Z" fill="#0077ff" fillOpacity="0.7" />
-          </svg>
-          <span className="dashboard-brand-name">MyPartner</span>
-        </div>
-      </div>
-
-      <aside className={`dashboard-sidebar ${isSidebarOpen ? 'open' : ''}`}>
+    <div className="dashboard-layout">
+      <aside className="dashboard-sidebar">
         <div className="dashboard-sidebar-header">
           <svg width="28" height="28" viewBox="0 0 24 32" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M0 0H12L24 12V20L12 8H0V0Z" fill="#0077ff" />
@@ -2951,7 +2923,7 @@ const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
                     key={item.id}
                     href="#"
                     className={`dashboard-nav-item ${activeTab === item.id ? 'active' : ''}`}
-                    onClick={(e) => { e.preventDefault(); setActiveTab(item.id); setIsSidebarOpen(false); }}
+                    onClick={(e) => { e.preventDefault(); setActiveTab(item.id); }}
                   >
                     <span className="nav-icon">{item.icon}</span>
                     <span className="nav-label">{item.label}</span>
