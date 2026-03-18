@@ -733,6 +733,13 @@ input[type="file"].input-field::file-selector-button:hover {
 }
 
 /* Password Visibility Toggle */
+.btn-sm {
+  padding: 0.45rem 0.9rem;
+  font-size: 0.85rem;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
 .input-group-with-icon {
   position: relative;
   display: flex; justify-content: center;
@@ -2832,6 +2839,129 @@ input[type="file"].input-field::file-selector-button:hover {
   gap: 2rem;
 }
 
+.pause-card-v4, .availability-card, .leave-card-v4 {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid #e2e8f0;
+}
+
+.leave-card-v4 {
+  position: relative;
+}
+
+.leave-header-v4 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+
+.leave-title-v4 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+.leave-add-btn-v4 {
+  background: white;
+  color: #0077ff;
+  border: 1px solid #0077ff;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+}
+
+.leave-add-btn-v4:hover {
+  background: #f0f7ff;
+}
+
+.leave-list-v4 {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.leave-item-v4 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.85rem 1rem;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #f1f5f9;
+}
+
+.leave-info-v4 {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.leave-date-text-v4 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.leave-reason-text-v4 {
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.leave-delete-btn-v4 {
+  color: #94a3b8;
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.leave-delete-btn-v4:hover {
+  color: #ef4444;
+}
+
+.leave-note-v4 {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin: 0;
+  padding-top: 0.75rem;
+  border-top: 1px solid #f1f5f9;
+}
+
+/* Leave Modal specific */
+.leave-modal-body-v4 {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.leave-form-group-v4 {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.leave-error-v4 {
+  background: #fef2f2;
+  color: #dc2626;
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  border: 1px solid #fee2e2;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.leave-error-icon-v4 {
+  margin-top: 2px;
+}
+
 .documents-card {
   background: white;
   border-radius: 16px;
@@ -3455,11 +3585,20 @@ input[type="file"].input-field::file-selector-button:hover {
   gap: 1rem;
 }
 
+/* Refined Pane Title for Availability */
+.pane-title {
+  font-size: 1.15rem; /* Reduced from 1.5rem */
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 20px;
+}
+
+/* Fix for Toggle Switch (Half-moon issue) */
 .service-switch {
   position: relative;
   display: inline-block;
   width: 44px;
-  height: 24px;
+  height: 22px;
 }
 
 .service-switch input {
@@ -3477,33 +3616,28 @@ input[type="file"].input-field::file-selector-button:hover {
   bottom: 0;
   background-color: #cbd5e1;
   transition: .4s;
+  border-radius: 22px !important;
 }
 
 .service-slider:before {
   position: absolute;
   content: "";
-  height: 18px;
-  width: 18px;
+  height: 16px;
+  width: 16px;
   left: 3px;
   bottom: 3px;
   background-color: white;
   transition: .4s;
+  border-radius: 50%;
 }
 
 input:checked + .service-slider {
   background-color: #22c55e;
+  border-radius: 22px !important; /* Ensure full pill shape when checked */
 }
 
 input:checked + .service-slider:before {
-  transform: translateX(20px);
-}
-
-.service-slider.round {
-  border-radius: 34px;
-}
-
-.service-slider.round:before {
-  border-radius: 50%;
+  transform: translateX(22px);
 }
 
 .service-toggle-label {
@@ -6679,7 +6813,7 @@ input:checked + .service-slider:before {
   background: #f8fafc;
   padding: 24px 0;
   border-right: 1px solid #f1f5f9;
-  display: flex; justify-content: center;
+  display: flex; justify-content: flex-start;
   flex-direction: column;
 }
 
@@ -6726,6 +6860,11 @@ input:checked + .service-slider:before {
   background: #fef2f2;
 }
 
+.custom-time-input::-webkit-calendar-picker-indicator {
+  display: none;
+  -webkit-appearance: none;
+}
+
 .settings-tab-btn-v4.danger-tab.active {
   background: white;
   color: #ef4444;
@@ -6742,7 +6881,7 @@ input:checked + .service-slider:before {
 }
 
 .pane-title {
-  font-size: 1.5rem;
+  font-size: 1.15rem; /* Reduced from 1.5rem for Availability context */
   font-weight: 700;
   color: #1e293b;
   margin-bottom: 24px;
@@ -6899,25 +7038,42 @@ input:checked + .service-slider:before {
   line-height: 1.5;
 }
 
-.pause-smart-warning-v4 {
-  font-size: 0.83rem;
-  color: #b45309;
-  background: #fef3c7;
-  border: 1px solid #fde68a;
-  border-radius: 6px;
-  padding: 8px 12px;
+.pause-banner-v4 {
+  background: #fffbeb;
+  border: 1px solid #fef3c7;
+  border-radius: 12px;
+  padding: 16px;
+  margin: 1.5rem 0;
 }
 
-.pause-conflict-v4 {
+.pause-banner-text-v4 {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #92400e;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.pause-footer-v4 {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 0.84rem;
-  color: #dc2626;
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  border-radius: 6px;
-  padding: 8px 12px;
+  gap: 10px;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px dashed #e2e8f0;
+}
+
+.pause-footer-text-v4 {
+  font-size: 0.9rem;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pause-footer-text-v4 strong {
+  color: #1e293b;
+  font-weight: 700;
 }
 
 .pause-next-booking-v4 {
@@ -7653,5 +7809,279 @@ input:checked + .slider-v4:before {
 
   .status-badge {
     font-size: 0.6rem;
+  }
+}
+
+/* ── Availability Sub-tabs Layout ── */
+/* ── Availability Sync with Account Settings UI (Image 1) ── */
+.availability-layout-v4 {
+  display: flex;
+  gap: 3rem;
+  align-items: flex-start;
+  padding: 3rem;
+  background-color: #f8fafc; /* Added the soft grey background */
+  border-radius: 12px;
+  min-height: 800px;
+}
+
+.availability-sidebar-v4 {
+  width: 220px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background-color: transparent;
+  padding: 0;
+  border: none;
+}
+
+.av-sub-tab-btn {
+  padding: 10px 0 10px 16px;
+  text-align: left;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-weight: 500;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  border-left: 2px solid transparent;
+}
+
+.av-sub-tab-btn:hover {
+  color: #1e293b;
+}
+
+.av-sub-tab-btn.active {
+  color: #0077ff !important;
+  font-weight: 700 !important;
+  border-left: 3px solid #0077ff !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+.av-sub-tab-btn.active::before {
+  display: none; 
+}
+
+.availability-content-v4 {
+  flex: 1;
+  background: white;
+  border-radius: 20px; /* Matching the Profile design while keeping the Account sync */
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+  padding: 3rem;
+  min-height: 700px;
+}
+
+/* Overriding previous card styles to match the single large container feel */
+.availability-card, .pause-card-v4, .leave-card-v4 {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+}
+
+.group-title-v4 {
+  font-size: 1.75rem !important; /* Larger to match Account Settings Title */
+  font-weight: 800 !important;
+  color: #0f172a !important;
+  margin-bottom: 2.5rem !important;
+  padding-bottom: 0 !important;
+  border-bottom: none !important;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Remove icons from titles if user wants exact same look (Image 1 has no icons in header) */
+.group-title-v4 svg {
+  display: none;
+}
+
+.availability-list {
+  margin-top: 0.5rem;
+}
+
+.availability-header-v4 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid #f8fafc;
+}
+
+.availability-title-v4 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.availability-row-v4 {
+  display: flex;
+  align-items: center;
+  padding: 1.25rem 0;
+  border-bottom: 1px solid #f8fafc;
+}
+
+.availability-row-v4:last-child {
+  border-bottom: none;
+}
+
+.day-label-v4 {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #1e293b;
+}
+
+.status-toggle-wrapper-v4 {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.status-text-v4 {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.status-text-v4.open { color: #22c55e; }
+.status-text-v4.closed { color: #94a3b8; }
+
+.time-inputs-container-v4 {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+}
+
+.time-input-group-v4 {
+  position: relative;
+  width: 180px;
+}
+
+.time-field-v4 {
+  width: 100%;
+  padding: 0.75rem 2.5rem 0.75rem 1rem !important;
+  font-size: 0.95rem !important;
+  border-radius: 8px !important;
+  border: 1px solid #e2e8f0 !important;
+  background-color: white !important;
+  color: #1e293b !important;
+}
+
+.time-input-group-v4.disabled {
+  opacity: 0.5;
+}
+
+.clock-icon-v4 {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #64748b;
+  pointer-events: none;
+}
+
+.time-separator-v4 {
+  color: #64748b;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .availability-layout-v4 {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .availability-sidebar-v4 {
+    width: 100%;
+    flex-direction: row;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+    gap: 1rem;
+    border-right: none;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .av-sub-tab-btn {
+    white-space: nowrap;
+    padding: 0.75rem 0.5rem;
+    font-size: 0.875rem;
+  }
+  .av-sub-tab-btn.active::before {
+    display: none;
+  }
+  .av-sub-tab-btn.active {
+    border-bottom: 2px solid #0077ff;
+    border-left: none;
+  }
+  .availability-card {
+    padding: 12px; /* Narrower padding for mobile */
+  }
+  .availability-layout-v4 .pane-title {
+    font-size: 1.15rem;
+    margin-bottom: 1rem;
+    line-height: 1.4;
+  }
+  .availability-header-v4 {
+    flex-direction: row !important; /* Keep on one line if possible */
+    align-items: center;
+    justify-content: space-between !important;
+    gap: 0.5rem;
+  }
+  .availability-title-v4 {
+    font-size: 1.05rem;
+  }
+  .availability-layout-v4 .btn-sm {
+    padding: 0.35rem 0.6rem;
+    font-size: 0.75rem;
+  }
+  .availability-row-v4 {
+    flex-direction: row; /* Keep day and toggle on same line */
+    flex-wrap: wrap; /* Wrap the time inputs only */
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 1rem 0;
+  }
+  .day-label-v4 {
+    width: auto;
+    flex: 1;
+    font-size: 0.9rem;
+  }
+  .status-toggle-wrapper-v4 {
+    width: auto;
+    justify-content: flex-end;
+    gap: 0.5rem;
+  }
+  .time-inputs-container-v4 {
+    width: 100%; /* Force time inputs to new line */
+    margin-top: 0.5rem;
+    justify-content: space-between;
+    gap: 4px; /* Minimal gap between inputs and 'to' */
+  }
+  .time-input-group-v4 {
+    width: 45%; /* Dynamically scale to fit */
+    flex: 1;
+    min-width: 0;
+  }
+  .time-field-v4 {
+    padding: 0.55rem 1.75rem 0.55rem 0.5rem !important; /* Narrower padding */
+    font-size: 0.8rem !important; /* Smaller text */
+    height: 38px;
+  }
+  .clock-icon-v4 {
+    right: 6px; /* Move icon closer to edge */
+    width: 14px;
+    height: 14px;
+  }
+  .time-separator-v4 {
+    font-size: 0.7rem;
+    margin: 0;
+    min-width: 15px !important;
+    text-align: center;
   }
 }

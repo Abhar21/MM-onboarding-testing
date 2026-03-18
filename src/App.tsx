@@ -1115,6 +1115,7 @@ const Settings = ({
   );
 };
 
+
 const ServiceSettings = () => {
   const [activeCategory, setActiveCategory] = useState('breakfast');
 
@@ -1148,11 +1149,22 @@ const ServiceSettings = () => {
     }));
   };
 
-  // Temporary Pause state
   const [pauseBookings, setPauseBookings] = useState({
     isPaused: false,
     pauseUntil: '',
   });
+
+  // Leave Management State
+  const [leaves, setLeaves] = useState([
+    { id: 1, date: '2026-03-15', reason: 'Festival Leave' },
+    { id: 2, date: '2026-03-22', reason: 'Personal Leave' }
+  ]);
+  const [showLeaveModal, setShowLeaveModal] = useState(false);
+  const [newLeaveDate, setNewLeaveDate] = useState('');
+  const [newLeaveEndDate, setNewLeaveEndDate] = useState('');
+  const [newLeaveReason, setNewLeaveReason] = useState('Personal');
+  const [leaveError, setLeaveError] = useState('');
+  const [availabilitySubTab, setAvailabilitySubTab] = useState('schedule');
 
   // Simulate next confirmed booking
   const nextConfirmedBooking = '2026-03-24';
@@ -1161,6 +1173,74 @@ const ServiceSettings = () => {
   const handlePauseToggle = () => {
     if (hasActiveConflict) return;
     setPauseBookings(prev => ({ ...prev, isPaused: !prev.isPaused, pauseUntil: prev.isPaused ? '' : prev.pauseUntil }));
+  };
+
+  const handleSaveLeave = () => {
+    if (!newLeaveDate) {
+      setLeaveError('Please select a start date.');
+      return;
+    }
+
+    const startDate = new Date(newLeaveDate);
+    const endDate = newLeaveEndDate ? new Date(newLeaveEndDate) : startDate;
+
+    if (endDate < startDate) {
+      setLeaveError('End date cannot be before start date.');
+      return;
+    }
+
+    // Calculate dates in range
+    const dateList: string[] = [];
+    let current = new Date(startDate);
+    while (current <= endDate) {
+      dateList.push(current.toISOString().split('T')[0]);
+      current.setDate(current.getDate() + 1);
+    }
+
+    if (dateList.length > 7) {
+      setLeaveError('Maximum 7 consecutive days allowed.');
+      return;
+    }
+
+    // Rule: Max 7 leaves per month
+    const selectedMonth = newLeaveDate.substring(0, 7); // YYYY-MM
+    const currentMonthLeaves = leaves.filter(l => l.date.startsWith(selectedMonth));
+    
+    // Check for existing leaves in range
+    const overlapping = dateList.find(d => currentMonthLeaves.some(l => l.date === d));
+    if (overlapping) {
+      setLeaveError(`Leave already exists for ${overlapping}.`);
+      return;
+    }
+
+    if (currentMonthLeaves.length + dateList.length > 7) {
+      setLeaveError(`Adding these ${dateList.length} days would exceed 7 leaves for ${selectedMonth}.`);
+      return;
+    }
+
+    // Rule: Block if confirmed booking exists in range
+    const conflictDate = dateList.find(d => d === nextConfirmedBooking);
+    if (conflictDate) {
+      setLeaveError(`Leave unavailable; confirmed booking exists on ${conflictDate}.`);
+      return;
+    }
+
+    const newEntries = dateList.map((d, index) => ({
+      id: Date.now() + index,
+      date: d,
+      reason: newLeaveReason
+    }));
+
+    setLeaves(prev => [...prev, ...newEntries].sort((a, b) => a.date.localeCompare(b.date)));
+    setShowLeaveModal(false);
+    setNewLeaveDate('');
+    setNewLeaveEndDate('');
+    setNewLeaveReason('Personal');
+    setLeaveError('');
+  };
+
+  const handleDeleteLeave = (id: number) => {
+    setLeaves(prev => prev.filter(l => l.id !== id));
   };
 
   const categories = [
@@ -2086,118 +2166,268 @@ const ServiceSettings = () => {
         )}
       </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-
-          {/* ── Temporary Pause Bookings card ─────────────────────── */}
-          <div className="pause-card-v4">
-            {/* Row 1: Title + Toggle */}
-            <div className="pause-header-v4">
-              <div>
-                <h3 className="pause-title-v4">Temporary Pause Bookings</h3>
-              </div>
-              <label className={`service-switch ${hasActiveConflict ? 'disabled-switch' : ''}`} style={{ opacity: hasActiveConflict ? 0.5 : 1 }}>
-                <input
-                  type="checkbox"
-                  checked={pauseBookings.isPaused}
-                  onChange={handlePauseToggle}
-                  disabled={hasActiveConflict}
-                />
-                <span className="service-slider round"></span>
-              </label>
-            </div>
-
-            {/* Conflict Warning */}
-            {hasActiveConflict && (
-              <div className="pause-conflict-v4">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                Pause unavailable due to active booking schedule.
-              </div>
-            )}
-
-            {/* Row 2: Pause Until date picker */}
-            <div className="pause-date-row-v4">
-              <label className="pause-date-label-v4">Pause Until</label>
-              <input
-                type="date"
-                className="input-field pause-date-input-v4"
-                value={pauseBookings.pauseUntil}
-                min={new Date().toISOString().split('T')[0]}
-                max={nextConfirmedBooking}
-                disabled={!pauseBookings.isPaused}
-                onChange={(e) => setPauseBookings(prev => ({ ...prev, pauseUntil: e.target.value }))}
-              />
-            </div>
-
-            {/* Row 3: Info note */}
-            <p className="pause-note-v4">
-              {pauseBookings.isPaused
-                ? 'Existing confirmed bookings remain active. Only new bookings will stop until selected date.'
-                : 'Pause bookings temporarily without affecting confirmed orders.'}
-            </p>
-
-            {/* Smart Rule: next booking warning */}
-            {pauseBookings.isPaused && nextConfirmedBooking && (
-              <div className="pause-smart-warning-v4">
-                Pause can remain active until your next confirmed booking date.
-              </div>
-            )}
-
-            {/* Row 4: Next confirmed booking */}
-            {nextConfirmedBooking && (
-              <div className="pause-next-booking-v4">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                Next confirmed booking: <strong>24 Mar 2026</strong>
-              </div>
-            )}
-          </div>
-
-          {/* ── Weekly Schedule card ───────────────────────────────── */}
-          <div className="availability-card">
-          <div className="availability-header-v4">
-            <h3 className="availability-title-v4">Weekly Schedule</h3>
+        <div className="settings-content-v4" style={{ height: 'auto', minHeight: '700px' }}>
+          {/* Internal Sidebar (Standard Settings Tabs) */}
+          <div className="settings-tabs-v4">
             <button 
-              className="btn btn-sm" 
-              onClick={() => applyToAllOpenDays(0)}
-              style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem', color: '#0077ff', border: '1px solid #0077ff', backgroundColor: 'transparent', borderRadius: '6px' }}
+              className={`settings-tab-btn-v4 ${availabilitySubTab === 'schedule' ? 'active' : ''}`}
+              onClick={() => setAvailabilitySubTab('schedule')}
             >
-              Apply Mon to All
+              Weekly Schedule
+            </button>
+            <button 
+              className={`settings-tab-btn-v4 ${availabilitySubTab === 'leaves' ? 'active' : ''}`}
+              onClick={() => setAvailabilitySubTab('leaves')}
+            >
+              Leave & Pause
             </button>
           </div>
-          
-          <div className="availability-list">
-            {weeklySchedule.map((day, index) => (
-              <div key={day.day} className="availability-row-v4">
-                <div className="day-label-v4">{day.day}</div>
+
+          {/* Internal Content Area (Standard Settings Panel) */}
+          <div className="settings-panel-v4">
+            <div className="settings-pane-v4">
+              {availabilitySubTab === 'schedule' ? (
+                <>
+                  <h3 className="pane-title" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontWeight: 'bold', fontSize: '1.25rem', color: '#1e293b', marginBottom: '1.5rem' }}>
+                    Weekly Schedule
+                    <button 
+                      className="btn btn-sm" 
+                      onClick={() => applyToAllOpenDays(0)}
+                      style={{ 
+                        padding: '0.5rem 1rem', 
+                        fontSize: '0.85rem', 
+                        color: '#3b82f6', 
+                        border: '1px solid #bfdbfe', 
+                        backgroundColor: 'white', 
+                        borderRadius: '6px',
+                        fontWeight: '600',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Apply Mon to All
+                    </button>
+                  </h3>
+                  
+                  <div className="availability-list" style={{ marginTop: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                    {weeklySchedule.map((day, index) => (
+                      <div key={day.day} className="availability-row-v4" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', padding: '1.25rem 0', borderBottom: '1px solid #f1f5f9' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                          <div className="day-label-v4" style={{ fontWeight: '600', fontSize: '1rem', color: '#1e293b' }}>{day.day}</div>
+                          
+                          <div className="status-toggle-wrapper-v4" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                            <label className="service-switch" style={{ margin: 0 }}>
+                              <input type="checkbox" checked={day.isOpen} onChange={(e) => handleScheduleChange(index, 'isOpen', e.target.checked)} />
+                              <span className="service-slider round" style={{ backgroundColor: day.isOpen ? '#22c55e' : '#e2e8f0' }}></span>
+                            </label>
+                            <span className="status-text-v4" style={{ color: day.isOpen ? '#22c55e' : '#94a3b8', fontWeight: '600', fontSize: '0.875rem' }}>
+                              {day.isOpen ? 'Open' : 'Closed'}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="time-inputs-container-v4" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', width: '100%', opacity: day.isOpen ? 1 : 0.5 }}>
+                          <div className={`time-input-group-v4 ${!day.isOpen ? 'disabled' : ''}`} style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '1px solid #e2e8f0', borderRadius: '8px', backgroundColor: 'white', padding: '0.625rem 0.75rem', width: '100%' }}>
+                              <span style={{ fontSize: '0.9rem', color: '#1e293b', fontWeight: '500' }}>
+                                {day.openTime ? (() => {
+                                  const [h, m] = day.openTime.split(':');
+                                  const hours = parseInt(h, 10);
+                                  return `${(hours % 12 || 12).toString().padStart(2, '0')}:${m} ${hours >= 12 ? 'PM' : 'AM'}`;
+                                })() : '--:-- --'}
+                              </span>
+                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2.5" style={{ flexShrink: 0, pointerEvents: 'none' }}><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                              <input 
+                                type="time" 
+                                value={day.openTime} 
+                                disabled={!day.isOpen}
+                                onChange={(e) => handleScheduleChange(index, 'openTime', e.target.value)}
+                                style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer' }}
+                              />
+                            </div>
+                          </div>
+                          
+                          <span className="time-separator-v4" style={{ color: '#94a3b8', fontSize: '0.9rem', fontWeight: '600', minWidth: '15px', textAlign: 'center' }}>to</span>
+                          
+                          <div className={`time-input-group-v4 ${!day.isOpen ? 'disabled' : ''}`} style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '1px solid #e2e8f0', borderRadius: '8px', backgroundColor: 'white', padding: '0.625rem 0.75rem', width: '100%' }}>
+                              <span style={{ fontSize: '0.95rem', color: '#1e293b', fontWeight: '500' }}>
+                                {day.closeTime ? (() => {
+                                  const [h, m] = day.closeTime.split(':');
+                                  const hours = parseInt(h, 10);
+                                  return `${(hours % 12 || 12).toString().padStart(2, '0')}:${m} ${hours >= 12 ? 'PM' : 'AM'}`;
+                                })() : '--:-- --'}
+                              </span>
+                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2.5" style={{ flexShrink: 0, pointerEvents: 'none' }}><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                              <input 
+                                type="time" 
+                                value={day.closeTime} 
+                                disabled={!day.isOpen}
+                                onChange={(e) => handleScheduleChange(index, 'closeTime', e.target.value)}
+                                style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer' }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}>
+                  {/* ── Temporary Pause Bookings section ─────────────────────── */}
+                  <div className="availability-section-v4">
+                    <h3 className="pane-title" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+                      Temporary Pause Bookings
+                      <label className={`service-switch ${hasActiveConflict ? 'disabled-switch' : ''}`} style={{ opacity: hasActiveConflict ? 0.5 : 1 }}>
+                        <input
+                          type="checkbox"
+                          checked={pauseBookings.isPaused}
+                          onChange={handlePauseToggle}
+                          disabled={hasActiveConflict}
+                        />
+                        <span className="service-slider round"></span>
+                      </label>
+                    </h3>
+
+                    <div className="pause-date-row-v4">
+                      <label className="pause-date-label-v4">Pause Until</label>
+                      <input
+                        type="date"
+                        className="input-field pause-date-input-v4"
+                        value={pauseBookings.pauseUntil}
+                        min={new Date().toISOString().split('T')[0]}
+                        max={nextConfirmedBooking}
+                        disabled={!pauseBookings.isPaused}
+                        onChange={(e) => setPauseBookings(prev => ({ ...prev, pauseUntil: e.target.value }))}
+                        style={{ border: '1px solid #e2e8f0', borderRadius: '8px', padding: '10px 12px' }}
+                      />
+                    </div>
+
+                    <p className="pause-note-v4" style={{ marginTop: '1.25rem', color: '#64748b' }}>
+                      Existing confirmed bookings remain active. Only new bookings will stop until selected date.
+                    </p>
+
+                    {/* Conflict Awareness Banner */}
+                    <div className="pause-banner-v4">
+                      <p className="pause-banner-text-v4">
+                        Pause can remain active until your next confirmed booking date.
+                      </p>
+                    </div>
+
+                    {/* Next Confirmed Booking Footer */}
+                    {nextConfirmedBooking && (
+                      <div className="pause-footer-v4">
+                        <span className="pause-footer-text-v4">
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                          Next confirmed booking: <strong>{(() => {
+                            const date = new Date(nextConfirmedBooking);
+                            return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+                          })()}</strong>
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Visual Separator */}
+                  <div style={{ borderBottom: '1px solid #f1f5f9', margin: '1rem 0' }}></div>
+
+                  {/* ── Leave Management section ────────────────────────────── */}
+                  <div className="availability-section-v4">
+                    <h3 className="pane-title" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      Leave Management
+                      <button className="btn btn-primary-blue btn-sm" onClick={() => setShowLeaveModal(true)}>
+                        + Add Leave
+                      </button>
+                    </h3>
+
+                    <div className="leave-list-v4" style={{ marginTop: '1.5rem' }}>
+                      {leaves.length === 0 ? (
+                        <div className="no-leaves-v4" style={{ padding: '24px', backgroundColor: '#f8fafc', borderRadius: '12px', textAlign: 'center', color: '#64748b' }}>
+                          No leaves scheduled for this month.
+                        </div>
+                      ) : (
+                        leaves.map(leave => (
+                          <div key={leave.id} className="leave-item-v4" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px', borderBottom: '1px solid #f1f5f9' }}>
+                            <div className="leave-info-v4" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                              <span className="leave-date-v4" style={{ fontWeight: '600', color: '#1e293b' }}>{leave.date}</span>
+                              <span className="leave-reason-v4" style={{ padding: '2px 8px', backgroundColor: '#f1f5f9', borderRadius: '4px', fontSize: '0.75rem', color: '#64748b' }}>{leave.reason}</span>
+                            </div>
+                            <button 
+                              className="leave-remove-v4" 
+                              style={{ border: 'none', background: 'transparent', color: '#ef4444', cursor: 'pointer', padding: '4px' }}
+                              onClick={() => handleDeleteLeave(leave.id)}
+                            >
+                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                            </button>
+                          </div>
+                        ))
+                      )}
+                    </div>
+
+                    <p className="leave-footer-v4" style={{ marginTop: '1.5rem', color: '#64748b', fontSize: '0.9rem' }}>
+                      Maximum 7 leaves allowed per month.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* ── Add Leave Modal ─────────────────────────────────────── */}
+          {showLeaveModal && (
+            <div className="otp-popup-overlay-v4">
+              <div className="otp-popup-card-v4" style={{ maxWidth: '450px' }}>
+                <h3 className="otp-popup-title-v4">Add Leave</h3>
+                <p className="otp-popup-subtitle-v4" style={{ marginBottom: '1.5rem' }}>Select a date or range for your business leave.</p>
                 
-                <div className="status-toggle-wrapper-v4">
-                  <label className="service-switch">
-                    <input type="checkbox" checked={day.isOpen} onChange={(e) => handleScheduleChange(index, 'isOpen', e.target.checked)} />
-                    <span className="service-slider round"></span>
-                  </label>
-                  <span style={{ marginLeft: '10px', fontSize: '0.85rem', color: day.isOpen ? '#22c55e' : '#94a3b8', fontWeight: '500' }}>
-                    {day.isOpen ? 'Open' : 'Closed'}
-                  </span>
+                <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.25rem' }}>
+                  <div className="form-group" style={{ flex: 1 }}>
+                    <label className="input-label">Start Date</label>
+                    <input 
+                      type="date" 
+                      className="input-field" 
+                      min={new Date().toISOString().split('T')[0]}
+                      value={newLeaveDate}
+                      onChange={(e) => setNewLeaveDate(e.target.value)}
+                    />
+                  </div>
+                  <div className="form-group" style={{ flex: 1 }}>
+                    <label className="input-label">End Date (Optional)</label>
+                    <input 
+                      type="date" 
+                      className="input-field" 
+                      min={newLeaveDate || new Date().toISOString().split('T')[0]}
+                      max={newLeaveDate ? (() => {
+                        const d = new Date(newLeaveDate);
+                        d.setDate(d.getDate() + 6); // Max 7 days range (Start + 6 days)
+                        return d.toISOString().split('T')[0];
+                      })() : undefined}
+                      value={newLeaveEndDate}
+                      onChange={(e) => setNewLeaveEndDate(e.target.value)}
+                    />
+                  </div>
                 </div>
 
-                <div className="time-inputs-wrapper-v4" style={{ opacity: day.isOpen ? 1 : 0.5, pointerEvents: day.isOpen ? 'auto' : 'none' }}>
+                <div className="form-group" style={{ marginBottom: '1.5rem' }}>
+                  <label className="input-label">Reason (Optional)</label>
                   <input 
-                    type="time" 
+                    type="text" 
                     className="input-field" 
-                    value={day.openTime} 
-                    onChange={(e) => handleScheduleChange(index, 'openTime', e.target.value)} 
-                  />
-                  <span style={{ color: '#64748b' }}>to</span>
-                  <input 
-                    type="time" 
-                    className="input-field" 
-                    value={day.closeTime} 
-                    onChange={(e) => handleScheduleChange(index, 'closeTime', e.target.value)} 
+                    placeholder="e.g. Festival, Personal"
+                    value={newLeaveReason}
+                    onChange={(e) => setNewLeaveReason(e.target.value)}
                   />
                 </div>
+
+                {leaveError && <div className="otp-error-v4" style={{ marginBottom: '1rem' }}>{leaveError}</div>}
+
+                <div style={{ display: 'flex', gap: '12px', marginTop: '1rem' }}>
+                  <button className="btn btn-outline" style={{ flex: 1 }} onClick={() => { setShowLeaveModal(false); setLeaveError(''); }}>Cancel</button>
+                  <button className="btn btn-primary-blue" style={{ flex: 1 }} onClick={handleSaveLeave}>Save Leave</button>
+                </div>
               </div>
-            ))}
-          </div>
-          </div>
+            </div>
+          )}
         </div>
       )}
     </div>
