@@ -1147,6 +1147,21 @@ const ServiceSettings = () => {
     }));
   };
 
+  // Temporary Pause state
+  const [pauseBookings, setPauseBookings] = useState({
+    isPaused: false,
+    pauseUntil: '',
+  });
+
+  // Simulate next confirmed booking
+  const nextConfirmedBooking = '2026-03-24';
+  const hasActiveConflict = false; // Set true to simulate conflict scenario
+
+  const handlePauseToggle = () => {
+    if (hasActiveConflict) return;
+    setPauseBookings(prev => ({ ...prev, isPaused: !prev.isPaused, pauseUntil: prev.isPaused ? '' : prev.pauseUntil }));
+  };
+
   const categories = [
     { id: 'breakfast', label: 'Breakfast', count: 3, status: 'Active' },
     { id: 'lunch', label: 'Lunch', count: 3, status: 'Active' },
@@ -2070,7 +2085,73 @@ const ServiceSettings = () => {
         )}
       </div>
       ) : (
-        <div className="availability-card">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+
+          {/* ── Temporary Pause Bookings card ─────────────────────── */}
+          <div className="pause-card-v4">
+            {/* Row 1: Title + Toggle */}
+            <div className="pause-header-v4">
+              <div>
+                <h3 className="pause-title-v4">Temporary Pause Bookings</h3>
+              </div>
+              <label className={`service-switch ${hasActiveConflict ? 'disabled-switch' : ''}`} style={{ opacity: hasActiveConflict ? 0.5 : 1 }}>
+                <input
+                  type="checkbox"
+                  checked={pauseBookings.isPaused}
+                  onChange={handlePauseToggle}
+                  disabled={hasActiveConflict}
+                />
+                <span className="service-slider round"></span>
+              </label>
+            </div>
+
+            {/* Conflict Warning */}
+            {hasActiveConflict && (
+              <div className="pause-conflict-v4">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                Pause unavailable due to active booking schedule.
+              </div>
+            )}
+
+            {/* Row 2: Pause Until date picker */}
+            <div className="pause-date-row-v4">
+              <label className="pause-date-label-v4">Pause Until</label>
+              <input
+                type="date"
+                className="input-field pause-date-input-v4"
+                value={pauseBookings.pauseUntil}
+                min={new Date().toISOString().split('T')[0]}
+                max={nextConfirmedBooking}
+                disabled={!pauseBookings.isPaused}
+                onChange={(e) => setPauseBookings(prev => ({ ...prev, pauseUntil: e.target.value }))}
+              />
+            </div>
+
+            {/* Row 3: Info note */}
+            <p className="pause-note-v4">
+              {pauseBookings.isPaused
+                ? 'Existing confirmed bookings remain active. Only new bookings will stop until selected date.'
+                : 'Pause bookings temporarily without affecting confirmed orders.'}
+            </p>
+
+            {/* Smart Rule: next booking warning */}
+            {pauseBookings.isPaused && nextConfirmedBooking && (
+              <div className="pause-smart-warning-v4">
+                Pause can remain active until your next confirmed booking date.
+              </div>
+            )}
+
+            {/* Row 4: Next confirmed booking */}
+            {nextConfirmedBooking && (
+              <div className="pause-next-booking-v4">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                Next confirmed booking: <strong>24 Mar 2026</strong>
+              </div>
+            )}
+          </div>
+
+          {/* ── Weekly Schedule card ───────────────────────────────── */}
+          <div className="availability-card">
           <div className="availability-header-v4">
             <h3 className="availability-title-v4">Weekly Schedule</h3>
             <button 
@@ -2114,6 +2195,7 @@ const ServiceSettings = () => {
                 </div>
               </div>
             ))}
+          </div>
           </div>
         </div>
       )}
