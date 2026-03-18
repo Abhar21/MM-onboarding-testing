@@ -1,0 +1,352 @@
+
+/* ═══════════════════════════════════════
+   RATINGS & REVIEWS SCREEN
+   ═══════════════════════════════════════ */
+
+.ratings-screen-v4 {
+  padding: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Header */
+.ratings-page-header-v4 {
+  margin-bottom: 24px;
+}
+
+.ratings-page-title-v4 {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 4px 0;
+}
+
+.ratings-page-sub-v4 {
+  font-size: 0.9rem;
+  color: #64748b;
+  margin: 0;
+}
+
+/* ── Section 1: Summary Cards (Deprecated full-width grid) ── */
+.ratings-summary-grid-v4 {
+  display: none;
+}
+
+.sidebar-col-v4 {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.ratings-stat-card-v4 {
+  background: white;
+  border-radius: 14px;
+  padding: 20px;
+  text-align: center;
+  border: 1px solid #f1f5f9;
+  position: relative;
+  overflow: hidden;
+}
+
+.ratings-stat-card-v4.condensed-v4 {
+  padding: 16px;
+}
+
+.ratings-stat-card-v4.condensed-v4 .ratings-stat-value-v4 {
+  font-size: 2.2rem;
+  margin-bottom: 2px;
+}
+
+.ratings-stat-card-v4.condensed-v4 .ratings-stat-icon-v4 {
+  font-size: 1.2rem;
+  margin-bottom: 4px;
+}
+
+
+.ratings-stat-card-v4::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  border-radius: 14px 14px 0 0;
+}
+
+.ratings-stat-card-v4.accent-blue::before  { background: #0077ff; }
+.ratings-stat-card-v4.accent-purple::before { background: #8b5cf6; }
+.ratings-stat-card-v4.accent-green::before  { background: #22c55e; }
+.ratings-stat-card-v4.accent-orange::before { background: #f59e0b; }
+
+.ratings-stat-icon-v4 {
+  font-size: 1.6rem;
+  margin-bottom: 8px;
+}
+
+.ratings-stat-value-v4 {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.ratings-stat-label-v4 {
+  font-size: 0.78rem;
+  color: #64748b;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+/* ── Body layout ── */
+.ratings-body-v4 {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+/* ── Section 2: Breakdown Card ── */
+.ratings-card-v4 {
+  background: white;
+  border-radius: 14px;
+  border: 1px solid #f1f5f9;
+  padding: 20px;
+  position: sticky;
+  top: 20px;
+}
+
+.ratings-card-title-v4 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 16px 0;
+}
+
+.ratings-breakdown-list-v4 {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.ratings-breakdown-row-v4 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.breakdown-stars-label-v4 {
+  width: 28px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #475569;
+  flex-shrink: 0;
+}
+
+.breakdown-bar-track-v4 {
+  flex: 1;
+  height: 7px;
+  background: #f1f5f9;
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.breakdown-bar-fill-v4 {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.4s ease;
+  min-width: 4px;
+}
+
+.breakdown-count-v4 {
+  width: 20px;
+  font-size: 0.82rem;
+  color: #64748b;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* Insight box */
+.ratings-insight-v4 {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 0.83rem;
+  color: #1e40af;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  line-height: 1.5;
+}
+
+.insight-icon-v4 {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* ── Section 3: Reviews Column ── */
+.ratings-reviews-col-v4 {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Filter Bar */
+.ratings-filter-bar-v4 {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+
+.ratings-filter-btn-v4 {
+  padding: 6px 16px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  border-radius: 99px;
+  border: 1.5px solid #e2e8f0;
+  background: white;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+
+.ratings-filter-btn-v4:hover {
+  border-color: #0077ff;
+  color: #0077ff;
+}
+
+.ratings-filter-btn-v4.active {
+  background: #0077ff;
+  border-color: #0077ff;
+  color: white;
+  font-weight: 600;
+}
+
+/* Review Card */
+.review-card-v4 {
+  background: white;
+  border-radius: 14px;
+  border: 1px solid #f1f5f9;
+  padding: 18px 20px;
+  transition: background-color 0.2s;
+}
+
+.review-card-v4:hover {
+  background-color: #f8fafc;
+}
+
+.review-card-top-v4 {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.review-avatar-v4 {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #0077ff;
+  color: white;
+  font-weight: 700;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.review-meta-v4 {
+  flex: 1;
+  min-width: 0;
+}
+
+.review-customer-row-v4 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+
+.review-customer-name-v4 {
+  font-size: 0.95rem;
+  color: #1e293b;
+}
+
+.review-details-row-v4 {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.review-detail-chip-v4 {
+  font-size: 0.72rem;
+  color: #64748b;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+
+
+.review-rating-v4 {
+  flex-shrink: 0;
+}
+
+.review-text-v4 {
+  font-size: 0.875rem;
+  color: #475569;
+  line-height: 1.6;
+  margin: 0 0 14px 0;
+}
+
+.review-footer-v4 {
+  border-top: none;
+  padding-top: 0;
+}
+
+/* Empty State */
+.ratings-empty-v4 {
+  text-align: center;
+  padding: 40px;
+  color: #94a3b8;
+  font-size: 0.9rem;
+  background: white;
+  border-radius: 14px;
+  border: 1px solid #f1f5f9;
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .ratings-body-v4 {
+    grid-template-columns: 1fr;
+  }
+
+  .ratings-card-v4 {
+    position: static;
+  }
+}
+
+@media (max-width: 600px) {
+  .ratings-screen-v4 {
+    padding: 16px;
+  }
+
+  .ratings-summary-grid-v4 {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .ratings-page-title-v4 {
+    font-size: 1.3rem;
+  }
+
+  .review-card-top-v4 {
+    flex-wrap: wrap;
+  }
+}

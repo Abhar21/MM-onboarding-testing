@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, Fragment } from 'react';
 import { Routes, Route, useNavigate, Navigate, Link } from 'react-router-dom';
 import './App.css';
+import './ratings.css';
 
 interface FormData {
   ownerName: string;
@@ -2889,7 +2890,179 @@ interface ProfileData {
   };
 }
 
+/* ─────────────────── RATINGS SCREEN ─────────────────── */
+const Ratings = () => {
+  const [filter, setFilter] = useState<'all' | '5' | '4' | '3' | '2' | '1'>('all');
+
+  const reviews = [
+    {
+      id: 1,
+      customer: 'Ananya Sharma',
+      bookingId: 'BK-10821',
+      eventDate: '12 Mar 2026',
+      rating: 5,
+      review: 'Absolutely amazing food and service! The team was incredibly professional and the presentation was stunning. Guests kept complimenting the food throughout. Highly recommend!',
+      category: 'Birthday Party',
+      verified: true,
+    },
+    {
+      id: 2,
+      customer: 'Ravi Krishnan',
+      bookingId: 'BK-10744',
+      eventDate: '5 Mar 2026',
+      rating: 4,
+      review: 'Good overall experience. Food was tasty but setup took a little longer than expected. Would consider booking again.',
+      category: 'Corporate Event',
+      verified: true,
+    },
+    {
+      id: 3,
+      customer: 'Meera Patel',
+      bookingId: 'BK-10632',
+      eventDate: '28 Feb 2026',
+      rating: 5,
+      review: 'Outstanding experience from start to finish. The menu customisation was excellent and the staff were very attentive.',
+      category: 'Wedding Reception',
+      verified: true,
+    },
+    {
+      id: 4,
+      customer: 'Siddharth R.',
+      bookingId: 'BK-10589',
+      eventDate: '20 Feb 2026',
+      rating: 3,
+      review: 'Food was decent but portions were a bit small for the group size. Communication could improve.',
+      category: 'House Party',
+      verified: true,
+    },
+    {
+      id: 5,
+      customer: 'Lakshmi N.',
+      bookingId: 'BK-10502',
+      eventDate: '14 Feb 2026',
+      rating: 5,
+      review: "Loved every bit of it! The Valentine's Day special menu was a hit. Thank you for making it memorable.",
+      category: 'Anniversary Dinner',
+      verified: true,
+    },
+  ];
+
+  const filtered = reviews.filter(r => {
+    if (filter === 'all') return true;
+    return r.rating === parseInt(filter);
+  });
+
+  const totalReviews = reviews.length;
+  const avgRating = (reviews.reduce((s, r) => s + r.rating, 0) / totalReviews).toFixed(1);
+
+  const breakdown: { stars: number; count: number }[] = [5, 4, 3, 2, 1].map(s => ({
+    stars: s,
+    count: reviews.filter(r => r.rating === s).length,
+  }));
+
+  const renderStars = (rating: number, size = 16) => (
+    <span style={{ display: 'inline-flex', gap: '2px' }}>
+      {[1, 2, 3, 4, 5].map(i => (
+        <svg key={i} width={size} height={size} viewBox="0 0 24 24" fill={i <= rating ? '#f59e0b' : 'none'} stroke={i <= rating ? '#f59e0b' : '#d1d5db'} strokeWidth="2">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+        </svg>
+      ))}
+    </span>
+  );
+
+  return (
+    <div className="ratings-screen-v4">
+      {/* Header */}
+      <div className="ratings-page-header-v4">
+        <div>
+          <h1 className="ratings-page-title-v4">Ratings & Reviews</h1>
+          <p className="ratings-page-sub-v4">What your customers are saying</p>
+        </div>
+      </div>
+
+      <div className="ratings-body-v4">
+        {/* Sidebar Column */}
+        <div className="sidebar-col-v4">
+          <div className="ratings-stat-card-v4 accent-blue condensed-v4">
+            <div className="ratings-stat-icon-v4">⭐</div>
+            <div className="ratings-stat-value-v4">{avgRating}</div>
+            <div className="ratings-stat-label-v4">Overall Rating</div>
+          </div>
+
+          {/* Section 2 — Rating Breakdown */}
+          <div className="ratings-card-v4">
+            <h3 className="ratings-card-title-v4">Rating Breakdown</h3>
+            <div className="ratings-breakdown-list-v4">
+              {breakdown.map(({ stars, count }) => (
+                <div key={stars} className="ratings-breakdown-row-v4">
+                  <span className="breakdown-stars-label-v4">{stars}★</span>
+                  <div className="breakdown-bar-track-v4">
+                    <div
+                      className="breakdown-bar-fill-v4"
+                      style={{ width: `${(count / totalReviews) * 100}%`, background: stars >= 4 ? '#22c55e' : stars === 3 ? '#f59e0b' : '#ef4444' }}
+                    />
+                  </div>
+                  <span className="breakdown-count-v4">{count}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Insight */}
+            <div className="ratings-insight-v4">
+              <span className="insight-icon-v4">💡</span>
+              <span>Customers appreciate <strong>food quality</strong> and <strong>presentation</strong> most.</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content: Review Cards */}
+        <div className="ratings-reviews-col-v4">
+          {/* Filter bar */}
+          <div className="ratings-filter-bar-v4">
+            {(['all', '5', '4', '3', '2', '1'] as const).map(f => (
+              <button
+                key={f}
+                className={`ratings-filter-btn-v4 ${filter === f ? 'active' : ''}`}
+                onClick={() => setFilter(f)}
+              >
+                {f === 'all' ? 'All' : `${f}★`}
+              </button>
+            ))}
+          </div>
+
+          {filtered.map(r => (
+            <div key={r.id} className="review-card-v4">
+              <div className="review-card-top-v4">
+                <div className="review-avatar-v4">{r.customer.charAt(0)}</div>
+                <div className="review-meta-v4">
+                  <div className="review-customer-row-v4">
+                    <strong className="review-customer-name-v4">{r.customer}</strong>
+                  </div>
+                  <div className="review-details-row-v4">
+                    <span className="review-detail-chip-v4">{r.bookingId}</span>
+                    <span className="review-detail-chip-v4">{r.eventDate}</span>
+                  </div>
+                </div>
+                <div className="review-rating-v4">{renderStars(r.rating, 14)}</div>
+              </div>
+              <p className="review-text-v4">{r.review}</p>
+
+            </div>
+          ))}
+
+          {filtered.length === 0 && (
+            <div className="ratings-empty-v4">No reviews match this filter.</div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
+/* ─────────────────── DASHBOARD ─────────────────── */
 const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
+
   const [profileData, setProfileData] = useState<ProfileData>({
     header: {
       name: 'Catering Enterprise 3',
@@ -2969,6 +3142,7 @@ const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
     {
       title: 'Business',
       items: [
+
         {
           id: 'dashboard', label: 'Dashboard', icon: (
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -3020,6 +3194,13 @@ const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
           )
         },
         {
+          id: 'ratings', label: 'Ratings', icon: (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+            </svg>
+          )
+        },
+        {
           id: 'coupons', label: 'Coupons', icon: (
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M15 5v2"></path>
@@ -3029,13 +3210,7 @@ const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
             </svg>
           )
         },
-        {
-          id: 'ratings', label: 'Ratings', icon: (
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-            </svg>
-          )
-        },
+
         {
           id: 'tickets', label: 'Tickets', icon: (
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -3137,6 +3312,7 @@ const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
           {activeTab === 'tickets' && <Tickets />}
           {activeTab === 'documents' && <Documents />}
           {activeTab === 'service-settings' && <ServiceSettings />}
+          {activeTab === 'ratings' && <Ratings />}
           {activeTab === 'profile' && (
             <VendorProfile
               profileData={profileData}
@@ -3159,7 +3335,7 @@ const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
               setVerification={setVerification}
             />
           )}
-          {!['dashboard', 'tickets', 'documents', 'service-settings', 'profile', 'settings'].includes(activeTab) && (
+          {!['dashboard', 'tickets', 'documents', 'service-settings', 'profile', 'settings', 'ratings'].includes(activeTab) && (
             <div className="placeholder-screen">
               <h2>{activeTab.charAt(0).toUpperCase() + activeTab.slice(1).replace('-', ' ')}</h2>
               <p>This screen is coming soon.</p>
