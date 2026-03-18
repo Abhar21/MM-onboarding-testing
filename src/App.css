@@ -3424,12 +3424,14 @@ input[type="file"].input-field::file-selector-button:hover {
 }
 
 .stop-value {
-  width: 350px !important;
-  flex: none !important;
+  flex: 1 !important;
+  width: 100% !important;
+  min-width: 0 !important;
 }
 
 .stop-unit {
-  flex: 1;
+  width: 150px;
+  flex: none;
 }
 
 .settings-grid-rows {
