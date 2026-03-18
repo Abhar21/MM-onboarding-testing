@@ -3419,7 +3419,8 @@ input[type="file"].input-field::file-selector-button:hover {
 }
 
 .stop-orders-wrapper {
-  display: flex; justify-content: center;
+  display: flex;
+  width: 100%;
   gap: 0.5rem;
 }
 
