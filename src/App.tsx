@@ -1281,18 +1281,16 @@ const ServiceSettings = () => {
         <p className="section-subtitle">Manage your service timings, styles, and menu builder.</p>
       </div>
 
-      <div className="settings-tabs-v4" style={{ marginBottom: '1.5rem', display: 'flex', gap: '1rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '0' }}>
+      <div className="profile-tabs-nav-v4" style={{ marginBottom: '1.5rem' }}>
         <button 
-          className={`settings-tab-btn-v4 ${activeSettingsTab === 'services' ? 'active' : ''}`}
+          className={`tab-btn-v4 ${activeSettingsTab === 'services' ? 'active' : ''}`}
           onClick={() => setActiveSettingsTab('services')}
-          style={{ background: 'none', border: 'none', borderBottom: activeSettingsTab === 'services' ? '2px solid #0077ff' : '2px solid transparent', color: activeSettingsTab === 'services' ? '#0077ff' : '#64748b', padding: '0.75rem 1rem', fontWeight: 600, cursor: 'pointer', fontSize: '1rem' }}
         >
           Services
         </button>
         <button 
-          className={`settings-tab-btn-v4 ${activeSettingsTab === 'availability' ? 'active' : ''}`}
+          className={`tab-btn-v4 ${activeSettingsTab === 'availability' ? 'active' : ''}`}
           onClick={() => setActiveSettingsTab('availability')}
-          style={{ background: 'none', border: 'none', borderBottom: activeSettingsTab === 'availability' ? '2px solid #0077ff' : '2px solid transparent', color: activeSettingsTab === 'availability' ? '#0077ff' : '#64748b', padding: '0.75rem 1rem', fontWeight: 600, cursor: 'pointer', fontSize: '1rem' }}
         >
           Availability
         </button>
