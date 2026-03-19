@@ -8519,3 +8519,339 @@ input:checked + .slider-v4:before {
   background: #f1f5f9;
   color: #1e293b;
 }
+
+/* Vendor Subscription Screen Refinements */
+.active-plan-container-v4 {
+  background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+}
+
+.active-plan-info-v4 h4 {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+
+.active-plan-details-v4 {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.active-plan-details-v4 .plan-name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.active-plan-details-v4 .plan-meta {
+  font-size: 0.95rem;
+  color: #64748b;
+}
+
+.active-plan-badge-v4 {
+  background: #dcfce7;
+  color: #166534;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-left: 0.75rem;
+}
+
+.subscription-plans-grid-v4 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.plan-card-v4 {
+  background: white;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+  position: relative;
+  text-align: center;
+}
+
+.plan-card-v4:hover {
+  border-color: #0077ff;
+  transform: translateY(-5px);
+  box-shadow: 0 12px 30px rgba(0, 119, 255, 0.1);
+}
+
+.plan-card-v4.active-selection {
+  border-color: #0077ff;
+  background: #f0f7ff;
+}
+
+.card-badge-v4 {
+  position: absolute;
+  top: -12px;
+  background: #0077ff;
+  color: white;
+  padding: 4px 14px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  box-shadow: 0 4px 10px rgba(0, 119, 255, 0.3);
+}
+
+.plan-card-v4 h5 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 1rem;
+}
+
+.plan-price-large-v4 {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 0.25rem;
+}
+
+.plan-price-large-v4 span {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #64748b;
+}
+
+.plan-total-v4 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 2rem;
+}
+
+.plan-btn-v4 {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+}
+
+.plan-btn-v4.current {
+  background: #f1f5f9;
+  color: #94a3b8;
+  cursor: default;
+}
+
+.plan-btn-v4.switch {
+  background: #0077ff;
+  color: white;
+}
+
+.plan-btn-v4.switch:hover {
+  background: #0066d9;
+  transform: scale(1.02);
+}
+
+.common-benefits-container-v4 {
+  background: #f8fafc;
+  border: 1px dashed #cbd5e1;
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 3rem;
+}
+
+.common-benefits-container-v4 h5 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.benefits-grid-v4 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+}
+
+.benefit-item-v4 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #475569;
+}
+
+.benefit-item-v4 svg {
+  color: #10b981;
+  flex-shrink: 0;
+}
+
+@media (max-width: 1024px) {
+  .subscription-plans-grid-v4 {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  .benefits-grid-v4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .benefits-grid-v4 {
+    grid-template-columns: 1fr;
+  }
+  .active-plan-container-v4 {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+}
+
+.plan-card-v4 .plan-duration-v4 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 0.5rem;
+}
+
+.plan-savings-v4 {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #10b981;
+  background: #f0fdf4;
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-top: 0.5rem;
+}
+
+/* Subscription Main Display Refinement */
+.active-plan-container-v4.main-display-v4 {
+  background: white;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.plan-header-row-v4 {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.plan-header-row-v4 h4 {
+  margin: 0;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #64748b;
+}
+
+.view-plans-btn-v4 {
+  background: #f1f5f9;
+  color: #0f172a;
+  border: 1px solid #e2e8f0;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.view-plans-btn-v4:hover {
+  background: #e2e8f0;
+  border-color: #cbd5e1;
+}
+
+/* Subscription Modal Refinement */
+.subscription-modal-v4 {
+  max-width: 850px !important;
+  width: 95%;
+}
+
+.subscription-modal-v4 .modal-body-v4 {
+  padding: 1.5rem;
+}
+
+.subscription-modal-v4 .subscription-plans-grid-v4 {
+  margin-top: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 768px) {
+  .active-plan-container-v4.main-display-v4 {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
+  
+  .active-plan-meta-v4 {
+    width: 100%;
+    border-top: 1px solid #f1f5f9;
+    padding-top: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+/* Premium Subscription Card Aesthetics */
+.plan-card-v4.starter-premium {
+  background: linear-gradient(to right, #f5f3ff 0%, #ffffff 100%);
+}
+
+.plan-card-v4.growth-premium {
+  background: linear-gradient(to right, #eff6ff 0%, #ffffff 100%);
+}
+
+.plan-card-v4.saving-premium {
+  background: linear-gradient(to right, #fffbeb 0%, #ffffff 100%);
+  border-color: #fef08a;
+}
+
+.plan-sparkles-v4 {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  gap: 2px;
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.starter-premium .plan-sparkles-v4 { color: #a78bfa; }
+.growth-premium .plan-sparkles-v4 { color: #60a5fa; }
+.saving-premium .plan-sparkles-v4 { color: #fbbf24; opacity: 0.6; }
+
+.sparkle-1 { transform: rotate(15deg); }
+.sparkle-2 { transform: translateY(8px) rotate(-10deg); }
+.sparkle-3 { transform: translateX(-4px) translateY(4px) rotate(45deg); }
+
+/* Ensure high contrast for plan details on light gradients */
+.plan-card-v4 h5 { color: #1e293b; }
+.plan-duration-v4 { color: #64748b; }
+.plan-price-large-v4 { color: #0f172a; }
+.plan-total-v4 { color: #475569; }

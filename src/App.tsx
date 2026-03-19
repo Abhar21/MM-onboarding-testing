@@ -862,6 +862,7 @@ const Settings = ({
   setEditOtp: (val: string) => void
 }) => {
   const [activeTab, setActiveTab] = useState('account');
+  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
 
   const tabs = [
     { id: 'account', label: 'Account' },
@@ -996,14 +997,30 @@ const Settings = ({
           {activeTab === 'subscription' && (
             <div className="settings-pane-v4">
               <h3 className="pane-title">Subscription Plan</h3>
-              <div className="subscription-card-v4">
-                <div className="plan-info-v4">
-                  <div className="plan-badge-v4">Premium Plan</div>
-                  <div className="plan-price-v4">₹1,999 <span className="period-v4">/ month</span></div>
-                  <p className="renewal-date-v4">Next renewal: <strong>April 01, 2026</strong></p>
+              
+              <div className="active-plan-container-v4 main-display-v4">
+                <div className="active-plan-info-v4">
+                  <div className="plan-header-row-v4">
+                    <h4>Current Active Plan</h4>
+                    <span className="active-plan-badge-v4">Active</span>
+                  </div>
+                  <div className="active-plan-details-v4">
+                    <span className="plan-name">Growth Plan</span>
+                    <span className="plan-meta">6 Months • ₹499 / Month</span>
+                  </div>
                 </div>
-                <button className="upgrade-plan-btn-v4">Upgrade Plan</button>
+                <div className="active-plan-meta-v4">
+                  <p className="renewal-date-v4">Valid till: <strong>April 01, 2026</strong></p>
+                  <button className="view-plans-btn-v4" onClick={() => setShowSubscriptionModal(true)}>
+                    View Plans
+                  </button>
+                </div>
               </div>
+
+              <SubscriptionPlanModal 
+                isOpen={showSubscriptionModal} 
+                onClose={() => setShowSubscriptionModal(false)} 
+              />
 
               <h4 className="sub-title-margin">Billing History</h4>
               <div className="table-responsive">
@@ -3842,6 +3859,118 @@ const SuccessPage = ({ onBackToHome }: { onBackToHome: () => void }) => (
     </div>
   </div>
 );
+
+const SubscriptionPlanModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) => {
+  if (!isOpen) return null;
+
+  const plans = [
+    {
+      name: 'Starter Plan',
+      duration: '3 Months • ₹599/month',
+      price: '₹599',
+      total: 'Total ₹1,797',
+      badge: null,
+      savings: null,
+      isActive: false,
+      premiumClass: 'starter-premium'
+    },
+    {
+      name: 'Growth Plan',
+      duration: '6 Months • ₹499/month',
+      price: '₹499',
+      total: 'Total ₹2,994',
+      badge: 'Most Popular',
+      savings: 'Save ₹600',
+      isActive: true,
+      premiumClass: 'growth-premium'
+    },
+    {
+      name: 'Saving Plan',
+      duration: '12 Months • ₹449/month',
+      price: '₹449',
+      total: 'Total ₹5,388',
+      badge: 'Best Value',
+      savings: 'Save ₹1,800',
+      badgeColor: '#10b981',
+      isActive: false,
+      premiumClass: 'saving-premium'
+    }
+  ];
+
+  const PlanSparkles = () => (
+    <div className="plan-sparkles-v4">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" className="sparkle-1">
+        <path d="M12 0l3 9 9 3-9 3-3 9-3-9-9-3 9-3z"/>
+      </svg>
+      <svg width="6" height="6" viewBox="0 0 24 24" fill="currentColor" className="sparkle-2">
+        <path d="M12 0l3 9 9 3-9 3-3 9-3-9-9-3 9-3z"/>
+      </svg>
+      <svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor" className="sparkle-3">
+        <path d="M12 0l3 9 9 3-9 3-3 9-3-9-9-3 9-3z"/>
+      </svg>
+    </div>
+  );
+
+  return (
+    <div className="modal-overlay-v4" onClick={onClose}>
+      <div className="modal-content-v4 subscription-modal-v4" onClick={e => e.stopPropagation()}>
+        <div className="modal-header-v4">
+          <h3>Choose Subscription Plan</h3>
+          <button className="modal-close-v4" onClick={onClose}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        
+        <div className="modal-body-v4">
+          <div className="subscription-plans-grid-v4">
+            {plans.map((plan, idx) => (
+              <div key={idx} className={`plan-card-v4 ${plan.isActive ? 'active-selection' : ''} ${plan.premiumClass}`}>
+                <PlanSparkles />
+                {plan.badge && (
+                  <div className="card-badge-v4" style={plan.badgeColor ? { background: plan.badgeColor } : {}}>
+                    {plan.badge}
+                  </div>
+                )}
+                <h5>{plan.name}</h5>
+                <div className="plan-duration-v4">{plan.duration}</div>
+                <div className="plan-price-large-v4">{plan.price} <span>/mo</span></div>
+                <div className="plan-total-v4">{plan.total}</div>
+                {plan.savings && <div className="plan-savings-v4">{plan.savings}</div>}
+                <button className={`plan-btn-v4 ${plan.isActive ? 'current' : 'switch'}`}>
+                  {plan.isActive ? 'Current Plan' : 'Switch Plan'}
+                </button>
+              </div>
+            ))}
+          </div>
+
+          <div className="common-benefits-container-v4">
+            <h5>Included in every plan:</h5>
+            <div className="benefits-grid-v4">
+              {[
+                'TDS Filing Support', 
+                'Free Listing & Onboarding', 
+                'Payout Management', 
+                'TDS Tracking', 
+                'Reports Access', 
+                'Vendor Support'
+              ].map(benefit => (
+                <div key={benefit} className="benefit-item-v4">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                  {benefit}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const AccountEditModal = ({ 
   show, 
