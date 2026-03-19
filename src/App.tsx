@@ -1430,7 +1430,8 @@ const ServiceSettings = () => {
             </div>
           </div>
 
-          <div className="settings-card">
+          <div className={`settings-main-split-v4 ${!currentSettings.acceptingOrders ? 'disabled-menu' : ''}`}>
+            <div className="settings-card">
             <div className="settings-grid-rows">
               <div className="settings-row">
                 <div className="form-group">
@@ -1449,22 +1450,34 @@ const ServiceSettings = () => {
                   <input type="number" className="input-field" placeholder="Enter booking limit..." />
                 </div>
                 <div className="form-group">
-                  <label className="input-label">Stop Orders Before</label>
+                  <label className="input-label">Stop Accepting Orders Before</label>
                   <div className="stop-orders-wrapper">
-                    <input
-                      type="number"
+                    <select
                       className="input-field stop-value"
                       value={currentSettings.stopOrdersValue}
                       onChange={(e) => updateSetting('stopOrdersValue', e.target.value)}
-                      min="1"
-                    />
+                    >
+                      {Array.from(
+                        { length: currentSettings.stopOrdersUnit === 'Hours' ? 24 : 30 },
+                        (_, i) => i + 1
+                      ).map(val => (
+                        <option key={val} value={val}>{val}</option>
+                      ))}
+                    </select>
                     <select
                       className="input-field stop-unit"
                       value={currentSettings.stopOrdersUnit}
-                      onChange={(e) => updateSetting('stopOrdersUnit', e.target.value)}
+                      onChange={(e) => {
+                        const newUnit = e.target.value;
+                        updateSetting('stopOrdersUnit', newUnit);
+                        // Cap value at 24 if switching to Hours
+                        if (newUnit === 'Hours' && parseInt(currentSettings.stopOrdersValue) > 24) {
+                          updateSetting('stopOrdersValue', '24');
+                        }
+                      }}
                     >
-                      <option>Hours</option>
-                      <option>Days</option>
+                      <option value="Hours">Hours</option>
+                      <option value="Days">Days</option>
                     </select>
                   </div>
                 </div>
@@ -1566,7 +1579,7 @@ const ServiceSettings = () => {
                       <div className="menu-main-info">
                         <h4>{menu.name}</h4>
                         <div className="menu-meta">
-                          <span className="menu-price">₹{menu.price} per plate</span>
+                          <span className="menu-price">₹{menu.price}</span>
                           <span className={`status-badge ${menu.status.toLowerCase()}`}>{menu.status}</span>
                         </div>
                       </div>
@@ -1590,7 +1603,6 @@ const ServiceSettings = () => {
                         }}
                       >
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                        Edit
                       </button>
                       <button
                         className="icon-btn manage-btn"
@@ -1599,8 +1611,7 @@ const ServiceSettings = () => {
                           setMenuActionId(menuActionId === menu.id ? null : menu.id);
                         }}
                       >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                        Delete / Hide
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                       </button>
 
                       {/* Existing Edit/Delete buttons */}
@@ -1707,6 +1718,7 @@ const ServiceSettings = () => {
               )}
             </div>
           </div>
+        </div>
         </div>
 
         {isAddingMenu && (
