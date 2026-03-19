@@ -998,15 +998,19 @@ const Settings = ({
             <div className="settings-pane-v4">
               <h3 className="pane-title">Subscription Plan</h3>
               
-              <div className="active-plan-container-v4 main-display-v4">
+              <div className="active-plan-container-v4 main-display-v4 starter-premium">
+                <div className="plan-card-bg-v4">
+                  <PlanAbstract />
+                  <PlanSparkles />
+                </div>
                 <div className="active-plan-info-v4">
                   <div className="plan-header-row-v4">
                     <h4>Current Active Plan</h4>
                     <span className="active-plan-badge-v4">Active</span>
                   </div>
                   <div className="active-plan-details-v4">
-                    <span className="plan-name">Growth Plan</span>
-                    <span className="plan-meta">6 Months • ₹499 / Month</span>
+                    <h3 className="plan-name-v4">Growth Plan</h3>
+                    <p className="plan-meta-v4">6 Months • Total ₹2,994</p>
                   </div>
                 </div>
                 <div className="active-plan-meta-v4">
@@ -3860,56 +3864,77 @@ const SuccessPage = ({ onBackToHome }: { onBackToHome: () => void }) => (
   </div>
 );
 
+const PlanAbstract = () => (
+  <div className="plan-abstract-v4">
+    <svg width="60" height="60" viewBox="0 0 100 100" fill="currentColor">
+      <circle cx="80" cy="20" r="40" opacity="0.1" />
+      <circle cx="90" cy="10" r="25" opacity="0.05" />
+    </svg>
+  </div>
+);
+
+const PlanSparkles = () => (
+  <div className="plan-sparkles-v4">
+    <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" className="sparkle-1">
+      <path d="M12 0l3 9 9 3-9 3-3 9-3-9-9-3 9-3z"/>
+    </svg>
+    <svg width="6" height="6" viewBox="0 0 24 24" fill="currentColor" className="sparkle-2">
+      <path d="M12 0l3 9 9 3-9 3-3 9-3-9-9-3 9-3z"/>
+    </svg>
+    <svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor" className="sparkle-3">
+      <path d="M12 0l3 9 9 3-9 3-3 9-3-9-9-3 9-3z"/>
+    </svg>
+  </div>
+);
+
 const SubscriptionPlanModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) => {
   if (!isOpen) return null;
 
   const plans = [
     {
       name: 'Starter Plan',
-      duration: '3 Months • ₹599/month',
+      duration: '3 Months • Total ₹1,797',
       price: '₹599',
       total: 'Total ₹1,797',
+      yearlyCost: '₹7,188/year',
+      yearlyLabel: 'Current yearly pricing',
       badge: null,
-      savings: null,
       isActive: false,
-      premiumClass: 'starter-premium'
+      premiumClass: 'growth-premium',
+      btnText: 'Switch to 3 Months',
+      hasSavings: false,
+      features: ['TDS Filing Support', 'Free Listing & Onboarding', 'Monthly Reports Access']
     },
     {
       name: 'Growth Plan',
-      duration: '6 Months • ₹499/month',
+      duration: '6 Months • Total ₹2,994',
       price: '₹499',
       total: 'Total ₹2,994',
+      yearlyCost: '₹7,188/year',
+      yearlyLabel: 'Save ₹1,200/year',
       badge: 'Most Popular',
-      savings: 'Save ₹600',
       isActive: true,
-      premiumClass: 'growth-premium'
+      premiumClass: 'starter-premium',
+      btnText: 'Switch to 6 Months',
+      hasSavings: true,
+      features: ['TDS Filing Support', 'Faster Payout Tracking', 'Priority Vendor Support']
     },
     {
       name: 'Saving Plan',
-      duration: '12 Months • ₹449/month',
+      duration: '12 Months • Total ₹5,388',
       price: '₹449',
       total: 'Total ₹5,388',
+      yearlyCost: '₹7,188/year',
+      yearlyLabel: 'Save ₹1,800/year',
       badge: 'Best Value',
-      savings: 'Save ₹1,800',
       badgeColor: '#10b981',
       isActive: false,
-      premiumClass: 'saving-premium'
+      premiumClass: 'saving-premium',
+      btnText: 'Switch to 12 Months',
+      hasSavings: true,
+      features: ['Full TDS Tracking', 'Priority Payout Support', 'Long-Term Savings Benefits']
     }
   ];
-
-  const PlanSparkles = () => (
-    <div className="plan-sparkles-v4">
-      <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" className="sparkle-1">
-        <path d="M12 0l3 9 9 3-9 3-3 9-3-9-9-3 9-3z"/>
-      </svg>
-      <svg width="6" height="6" viewBox="0 0 24 24" fill="currentColor" className="sparkle-2">
-        <path d="M12 0l3 9 9 3-9 3-3 9-3-9-9-3 9-3z"/>
-      </svg>
-      <svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor" className="sparkle-3">
-        <path d="M12 0l3 9 9 3-9 3-3 9-3-9-9-3 9-3z"/>
-      </svg>
-    </div>
-  );
 
   return (
     <div className="modal-overlay-v4" onClick={onClose}>
@@ -3928,7 +3953,11 @@ const SubscriptionPlanModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: 
           <div className="subscription-plans-grid-v4">
             {plans.map((plan, idx) => (
               <div key={idx} className={`plan-card-v4 ${plan.isActive ? 'active-selection' : ''} ${plan.premiumClass}`}>
-                <PlanSparkles />
+                {/* Clipped background layer */}
+                <div className="plan-card-bg-v4">
+                  <PlanAbstract />
+                  <PlanSparkles />
+                </div>
                 {plan.badge && (
                   <div className="card-badge-v4" style={plan.badgeColor ? { background: plan.badgeColor } : {}}>
                     {plan.badge}
@@ -3936,36 +3965,40 @@ const SubscriptionPlanModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: 
                 )}
                 <h5>{plan.name}</h5>
                 <div className="plan-duration-v4">{plan.duration}</div>
+                
                 <div className="plan-price-large-v4">{plan.price} <span>/mo</span></div>
-                <div className="plan-total-v4">{plan.total}</div>
-                {plan.savings && <div className="plan-savings-v4">{plan.savings}</div>}
+                
+                
+                <div className="plan-savings-strip-v4">
+                  <span className={`yearly-price-v4 ${plan.hasSavings ? 'struck' : ''}`}>
+                    {plan.yearlyCost}
+                  </span>
+                  <span className={`yearly-label-v4 ${plan.hasSavings ? 'savings' : ''}`}>
+                    {plan.yearlyLabel}
+                  </span>
+                </div>
+                
                 <button className={`plan-btn-v4 ${plan.isActive ? 'current' : 'switch'}`}>
-                  {plan.isActive ? 'Current Plan' : 'Switch Plan'}
+                  {plan.btnText || (plan.isActive ? 'Current Plan' : 'Switch Plan')}
                 </button>
+
+                <div className="plan-divider-v4" />
+
+                <div className="plan-features-list-v4">
+                  <h6>Includes</h6>
+                  {plan.features.map(feat => (
+                    <div key={feat} className="plan-feature-v4">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                      </svg>
+                      {feat}
+                    </div>
+                  ))}
+                </div>
               </div>
             ))}
           </div>
 
-          <div className="common-benefits-container-v4">
-            <h5>Included in every plan:</h5>
-            <div className="benefits-grid-v4">
-              {[
-                'TDS Filing Support', 
-                'Free Listing & Onboarding', 
-                'Payout Management', 
-                'TDS Tracking', 
-                'Reports Access', 
-                'Vendor Support'
-              ].map(benefit => (
-                <div key={benefit} className="benefit-item-v4">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="20 6 9 17 4 12"></polyline>
-                  </svg>
-                  {benefit}
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
       </div>
     </div>
