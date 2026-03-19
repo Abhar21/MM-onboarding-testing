@@ -6703,15 +6703,21 @@ input:checked + .service-slider:before {
   color: #0077ff;
 }
 
-.verified-status-v4 {
-  position: absolute;
-  right: 16px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #16a34a;
-  background: #f0fdf4;
-  padding: 2px 8px;
-  border-radius: 4px;
+.form-row-v4 {
+  display: flex;
+  gap: 20px;
+  width: 100%;
+}
+
+.form-row-v4 .form-group {
+  flex: 1;
+}
+
+@media (max-width: 600px) {
+  .form-row-v4 {
+    flex-direction: column;
+    gap: 0;
+  }
 }
 
 /* OTP Popup Overlay (inside modal body) */

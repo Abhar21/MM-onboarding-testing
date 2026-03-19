@@ -902,90 +902,30 @@ const Settings = ({
             <div className="settings-pane-v4">
               <h3 className="pane-title">Account Settings</h3>
               <div className="settings-form-v4">
-                <div className="form-group">
-                  <label className="input-label">Mobile Number</label>
-                  <div className="integrated-input-v4">
-                    <input
-                      type="text"
-                      className="input-field"
-                      value={profileForm.mobile}
-                      onChange={(e) => {
-                        setProfileForm({ ...profileForm, mobile: e.target.value });
-                        if (e.target.value !== profileData.owner.mobile) {
-                          setVerification({ ...verification, mobileVerified: false });
-                        }
-                      }}
-                    />
-                    {!verification.mobileVerified && !verification.mobileOtpSent && profileForm.mobile.length >= 10 && (
-                      <button className="settings-action-link-v4" onClick={() => setVerification({ ...verification, mobileOtpSent: true })}>Verify</button>
-                    )}
-                    {verification.mobileVerified && (
-                      <span className="verified-status-v4">Verified</span>
-                    )}
-                  </div>
-                </div>
-                <div className="form-group">
-                  <label className="input-label">Email Address</label>
-                  <div className="integrated-input-v4">
-                    <input
-                      type="email"
-                      className="input-field"
-                      value={profileForm.email}
-                      onChange={(e) => {
-                        setProfileForm({ ...profileForm, email: e.target.value });
-                        if (e.target.value !== profileData.owner.email) {
-                          setVerification({ ...verification, emailVerified: false });
-                        }
-                      }}
-                    />
-                    {!verification.emailVerified && !verification.emailOtpSent && profileForm.email.includes('@') && (
-                      <button className="settings-action-link-v4" onClick={() => setVerification({ ...verification, emailOtpSent: true })}>Verify</button>
-                    )}
-                    {verification.emailVerified && (
-                      <span className="verified-status-v4">Verified</span>
-                    )}
-                  </div>
-                </div>
-
-                {/* Account Settings OTP Overlay */}
-                {(verification.mobileOtpSent || verification.emailOtpSent) && (
-                  <div className="otp-popup-overlay-v4 settings-otp-overlay">
-                    <div className="otp-popup-card-v4">
-                      <h3>Enter OTP</h3>
-                      <p>Enter the code sent to your {verification.mobileOtpSent ? 'Mobile' : 'Email'}</p>
-                      <div className="otp-input-row-v4">
-                        <input
-                          type="text"
-                          maxLength={6}
-                          placeholder="••••••"
-                          value={verification.mobileOtpSent ? verification.mobileOtp : verification.emailOtp}
-                          onChange={(e) => {
-                            if (verification.mobileOtpSent) {
-                              setVerification({ ...verification, mobileOtp: e.target.value });
-                            } else {
-                              setVerification({ ...verification, emailOtp: e.target.value });
-                            }
-                          }}
-                        />
-                      </div>
-                      <div className="otp-actions-v4">
-                        <button className="otp-cancel-v4" onClick={() => setVerification({ ...verification, mobileOtpSent: false, emailOtpSent: false, mobileOtp: '', emailOtp: '' })}>Cancel</button>
-                        <button
-                          className="otp-verify-v4"
-                          onClick={() => {
-                            if (verification.mobileOtpSent) {
-                              setVerification({ ...verification, mobileVerified: true, mobileOtpSent: false });
-                            } else {
-                              setVerification({ ...verification, emailVerified: true, emailOtpSent: false });
-                            }
-                          }}
-                        >
-                          Verify
-                        </button>
-                      </div>
+                <div className="form-row-v4">
+                  <div className="form-group">
+                    <label className="input-label">Mobile Number</label>
+                    <div className="integrated-input-v4">
+                      <input
+                        type="text"
+                        className="input-field"
+                        value={profileForm.mobile}
+                        onChange={(e) => setProfileForm({ ...profileForm, mobile: e.target.value })}
+                      />
                     </div>
                   </div>
-                )}
+                  <div className="form-group">
+                    <label className="input-label">Email Address</label>
+                    <div className="integrated-input-v4">
+                      <input
+                        type="email"
+                        className="input-field"
+                        value={profileForm.email}
+                        onChange={(e) => setProfileForm({ ...profileForm, email: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                </div>
 
                 <div className="form-group">
                   <div className="notification-settings-v4">
