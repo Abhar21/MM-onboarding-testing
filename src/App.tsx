@@ -778,7 +778,7 @@ const Tickets = () => {
   );
 };
 
-const Documents = () => {
+const Documents = ({ hideHeader = false }: { hideHeader?: boolean }) => {
   const platformPolicies = [
     { name: 'Terms & Conditions', updated: '22 Jan 2026' },
     { name: 'Privacy Policy', updated: '15 Feb 2026' },
@@ -789,15 +789,17 @@ const Documents = () => {
   const vendorAgreement = { name: 'Vendor Agreement', accepted: '03 Mar 2026' };
 
   return (
-    <div className="documents-container">
-      <div className="section-header">
-        <h2 className="section-title">Documents</h2>
-        <p className="section-subtitle">View and download your platform policies and signed agreements.</p>
-      </div>
+    <div className="documents-container-pane-v4">
+      {!hideHeader && (
+        <div className="section-header">
+          <h2 className="section-title">Documents</h2>
+          <p className="section-subtitle">View and download your platform policies and signed agreements.</p>
+        </div>
+      )}
 
-      <div className="documents-grid">
-        <div className="documents-card">
-          <h3 className="card-title">Platform Policies</h3>
+      <div className="documents-content-v4">
+        <div className="documents-section-v4">
+          <h3 className="pane-title">Platform Policies</h3>
           <div className="document-list">
             {platformPolicies.map((doc, idx) => (
               <div key={idx} className="document-row">
@@ -819,8 +821,8 @@ const Documents = () => {
           </div>
         </div>
 
-        <div className="documents-card">
-          <h3 className="card-title">Vendor Agreement</h3>
+        <div className="documents-section-v4" style={{ marginTop: '2.5rem' }}>
+          <h3 className="pane-title">Vendor Agreement</h3>
           <div className="document-list">
             <div className="document-row">
               <div className="doc-info">
@@ -863,6 +865,7 @@ const Settings = ({
 
   const tabs = [
     { id: 'account', label: 'Account' },
+    { id: 'documents', label: 'Documents' },
     { id: 'subscription', label: 'Subscription' },
     { id: 'security', label: 'Security' },
     { id: 'danger', label: 'Danger Zone' },
@@ -1019,6 +1022,12 @@ const Settings = ({
                   Save Changes
                 </button>
               </div>
+            </div>
+          )}
+
+          {activeTab === 'documents' && (
+            <div className="settings-pane-v4">
+              <Documents hideHeader={true} />
             </div>
           )}
 
@@ -3714,14 +3723,6 @@ const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
       title: 'Account',
       items: [
         {
-          id: 'documents', label: 'Documents', icon: (
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
-              <polyline points="14 2 14 8 20 8"></polyline>
-            </svg>
-          )
-        },
-        {
           id: 'profile', label: 'Profile', icon: (
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
@@ -3797,7 +3798,6 @@ const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
             </>
           )}
           {activeTab === 'tickets' && <Tickets />}
-          {activeTab === 'documents' && <Documents />}
           {activeTab === 'service-settings' && <ServiceSettings />}
           {activeTab === 'ratings' && <Ratings />}
           {activeTab === 'profile' && (
