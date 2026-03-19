@@ -847,19 +847,19 @@ const Documents = ({ hideHeader = false }: { hideHeader?: boolean }) => {
 };
 
 const Settings = ({
-  profileData,
   setProfileData,
   profileForm,
-  setProfileForm,
-  verification,
-  setVerification
+  setShowAccountEditModal,
+  setNewEditValue,
+  setEditStep,
+  setEditOtp
 }: {
-  profileData: any,
   setProfileData: any,
   profileForm: any,
-  setProfileForm: any,
-  verification: any,
-  setVerification: any
+  setShowAccountEditModal: (val: 'Mobile' | 'Email' | null) => void,
+  setNewEditValue: (val: string) => void,
+  setEditStep: (val: number) => void,
+  setEditOtp: (val: string) => void
 }) => {
   const [activeTab, setActiveTab] = useState('account');
 
@@ -910,8 +910,16 @@ const Settings = ({
                         type="text"
                         className="input-field"
                         value={profileForm.mobile}
-                        onChange={(e) => setProfileForm({ ...profileForm, mobile: e.target.value })}
+                        disabled
                       />
+                      <button className="edit-trigger-v4" onClick={() => {
+                        setShowAccountEditModal('Mobile');
+                        setNewEditValue(profileForm.mobile);
+                        setEditStep(1);
+                        setEditOtp('');
+                      }}>
+                        <i className="phi-pencil-line-duotone"></i>
+                      </button>
                     </div>
                   </div>
                   <div className="form-group">
@@ -921,8 +929,16 @@ const Settings = ({
                         type="email"
                         className="input-field"
                         value={profileForm.email}
-                        onChange={(e) => setProfileForm({ ...profileForm, email: e.target.value })}
+                        disabled
                       />
+                      <button className="edit-trigger-v4" onClick={() => {
+                        setShowAccountEditModal('Email');
+                        setNewEditValue(profileForm.email);
+                        setEditStep(1);
+                        setEditOtp('');
+                      }}>
+                        <i className="phi-pencil-line-duotone"></i>
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -3570,6 +3586,11 @@ const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
     emailVerified: true
   });
 
+  const [showAccountEditModal, setShowAccountEditModal] = useState<'Mobile' | 'Email' | null>(null);
+  const [editStep, setEditStep] = useState(1);
+  const [newFieldValue, setNewFieldValue] = useState('');
+  const [editOtp, setEditOtp] = useState('');
+
   const [activeTab, setActiveTab] = useState('dashboard');
 
   const navigationGroups = [
@@ -3754,12 +3775,12 @@ const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
           )}
           {activeTab === 'settings' && (
             <Settings
-              profileData={profileData}
               setProfileData={setProfileData}
               profileForm={profileForm}
-              setProfileForm={setProfileForm}
-              verification={verification}
-              setVerification={setVerification}
+              setShowAccountEditModal={setShowAccountEditModal}
+              setNewEditValue={setNewFieldValue}
+              setEditStep={setEditStep}
+              setEditOtp={setEditOtp}
             />
           )}
           {!['dashboard', 'tickets', 'documents', 'service-settings', 'profile', 'settings', 'ratings'].includes(activeTab) && (
@@ -3770,6 +3791,25 @@ const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
           )}
         </div>
       </main>
+
+      <AccountEditModal
+        show={showAccountEditModal}
+        type={showAccountEditModal}
+        onClose={() => setShowAccountEditModal(null)}
+        step={editStep}
+        setStep={setEditStep}
+        value={newFieldValue}
+        setValue={setNewFieldValue}
+        otp={editOtp}
+        setOtp={setEditOtp}
+        onConfirm={() => {
+          setProfileForm({
+            ...profileForm,
+            [showAccountEditModal === 'Mobile' ? 'mobile' : 'email']: newFieldValue
+          });
+          setShowAccountEditModal(null);
+        }}
+      />
     </div>
   );
 };
@@ -3796,6 +3836,86 @@ const SuccessPage = ({ onBackToHome }: { onBackToHome: () => void }) => (
     </div>
   </div>
 );
+
+const AccountEditModal = ({ 
+  show, 
+  onClose, 
+  type, 
+  step, 
+  setStep, 
+  value, 
+  setValue, 
+  otp, 
+  setOtp, 
+  onConfirm 
+}: any) => {
+  if (!show) return null;
+
+  return (
+    <div className="modal-overlay-v4">
+      <div className="modal-container-v4 account-edit-modal-v4">
+        <div className="modal-header-v4">
+          <h2>Update {type}</h2>
+          <button className="close-btn-v4" onClick={onClose}>
+            <i className="phi-x"></i>
+          </button>
+        </div>
+        <div className="modal-body-v4">
+          {step === 1 ? (
+            <div className="edit-step-v4">
+              <p>Enter your new {type.toLowerCase()} below. We'll send a verification code to confirm.</p>
+              <div className="edit-field-group-v4">
+                <label>New {type}</label>
+                <input
+                  type={type === 'Mobile' ? 'text' : 'email'}
+                  className="edit-input-v4"
+                  placeholder={`Enter new ${type.toLowerCase()}`}
+                  value={value}
+                  onChange={(e) => setValue(e.target.value)}
+                />
+              </div>
+              <div className="modal-footer-v4">
+                <button className="btn-secondary-v4" onClick={onClose}>Cancel</button>
+                <button 
+                  className="btn btn-primary-blue" 
+                  disabled={!value}
+                  onClick={() => setStep(2)}
+                >
+                  Send OTP
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="edit-step-v4">
+              <p>A 6-digit code has been sent to your new {type.toLowerCase()}.</p>
+              <div className="edit-field-group-v4">
+                <label>One-Time Password</label>
+                <input
+                  type="text"
+                  className="edit-input-v4"
+                  placeholder="••••••"
+                  maxLength={6}
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                />
+              </div>
+              <div className="modal-footer-v4">
+                <button className="btn-secondary-v4" onClick={() => setStep(1)}>Back</button>
+                <button 
+                  className="btn btn-primary-blue" 
+                  disabled={otp.length < 6}
+                  onClick={onConfirm}
+                >
+                  Verify & Update
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const SignupPage = ({ mobile, handleMobileChange, handleSendOtp, isTimerActive, timer, hasSentOtp, otp, setOtp, navigate }: any) => (
   <AuthLayout currentScreen="signup">

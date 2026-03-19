@@ -6720,6 +6720,95 @@ input:checked + .service-slider:before {
   }
 }
 
+.edit-trigger-v4 {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.edit-trigger-v4:hover {
+  background: #f1f5f9;
+  color: #0077ff;
+}
+
+.input-field:disabled {
+  background-color: #f8fafc;
+  cursor: not-allowed;
+  color: #64748b;
+}
+
+/* Account Edit Modal */
+.account-edit-modal-v4 {
+  width: 400px;
+  max-width: 90vw;
+}
+
+.edit-step-v4 {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.edit-step-v4 h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #1a1a1a;
+}
+
+.edit-step-v4 p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
+.edit-field-group-v4 {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.edit-field-group-v4 label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #64748b;
+}
+
+.edit-input-wrapper-v4 {
+  position: relative;
+}
+
+.edit-input-v4 {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.edit-input-v4:focus {
+  border-color: #0077ff;
+}
+
+.modal-footer-v4 {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+}
+
 /* OTP Popup Overlay (inside modal body) */
 .otp-popup-overlay-v4 {
   position: absolute;
