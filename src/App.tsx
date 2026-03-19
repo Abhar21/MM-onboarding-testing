@@ -3213,15 +3213,16 @@ const Ratings = () => {
       <div className="ratings-body-v4">
         {/* Sidebar Column */}
         <div className="sidebar-col-v4">
-          <div className="ratings-stat-card-v4 accent-blue condensed-v4">
-            <div className="ratings-stat-icon-v4">⭐</div>
-            <div className="ratings-stat-value-v4">{avgRating}</div>
-            <div className="ratings-stat-label-v4">Overall Rating</div>
-          </div>
+          <div className="ratings-card-v4 accent-blue-v4">
+            {/* Combined Summary Header */}
+            <div className="ratings-summary-combined-v4">
+              <div className="overall-star-v4">⭐</div>
+              <div className="overall-value-v4">{avgRating}</div>
+              <div className="overall-label-v4">Overall Rating</div>
+              <div className="total-reviews-count-v4">{totalReviews} customer reviews</div>
+            </div>
 
-          {/* Section 2 — Rating Breakdown */}
-          <div className="ratings-card-v4">
-            <h3 className="ratings-card-title-v4">Rating Breakdown</h3>
+            <h3 className="ratings-card-title-v4" style={{ marginTop: '0.5rem' }}>Rating Breakdown</h3>
             <div className="ratings-breakdown-list-v4">
               {breakdown.map(({ stars, count }) => (
                 <div key={stars} className="ratings-breakdown-row-v4">
