@@ -1251,11 +1251,14 @@ const ServiceSettings = () => {
   ];
 
   const [settings, setSettings] = useState({
-    breakfast: { startTime: '07:00', endTime: '11:00', acceptingOrders: true, stopOrdersValue: '2', stopOrdersUnit: 'Hours', style: ['Buffet Service'], sitDownExtraPrice: 0 },
-    lunch: { startTime: '12:00', endTime: '15:30', acceptingOrders: true, stopOrdersValue: '4', stopOrdersUnit: 'Hours', style: ['Buffet Service', 'Sit-down Service'], sitDownExtraPrice: 10 },
-    snacks: { startTime: '16:00', endTime: '18:30', acceptingOrders: false, stopOrdersValue: '2', stopOrdersUnit: 'Hours', style: ['Buffet Service'], sitDownExtraPrice: 0 },
-    dinner: { startTime: '19:00', endTime: '23:00', acceptingOrders: true, stopOrdersValue: '1', stopOrdersUnit: 'Days', style: ['Buffet Service', 'Sit-down Service'], sitDownExtraPrice: 15 },
+    breakfast: { startTime: '07:00', endTime: '11:00', acceptingOrders: true, stopOrdersValue: '2', stopOrdersUnit: 'Hours', style: ['Buffet Service'], sitDownExtraPrice: 0, bookingLimit: '' },
+    lunch: { startTime: '12:00', endTime: '15:30', acceptingOrders: true, stopOrdersValue: '4', stopOrdersUnit: 'Hours', style: ['Buffet Service', 'Sit-down Service'], sitDownExtraPrice: 10, bookingLimit: '' },
+    snacks: { startTime: '16:00', endTime: '18:30', acceptingOrders: false, stopOrdersValue: '2', stopOrdersUnit: 'Hours', style: ['Buffet Service'], sitDownExtraPrice: 0, bookingLimit: '' },
+    dinner: { startTime: '19:00', endTime: '23:00', acceptingOrders: true, stopOrdersValue: '1', stopOrdersUnit: 'Days', style: ['Buffet Service', 'Sit-down Service'], sitDownExtraPrice: 15, bookingLimit: '' },
   });
+
+  const [overallStatus, setOverallStatus] = useState('All changes saved');
+  const [overlapError, setOverlapError] = useState<string | null>(null);
 
   const [menus, setMenus] = useState([
     {
@@ -1360,21 +1363,97 @@ const ServiceSettings = () => {
     }));
   };
 
-  const updateSetting = (field: string, value: any) => {
-    setSettings(prev => ({
-      ...prev,
-      [activeCategory]: {
-        ...prev[activeCategory as keyof typeof prev],
-        [field]: value
+  // Compute min/max time constraints based on other services' occupied ranges
+  const getTimingConstraints = () => {
+    // Gather all ranges from OTHER categories that have both times set
+    const otherRanges = Object.entries(settings)
+      .filter(([id, s]) => id !== activeCategory && s.startTime && s.endTime)
+      .map(([, s]) => ({ start: s.startTime, end: s.endTime }));
+
+    // For Start Time: the maximum it can be is the minimum start of any overlapping service
+    // Strategy: find the earliest END time among services whose start is >= current start (they block from above)
+    // More simply: startTime max = min of all other services' startTime if the current end would overlap them
+    // For simplicity we restrict: if other services exist, the startTime cannot enter another service's occupied range
+    let startMax: string | undefined = undefined;
+    let endMin: string | undefined = undefined;
+    let endMax: string | undefined = undefined;
+    let startMin: string | undefined = undefined;
+
+    const curStart = currentSettings.startTime;
+    const curEnd = currentSettings.endTime;
+
+    for (const range of otherRanges) {
+      // If other service's start time is after our current start (or we have no start),
+      // then our end time cannot exceed the other's start
+      if (!curStart || range.start > curStart) {
+        // The earliest such other service limits our end time
+        if (endMax === undefined || range.start < endMax) {
+          endMax = range.start;
+        }
       }
-    }));
+      // If other service's end time is before our current end (or we have no end),
+      // then our start time cannot be less than the other's end
+      if (!curEnd || range.end < curEnd) {
+        if (startMin === undefined || range.end > startMin) {
+          startMin = range.end;
+        }
+      }
+    }
+
+    return { startMin, startMax, endMin, endMax };
+  };
+
+  const triggerAutoSave = () => {
+    setOverallStatus('Saving...');
+    setTimeout(() => {
+      setOverallStatus('All changes saved');
+    }, 1000);
+  };
+
+  const updateSetting = (field: string, value: any) => {
+    setSettings(prev => {
+      const updated = {
+        ...prev,
+        [activeCategory]: {
+          ...prev[activeCategory as keyof typeof prev],
+          [field]: value
+        }
+      };
+
+      // Validation check for timing fields
+      if (field === 'startTime' || field === 'endTime') {
+        const cat = updated[activeCategory as keyof typeof updated];
+        const doesOverlap = Object.entries(updated).some(([id, s]: [string, any]) => {
+          if (id === activeCategory || !s.startTime || !s.endTime) return false;
+          const sStart = s.startTime;
+          const sEnd = s.endTime;
+          const newStart = cat.startTime;
+          const newEnd = cat.endTime;
+          if (!newStart || !newEnd) return false;
+          return newStart < sEnd && newEnd > sStart;
+        });
+        if (doesOverlap) {
+          setOverlapError('This timing overlaps with another service. Please adjust timing.');
+        } else {
+          setOverlapError(null);
+          triggerAutoSave();
+        }
+      } else if (field !== 'sitDownExtraPrice') {
+        triggerAutoSave();
+      }
+
+      return updated;
+    });
   };
 
   return (
     <div className="service-settings-container">
       <div className="section-header">
-        <h2 className="section-title">Service Settings</h2>
-        <p className="section-subtitle">Manage your service timings, styles, and menu builder.</p>
+        <div className="section-header-left">
+          <h2 className="section-title">Service Settings</h2>
+          <p className="section-subtitle">Manage your service timings, styles, and menu builder.</p>
+        </div>
+
       </div>
 
       <div className="profile-tabs-nav-v4" style={{ marginBottom: '1.5rem' }}>
@@ -1420,7 +1499,14 @@ const ServiceSettings = () => {
         </div>
         <div className="settings-content">
           <div className="content-category-header">
-            <h3 className="category-title">{activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1)}</h3>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <h3 className="category-title">{activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1)}</h3>
+              {overallStatus && (
+                <span className={`status-text ${overallStatus === 'Saving...' ? 'saving' : 'saved'}`} style={{ fontSize: '12px', fontWeight: 600 }}>
+                  {overallStatus === 'Saving...' ? '⏳ Saving...' : '✓ Saved'}
+                </span>
+              )}
+            </div>
             <div className="service-toggle-wrapper">
               <span className="service-toggle-label">{currentSettings.acceptingOrders ? 'Accepting Orders' : 'Paused Orders'}</span>
               <label className="service-switch">
@@ -1430,126 +1516,161 @@ const ServiceSettings = () => {
             </div>
           </div>
 
-          <div className={`settings-main-split-v4 ${!currentSettings.acceptingOrders ? 'disabled-menu' : ''}`}>
-            <div className="settings-card">
-            <div className="settings-grid-rows">
-              <div className="settings-row">
-                <div className="form-group">
-                  <label className="input-label">Start Time</label>
-                  <input type="time" className="input-field" value={currentSettings.startTime} onChange={(e) => updateSetting('startTime', e.target.value)} />
-                </div>
-                <div className="form-group">
-                  <label className="input-label">End Time</label>
-                  <input type="time" className="input-field" value={currentSettings.endTime} onChange={(e) => updateSetting('endTime', e.target.value)} />
-                </div>
+          <div className="service-settings-content-wrapper">
+            {overlapError && (
+              <div className="timing-overlap-warning">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                <span>{overlapError}</span>
               </div>
+            )}
+            <div className={`settings-main-split-v4 ${!currentSettings.acceptingOrders ? 'disabled-menu' : ''}`}>
+              <div className="settings-card">
+                <div className="settings-grid-rows">
+                  <div className="settings-row">
+                    {(() => {
+                      const { startMin, endMax } = getTimingConstraints();
+                      return (
+                        <>
+                          <div className="form-group">
+                            <label className="input-label">Start Time</label>
+                            <input
+                              type="time"
+                              className="input-field"
+                              value={currentSettings.startTime}
+                              min={startMin}
+                              onChange={(e) => updateSetting('startTime', e.target.value)}
+                            />
+                            {startMin && <p className="input-helper-v4" style={{ marginTop: 4, color: '#64748b', fontSize: 11 }}>Available from {startMin}</p>}
+                          </div>
+                          <div className="form-group">
+                            <label className="input-label">End Time</label>
+                            <input
+                              type="time"
+                              className="input-field"
+                              value={currentSettings.endTime}
+                              max={endMax}
+                              onChange={(e) => updateSetting('endTime', e.target.value)}
+                            />
+                            {endMax && <p className="input-helper-v4" style={{ marginTop: 4, color: '#64748b', fontSize: 11 }}>Must end by {endMax}</p>}
+                          </div>
+                        </>
+                      );
+                    })()}
+                  </div>
 
-              <div className="settings-row">
-                <div className="form-group">
-                  <label className="input-label">Manage Bookings</label>
-                  <input type="number" className="input-field" placeholder="Enter booking limit..." />
+                  <div className="settings-row">
+                    <div className="form-group">
+                      <label className="input-label">Manage Bookings</label>
+                      <input 
+                        type="number" 
+                        className="input-field" 
+                        placeholder="Enter booking limit..." 
+                        value={currentSettings.bookingLimit}
+                        onChange={(e) => updateSetting('bookingLimit', e.target.value)}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label className="input-label">Stop Accepting Orders Before</label>
+                      <div className="stop-orders-wrapper">
+                        <select
+                          className="input-field stop-value"
+                          value={currentSettings.stopOrdersValue}
+                          onChange={(e) => updateSetting('stopOrdersValue', e.target.value)}
+                        >
+                          {Array.from(
+                            { length: currentSettings.stopOrdersUnit === 'Hours' ? 24 : 30 },
+                            (_, i) => i + 1
+                          ).map(val => (
+                            <option key={val} value={val}>{val}</option>
+                          ))}
+                        </select>
+                        <select
+                          className="input-field stop-unit"
+                          value={currentSettings.stopOrdersUnit}
+                          onChange={(e) => {
+                            const newUnit = e.target.value;
+                            updateSetting('stopOrdersUnit', newUnit);
+                            // Cap value at 24 if switching to Hours
+                            if (newUnit === 'Hours' && parseInt(currentSettings.stopOrdersValue) > 24) {
+                              updateSetting('stopOrdersValue', '24');
+                            }
+                          }}
+                        >
+                          <option value="Hours">Hours</option>
+                          <option value="Days">Days</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div className="form-group">
-                  <label className="input-label">Stop Accepting Orders Before</label>
-                  <div className="stop-orders-wrapper">
-                    <select
-                      className="input-field stop-value"
-                      value={currentSettings.stopOrdersValue}
-                      onChange={(e) => updateSetting('stopOrdersValue', e.target.value)}
-                    >
-                      {Array.from(
-                        { length: currentSettings.stopOrdersUnit === 'Hours' ? 24 : 30 },
-                        (_, i) => i + 1
-                      ).map(val => (
-                        <option key={val} value={val}>{val}</option>
-                      ))}
-                    </select>
-                    <select
-                      className="input-field stop-unit"
-                      value={currentSettings.stopOrdersUnit}
-                      onChange={(e) => {
-                        const newUnit = e.target.value;
-                        updateSetting('stopOrdersUnit', newUnit);
-                        // Cap value at 24 if switching to Hours
-                        if (newUnit === 'Hours' && parseInt(currentSettings.stopOrdersValue) > 24) {
-                          updateSetting('stopOrdersValue', '24');
-                        }
+
+                <div className="service-style-section">
+                  <label className="input-label">Service Style Supported</label>
+                  <div className="service-style-cards">
+                    <div
+                      className={`style-card ${currentSettings.style.includes('Buffet Service') ? 'active' : ''}`}
+                      onClick={() => {
+                        const newStyles = currentSettings.style.includes('Buffet Service')
+                          ? currentSettings.style.filter(s => s !== 'Buffet Service')
+                          : [...currentSettings.style, 'Buffet Service'];
+                        updateSetting('style', newStyles);
                       }}
                     >
-                      <option value="Hours">Hours</option>
-                      <option value="Days">Days</option>
-                    </select>
+                      <div className="style-icon-wrapper">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path><path d="M7 2v20"></path><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"></path></svg>
+                      </div>
+                      <div className="style-info">
+                        <span className="style-name">Buffet Service</span>
+                        <span className="style-desc">Self-service meal style</span>
+                      </div>
+                      <div className="style-checkbox">
+                        {currentSettings.style.includes('Buffet Service') && <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>}
+                      </div>
+                    </div>
+
+                    <div
+                      className={`style-card ${currentSettings.style.includes('Sit-down Service') ? 'active' : ''}`}
+                      onClick={() => {
+                        const newStyles = currentSettings.style.includes('Sit-down Service')
+                          ? currentSettings.style.filter(s => s !== 'Sit-down Service')
+                          : [...currentSettings.style, 'Sit-down Service'];
+                        updateSetting('style', newStyles);
+                      }}
+                    >
+                      <div className="style-icon-wrapper">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M7 21v-7a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v7"></path><path d="M4 11V4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v7"></path><path d="M12 2v10"></path></svg>
+                      </div>
+                      <div className="style-info">
+                        <span className="style-name">Sit-down Service</span>
+                        <span className="style-desc">Wait-staff table service</span>
+                      </div>
+                      <div className="style-checkbox">
+                        {currentSettings.style.includes('Sit-down Service') && <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className={`sit-down-pricing-block-v4 ${!currentSettings.style.includes('Sit-down Service') ? 'disabled' : ''}`}>
+                    <label className="input-label">Add Extra Cost for Sit-down Service</label>
+                    <div className="pricing-input-wrapper-v4">
+                      <span className="currency-prefix">₹</span>
+                      <input 
+                        type="number" 
+                        className="input-field pricing-input-v4" 
+                        placeholder="per person"
+                        disabled={!currentSettings.style.includes('Sit-down Service')}
+                        value={currentSettings.sitDownExtraPrice || ''}
+                        onChange={(e) => updateSetting('sitDownExtraPrice', parseFloat(e.target.value) || 0)}
+                        onBlur={() => triggerAutoSave()}
+                      />
+                      <span className="unit-suffix">per person</span>
+                    </div>
+                    <p className="input-helper-v4">
+                      Enter only the extra amount added to your current menu price, not the total sit-down price.
+                    </p>
                   </div>
                 </div>
               </div>
-            </div>
-
-            <div className="service-style-section">
-              <label className="input-label">Service Style Supported</label>
-              <div className="service-style-cards">
-                <div
-                  className={`style-card ${currentSettings.style.includes('Buffet Service') ? 'active' : ''}`}
-                  onClick={() => {
-                    const newStyles = currentSettings.style.includes('Buffet Service')
-                      ? currentSettings.style.filter(s => s !== 'Buffet Service')
-                      : [...currentSettings.style, 'Buffet Service'];
-                    updateSetting('style', newStyles);
-                  }}
-                >
-                  <div className="style-icon-wrapper">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path><path d="M7 2v20"></path><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"></path></svg>
-                  </div>
-                  <div className="style-info">
-                    <span className="style-name">Buffet Service</span>
-                    <span className="style-desc">Self-service meal style</span>
-                  </div>
-                  <div className="style-checkbox">
-                    {currentSettings.style.includes('Buffet Service') && <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>}
-                  </div>
-                </div>
-
-                <div
-                  className={`style-card ${currentSettings.style.includes('Sit-down Service') ? 'active' : ''}`}
-                  onClick={() => {
-                    const newStyles = currentSettings.style.includes('Sit-down Service')
-                      ? currentSettings.style.filter(s => s !== 'Sit-down Service')
-                      : [...currentSettings.style, 'Sit-down Service'];
-                    updateSetting('style', newStyles);
-                  }}
-                >
-                  <div className="style-icon-wrapper">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M7 21v-7a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v7"></path><path d="M4 11V4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v7"></path><path d="M12 2v10"></path></svg>
-                  </div>
-                  <div className="style-info">
-                    <span className="style-name">Sit-down Service</span>
-                    <span className="style-desc">Wait-staff table service</span>
-                  </div>
-                  <div className="style-checkbox">
-                    {currentSettings.style.includes('Sit-down Service') && <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>}
-                  </div>
-                </div>
-              </div>
-
-              <div className={`sit-down-pricing-block-v4 ${!currentSettings.style.includes('Sit-down Service') ? 'disabled' : ''}`}>
-                <label className="input-label">Add Extra Cost for Sit-down Service</label>
-                <div className="pricing-input-wrapper-v4">
-                  <span className="currency-prefix">₹</span>
-                  <input 
-                    type="number" 
-                    className="input-field pricing-input-v4" 
-                    placeholder="per person"
-                    disabled={!currentSettings.style.includes('Sit-down Service')}
-                    value={currentSettings.sitDownExtraPrice || ''}
-                    onChange={(e) => updateSetting('sitDownExtraPrice', parseFloat(e.target.value) || 0)}
-                  />
-                  <span className="unit-suffix">per person</span>
-                </div>
-                <p className="input-helper-v4">
-                  Enter only the extra amount added to your current menu price, not the total sit-down price.
-                </p>
-              </div>
-            </div>
-          </div>
 
           <div className="menu-builder-section">
             <div className="menu-builder-header">
@@ -1718,8 +1839,10 @@ const ServiceSettings = () => {
               )}
             </div>
           </div>
+            </div>
+          </div>
         </div>
-        </div>
+
 
         {isAddingMenu && (
           <div className="modal-overlay">
