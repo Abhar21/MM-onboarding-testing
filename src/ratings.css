@@ -284,8 +284,10 @@
 
 .review-card-top-v4 {
   display: flex;
-  gap: 14px;
-  align-items: flex-start;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
   margin-bottom: 12px;
 }
 
@@ -303,9 +305,17 @@
   flex-shrink: 0;
 }
 
+.review-customer-info-v4 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .review-meta-v4 {
-  flex: 1;
-  min-width: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
 }
 
 .review-customer-row-v4 {
@@ -313,7 +323,6 @@
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
-  margin-bottom: 6px;
 }
 
 .review-customer-name-v4 {
@@ -341,6 +350,15 @@
 
 .review-rating-v4 {
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+/* Remove separate mobile overrides for meta column alignment to keep global consistency */
+@media (max-width: 600px) {
+  .review-meta-v4 {
+    margin-top: 0;
+  }
 }
 
 .review-text-v4 {
@@ -392,13 +410,25 @@
   }
 
   .review-card-top-v4 {
-    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 8px;
   }
 
-  /* Ensure meta column takes full width when wrapped to allow horizontal chips */
+  .review-customer-info-v4 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
   .review-meta-v4 {
-    flex: 1 1 100%;
-    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    margin-top: 0;
+    width: 100%;
   }
 
   .review-details-row-v4 {

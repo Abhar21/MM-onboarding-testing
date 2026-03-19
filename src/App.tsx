@@ -1251,10 +1251,10 @@ const ServiceSettings = () => {
   ];
 
   const [settings, setSettings] = useState({
-    breakfast: { startTime: '07:00', endTime: '11:00', acceptingOrders: true, stopOrdersValue: '2', stopOrdersUnit: 'Hours', style: ['Buffet Service'] },
-    lunch: { startTime: '12:00', endTime: '15:30', acceptingOrders: true, stopOrdersValue: '4', stopOrdersUnit: 'Hours', style: ['Buffet Service', 'Sit-down Service'] },
-    snacks: { startTime: '16:00', endTime: '18:30', acceptingOrders: false, stopOrdersValue: '2', stopOrdersUnit: 'Hours', style: ['Buffet Service'] },
-    dinner: { startTime: '19:00', endTime: '23:00', acceptingOrders: true, stopOrdersValue: '1', stopOrdersUnit: 'Days', style: ['Buffet Service', 'Sit-down Service'] },
+    breakfast: { startTime: '07:00', endTime: '11:00', acceptingOrders: true, stopOrdersValue: '2', stopOrdersUnit: 'Hours', style: ['Buffet Service'], sitDownExtraPrice: 0 },
+    lunch: { startTime: '12:00', endTime: '15:30', acceptingOrders: true, stopOrdersValue: '4', stopOrdersUnit: 'Hours', style: ['Buffet Service', 'Sit-down Service'], sitDownExtraPrice: 10 },
+    snacks: { startTime: '16:00', endTime: '18:30', acceptingOrders: false, stopOrdersValue: '2', stopOrdersUnit: 'Hours', style: ['Buffet Service'], sitDownExtraPrice: 0 },
+    dinner: { startTime: '19:00', endTime: '23:00', acceptingOrders: true, stopOrdersValue: '1', stopOrdersUnit: 'Days', style: ['Buffet Service', 'Sit-down Service'], sitDownExtraPrice: 15 },
   });
 
   const [menus, setMenus] = useState([
@@ -1515,6 +1515,25 @@ const ServiceSettings = () => {
                     {currentSettings.style.includes('Sit-down Service') && <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>}
                   </div>
                 </div>
+              </div>
+
+              <div className={`sit-down-pricing-block-v4 ${!currentSettings.style.includes('Sit-down Service') ? 'disabled' : ''}`}>
+                <label className="input-label">Add Extra Cost for Sit-down Service</label>
+                <div className="pricing-input-wrapper-v4">
+                  <span className="currency-prefix">₹</span>
+                  <input 
+                    type="number" 
+                    className="input-field pricing-input-v4" 
+                    placeholder="per person"
+                    disabled={!currentSettings.style.includes('Sit-down Service')}
+                    value={currentSettings.sitDownExtraPrice || ''}
+                    onChange={(e) => updateSetting('sitDownExtraPrice', parseFloat(e.target.value) || 0)}
+                  />
+                  <span className="unit-suffix">per person</span>
+                </div>
+                <p className="input-helper-v4">
+                  Enter only the extra amount added to your current menu price, not the total sit-down price.
+                </p>
               </div>
             </div>
           </div>
@@ -3364,17 +3383,17 @@ const Ratings = () => {
           {filtered.map(r => (
             <div key={r.id} className="review-card-v4">
               <div className="review-card-top-v4">
-                <div className="review-avatar-v4">{r.customer.charAt(0)}</div>
+                <div className="review-customer-info-v4">
+                  <div className="review-avatar-v4">{r.customer.charAt(0)}</div>
+                  <strong className="review-customer-name-v4">{r.customer}</strong>
+                </div>
                 <div className="review-meta-v4">
-                  <div className="review-customer-row-v4">
-                    <strong className="review-customer-name-v4">{r.customer}</strong>
-                  </div>
                   <div className="review-details-row-v4">
                     <span className="review-detail-chip-v4">{r.bookingId}</span>
                     <span className="review-detail-chip-v4">{r.eventDate}</span>
                   </div>
+                  <div className="review-rating-v4">{renderStars(r.rating, 14)}</div>
                 </div>
-                <div className="review-rating-v4">{renderStars(r.rating, 14)}</div>
               </div>
               <p className="review-text-v4">{r.review}</p>
 
@@ -3519,8 +3538,8 @@ const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
         {
           id: 'service-settings', label: 'Service Settings', icon: (
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="3"></circle>
-              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1Z"></path>
+              <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
             </svg>
           )
         },
@@ -3543,12 +3562,14 @@ const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
         },
 
         {
-          id: 'tickets', label: 'Tickets', icon: (
+          id: 'tickets', label: 'Support', icon: (
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"></path>
-              <path d="M13 5v2"></path>
-              <path d="M13 17v2"></path>
-              <path d="M13 11v2"></path>
+              <circle cx="12" cy="12" r="10"></circle>
+              <circle cx="12" cy="12" r="4"></circle>
+              <line x1="4.93" y1="4.93" x2="9.17" y2="9.17"></line>
+              <line x1="14.83" y1="14.83" x2="19.07" y2="19.07"></line>
+              <line x1="14.83" y1="9.17" x2="19.07" y2="4.93"></line>
+              <line x1="4.93" y1="19.07" x2="9.17" y2="14.83"></line>
             </svg>
           )
         }
