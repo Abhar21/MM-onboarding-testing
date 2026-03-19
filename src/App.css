@@ -7599,7 +7599,7 @@ input:checked + .slider-v4:before {
 
   .settings-row {
     grid-template-columns: 1fr;
-    gap: 1.25rem;
+    gap: 1.15rem;
   }
 
   .stop-orders-wrapper {
@@ -7621,6 +7621,12 @@ input:checked + .slider-v4:before {
   .service-settings-container {
     max-width: 100%;
     overflow: hidden;
+  }
+
+  .settings-main-split-v4 {
+    padding: 1.25rem !important;
+    gap: 1rem;
+    border-radius: 12px;
   }
 
   .settings-content {
@@ -7673,11 +7679,13 @@ input:checked + .slider-v4:before {
   }
 
   .settings-card {
-    padding: 1rem;
+    padding: 0.4rem !important;
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
     overflow: hidden;
+    border-right: none !important;
+    padding-right: 0 !important;
   }
 
   .service-toggle-wrapper {
