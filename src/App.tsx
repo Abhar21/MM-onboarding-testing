@@ -1010,7 +1010,7 @@ const Settings = ({
                   </div>
                   <div className="active-plan-details-v4">
                     <h3 className="plan-name-v4">Growth Plan</h3>
-                    <p className="plan-meta-v4">6 Months • Total ₹2,994</p>
+                    <p className="plan-meta-v4">6 Months • ₹499 / Month</p>
                   </div>
                 </div>
                 <div className="active-plan-meta-v4">
@@ -3915,7 +3915,7 @@ const SubscriptionPlanModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: 
       badge: 'Most Popular',
       isActive: true,
       premiumClass: 'starter-premium',
-      btnText: 'Switch to 6 Months',
+      btnText: 'Current Active Plan',
       hasSavings: true,
       features: ['TDS Filing Support', 'Faster Payout Tracking', 'Priority Vendor Support']
     },
@@ -3985,7 +3985,7 @@ const SubscriptionPlanModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: 
                 <div className="plan-divider-v4" />
 
                 <div className="plan-features-list-v4">
-                  <h6>Includes</h6>
+                  <h6>Benefits</h6>
                   {plan.features.map(feat => (
                     <div key={feat} className="plan-feature-v4">
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
