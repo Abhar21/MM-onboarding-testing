@@ -872,6 +872,16 @@ const Settings = ({
     { id: 'danger', label: 'Danger Zone' },
   ];
 
+  const [autoRenew, setAutoRenew] = useState(true);
+  const [showAutoRenewModal, setShowAutoRenewModal] = useState(false);
+  const [paymentFailed, setPaymentFailed] = useState(false);
+  const [isNearExpiry, setIsNearExpiry] = useState(false);
+  
+  const toggleAutoRenew = () => {
+    setAutoRenew(!autoRenew);
+    setShowAutoRenewModal(false);
+  };
+
   const billingHistory = [
     { 
       id: 'INV-102', 
@@ -1033,9 +1043,25 @@ const Settings = ({
                     <h3 className="plan-name-v4">Growth Plan</h3>
                     <p className="plan-meta-v4">6 Months • ₹499 / Month</p>
                   </div>
+                  
+                  <div className="auto-renew-segment-v4">
+                    <div className="status-row-v4">
+                      <div className="status-label-v4">Auto-renew: <span className={autoRenew ? 'status-on' : 'status-off'}>{autoRenew ? 'ON' : 'OFF'}</span></div>
+                      <div className="status-value-v4">{autoRenew ? 'Renews on April 01, 2026' : 'Expires on April 01, 2026'}</div>
+                    </div>
+                    <div className="status-row-v4 payment-method-row-v4">
+                      <div className="status-label-v4">Payment Method</div>
+                      <div className="status-value-v4 payment-value-v4">
+                        <span>UPI ••••9823</span>
+                        <button className="change-payment-link-v4">Change</button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div className="active-plan-meta-v4">
-                  <p className="renewal-date-v4">Valid till: <strong>April 01, 2026</strong></p>
+                <div className="active-plan-actions-v4">
+                  <button className="manage-renew-btn-v4" onClick={() => setShowAutoRenewModal(true)}>
+                    Manage Auto-renew
+                  </button>
                   <button className="view-plans-btn-v4" onClick={() => setShowSubscriptionModal(true)}>
                     View Plans
                   </button>
@@ -1046,6 +1072,96 @@ const Settings = ({
                 isOpen={showSubscriptionModal} 
                 onClose={() => setShowSubscriptionModal(false)} 
               />
+
+              {showAutoRenewModal && (
+                <div className="modal-overlay-v4" onClick={() => setShowAutoRenewModal(false)}>
+                  <div className="modal-content-v4 confirm-modal-v4" onClick={e => e.stopPropagation()}>
+                    <div className="modal-header-v4">
+                      <h3>{autoRenew ? 'Disable Auto-renew?' : 'Enable Auto-renew?'}</h3>
+                    </div>
+                    <div className="modal-body-v4">
+                      {autoRenew ? (
+                        <div className="info-card-v4 warning-card-v4">
+                          <div className="info-card-header-v4">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                              <circle cx="12" cy="12" r="10"></circle>
+                              <line x1="12" y1="8" x2="12" y2="12"></line>
+                              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                            </svg>
+                            <span>Renews OFF after April 01, 2026</span>
+                          </div>
+                          <div className="info-card-body-v4">
+                            <p>Your plan stays active until then.</p>
+                            <p className="info-card-subtext-v4">You can renew anytime before expiry.</p>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="info-card-v4 info-highlight-v4">
+                          <div className="info-card-header-v4">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>
+                            <span>Auto-renew ON April 01, 2026</span>
+                          </div>
+                          <div className="info-card-body-v4">
+                            <p>Your subscription will renew automatically.</p>
+                          </div>
+                        </div>
+                      )}
+                      {autoRenew && <p className="modal-helper-text-v4">No immediate changes will be made to your current plan.</p>}
+                    </div>
+                    <div className="modal-footer-v4 dual-btns-v4">
+                      <button className="btn-v4 secondary-outline-v4" onClick={() => {
+                        if (autoRenew) {
+                          toggleAutoRenew(); // Disable if choosing this
+                        } else {
+                          setShowAutoRenewModal(false); // Cancel if choosing this
+                        }
+                      }}>
+                        {autoRenew ? 'Disable Auto-renew' : 'Cancel'}
+                      </button>
+                      <button className="btn-v4 primary-v4" onClick={() => {
+                        if (autoRenew) {
+                          setShowAutoRenewModal(false); // Keep ON stays ON
+                        } else {
+                          toggleAutoRenew(); // Enable if choosing this
+                        }
+                      }}>
+                        {autoRenew ? 'Keep Auto-renew ON' : 'Enable Auto-renew'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {paymentFailed && (
+                <div className="subscription-alert-v4 failure-v4">
+                  <div className="alert-content-v4">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <line x1="12" y1="8" x2="12" y2="12"></line>
+                      <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    <span>Automatic payment failed for your next billing cycle.</span>
+                  </div>
+                  <button className="alert-btn-v4" onClick={() => setPaymentFailed(false)}>Retry Payment</button>
+                </div>
+              )}
+
+              {isNearExpiry && !autoRenew && (
+                <div className="subscription-alert-v4 warning-v4">
+                  <div className="alert-content-v4">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                      <line x1="12" y1="9" x2="12" y2="13"></line>
+                      <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                    <span>Your subscription is expiring in 3 days. Renew now to avoid interruption.</span>
+                  </div>
+                  <button className="alert-btn-v4" onClick={() => setAutoRenew(true)}>Renew Now</button>
+                </div>
+              )}
 
               <h4 className="sub-title-margin">Billing History</h4>
               <div className="billing-history-container-v4">

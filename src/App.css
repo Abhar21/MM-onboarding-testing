@@ -8838,7 +8838,7 @@ input:checked + .slider-v4:before {
   border: none;
   padding: 0;
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   text-decoration: underline;
   cursor: pointer;
   transition: opacity 0.2s;
@@ -8846,6 +8846,249 @@ input:checked + .slider-v4:before {
 
 .view-plans-btn-v4:hover {
   opacity: 0.8;
+}
+
+.active-plan-actions-v4 {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1rem;
+}
+
+.manage-renew-btn-v4 {
+  background: none;
+  border: none;
+  color: #1e293b;
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+}
+
+.auto-renew-segment-v4 {
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.status-row-v4 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.status-label-v4 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.status-label-v4 .status-on { color: #059669; }
+.status-label-v4 .status-off { color: #dc2626; }
+
+.status-value-v4 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.payment-method-row-v4 {
+  margin-top: 4px;
+}
+
+.payment-value-v4 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.change-payment-link-v4 {
+  background: transparent;
+  border: none;
+  color: #2563eb;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.change-payment-link-v4:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
+}
+
+/* Subscription Alerts */
+.subscription-alert-v4 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.subscription-alert-v4.failure-v4 {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+}
+
+.subscription-alert-v4.warning-v4 {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  color: #92400e;
+}
+
+.alert-content-v4 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.alert-btn-v4 {
+  background: white;
+  border: 1px solid currentColor;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* Billing Header Row */
+.billing-header-row-v4 {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 0.5rem;
+}
+
+.update-payment-v4 {
+  font-size: 0.85rem;
+  margin-bottom: 1.5rem;
+}
+
+.confirm-modal-v4 {
+  max-width: 480px;
+}
+
+.dual-btns-v4 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.btn-v4 {
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-v4.primary-v4 {
+  background: #2563eb;
+  color: white;
+}
+
+.btn-v4.primary-v4:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+.btn-v4.secondary-outline-v4 {
+  background: white;
+  border-color: #e2e8f0;
+  color: #64748b;
+}
+
+.btn-v4.secondary-outline-v4:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #475569;
+}
+
+.info-card-v4 {
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.warning-card-v4 {
+  background: #fffbeb;
+  border: 1px solid #fef3c7;
+}
+
+.info-highlight-v4 {
+  background: #f0f9ff;
+  border: 1px solid #e0f2fe;
+}
+
+.info-card-header-v4 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.warning-card-v4 .info-card-header-v4 {
+  color: #92400e;
+}
+
+.warning-card-v4 .info-card-header-v4 svg {
+  color: #d97706;
+}
+
+.info-highlight-v4 .info-card-header-v4 {
+  color: #0369a1;
+}
+
+.info-highlight-v4 .info-card-header-v4 svg {
+  color: #0284c7;
+}
+
+.info-card-body-v4 {
+  margin-left: 30px;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.info-card-body-v4 p {
+  margin: 0 !important;
+  color: #475569;
+}
+
+.info-card-subtext-v4 {
+  font-size: 0.8rem !important;
+  color: #64748b !important;
+  margin-top: 4px !important;
+}
+
+.modal-helper-text-v4 {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  margin-top: 1.5rem;
+  text-align: center;
 }
 
 .active-plan-meta-v4 {
