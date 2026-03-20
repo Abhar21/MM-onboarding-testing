@@ -873,9 +873,30 @@ const Settings = ({
   ];
 
   const billingHistory = [
-    { id: 'INV-102', date: 'Mar 01, 2026', amount: '₹1,999', status: 'Paid' },
-    { id: 'INV-091', date: 'Feb 01, 2026', amount: '₹1,999', status: 'Paid' },
-    { id: 'INV-084', date: 'Jan 01, 2026', amount: '₹1,999', status: 'Paid' },
+    { 
+      id: 'INV-102', 
+      date: '15 Jan 2026', 
+      plan: '6 Months Plan', 
+      validity: '15 Jan 2026 – 14 Jul 2026', 
+      paymentMethod: 'UPI ••••9823', 
+      amount: '₹2,994' 
+    },
+    { 
+      id: 'INV-091', 
+      date: '15 Jul 2025', 
+      plan: '6 Months Plan', 
+      validity: '15 Jul 2025 – 14 Jan 2026', 
+      paymentMethod: 'UPI ••••9823', 
+      amount: '₹2,994' 
+    },
+    { 
+      id: 'INV-084', 
+      date: '15 Jan 2025', 
+      plan: '6 Months Plan', 
+      validity: '15 Jan 2025 – 14 Jul 2025', 
+      paymentMethod: 'UPI ••••9823', 
+      amount: '₹2,994' 
+    },
   ];
 
   return (
@@ -1027,29 +1048,56 @@ const Settings = ({
               />
 
               <h4 className="sub-title-margin">Billing History</h4>
-              <div className="table-responsive">
-                <table className="settings-table-v4">
-                  <thead>
-                    <tr>
-                      <th>Invoice ID</th>
-                      <th>Date</th>
-                      <th>Amount</th>
-                      <th>Status</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {billingHistory.map(inv => (
-                      <tr key={inv.id}>
-                        <td className="inv-id-v4">{inv.id}</td>
-                        <td>{inv.date}</td>
-                        <td>{inv.amount}</td>
-                        <td><span className="status-paid-v4">{inv.status}</span></td>
-                        <td><button className="download-inv-v4">Download</button></td>
+              <div className="billing-history-container-v4">
+                <div className="table-responsive">
+                  <table className="settings-table-v4 billing-table-v4">
+                    <thead>
+                      <tr>
+                        <th>Date</th>
+                        <th>Plan</th>
+                        <th>Validity</th>
+                        <th>Payment Method</th>
+                        <th>Invoice</th>
+                        <th>Total</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {billingHistory.map(inv => (
+                        <tr key={inv.id}>
+                          <td className="billing-date-v4">{inv.date}</td>
+                          <td className="billing-plan-col-v4">
+                            <div className="plan-name-v4">{inv.plan}</div>
+                            <div className="plan-inv-id-v4">{inv.id}</div>
+                          </td>
+                          <td className="billing-validity-v4">{inv.validity}</td>
+                          <td className="billing-method-v4">
+                            <span>{inv.paymentMethod}</span>
+                          </td>
+                          <td className="billing-invoice-v4">
+                            <button className="download-btn-v4">
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                              </svg>
+                              Download
+                            </button>
+                          </td>
+                          <td className="billing-total-v4">{inv.amount}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <div className="billing-footer-v4">
+                  <div className="razorpay-secure-v4">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                      <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                    Secure Payments by Razorpay
+                  </div>
+                </div>
               </div>
             </div>
           )}
