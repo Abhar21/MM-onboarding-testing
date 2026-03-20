@@ -2935,6 +2935,7 @@ input[type="file"].input-field::file-selector-button:hover {
   gap: 1.25rem;
 }
 
+
 .leave-form-group-v4 {
   display: flex;
   flex-direction: column;
@@ -7445,6 +7446,71 @@ input:checked + .slider-v4:before {
   font-size: 1rem;
 }
 
+.settings-pagination-v4 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem;
+  border-top: 1px solid #f1f5f9;
+  margin-top: 0.5rem;
+}
+
+.pagination-info-v4 {
+  font-size: 0.875rem;
+  color: #64748b;
+  font-weight: 400;
+}
+
+.pagination-controls-v4 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pagination-btn-v4 {
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0.875rem;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  background: white;
+  color: #475569;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pagination-btn-v4:hover:not(:disabled) {
+  border-color: #0077ff;
+  color: #0077ff;
+  background: #f0f7ff;
+}
+
+.pagination-btn-v4:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #f8fafc;
+}
+
+.page-number-v4 {
+  width: 32px;
+  padding: 0;
+}
+
+.page-number-v4.active {
+  background: #0077ff;
+  color: white;
+  border-color: #0077ff;
+}
+
+.pagination-ellipsis-v4 {
+  color: #94a3b8;
+  padding: 0 0.25rem;
+}
+
 .billing-footer-v4 {
   padding: 16px;
   background: #f8fafc;
@@ -8581,14 +8647,66 @@ input:checked + .slider-v4:before {
   background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
   border: 1px solid #e2e8f0;
   border-radius: 16px;
-  padding: 1.5rem 2rem;
+  padding: 1.5rem 2rem 8.5rem; /* Increased to 8.5rem to ensure payment row is visible above strip */
   margin-bottom: 2rem;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   box-shadow: 0 4px 12px rgba(0,0,0,0.03);
   position: relative;
   overflow: hidden;
+}
+
+.upgrade-sticky-strip-v4 {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(90deg, #fffbeb 0%, #fef3c7 100%);
+  padding: 12px 24px;
+  border-top: 1px solid #fde68a;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.upgrade-sticky-strip-v4:hover {
+  background: linear-gradient(90deg, #fef3c7 0%, #fde68a 100%);
+}
+
+.strip-content-v4 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sparkle-icon-v4 {
+  font-size: 0.9rem;
+}
+
+.strip-text-v4 {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #92400e;
+}
+
+.strip-text-v4 strong {
+  font-weight: 800;
+  color: #b45309;
+}
+
+.strip-action-v4 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #b45309;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
 }
 
 .active-plan-info-v4 h4 {
@@ -8603,8 +8721,8 @@ input:checked + .slider-v4:before {
 .active-plan-details-v4 {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  margin-top: 12px;
+  gap: 2px;
+  margin-top: 4px; /* Reduced from 12px */
 }
 
 .active-plan-details-v4 .plan-name-v4 {
@@ -8618,6 +8736,28 @@ input:checked + .slider-v4:before {
   font-size: 1rem;
   color: #64748b;
   margin: 0;
+}
+
+.plan-name-row-v4 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.plan-savings-v4 {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #059669;
+}
+
+.horizontal-badge-v4 {
+  background: #ecfdf5;
+  padding: 2px 10px;
+  border-radius: 12px;
+  border: 1px solid #d1fae5;
+  font-size: 0.75rem !important;
+  display: flex;
+  align-items: center;
 }
 
 .active-plan-badge-v4 {
@@ -8704,10 +8844,10 @@ input:checked + .slider-v4:before {
 
 .plan-btn-v4 {
   width: 100%;
-  padding: 0.85rem;
+  padding: 0.6rem 1rem;
   border-radius: 12px;
   font-weight: 700;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   border: none;
@@ -8721,14 +8861,17 @@ input:checked + .slider-v4:before {
 }
 
 .plan-btn-v4.switch {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-  color: white;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+  background: transparent;
+  color: #3b82f6;
+  border: 2px solid #3b82f6;
+  box-shadow: none;
 }
 
 .plan-btn-v4.switch:hover {
-  transform: scale(1.02);
-  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
+  transform: translateY(-2px);
+  background: #3b82f6;
+  color: white;
+  box-shadow: none;
 }
 
 .common-benefits-container-v4 {
@@ -8844,16 +8987,41 @@ input:checked + .slider-v4:before {
   transition: opacity 0.2s;
 }
 
+.plan-pricing-v4 {
+  margin-top: 4px; /* Reduced from 0.75rem */
+}
+
+.plan-pricing-v4.compact-v4 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #64748b;
+  font-size: 0.95rem;
+}
+
+.plan-pricing-divider-v4 {
+  color: #cbd5e1;
+  font-weight: normal;
+}
+
+.plan-rate-v4 {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #1e293b;
+}
+
+.plan-duration-v4 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #64748b;
+  margin-top: 2px;
+}
+
 .view-plans-btn-v4:hover {
   opacity: 0.8;
 }
 
-.active-plan-actions-v4 {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 1rem;
-}
+/* active-plan-actions-v4 removed as actions are now localized */
 
 .manage-renew-btn-v4 {
   background: none;
@@ -8864,15 +9032,44 @@ input:checked + .slider-v4:before {
   text-decoration: underline;
   cursor: pointer;
   padding: 0;
+  transition: color 0.2s;
+}
+
+.manage-renew-btn-v4:hover {
+  color: #2563eb;
+}
+
+.inline-action-v4 {
+  margin-top: 10px;
+  align-self: flex-start;
+  color: #2563eb !important;
+}
+
+.payment-method-horizontal-v4 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: #64748b;
+  margin-top: 4px;
+}
+
+.payment-label-v4 {
+  font-weight: 500;
+}
+
+.payment-value-text-v4 {
+  font-weight: 700;
+  color: #1e293b;
 }
 
 .auto-renew-segment-v4 {
-  margin-top: 1.25rem;
-  padding-top: 1.25rem;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
   border-top: 1px solid rgba(0,0,0,0.05);
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 1.5rem; /* Increased gap for visibility */
 }
 
 .status-row-v4 {
@@ -8880,6 +9077,12 @@ input:checked + .slider-v4:before {
   justify-content: space-between;
   align-items: center;
   gap: 16px;
+}
+
+.vertical-stack-v4 {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px !important;
 }
 
 .status-label-v4 {
@@ -8894,6 +9097,11 @@ input:checked + .slider-v4:before {
 .status-value-v4 {
   font-size: 0.95rem;
   font-weight: 600;
+  color: #64748b;
+}
+
+.emphasized-v4 {
+  font-weight: 700;
   color: #1e293b;
 }
 
@@ -9284,3 +9492,472 @@ input:checked + .slider-v4:before {
 .plan-duration-v4 { color: #64748b; }
 .plan-price-large-v4 { color: #0f172a; }
 .plan-total-v4 { color: #475569; }
+
+/* Checkout Modal v5 Refinements */
+.checkout-modal-v5 {
+  width: 100%;
+  max-width: 450px;
+}
+
+.modal-title-v5 {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #1e293b;
+}
+
+.compact-body-v5 {
+  padding: 0 24px 20px !important;
+}
+
+.checkout-plan-preview-v5 {
+  background: #ffffff;
+  border: 1.5px solid #fbbf24;
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+  background-image: linear-gradient(to right, rgba(251, 191, 36, 0.05), transparent);
+}
+
+.checkout-plan-preview-v5::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 5px;
+  background: #fbbf24;
+}
+
+.preview-top-v5 h4 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #1e293b;
+  font-weight: 700;
+}
+
+.preview-bottom-v5 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 6px;
+}
+
+.price-bold-v5 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #1e293b;
+}
+
+.month-muted-v5 {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin-left: 2px;
+}
+
+.savings-badge-v5 {
+  background: #fef3c7;
+  color: #92400e;
+  padding: 2px 10px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border: 1px solid #fde68a;
+}
+
+.subtle-sparkle-v5 {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  font-size: 0.9rem;
+  opacity: 0.5;
+}
+
+.coupon-card-v5 {
+  margin-bottom: 20px;
+}
+
+.coupon-label-v5 {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 8px;
+}
+
+.coupon-input-group-v5 {
+  display: flex;
+  gap: 10px;
+}
+
+.coupon-input-v5 {
+  flex: 1;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.coupon-input-v5.success-v5 { border-color: #10b981; background: #f0fdf4; }
+.coupon-input-v5.error-v5 { border-color: #ef4444; background: #fef2f2; }
+
+.apply-btn-v5, .remove-btn-v5 {
+  height: 40px;
+  padding: 0 20px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.apply-btn-v5 { background: #f8fafc; border: 1px solid #e2e8f0; color: #1e293b; }
+.remove-btn-v5 { background: #fee2e2; border: 1px solid #fecaca; color: #ef4444; }
+
+.feedback-success-v5 { font-size: 0.8rem; color: #10b981; font-weight: 600; margin-top: 6px; }
+.feedback-error-v5 { font-size: 0.8rem; color: #ef4444; font-weight: 600; margin-top: 6px; }
+
+.billing-summary-v5 {
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.summary-section-header-v5 {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 12px;
+}
+
+.summary-row-v5 {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+  color: #475569;
+}
+
+.summary-row-v5 span:last-child {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.discount-active-v5 span:last-child { color: #10b981; font-weight: 700; }
+.discount-none-v5 { opacity: 0.6; }
+
+.summary-divider-v5 { height: 1px; background: #e2e8f0; margin: 10px 0; }
+
+.final-row-v5 { color: #1e293b; margin-top: 10px; align-items: center; }
+.final-label-v5 { font-size: 1rem; font-weight: 700; }
+.final-amount-v5 { font-size: 1.4rem; font-weight: 800; color: #0077ff; }
+
+.payment-context-v5 {
+  padding: 0 4px;
+}
+
+.context-label-v5 {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 10px;
+}
+
+.method-display-v5 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.method-left-v5 { display: flex; align-items: center; gap: 8px; }
+.upi-icon-v5 { font-size: 1rem; }
+.method-name-v5 { font-size: 0.95rem; font-weight: 600; color: #1e293b; }
+
+.change-link-v5 {
+  background: none;
+  border: none;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #0077ff;
+  cursor: pointer;
+  padding: 0;
+}
+
+/* Round 4 Trust-Based Pricing Refinements */
+.plan-savings-strip-v6 {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.yearly-compare-v6 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+}
+
+.yearly-price-v6 {
+  color: #64748b;
+  font-weight: 500;
+}
+
+.struck-v6 {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+.savings-green-v6 {
+  color: #10b981;
+  font-weight: 700;
+}
+
+.promo-tag-v6 {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #0077ff;
+  background: #eff6ff;
+  padding: 2px 8px;
+  border-radius: 4px;
+  display: inline-block;
+  width: fit-content;
+  border: 1px solid #dbeafe;
+}
+
+/* Refined Discount Styling */
+.discount-active-v5 span:last-child {
+  color: #10b981;
+  font-weight: 700;
+}
+
+/* Round 5 Checkout Footer Refinements */
+.footer-vertical-v5 {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 12px !important;
+  margin-top: 24px !important;
+  justify-content: center !important;
+}
+
+.dominant-btn-v5 {
+  width: 100% !important;
+  height: 48px !important;
+  border-radius: 12px !important;
+  font-size: 1rem !important;
+  font-weight: 700 !important;
+  border: none !important;
+  cursor: pointer !important;
+  transition: all 0.2s !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: #8b5cf6 !important; /* Universal Purple */
+  color: white !important;
+}
+
+.dominant-btn-v5:hover {
+  background: #7c3aed !important;
+}
+
+/* Plan-specific accents for the top card (kept dynamic) */
+.checkout-plan-preview-v5.starter-premium { border-left: 4px solid #8b5cf6; background: #faf5ff; }
+.checkout-plan-preview-v5.growth-premium { border-left: 4px solid #3b82f6; background: #eff6ff; }
+.checkout-plan-preview-v5.saving-premium { border-left: 4px solid #fbbf24; background: #fffbeb; }
+
+.cancel-link-v5 {
+  background: none !important;
+  border: none !important;
+  font-size: 0.95rem !important;
+  font-weight: 600 !important;
+  color: #64748b !important;
+  cursor: pointer !important;
+  padding: 4px 12px !important;
+  transition: all 0.2s !important;
+  text-decoration: none !important;
+}
+.cancel-link-v5:hover { color: #1e293b !important; text-decoration: underline !important; }
+
+.footer-meta-v5 {
+  text-align: center !important;
+  margin-top: 8px !important;
+}
+.redirect-text-v5 {
+  font-size: 0.8rem !important;
+  color: #64748b !important;
+  margin: 0 0 8px 0 !important;
+}
+.trust-badges-v5 {
+  display: flex !important;
+  justify-content: center !important;
+  gap: 16px !important;
+}
+.trust-item-v5 {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  color: #94a3b8 !important;
+}
+
+/* Security Screen Redesign */
+.security-card-v4 {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.security-label-major-v4 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.security-subtext-v4 {
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
+.btn-outline-blue-v4 {
+  background: white;
+  border: 1px solid #e2e8f0;
+  color: #2563eb;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.btn-outline-blue-v4:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.btn-outline-red-v4 {
+  background: white;
+  border: 1px solid #fecaca;
+  color: #ef4444;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.btn-outline-red-v4:hover {
+  background: #fef2f2;
+}
+
+.login-activity-section-v4 {
+  margin-top: 32px;
+}
+
+.login-activity-header-v4 {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.section-title-v4 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 12px 0;
+}
+
+.section-description-v4 {
+  font-size: 0.95rem;
+  color: #64748b;
+  margin: 0;
+  max-width: 600px;
+}
+
+.sessions-card-v4 {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.session-item-v4 {
+  display: flex;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.session-item-v4:last-child {
+  border-bottom: none;
+}
+
+.session-icon-container-v4 {
+  width: 48px;
+  height: 48px;
+  background: #eff6ff;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #3b82f6;
+  margin-right: 20px;
+}
+
+.session-details-v4 {
+  flex: 1;
+}
+
+.device-info-v4 {
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 4px;
+}
+
+.session-meta-v4 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
+.current-status-v4 {
+  color: #3b82f6;
+  font-weight: 600;
+}
+
+.meta-bullet-v4 {
+  color: #cbd5e1;
+}
+
+.revoke-session-btn-v4 {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  padding: 8px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.revoke-session-btn-v4:hover {
+  color: #64748b;
+}

@@ -876,38 +876,39 @@ const Settings = ({
   const [showAutoRenewModal, setShowAutoRenewModal] = useState(false);
   const [paymentFailed, setPaymentFailed] = useState(false);
   const [isNearExpiry, setIsNearExpiry] = useState(false);
-  
+  const [billingPage, setBillingPage] = useState(1);
+  const [showCheckoutModal, setShowCheckoutModal] = useState(false);
+  const [checkoutPlan, setCheckoutPlan] = useState<any>(null);
+  const pageSize = 5;
+
+  useEffect(() => {
+    setIsNearExpiry(true);
+  }, []);
+
   const toggleAutoRenew = () => {
     setAutoRenew(!autoRenew);
     setShowAutoRenewModal(false);
   };
 
   const billingHistory = [
-    { 
-      id: 'INV-102', 
-      date: '15 Jan 2026', 
-      plan: '6 Months Plan', 
-      validity: '15 Jan 2026 – 14 Jul 2026', 
-      paymentMethod: 'UPI ••••9823', 
-      amount: '₹2,994' 
-    },
-    { 
-      id: 'INV-091', 
-      date: '15 Jul 2025', 
-      plan: '6 Months Plan', 
-      validity: '15 Jul 2025 – 14 Jan 2026', 
-      paymentMethod: 'UPI ••••9823', 
-      amount: '₹2,994' 
-    },
-    { 
-      id: 'INV-084', 
-      date: '15 Jan 2025', 
-      plan: '6 Months Plan', 
-      validity: '15 Jan 2025 – 14 Jul 2025', 
-      paymentMethod: 'UPI ••••9823', 
-      amount: '₹2,994' 
-    },
+    { id: 'INV-102', date: '15 Jan 2026', plan: '6 Months Plan', validity: '15 Jan 2026 – 14 Jul 2026', paymentMethod: 'UPI ••••9823', amount: '₹2,994' },
+    { id: 'INV-091', date: '15 Jul 2025', plan: '6 Months Plan', validity: '15 Jul 2025 – 14 Jan 2026', paymentMethod: 'UPI ••••9823', amount: '₹2,994' },
+    { id: 'INV-084', date: '15 Jan 2025', plan: '6 Months Plan', validity: '15 Jan 2025 – 14 Jul 2025', paymentMethod: 'UPI ••••9823', amount: '₹2,994' },
+    { id: 'INV-077', date: '15 Jul 2024', plan: '6 Months Plan', validity: '15 Jul 2024 – 14 Jan 2025', paymentMethod: 'UPI ••••9823', amount: '₹2,994' },
+    { id: 'INV-065', date: '15 Jan 2024', plan: '6 Months Plan', validity: '15 Jan 2024 – 14 Jul 2024', paymentMethod: 'UPI ••••9823', amount: '₹2,994' },
+    { id: 'INV-058', date: '15 Jul 2023', plan: '6 Months Plan', validity: '15 Jul 2023 – 14 Jan 2024', paymentMethod: 'UPI ••••9823', amount: '₹2,994' },
+    { id: 'INV-042', date: '15 Jan 2023', plan: '6 Months Plan', validity: '15 Jan 2023 – 14 Jul 2023', paymentMethod: 'UPI ••••9823', amount: '₹2,994' },
+    { id: 'INV-031', date: '15 Jul 2022', plan: '6 Months Plan', validity: '15 Jul 2022 – 14 Jan 2023', paymentMethod: 'UPI ••••9823', amount: '₹2,994' },
+    { id: 'INV-024', date: '15 Jan 2022', plan: '6 Months Plan', validity: '15 Jan 2022 – 14 Jul 2022', paymentMethod: 'UPI ••••9823', amount: '₹2,994' },
+    { id: 'INV-018', date: '15 Jul 2021', plan: '6 Months Plan', validity: '15 Jul 2021 – 14 Jan 2022', paymentMethod: 'UPI ••••9823', amount: '₹2,994' },
+    { id: 'INV-009', date: '15 Jan 2021', plan: '1 Month Plan', validity: '15 Jan 2021 – 14 Feb 2021', paymentMethod: 'UPI ••••9823', amount: '₹499' },
+    { id: 'INV-001', date: '01 Jan 2021', plan: '1 Month Plan', validity: '01 Jan 2021 – 31 Jan 2021', paymentMethod: 'UPI ••••9823', amount: '₹499' },
   ];
+
+  const totalPages = Math.ceil(billingHistory.length / pageSize);
+  const paginatedHistory = billingHistory.slice((billingPage - 1) * pageSize, billingPage * pageSize);
+  const startEntry = (billingPage - 1) * pageSize + 1;
+  const endEntry = Math.min(billingPage * pageSize, billingHistory.length);
 
   return (
     <div className="settings-container-v4">
@@ -1028,7 +1029,7 @@ const Settings = ({
           {activeTab === 'subscription' && (
             <div className="settings-pane-v4">
               <h3 className="pane-title">Subscription Plan</h3>
-              
+
               <div className="active-plan-container-v4 main-display-v4 starter-premium">
                 <div className="plan-card-bg-v4">
                   <PlanAbstract />
@@ -1040,37 +1041,61 @@ const Settings = ({
                     <span className="active-plan-badge-v4">Active</span>
                   </div>
                   <div className="active-plan-details-v4">
-                    <h3 className="plan-name-v4">Growth Plan</h3>
-                    <p className="plan-meta-v4">6 Months • ₹499 / Month</p>
-                  </div>
-                  
-                  <div className="auto-renew-segment-v4">
-                    <div className="status-row-v4">
-                      <div className="status-label-v4">Auto-renew: <span className={autoRenew ? 'status-on' : 'status-off'}>{autoRenew ? 'ON' : 'OFF'}</span></div>
-                      <div className="status-value-v4">{autoRenew ? 'Renews on April 01, 2026' : 'Expires on April 01, 2026'}</div>
+                    <div className="plan-name-row-v4">
+                      <h3 className="plan-name-v4">Growth Plan</h3>
+                      <div className="plan-savings-v4 horizontal-badge-v4">Saved ₹1,200/year</div>
                     </div>
-                    <div className="status-row-v4 payment-method-row-v4">
-                      <div className="status-label-v4">Payment Method</div>
-                      <div className="status-value-v4 payment-value-v4">
-                        <span>UPI ••••9823</span>
-                        <button className="change-payment-link-v4">Change</button>
-                      </div>
+                    <div className="plan-pricing-v4 compact-v4">
+                      <span className="plan-rate-v4">₹499 / month</span>
+                      <span className="plan-pricing-divider-v4">•</span>
+                      <span className="plan-duration-v4">6 Months plan</span>
+                    </div>
+                  </div>
+
+                  <div className="auto-renew-segment-v4">
+                    <div className="status-group-v4 vertical-stack-v4">
+                      <div className="status-label-v4">Auto-renew: <span className={autoRenew ? 'status-on' : 'status-off'}>{autoRenew ? 'ON' : 'OFF'}</span></div>
+                      <div className="status-value-v4 emphasized-v4">{autoRenew ? 'Renews on April 01, 2026' : 'Expires on April 01, 2026'}</div>
+                      <button className="manage-renew-btn-v4 inline-action-v4" onClick={() => setShowAutoRenewModal(true)}>
+                        Manage Auto-renew
+                      </button>
+                    </div>
+                    <div className="payment-method-horizontal-v4">
+                      <span className="payment-label-v4">Payment method: </span>
+                      <span className="payment-value-text-v4">UPI ••••9823</span>
+                      <button className="change-payment-link-v4" onClick={() => {}}>Change</button>
                     </div>
                   </div>
                 </div>
-                <div className="active-plan-actions-v4">
-                  <button className="manage-renew-btn-v4" onClick={() => setShowAutoRenewModal(true)}>
-                    Manage Auto-renew
-                  </button>
-                  <button className="view-plans-btn-v4" onClick={() => setShowSubscriptionModal(true)}>
-                    View Plans
-                  </button>
+
+                <div className="upgrade-sticky-strip-v4" onClick={() => setShowSubscriptionModal(true)}>
+                  <div className="strip-content-v4">
+                    <span className="sparkle-icon-v4">✨</span>
+                    <span className="strip-text-v4">Upgrade to 12 Months • <strong>Save ₹1,800/year</strong></span>
+                  </div>
+                  <div className="strip-action-v4">
+                    <span>Explore Plans</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                  </div>
                 </div>
               </div>
 
-              <SubscriptionPlanModal 
-                isOpen={showSubscriptionModal} 
-                onClose={() => setShowSubscriptionModal(false)} 
+              <SubscriptionPlanModal
+                isOpen={showSubscriptionModal}
+                onClose={() => setShowSubscriptionModal(false)}
+                onSelectPlan={(plan) => {
+                  setCheckoutPlan(plan);
+                  setShowSubscriptionModal(false);
+                  setShowCheckoutModal(true);
+                }}
+              />
+
+              <CheckoutModal
+                isOpen={showCheckoutModal}
+                plan={checkoutPlan}
+                onClose={() => setShowCheckoutModal(false)}
               />
 
               {showAutoRenewModal && (
@@ -1178,7 +1203,7 @@ const Settings = ({
                       </tr>
                     </thead>
                     <tbody>
-                      {billingHistory.map(inv => (
+                      {paginatedHistory.map(inv => (
                         <tr key={inv.id}>
                           <td className="billing-date-v4">{inv.date}</td>
                           <td className="billing-plan-col-v4">
@@ -1205,6 +1230,38 @@ const Settings = ({
                     </tbody>
                   </table>
                 </div>
+
+                <div className="settings-pagination-v4">
+                  <div className="pagination-info-v4">
+                    Showing {startEntry} to {endEntry} of {billingHistory.length} entries
+                  </div>
+                  <div className="pagination-controls-v4">
+                    <button
+                      className="pagination-btn-v4 prev-btn"
+                      disabled={billingPage === 1}
+                      onClick={() => setBillingPage(p => Math.max(1, p - 1))}
+                    >
+                      Prev
+                    </button>
+                    {[...Array(totalPages)].map((_, i) => (
+                      <button
+                        key={i + 1}
+                        className={`pagination-btn-v4 page-number-v4 ${billingPage === i + 1 ? 'active' : ''}`}
+                        onClick={() => setBillingPage(i + 1)}
+                      >
+                        {i + 1}
+                      </button>
+                    ))}
+                    {totalPages > 5 && <span className="pagination-ellipsis-v4">...</span>}
+                    <button
+                      className="pagination-btn-v4 next-btn"
+                      disabled={billingPage === totalPages}
+                      onClick={() => setBillingPage(p => Math.min(totalPages, p + 1))}
+                    >
+                      Next
+                    </button>
+                  </div>
+                </div>
                 <div className="billing-footer-v4">
                   <div className="razorpay-secure-v4">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -1220,21 +1277,56 @@ const Settings = ({
 
           {activeTab === 'security' && (
             <div className="settings-pane-v4">
-              <h3 className="pane-title">Security</h3>
-              <div className="security-section-v4">
-                <div className="security-row-v4">
-                  <div className="security-info-v4">
-                    <strong>Password</strong>
-                    <span>Last changed 3 months ago</span>
-                  </div>
-                  <button className="btn-secondary-v4">Change Password</button>
+              <div className="security-card-v4">
+                <div className="security-info-v4">
+                  <h4 className="security-label-major-v4">Password</h4>
+                  <span className="security-subtext-v4">Last changed 3 months ago</span>
                 </div>
-                <div className="security-divider-v4"></div>
-                <div className="security-row-v4">
-                  <div className="security-info-v4">
-                    <strong>Last Login</strong>
-                    <span>March 17, 2026 • 10:45 AM (Bengaluru, India)</span>
+                <button className="btn-outline-blue-v4">Change Password</button>
+              </div>
+
+              <div className="login-activity-section-v4">
+                <div className="login-activity-header-v4">
+                  <div className="header-info-v4">
+                    <h3 className="section-title-v4">Login Activity</h3>
+                    <p className="section-description-v4">Here is a list of devices that have logged into your account. Revoke any sessions that you do not recognize.</p>
                   </div>
+                  <button className="btn-outline-red-v4">Logout all devices</button>
+                </div>
+
+                <div className="sessions-card-v4">
+                  {[
+                    { id: 1, device: 'MacBook Pro 16"', browser: 'Chrome', status: 'Current Session', location: 'Mumbai, India', icon: 'laptop', current: true },
+                    { id: 2, device: 'iPhone 13 Pro', browser: 'Safari', time: 'Yesterday at 10:45 AM', location: 'Mumbai, India', icon: 'mobile', current: false },
+                    { id: 3, device: 'Windows PC', browser: 'Edge', time: 'Oct 24, 2023 at 4:30 PM', location: 'Delhi, India', icon: 'monitor', current: false },
+                  ].map(session => (
+                    <div key={session.id} className="session-item-v4">
+                      <div className="session-icon-container-v4">
+                        {session.icon === 'laptop' && (
+                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="2" y1="20" x2="22" y2="20"></line></svg>
+                        )}
+                        {session.icon === 'mobile' && (
+                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+                        )}
+                        {session.icon === 'monitor' && (
+                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><path d="M8 21h8"></path><path d="M12 17v4"></path></svg>
+                        )}
+                      </div>
+                      <div className="session-details-v4">
+                        <div className="device-info-v4">{session.device} • {session.browser}</div>
+                        <div className="session-meta-v4">
+                          <span className={session.current ? 'current-status-v4' : ''}>{session.status || session.time}</span>
+                          <span className="meta-bullet-v4">•</span>
+                          <span>{session.location}</span>
+                        </div>
+                      </div>
+                      {!session.current && (
+                        <button className="revoke-session-btn-v4">
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
+                      )}
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
@@ -1361,7 +1453,7 @@ const ServiceSettings = () => {
     // Rule: Max 7 leaves per month
     const selectedMonth = newLeaveDate.substring(0, 7); // YYYY-MM
     const currentMonthLeaves = leaves.filter(l => l.date.startsWith(selectedMonth));
-    
+
     // Check for existing leaves in range
     const overlapping = dateList.find(d => currentMonthLeaves.some(l => l.date === d));
     if (overlapping) {
@@ -1613,13 +1705,13 @@ const ServiceSettings = () => {
       </div>
 
       <div className="profile-tabs-nav-v4" style={{ marginBottom: '1.5rem' }}>
-        <button 
+        <button
           className={`tab-btn-v4 ${activeSettingsTab === 'services' ? 'active' : ''}`}
           onClick={() => setActiveSettingsTab('services')}
         >
           Services
         </button>
-        <button 
+        <button
           className={`tab-btn-v4 ${activeSettingsTab === 'availability' ? 'active' : ''}`}
           onClick={() => setActiveSettingsTab('availability')}
         >
@@ -1629,863 +1721,863 @@ const ServiceSettings = () => {
 
       {activeSettingsTab === 'services' ? (
         <div className="service-settings-main">
-        <div className="category-sidebar-wrapper">
-          <div className="sidebar-header">
-            <h3 className="sidebar-section-title">Services</h3>
-          </div>
-          <div className="category-sidebar">
-            <div className="category-cards">
-              {categories.map(cat => (
-                <button
-                  key={cat.id}
-                  className={`category-card-btn ${activeCategory === cat.id ? 'active' : ''}`}
-                  onClick={() => setActiveCategory(cat.id)}
-                >
-                  <div className="cat-card-main">
-                    <div className="cat-info">
-                      <span className="cat-label">{cat.label}</span>
-                      <span className="cat-count">{cat.count} items</span>
+          <div className="category-sidebar-wrapper">
+            <div className="sidebar-header">
+              <h3 className="sidebar-section-title">Services</h3>
+            </div>
+            <div className="category-sidebar">
+              <div className="category-cards">
+                {categories.map(cat => (
+                  <button
+                    key={cat.id}
+                    className={`category-card-btn ${activeCategory === cat.id ? 'active' : ''}`}
+                    onClick={() => setActiveCategory(cat.id)}
+                  >
+                    <div className="cat-card-main">
+                      <div className="cat-info">
+                        <span className="cat-label">{cat.label}</span>
+                        <span className="cat-count">{cat.count} items</span>
+                      </div>
+                      <span className="cat-status-badge">Active</span>
                     </div>
-                    <span className="cat-status-badge">Active</span>
-                  </div>
-                </button>
-              ))}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
-        <div className="settings-content">
-          <div className="content-category-header">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <h3 className="category-title">{activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1)}</h3>
-              {overallStatus && (
-                <span className={`status-text ${overallStatus === 'Saving...' ? 'saving' : 'saved'}`} style={{ fontSize: '12px', fontWeight: 600 }}>
-                  {overallStatus === 'Saving...' ? '⏳ Saving...' : '✓ Saved'}
-                </span>
+          <div className="settings-content">
+            <div className="content-category-header">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <h3 className="category-title">{activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1)}</h3>
+                {overallStatus && (
+                  <span className={`status-text ${overallStatus === 'Saving...' ? 'saving' : 'saved'}`} style={{ fontSize: '12px', fontWeight: 600 }}>
+                    {overallStatus === 'Saving...' ? '⏳ Saving...' : '✓ Saved'}
+                  </span>
+                )}
+              </div>
+              <div className="service-toggle-wrapper">
+                <span className="service-toggle-label">{currentSettings.acceptingOrders ? 'Accepting Orders' : 'Paused Orders'}</span>
+                <label className="service-switch">
+                  <input type="checkbox" checked={currentSettings.acceptingOrders} onChange={handleToggle} />
+                  <span className="service-slider round"></span>
+                </label>
+              </div>
+            </div>
+
+            <div className="service-settings-content-wrapper">
+              {overlapError && (
+                <div className="timing-overlap-warning">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                  <span>{overlapError}</span>
+                </div>
               )}
-            </div>
-            <div className="service-toggle-wrapper">
-              <span className="service-toggle-label">{currentSettings.acceptingOrders ? 'Accepting Orders' : 'Paused Orders'}</span>
-              <label className="service-switch">
-                <input type="checkbox" checked={currentSettings.acceptingOrders} onChange={handleToggle} />
-                <span className="service-slider round"></span>
-              </label>
-            </div>
-          </div>
-
-          <div className="service-settings-content-wrapper">
-            {overlapError && (
-              <div className="timing-overlap-warning">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                <span>{overlapError}</span>
-              </div>
-            )}
-            <div className={`settings-main-split-v4 ${!currentSettings.acceptingOrders ? 'disabled-menu' : ''}`}>
-              <div className="settings-card">
-                <div className="settings-grid-rows">
-                  <div className="settings-row">
-                    {(() => {
-                      const { startMin, endMax } = getTimingConstraints();
-                      return (
-                        <>
-                          <div className="form-group">
-                            <label className="input-label">Start Time</label>
-                            <input
-                              type="time"
-                              className="input-field"
-                              value={currentSettings.startTime}
-                              min={startMin}
-                              onChange={(e) => updateSetting('startTime', e.target.value)}
-                            />
-                            {startMin && <p className="input-helper-v4" style={{ marginTop: 4, color: '#64748b', fontSize: 11 }}>Available from {startMin}</p>}
-                          </div>
-                          <div className="form-group">
-                            <label className="input-label">End Time</label>
-                            <input
-                              type="time"
-                              className="input-field"
-                              value={currentSettings.endTime}
-                              max={endMax}
-                              onChange={(e) => updateSetting('endTime', e.target.value)}
-                            />
-                            {endMax && <p className="input-helper-v4" style={{ marginTop: 4, color: '#64748b', fontSize: 11 }}>Must end by {endMax}</p>}
-                          </div>
-                        </>
-                      );
-                    })()}
-                  </div>
-
-                  <div className="settings-row">
-                    <div className="form-group">
-                      <label className="input-label">Manage Bookings</label>
-                      <input 
-                        type="number" 
-                        className="input-field" 
-                        placeholder="Enter booking limit..." 
-                        value={currentSettings.bookingLimit}
-                        onChange={(e) => updateSetting('bookingLimit', e.target.value)}
-                      />
-                    </div>
-                    <div className="form-group">
-                      <label className="input-label">Stop Accepting Orders Before</label>
-                      <div className="stop-orders-wrapper">
-                        <select
-                          className="input-field stop-value"
-                          value={currentSettings.stopOrdersValue}
-                          onChange={(e) => updateSetting('stopOrdersValue', e.target.value)}
-                        >
-                          {Array.from(
-                            { length: currentSettings.stopOrdersUnit === 'Hours' ? 24 : 30 },
-                            (_, i) => i + 1
-                          ).map(val => (
-                            <option key={val} value={val}>{val}</option>
-                          ))}
-                        </select>
-                        <select
-                          className="input-field stop-unit"
-                          value={currentSettings.stopOrdersUnit}
-                          onChange={(e) => {
-                            const newUnit = e.target.value;
-                            updateSetting('stopOrdersUnit', newUnit);
-                            // Cap value at 24 if switching to Hours
-                            if (newUnit === 'Hours' && parseInt(currentSettings.stopOrdersValue) > 24) {
-                              updateSetting('stopOrdersValue', '24');
-                            }
-                          }}
-                        >
-                          <option value="Hours">Hours</option>
-                          <option value="Days">Days</option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="service-style-section">
-                  <label className="input-label">Service Style Supported</label>
-                  <div className="service-style-cards">
-                    <div
-                      className={`style-card ${currentSettings.style.includes('Buffet Service') ? 'active' : ''}`}
-                      onClick={() => {
-                        const newStyles = currentSettings.style.includes('Buffet Service')
-                          ? currentSettings.style.filter(s => s !== 'Buffet Service')
-                          : [...currentSettings.style, 'Buffet Service'];
-                        updateSetting('style', newStyles);
-                      }}
-                    >
-                      <div className="style-icon-wrapper">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path><path d="M7 2v20"></path><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"></path></svg>
-                      </div>
-                      <div className="style-info">
-                        <span className="style-name">Buffet Service</span>
-                        <span className="style-desc">Self-service meal style</span>
-                      </div>
-                      <div className="style-checkbox">
-                        {currentSettings.style.includes('Buffet Service') && <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>}
-                      </div>
+              <div className={`settings-main-split-v4 ${!currentSettings.acceptingOrders ? 'disabled-menu' : ''}`}>
+                <div className="settings-card">
+                  <div className="settings-grid-rows">
+                    <div className="settings-row">
+                      {(() => {
+                        const { startMin, endMax } = getTimingConstraints();
+                        return (
+                          <>
+                            <div className="form-group">
+                              <label className="input-label">Start Time</label>
+                              <input
+                                type="time"
+                                className="input-field"
+                                value={currentSettings.startTime}
+                                min={startMin}
+                                onChange={(e) => updateSetting('startTime', e.target.value)}
+                              />
+                              {startMin && <p className="input-helper-v4" style={{ marginTop: 4, color: '#64748b', fontSize: 11 }}>Available from {startMin}</p>}
+                            </div>
+                            <div className="form-group">
+                              <label className="input-label">End Time</label>
+                              <input
+                                type="time"
+                                className="input-field"
+                                value={currentSettings.endTime}
+                                max={endMax}
+                                onChange={(e) => updateSetting('endTime', e.target.value)}
+                              />
+                              {endMax && <p className="input-helper-v4" style={{ marginTop: 4, color: '#64748b', fontSize: 11 }}>Must end by {endMax}</p>}
+                            </div>
+                          </>
+                        );
+                      })()}
                     </div>
 
-                    <div
-                      className={`style-card ${currentSettings.style.includes('Sit-down Service') ? 'active' : ''}`}
-                      onClick={() => {
-                        const newStyles = currentSettings.style.includes('Sit-down Service')
-                          ? currentSettings.style.filter(s => s !== 'Sit-down Service')
-                          : [...currentSettings.style, 'Sit-down Service'];
-                        updateSetting('style', newStyles);
-                      }}
-                    >
-                      <div className="style-icon-wrapper">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M7 21v-7a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v7"></path><path d="M4 11V4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v7"></path><path d="M12 2v10"></path></svg>
+                    <div className="settings-row">
+                      <div className="form-group">
+                        <label className="input-label">Manage Bookings</label>
+                        <input
+                          type="number"
+                          className="input-field"
+                          placeholder="Enter booking limit..."
+                          value={currentSettings.bookingLimit}
+                          onChange={(e) => updateSetting('bookingLimit', e.target.value)}
+                        />
                       </div>
-                      <div className="style-info">
-                        <span className="style-name">Sit-down Service</span>
-                        <span className="style-desc">Wait-staff table service</span>
-                      </div>
-                      <div className="style-checkbox">
-                        {currentSettings.style.includes('Sit-down Service') && <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className={`sit-down-pricing-block-v4 ${!currentSettings.style.includes('Sit-down Service') ? 'disabled' : ''}`}>
-                    <label className="input-label">Add Extra Cost for Sit-down Service</label>
-                    <div className="pricing-input-wrapper-v4">
-                      <span className="currency-prefix">₹</span>
-                      <input 
-                        type="number" 
-                        className="input-field pricing-input-v4" 
-                        placeholder="per person"
-                        disabled={!currentSettings.style.includes('Sit-down Service')}
-                        value={currentSettings.sitDownExtraPrice || ''}
-                        onChange={(e) => updateSetting('sitDownExtraPrice', parseFloat(e.target.value) || 0)}
-                        onBlur={() => triggerAutoSave()}
-                      />
-                      <span className="unit-suffix">per person</span>
-                    </div>
-                    <p className="input-helper-v4">
-                      Enter only the extra amount added to your current menu price, not the total sit-down price.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-          <div className="menu-builder-section">
-            <div className="menu-builder-header">
-              <h3 className="builder-title">Menu Builder</h3>
-              <button
-                className="btn btn-primary-blue add-menu-btn"
-                onClick={() => setIsAddingMenu(true)}
-              >
-                + Add Menu
-              </button>
-            </div>
-
-            <div className="menu-list">
-              {menus.filter(m => m.category === activeCategory).map(menu => (
-                <div key={menu.id} className="menu-card">
-                  <div className="menu-card-header">
-                    <div className="menu-header-left">
-                      <div className="menu-card-image-wrapper">
-                        {menu.image ? (
-                          <img src={menu.image} alt={menu.name} className="header-menu-image" />
-                        ) : (
-                          <div className="menu-image-placeholder">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                          </div>
-                        )}
-                      </div>
-                      <div className="menu-main-info">
-                        <h4>{menu.name}</h4>
-                        <div className="menu-meta">
-                          <span className="menu-price">₹{menu.price}</span>
-                          <span className={`status-badge ${menu.status.toLowerCase()}`}>{menu.status}</span>
+                      <div className="form-group">
+                        <label className="input-label">Stop Accepting Orders Before</label>
+                        <div className="stop-orders-wrapper">
+                          <select
+                            className="input-field stop-value"
+                            value={currentSettings.stopOrdersValue}
+                            onChange={(e) => updateSetting('stopOrdersValue', e.target.value)}
+                          >
+                            {Array.from(
+                              { length: currentSettings.stopOrdersUnit === 'Hours' ? 24 : 30 },
+                              (_, i) => i + 1
+                            ).map(val => (
+                              <option key={val} value={val}>{val}</option>
+                            ))}
+                          </select>
+                          <select
+                            className="input-field stop-unit"
+                            value={currentSettings.stopOrdersUnit}
+                            onChange={(e) => {
+                              const newUnit = e.target.value;
+                              updateSetting('stopOrdersUnit', newUnit);
+                              // Cap value at 24 if switching to Hours
+                              if (newUnit === 'Hours' && parseInt(currentSettings.stopOrdersValue) > 24) {
+                                updateSetting('stopOrdersValue', '24');
+                              }
+                            }}
+                          >
+                            <option value="Hours">Hours</option>
+                            <option value="Days">Days</option>
+                          </select>
                         </div>
                       </div>
                     </div>
-                    <div className="menu-actions">
-                      <button
-                        className="icon-btn edit-btn"
-                        onClick={() => {
-                          setMenuIdentity({
-                            name: menu.name,
-                            price: menu.price.toString(),
-                            minMembers: menu.minMembers,
-                            maxMembers: menu.maxMembers,
-                            foodType: menu.foodType,
-                            image: menu.image
-                          });
-                          setSections([...menu.sections]);
-                          setMenuEditingId(menu.id);
-                          setMenuStep(1);
-                          setIsAddingMenu(true);
-                        }}
-                      >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                      </button>
-                      <button
-                        className="icon-btn manage-btn"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setMenuActionId(menuActionId === menu.id ? null : menu.id);
-                        }}
-                      >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-                      </button>
+                  </div>
 
-                      {/* Existing Edit/Delete buttons */}
+                  <div className="service-style-section">
+                    <label className="input-label">Service Style Supported</label>
+                    <div className="service-style-cards">
+                      <div
+                        className={`style-card ${currentSettings.style.includes('Buffet Service') ? 'active' : ''}`}
+                        onClick={() => {
+                          const newStyles = currentSettings.style.includes('Buffet Service')
+                            ? currentSettings.style.filter(s => s !== 'Buffet Service')
+                            : [...currentSettings.style, 'Buffet Service'];
+                          updateSetting('style', newStyles);
+                        }}
+                      >
+                        <div className="style-icon-wrapper">
+                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path><path d="M7 2v20"></path><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"></path></svg>
+                        </div>
+                        <div className="style-info">
+                          <span className="style-name">Buffet Service</span>
+                          <span className="style-desc">Self-service meal style</span>
+                        </div>
+                        <div className="style-checkbox">
+                          {currentSettings.style.includes('Buffet Service') && <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>}
+                        </div>
+                      </div>
+
+                      <div
+                        className={`style-card ${currentSettings.style.includes('Sit-down Service') ? 'active' : ''}`}
+                        onClick={() => {
+                          const newStyles = currentSettings.style.includes('Sit-down Service')
+                            ? currentSettings.style.filter(s => s !== 'Sit-down Service')
+                            : [...currentSettings.style, 'Sit-down Service'];
+                          updateSetting('style', newStyles);
+                        }}
+                      >
+                        <div className="style-icon-wrapper">
+                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M7 21v-7a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v7"></path><path d="M4 11V4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v7"></path><path d="M12 2v10"></path></svg>
+                        </div>
+                        <div className="style-info">
+                          <span className="style-name">Sit-down Service</span>
+                          <span className="style-desc">Wait-staff table service</span>
+                        </div>
+                        <div className="style-checkbox">
+                          {currentSettings.style.includes('Sit-down Service') && <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className={`sit-down-pricing-block-v4 ${!currentSettings.style.includes('Sit-down Service') ? 'disabled' : ''}`}>
+                      <label className="input-label">Add Extra Cost for Sit-down Service</label>
+                      <div className="pricing-input-wrapper-v4">
+                        <span className="currency-prefix">₹</span>
+                        <input
+                          type="number"
+                          className="input-field pricing-input-v4"
+                          placeholder="per person"
+                          disabled={!currentSettings.style.includes('Sit-down Service')}
+                          value={currentSettings.sitDownExtraPrice || ''}
+                          onChange={(e) => updateSetting('sitDownExtraPrice', parseFloat(e.target.value) || 0)}
+                          onBlur={() => triggerAutoSave()}
+                        />
+                        <span className="unit-suffix">per person</span>
+                      </div>
+                      <p className="input-helper-v4">
+                        Enter only the extra amount added to your current menu price, not the total sit-down price.
+                      </p>
                     </div>
                   </div>
                 </div>
-              ))}
 
-              {menuActionId && (
-                <div className="modal-overlay" onClick={() => {
-                  setMenuActionId(null);
-                  setSelectedMenuAction(null);
-                }}>
-                  <div className="modal-container mini" onClick={e => e.stopPropagation()}>
-                    <div className="modal-header">
-                      <div className="modal-title-group">
-                        <h3 className="modal-title">Manage Menu</h3>
-                        <p className="modal-subtitle">Choose an action for this menu</p>
+                <div className="menu-builder-section">
+                  <div className="menu-builder-header">
+                    <h3 className="builder-title">Menu Builder</h3>
+                    <button
+                      className="btn btn-primary-blue add-menu-btn"
+                      onClick={() => setIsAddingMenu(true)}
+                    >
+                      + Add Menu
+                    </button>
+                  </div>
+
+                  <div className="menu-list">
+                    {menus.filter(m => m.category === activeCategory).map(menu => (
+                      <div key={menu.id} className="menu-card">
+                        <div className="menu-card-header">
+                          <div className="menu-header-left">
+                            <div className="menu-card-image-wrapper">
+                              {menu.image ? (
+                                <img src={menu.image} alt={menu.name} className="header-menu-image" />
+                              ) : (
+                                <div className="menu-image-placeholder">
+                                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                                </div>
+                              )}
+                            </div>
+                            <div className="menu-main-info">
+                              <h4>{menu.name}</h4>
+                              <div className="menu-meta">
+                                <span className="menu-price">₹{menu.price}</span>
+                                <span className={`status-badge ${menu.status.toLowerCase()}`}>{menu.status}</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="menu-actions">
+                            <button
+                              className="icon-btn edit-btn"
+                              onClick={() => {
+                                setMenuIdentity({
+                                  name: menu.name,
+                                  price: menu.price.toString(),
+                                  minMembers: menu.minMembers,
+                                  maxMembers: menu.maxMembers,
+                                  foodType: menu.foodType,
+                                  image: menu.image
+                                });
+                                setSections([...menu.sections]);
+                                setMenuEditingId(menu.id);
+                                setMenuStep(1);
+                                setIsAddingMenu(true);
+                              }}
+                            >
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                            </button>
+                            <button
+                              className="icon-btn manage-btn"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setMenuActionId(menuActionId === menu.id ? null : menu.id);
+                              }}
+                            >
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                            </button>
+
+                            {/* Existing Edit/Delete buttons */}
+                          </div>
+                        </div>
                       </div>
-                      <button className="close-modal" onClick={() => {
+                    ))}
+
+                    {menuActionId && (
+                      <div className="modal-overlay" onClick={() => {
                         setMenuActionId(null);
                         setSelectedMenuAction(null);
                       }}>
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                      </button>
-                    </div>
+                        <div className="modal-container mini" onClick={e => e.stopPropagation()}>
+                          <div className="modal-header">
+                            <div className="modal-title-group">
+                              <h3 className="modal-title">Manage Menu</h3>
+                              <p className="modal-subtitle">Choose an action for this menu</p>
+                            </div>
+                            <button className="close-modal" onClick={() => {
+                              setMenuActionId(null);
+                              setSelectedMenuAction(null);
+                            }}>
+                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                            </button>
+                          </div>
 
-                    <div className="modal-content" style={{ padding: '0 1.5rem 1.5rem' }}>
-                      <div className="action-options-modal">
-                        {(() => {
-                          const menu = menus.find(m => m.id === menuActionId);
-                          if (!menu) return null;
-                          return (
-                            <>
-                              <label className={`action-option-v2 ${selectedMenuAction === 'hide' ? 'selected' : ''}`} onClick={() => setSelectedMenuAction('hide')}>
-                                <div className="option-radio">
-                                  <div className="radio-inner"></div>
-                                </div>
-                                <div className="option-info">
-                                  <span className="option-label">{menu.status === 'Disabled' ? 'Show Menu' : 'Hide Menu'}</span>
-                                  <span className="option-desc">{menu.status === 'Disabled' ? 'Make this menu visible to customers' : 'Temporarily hide this menu from customers'}</span>
-                                </div>
-                              </label>
+                          <div className="modal-content" style={{ padding: '0 1.5rem 1.5rem' }}>
+                            <div className="action-options-modal">
+                              {(() => {
+                                const menu = menus.find(m => m.id === menuActionId);
+                                if (!menu) return null;
+                                return (
+                                  <>
+                                    <label className={`action-option-v2 ${selectedMenuAction === 'hide' ? 'selected' : ''}`} onClick={() => setSelectedMenuAction('hide')}>
+                                      <div className="option-radio">
+                                        <div className="radio-inner"></div>
+                                      </div>
+                                      <div className="option-info">
+                                        <span className="option-label">{menu.status === 'Disabled' ? 'Show Menu' : 'Hide Menu'}</span>
+                                        <span className="option-desc">{menu.status === 'Disabled' ? 'Make this menu visible to customers' : 'Temporarily hide this menu from customers'}</span>
+                                      </div>
+                                    </label>
 
-                              <label className={`action-option-v2 ${selectedMenuAction === 'delete' ? 'selected delete-selected' : ''}`} onClick={() => setSelectedMenuAction('delete')}>
-                                <div className="option-radio">
-                                  <div className="radio-inner"></div>
-                                </div>
-                                <div className="option-info">
-                                  <span className="option-label delete">Delete Menu</span>
-                                  <span className="option-desc">Permanently remove this menu and its sections</span>
-                                </div>
-                              </label>
-                            </>
-                          );
-                        })()}
+                                    <label className={`action-option-v2 ${selectedMenuAction === 'delete' ? 'selected delete-selected' : ''}`} onClick={() => setSelectedMenuAction('delete')}>
+                                      <div className="option-radio">
+                                        <div className="radio-inner"></div>
+                                      </div>
+                                      <div className="option-info">
+                                        <span className="option-label delete">Delete Menu</span>
+                                        <span className="option-desc">Permanently remove this menu and its sections</span>
+                                      </div>
+                                    </label>
+                                  </>
+                                );
+                              })()}
+                            </div>
+                          </div>
+
+                          <div className="modal-footer" style={{ borderTop: '1px solid #f1f5f9', padding: '1.25rem 1.5rem' }}>
+                            <div className="footer-right" style={{ width: '100%', justifyContent: 'flex-end', gap: '0.75rem' }}>
+                              <button
+                                className="btn btn-ghost"
+                                onClick={() => {
+                                  setMenuActionId(null);
+                                  setSelectedMenuAction(null);
+                                }}
+                              >
+                                Cancel
+                              </button>
+                              <button
+                                className={`btn ${selectedMenuAction === 'delete' ? 'btn-primary-red' : 'btn-primary-blue'}`}
+                                disabled={!selectedMenuAction}
+                                style={{ minWidth: '120px' }}
+                                onClick={() => {
+                                  if (selectedMenuAction === 'hide') {
+                                    setMenus(menus.map(m => m.id === menuActionId ? { ...m, status: m.status === 'Disabled' ? 'Active' : 'Disabled' } : m));
+                                  } else if (selectedMenuAction === 'delete') {
+                                    setMenus(menus.filter(m => m.id !== menuActionId));
+                                  }
+                                  setMenuActionId(null);
+                                  setSelectedMenuAction(null);
+                                }}
+                              >
+                                {!selectedMenuAction ? 'Okay' : (selectedMenuAction === 'delete' ? 'Delete Menu' : (menus.find(m => m.id === menuActionId)?.status === 'Disabled' ? 'Show Menu' : 'Hide Menu'))}
+                              </button>
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-
-                    <div className="modal-footer" style={{ borderTop: '1px solid #f1f5f9', padding: '1.25rem 1.5rem' }}>
-                      <div className="footer-right" style={{ width: '100%', justifyContent: 'flex-end', gap: '0.75rem' }}>
+                    )}
+                    {menus.filter(m => m.category === activeCategory).length === 0 && (
+                      <div className="empty-menu-state">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z"></path><path d="M3 9V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4"></path><path d="M13 13h4"></path><path d="M13 17h4"></path><path d="M7 13h2v4H7z"></path></svg>
+                        <p>No menus added for this category yet.</p>
                         <button
-                          className="btn btn-ghost"
-                          onClick={() => {
-                            setMenuActionId(null);
-                            setSelectedMenuAction(null);
-                          }}
+                          className="btn btn-outline"
+                          style={{ marginTop: '1rem' }}
+                          onClick={() => setIsAddingMenu(true)}
                         >
-                          Cancel
-                        </button>
-                        <button
-                          className={`btn ${selectedMenuAction === 'delete' ? 'btn-primary-red' : 'btn-primary-blue'}`}
-                          disabled={!selectedMenuAction}
-                          style={{ minWidth: '120px' }}
-                          onClick={() => {
-                            if (selectedMenuAction === 'hide') {
-                              setMenus(menus.map(m => m.id === menuActionId ? { ...m, status: m.status === 'Disabled' ? 'Active' : 'Disabled' } : m));
-                            } else if (selectedMenuAction === 'delete') {
-                              setMenus(menus.filter(m => m.id !== menuActionId));
-                            }
-                            setMenuActionId(null);
-                            setSelectedMenuAction(null);
-                          }}
-                        >
-                          {!selectedMenuAction ? 'Okay' : (selectedMenuAction === 'delete' ? 'Delete Menu' : (menus.find(m => m.id === menuActionId)?.status === 'Disabled' ? 'Show Menu' : 'Hide Menu'))}
+                          Create First Menu
                         </button>
                       </div>
-                    </div>
+                    )}
                   </div>
                 </div>
-              )}
-              {menus.filter(m => m.category === activeCategory).length === 0 && (
-                <div className="empty-menu-state">
-                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z"></path><path d="M3 9V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4"></path><path d="M13 13h4"></path><path d="M13 17h4"></path><path d="M7 13h2v4H7z"></path></svg>
-                  <p>No menus added for this category yet.</p>
-                  <button
-                    className="btn btn-outline"
-                    style={{ marginTop: '1rem' }}
-                    onClick={() => setIsAddingMenu(true)}
-                  >
-                    Create First Menu
+              </div>
+            </div>
+          </div>
+
+
+          {isAddingMenu && (
+            <div className="modal-overlay">
+              <div className="modal-container medium-large">
+                <div className="modal-header">
+                  <div className="modal-title-group">
+                    <h3 className="modal-title">{menuEditingId ? 'Edit Menu' : 'Create New Menu'}</h3>
+                    <p className="modal-subtitle">
+                      {menuEditingId ? 'Update menu basics and food sections' : 'Create menu basics before adding food sections'}
+                    </p>
+                  </div>
+                  <button className="close-modal" onClick={resetAddMenu}>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                   </button>
                 </div>
-              )}
-            </div>
-          </div>
-            </div>
-          </div>
-        </div>
 
+                <div className="modal-content">
+                  {menuStep === 1 && (
+                    <div className="step-content">
+                      <div className="commercial-setup-grid">
+                        {/* Block 1: Menu Identity */}
+                        <div className="form-section-flat">
+                          <h4 className="block-title">Menu Identity</h4>
+                          <div className="form-group full-width">
+                            <label className="input-label">Menu Name</label>
+                            <input
+                              type="text"
+                              className="input-field"
+                              placeholder="e.g. Standard Breakfast"
+                              value={menuIdentity.name}
+                              onChange={(e) => setMenuIdentity(prev => ({ ...prev, name: e.target.value }))}
+                            />
+                          </div>
+                        </div>
 
-        {isAddingMenu && (
-          <div className="modal-overlay">
-            <div className="modal-container medium-large">
-              <div className="modal-header">
-                <div className="modal-title-group">
-                  <h3 className="modal-title">{menuEditingId ? 'Edit Menu' : 'Create New Menu'}</h3>
-                  <p className="modal-subtitle">
-                    {menuEditingId ? 'Update menu basics and food sections' : 'Create menu basics before adding food sections'}
-                  </p>
-                </div>
-                <button className="close-modal" onClick={resetAddMenu}>
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                </button>
-              </div>
+                        <div className="form-section-flat">
+                          <div className="form-group" style={{ marginBottom: '1.5rem' }}>
+                            <label className="input-label">Food Type</label>
+                            <div className="radio-group-pills">
+                              {['Veg', 'Non-Veg'].map(type => (
+                                <button
+                                  key={type}
+                                  className={`pill-btn ${type === 'Veg' ? 'pill-veg' : 'pill-non-veg'} ${menuIdentity.foodType === type ? 'active' : ''}`}
+                                  onClick={() => setMenuIdentity(prev => ({ ...prev, foodType: type }))}
+                                >
+                                  <span className="pill-icon">
+                                    {type === 'Veg' ? (
+                                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="0.5" y="0.5" width="11" height="11" rx="1.5" stroke="currentColor" /><circle cx="6" cy="6" r="3" fill="currentColor" /></svg>
+                                    ) : (
+                                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="0.5" y="0.5" width="11" height="11" rx="1.5" stroke="currentColor" /><circle cx="6" cy="6" r="3" fill="currentColor" /></svg>
+                                    )}
+                                  </span>
+                                  {type}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
 
-              <div className="modal-content">
-                {menuStep === 1 && (
-                  <div className="step-content">
-                    <div className="commercial-setup-grid">
-                      {/* Block 1: Menu Identity */}
-                      <div className="form-section-flat">
-                        <h4 className="block-title">Menu Identity</h4>
-                        <div className="form-group full-width">
-                          <label className="input-label">Menu Name</label>
-                          <input
-                            type="text"
-                            className="input-field"
-                            placeholder="e.g. Standard Breakfast"
-                            value={menuIdentity.name}
-                            onChange={(e) => setMenuIdentity(prev => ({ ...prev, name: e.target.value }))}
-                          />
+                          <div className="form-group" style={{ maxWidth: '320px', marginBottom: '1.5rem' }}>
+                            <label className="input-label">Price Per Person</label>
+                            <div className="input-with-prefix-fixed">
+                              <span className="prefix-fixed">₹</span>
+                              <input
+                                type="number"
+                                className="input-field pill-input"
+                                placeholder="0"
+                                value={menuIdentity.price}
+                                onChange={(e) => setMenuIdentity(prev => ({ ...prev, price: e.target.value }))}
+                              />
+                            </div>
+                          </div>
+
+                          <div className="form-row-2" style={{ marginBottom: '1.5rem' }}>
+                            <div className="form-group">
+                              <label className="input-label">Minimum Members</label>
+                              <input
+                                type="number"
+                                className="input-field"
+                                placeholder="Min pax"
+                                value={menuIdentity.minMembers}
+                                onChange={(e) => setMenuIdentity(prev => ({ ...prev, minMembers: e.target.value }))}
+                              />
+                              <span className="helper-text-label">Applicable booking size for this menu</span>
+                            </div>
+                            <div className="form-group">
+                              <label className="input-label">Maximum Members</label>
+                              <input
+                                type="number"
+                                className="input-field"
+                                placeholder="Max pax"
+                                value={menuIdentity.maxMembers}
+                                onChange={(e) => setMenuIdentity(prev => ({ ...prev, maxMembers: e.target.value }))}
+                              />
+                              <span className="helper-text-label">Applicable booking size for this menu</span>
+                            </div>
+                          </div>
+
+                          <div className="form-group full-width">
+                            <label className="input-label">Menu Image</label>
+                            <input
+                              type="file"
+                              ref={fileInputRef}
+                              style={{ display: 'none' }}
+                              accept="image/*"
+                              onChange={handleImageUpload}
+                            />
+                            <div className="image-dashed-upload-v2" onClick={() => fileInputRef.current?.click()}>
+                              {menuIdentity.image ? (
+                                <div className="upload-preview-container">
+                                  <img src={menuIdentity.image} alt="Menu Preview" className="upload-preview-img" />
+                                  <div className="upload-overlay-v2">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M23 4v6h-6"></path><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                                    <span>Change Image</span>
+                                  </div>
+                                </div>
+                              ) : (
+                                <>
+                                  <div className="upload-icon-circle">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                                  </div>
+                                  <div className="upload-texts">
+                                    <span className="upload-main">Click to upload menu image</span>
+                                    <span className="upload-sub">PNG, JPG or WebP (Max 5MB)</span>
+                                  </div>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {menuStep === 2 && (
+                    <div className="step-content">
+                      <h5 className="block-title" style={{ marginBottom: '0.75rem' }}>Example</h5>
+                      <div className="builder-helper-minimal" style={{ marginBottom: '1.5rem', background: '#f8fafc', padding: '1.25rem', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: 'none', minHeight: '140px' }}>
+                      </div>
+
+                      <div className="builder-header-minimal">
+                        <h4 className="builder-main-title">Sections</h4>
+                        <p className="builder-helper-text">Build food groups inside this menu</p>
+                        <div className="menu-status-hint">
+                          Menu was created you can customise or edit from dashboard
                         </div>
                       </div>
 
-                      <div className="form-section-flat">
-                        <div className="form-group" style={{ marginBottom: '1.5rem' }}>
-                          <label className="input-label">Food Type</label>
-                          <div className="radio-group-pills">
-                            {['Veg', 'Non-Veg'].map(type => (
-                              <button
-                                key={type}
-                                className={`pill-btn ${type === 'Veg' ? 'pill-veg' : 'pill-non-veg'} ${menuIdentity.foodType === type ? 'active' : ''}`}
-                                onClick={() => setMenuIdentity(prev => ({ ...prev, foodType: type }))}
-                              >
-                                <span className="pill-icon">
-                                  {type === 'Veg' ? (
-                                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="0.5" y="0.5" width="11" height="11" rx="1.5" stroke="currentColor" /><circle cx="6" cy="6" r="3" fill="currentColor" /></svg>
-                                  ) : (
-                                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="0.5" y="0.5" width="11" height="11" rx="1.5" stroke="currentColor" /><circle cx="6" cy="6" r="3" fill="currentColor" /></svg>
-                                  )}
+                      {!isAddingSection && sections.length === 0 && (
+                        <div className="builder-empty-state">
+                          <div className="empty-state-card">
+                            <div className="empty-icon-wrap">
+                              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20v-6M9 20V10M15 20V4"></path></svg>
+                            </div>
+                            <h5>No sections added yet</h5>
+                            <p>Start by creating your first food group like Starters or Main Course</p>
+                            <button
+                              className="btn btn-primary"
+                              onClick={() => {
+                                setCurrentSection({ name: '', type: 'All Included', limit: 0, items: [{ name: '', description: '', image: null }] });
+                                setIsAddingSection(true);
+                              }}
+                            >
+                              + Add First Section
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="saved-sections-list">
+                        {sections.map((sec, idx) => {
+                          if (idx === sectionEditingIndex) return null;
+                          return (
+                            <div key={idx} className="section-summary-card">
+                              <div className="sec-sum-info">
+                                <span className="sec-sum-name">{sec.name}</span>
+                                <span className="sec-sum-rule">
+                                  {sec.type === 'All Included' ? 'All items included' : `Choose any ${sec.limit} from ${sec.items.length} items`}
                                 </span>
-                                {type}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-
-                        <div className="form-group" style={{ maxWidth: '320px', marginBottom: '1.5rem' }}>
-                          <label className="input-label">Price Per Person</label>
-                          <div className="input-with-prefix-fixed">
-                            <span className="prefix-fixed">₹</span>
-                            <input
-                              type="number"
-                              className="input-field pill-input"
-                              placeholder="0"
-                              value={menuIdentity.price}
-                              onChange={(e) => setMenuIdentity(prev => ({ ...prev, price: e.target.value }))}
-                            />
-                          </div>
-                        </div>
-
-                        <div className="form-row-2" style={{ marginBottom: '1.5rem' }}>
-                          <div className="form-group">
-                            <label className="input-label">Minimum Members</label>
-                            <input
-                              type="number"
-                              className="input-field"
-                              placeholder="Min pax"
-                              value={menuIdentity.minMembers}
-                              onChange={(e) => setMenuIdentity(prev => ({ ...prev, minMembers: e.target.value }))}
-                            />
-                            <span className="helper-text-label">Applicable booking size for this menu</span>
-                          </div>
-                          <div className="form-group">
-                            <label className="input-label">Maximum Members</label>
-                            <input
-                              type="number"
-                              className="input-field"
-                              placeholder="Max pax"
-                              value={menuIdentity.maxMembers}
-                              onChange={(e) => setMenuIdentity(prev => ({ ...prev, maxMembers: e.target.value }))}
-                            />
-                            <span className="helper-text-label">Applicable booking size for this menu</span>
-                          </div>
-                        </div>
-
-                        <div className="form-group full-width">
-                          <label className="input-label">Menu Image</label>
-                          <input
-                            type="file"
-                            ref={fileInputRef}
-                            style={{ display: 'none' }}
-                            accept="image/*"
-                            onChange={handleImageUpload}
-                          />
-                          <div className="image-dashed-upload-v2" onClick={() => fileInputRef.current?.click()}>
-                            {menuIdentity.image ? (
-                              <div className="upload-preview-container">
-                                <img src={menuIdentity.image} alt="Menu Preview" className="upload-preview-img" />
-                                <div className="upload-overlay-v2">
-                                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M23 4v6h-6"></path><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
-                                  <span>Change Image</span>
-                                </div>
                               </div>
-                            ) : (
-                              <>
-                                <div className="upload-icon-circle">
-                                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-                                </div>
-                                <div className="upload-texts">
-                                  <span className="upload-main">Click to upload menu image</span>
-                                  <span className="upload-sub">PNG, JPG or WebP (Max 5MB)</span>
-                                </div>
-                              </>
-                            )}
-                          </div>
-                        </div>
+                              <div className="section-actions-inline">
+                                <button className="icon-btn edit-btn" onClick={() => {
+                                  setCurrentSection({ ...sec });
+                                  setSectionEditingIndex(idx);
+                                  setIsAddingSection(true);
+                                }}>
+                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                </button>
+                                <button className="icon-btn delete-btn" onClick={() => {
+                                  setSections(sections.filter((_, i) => i !== idx));
+                                }}>
+                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })}
                       </div>
-                    </div>
-                  </div>
-                )}
 
-                {menuStep === 2 && (
-                  <div className="step-content">
-                    <h5 className="block-title" style={{ marginBottom: '0.75rem' }}>Example</h5>
-                    <div className="builder-helper-minimal" style={{ marginBottom: '1.5rem', background: '#f8fafc', padding: '1.25rem', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: 'none', minHeight: '140px' }}>
-                    </div>
-
-                    <div className="builder-header-minimal">
-                      <h4 className="builder-main-title">Sections</h4>
-                      <p className="builder-helper-text">Build food groups inside this menu</p>
-                      <div className="menu-status-hint">
-                        Menu was created you can customise or edit from dashboard
-                      </div>
-                    </div>
-
-                    {!isAddingSection && sections.length === 0 && (
-                      <div className="builder-empty-state">
-                        <div className="empty-state-card">
-                          <div className="empty-icon-wrap">
-                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20v-6M9 20V10M15 20V4"></path></svg>
-                          </div>
-                          <h5>No sections added yet</h5>
-                          <p>Start by creating your first food group like Starters or Main Course</p>
+                      {!isAddingSection && sections.length > 0 && (
+                        <div className="add-sec-bar-inline">
                           <button
-                            className="btn btn-primary"
+                            className="btn btn-outline btn-sm"
                             onClick={() => {
                               setCurrentSection({ name: '', type: 'All Included', limit: 0, items: [{ name: '', description: '', image: null }] });
                               setIsAddingSection(true);
                             }}
                           >
-                            + Add First Section
+                            + Add Another Section
                           </button>
                         </div>
-                      </div>
-                    )}
+                      )}
 
-                    <div className="saved-sections-list">
-                      {sections.map((sec, idx) => {
-                        if (idx === sectionEditingIndex) return null;
-                        return (
-                          <div key={idx} className="section-summary-card">
-                            <div className="sec-sum-info">
-                              <span className="sec-sum-name">{sec.name}</span>
-                              <span className="sec-sum-rule">
-                                {sec.type === 'All Included' ? 'All items included' : `Choose any ${sec.limit} from ${sec.items.length} items`}
-                              </span>
-                            </div>
-                            <div className="section-actions-inline">
-                              <button className="icon-btn edit-btn" onClick={() => {
-                                setCurrentSection({ ...sec });
-                                setSectionEditingIndex(idx);
-                                setIsAddingSection(true);
-                              }}>
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                              </button>
-                              <button className="icon-btn delete-btn" onClick={() => {
-                                setSections(sections.filter((_, i) => i !== idx));
-                              }}>
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                              </button>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-
-                    {!isAddingSection && sections.length > 0 && (
-                      <div className="add-sec-bar-inline">
-                        <button
-                          className="btn btn-outline btn-sm"
-                          onClick={() => {
-                            setCurrentSection({ name: '', type: 'All Included', limit: 0, items: [{ name: '', description: '', image: null }] });
-                            setIsAddingSection(true);
-                          }}
-                        >
-                          + Add Another Section
-                        </button>
-                      </div>
-                    )}
-
-                    {isAddingSection && (
-                      <div className="section-inline-editor">
-                        <div className="section-form-top">
-                          <div className="form-group full-width">
-                            <label className="input-label">Section Name</label>
-                            <input
-                              type="text"
-                              className="input-field"
-                              placeholder="e.g. Starters"
-                              value={currentSection.name}
-                              onChange={(e) => setCurrentSection(prev => ({ ...prev, name: e.target.value }))}
-                            />
-                          </div>
-
-                          <div className="selection-type-row">
-                            <div className="form-group flex-1">
-                              <label className="input-label">Selection Type</label>
-                              <select
-                                className="input-field"
-                                value={currentSection.type}
-                                onChange={(e) => setCurrentSection(prev => ({ ...prev, type: e.target.value }))}
-                              >
-                                <option>All Included</option>
-                                <option>Limited Selection</option>
-                              </select>
-                            </div>
-                            <div className="form-group mini-limit">
-                              <label className="input-label">Choose Any</label>
+                      {isAddingSection && (
+                        <div className="section-inline-editor">
+                          <div className="section-form-top">
+                            <div className="form-group full-width">
+                              <label className="input-label">Section Name</label>
                               <input
-                                type="number"
+                                type="text"
                                 className="input-field"
-                                placeholder="0"
-                                disabled={currentSection.type === 'All Included'}
-                                value={currentSection.limit || ''}
-                                onChange={(e) => setCurrentSection(prev => ({ ...prev, limit: parseInt(e.target.value) || 0 }))}
+                                placeholder="e.g. Starters"
+                                value={currentSection.name}
+                                onChange={(e) => setCurrentSection(prev => ({ ...prev, name: e.target.value }))}
                               />
                             </div>
-                          </div>
-                        </div>
 
-                        <div className="items-area-inline">
-                          <label className="input-label">Items in this Section</label>
-                          <div className="item-cards-list">
-                            {currentSection.items.map((item, i) => (
-                              <div key={i} className="item-input-card">
-                                <div className="item-form-grid">
-                                  <div className="item-form-image">
-                                    <div className="item-upload-mini" onClick={() => {
-                                      const input = document.createElement('input');
-                                      input.type = 'file';
-                                      input.accept = 'image/*';
-                                      input.onchange = (e) => {
-                                        const file = (e.target as HTMLInputElement).files?.[0];
-                                        if (file) {
-                                          const reader = new FileReader();
-                                          reader.onloadend = () => {
-                                            const newItems = [...currentSection.items];
-                                            newItems[i].image = reader.result as string;
-                                            setCurrentSection(prev => ({ ...prev, items: newItems }));
-                                          };
-                                          reader.readAsDataURL(file);
-                                        }
-                                      };
-                                      input.click();
-                                    }}>
-                                      {item.image ? (
-                                        <img src={item.image} alt="Item" className="uploaded-mini-thumb" />
-                                      ) : (
-                                        <div className="upload-placeholder-mini">
-                                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                                          <span>Photo</span>
-                                        </div>
-                                      )}
-                                    </div>
-                                  </div>
-                                  <div className="item-form-details">
-                                    <div className="form-group">
-                                      <input
-                                        type="text"
-                                        className="input-field item-name-field"
-                                        placeholder="Item Name"
-                                        value={item.name}
-                                        onChange={(e) => {
-                                          const newItems = [...currentSection.items];
-                                          newItems[i].name = e.target.value;
-                                          setCurrentSection(prev => ({ ...prev, items: newItems }));
-                                        }}
-                                      />
-                                    </div>
-                                    <div className="form-group">
-                                      <textarea
-                                        className="input-field item-desc-field"
-                                        placeholder="Short Description (max 1000 chars)"
-                                        maxLength={1000}
-                                        value={item.description}
-                                        onChange={(e) => {
-                                          const newItems = [...currentSection.items];
-                                          newItems[i].description = e.target.value;
-                                          setCurrentSection(prev => ({ ...prev, items: newItems }));
-                                        }}
-                                      />
-                                    </div>
-                                  </div>
-                                </div>
-                                {currentSection.items.length > 1 && (
-                                  <button className="item-remove-btn" onClick={() => {
-                                    setCurrentSection(prev => ({ ...prev, items: prev.items.filter((_, idx) => idx !== i) }));
-                                  }}>
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                                  </button>
-                                )}
+                            <div className="selection-type-row">
+                              <div className="form-group flex-1">
+                                <label className="input-label">Selection Type</label>
+                                <select
+                                  className="input-field"
+                                  value={currentSection.type}
+                                  onChange={(e) => setCurrentSection(prev => ({ ...prev, type: e.target.value }))}
+                                >
+                                  <option>All Included</option>
+                                  <option>Limited Selection</option>
+                                </select>
                               </div>
-                            ))}
-                          </div>
-
-                          <button
-                            className="add-item-btn-inline"
-                            onClick={() => {
-                              setCurrentSection(prev => ({
-                                ...prev,
-                                items: [...prev.items, { name: '', description: '', image: null }]
-                              }));
-                            }}
-                          >
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                            Add Another Item
-                          </button>
-                        </div>
-
-                        <div className="section-builder-actions">
-                          <button className="btn btn-ghost" onClick={() => setIsAddingSection(false)}>Cancel</button>
-                          <button
-                            className="btn btn-primary-blue"
-                            disabled={!currentSection.name || currentSection.items.length === 0}
-                            onClick={handleSaveSection}
-                          >
-                            Save Section
-                          </button>
-                        </div>
-                        <div className="section-save-hint">
-                          save the current section to create the new section
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {menuStep === 3 && (
-                  <div className="step-content">
-                    <div className="preview-card">
-                      <div className="preview-identity">
-                        <div className="preview-img-box">
-                          <img
-                            src={menuIdentity.image || "https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?w=160&h=160&fit=crop"}
-                            alt="Menu Preview"
-                            className="thumbnail-80"
-                          />
-                        </div>
-                        <div className="preview-info">
-                          <h4 className="preview-menu-name">{menuIdentity.name || 'Untitled Menu'}</h4>
-                          <div className="preview-sub-meta">
-                            <span className="preview-category-count">
-                              {activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1)} • {sections.length} Sections
-                            </span>
-                            <span className={`food-type-tag ${menuIdentity.foodType.toLowerCase()}`}>
-                              <span className="p-type-icon">
-                                {menuIdentity.foodType === 'Veg' ? (
-                                  <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><rect x="0.5" y="0.5" width="11" height="11" rx="1.5" stroke="currentColor" /><circle cx="6" cy="6" r="3" fill="currentColor" /></svg>
-                                ) : (
-                                  <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><rect x="0.5" y="0.5" width="11" height="11" rx="1.5" stroke="currentColor" /><circle cx="6" cy="6" r="3" fill="currentColor" /></svg>
-                                )}
-                              </span>
-                              {menuIdentity.foodType}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="preview-sections-v2">
-                        {sections.map((sec, idx) => (
-                          <Fragment key={idx}>
-                            <div className="preview-section-item-flat">
-                              <div className="p-sec-header">
-                                <span className="p-sec-name">{sec.name}</span>
-                                <span className="p-sec-summary">
-                                  {sec.type?.toLowerCase().trim() === 'all included' ? '→ all included' : `→ choose any ${sec.limit} from ${sec.items.length} items`}
-                                </span>
-                              </div>
-                              <div className="p-sec-items-detailed-list">
-                                {sec.items.map((item: any, i: number) => (
-                                  <div key={i} className="p-item-detail">
-                                    <span className="p-item-name">{item.name}</span>
-                                    {item.description && <span className="p-item-desc">• {item.description}</span>}
-                                  </div>
-                                ))}
+                              <div className="form-group mini-limit">
+                                <label className="input-label">Choose Any</label>
+                                <input
+                                  type="number"
+                                  className="input-field"
+                                  placeholder="0"
+                                  disabled={currentSection.type === 'All Included'}
+                                  value={currentSection.limit || ''}
+                                  onChange={(e) => setCurrentSection(prev => ({ ...prev, limit: parseInt(e.target.value) || 0 }))}
+                                />
                               </div>
                             </div>
-                            {idx < sections.length - 1 && <div className="section-divider"></div>}
-                          </Fragment>
-                        ))}
+                          </div>
+
+                          <div className="items-area-inline">
+                            <label className="input-label">Items in this Section</label>
+                            <div className="item-cards-list">
+                              {currentSection.items.map((item, i) => (
+                                <div key={i} className="item-input-card">
+                                  <div className="item-form-grid">
+                                    <div className="item-form-image">
+                                      <div className="item-upload-mini" onClick={() => {
+                                        const input = document.createElement('input');
+                                        input.type = 'file';
+                                        input.accept = 'image/*';
+                                        input.onchange = (e) => {
+                                          const file = (e.target as HTMLInputElement).files?.[0];
+                                          if (file) {
+                                            const reader = new FileReader();
+                                            reader.onloadend = () => {
+                                              const newItems = [...currentSection.items];
+                                              newItems[i].image = reader.result as string;
+                                              setCurrentSection(prev => ({ ...prev, items: newItems }));
+                                            };
+                                            reader.readAsDataURL(file);
+                                          }
+                                        };
+                                        input.click();
+                                      }}>
+                                        {item.image ? (
+                                          <img src={item.image} alt="Item" className="uploaded-mini-thumb" />
+                                        ) : (
+                                          <div className="upload-placeholder-mini">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                                            <span>Photo</span>
+                                          </div>
+                                        )}
+                                      </div>
+                                    </div>
+                                    <div className="item-form-details">
+                                      <div className="form-group">
+                                        <input
+                                          type="text"
+                                          className="input-field item-name-field"
+                                          placeholder="Item Name"
+                                          value={item.name}
+                                          onChange={(e) => {
+                                            const newItems = [...currentSection.items];
+                                            newItems[i].name = e.target.value;
+                                            setCurrentSection(prev => ({ ...prev, items: newItems }));
+                                          }}
+                                        />
+                                      </div>
+                                      <div className="form-group">
+                                        <textarea
+                                          className="input-field item-desc-field"
+                                          placeholder="Short Description (max 1000 chars)"
+                                          maxLength={1000}
+                                          value={item.description}
+                                          onChange={(e) => {
+                                            const newItems = [...currentSection.items];
+                                            newItems[i].description = e.target.value;
+                                            setCurrentSection(prev => ({ ...prev, items: newItems }));
+                                          }}
+                                        />
+                                      </div>
+                                    </div>
+                                  </div>
+                                  {currentSection.items.length > 1 && (
+                                    <button className="item-remove-btn" onClick={() => {
+                                      setCurrentSection(prev => ({ ...prev, items: prev.items.filter((_, idx) => idx !== i) }));
+                                    }}>
+                                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                    </button>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+
+                            <button
+                              className="add-item-btn-inline"
+                              onClick={() => {
+                                setCurrentSection(prev => ({
+                                  ...prev,
+                                  items: [...prev.items, { name: '', description: '', image: null }]
+                                }));
+                              }}
+                            >
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                              Add Another Item
+                            </button>
+                          </div>
+
+                          <div className="section-builder-actions">
+                            <button className="btn btn-ghost" onClick={() => setIsAddingSection(false)}>Cancel</button>
+                            <button
+                              className="btn btn-primary-blue"
+                              disabled={!currentSection.name || currentSection.items.length === 0}
+                              onClick={handleSaveSection}
+                            >
+                              Save Section
+                            </button>
+                          </div>
+                          <div className="section-save-hint">
+                            save the current section to create the new section
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {menuStep === 3 && (
+                    <div className="step-content">
+                      <div className="preview-card">
+                        <div className="preview-identity">
+                          <div className="preview-img-box">
+                            <img
+                              src={menuIdentity.image || "https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?w=160&h=160&fit=crop"}
+                              alt="Menu Preview"
+                              className="thumbnail-80"
+                            />
+                          </div>
+                          <div className="preview-info">
+                            <h4 className="preview-menu-name">{menuIdentity.name || 'Untitled Menu'}</h4>
+                            <div className="preview-sub-meta">
+                              <span className="preview-category-count">
+                                {activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1)} • {sections.length} Sections
+                              </span>
+                              <span className={`food-type-tag ${menuIdentity.foodType.toLowerCase()}`}>
+                                <span className="p-type-icon">
+                                  {menuIdentity.foodType === 'Veg' ? (
+                                    <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><rect x="0.5" y="0.5" width="11" height="11" rx="1.5" stroke="currentColor" /><circle cx="6" cy="6" r="3" fill="currentColor" /></svg>
+                                  ) : (
+                                    <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><rect x="0.5" y="0.5" width="11" height="11" rx="1.5" stroke="currentColor" /><circle cx="6" cy="6" r="3" fill="currentColor" /></svg>
+                                  )}
+                                </span>
+                                {menuIdentity.foodType}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="preview-sections-v2">
+                          {sections.map((sec, idx) => (
+                            <Fragment key={idx}>
+                              <div className="preview-section-item-flat">
+                                <div className="p-sec-header">
+                                  <span className="p-sec-name">{sec.name}</span>
+                                  <span className="p-sec-summary">
+                                    {sec.type?.toLowerCase().trim() === 'all included' ? '→ all included' : `→ choose any ${sec.limit} from ${sec.items.length} items`}
+                                  </span>
+                                </div>
+                                <div className="p-sec-items-detailed-list">
+                                  {sec.items.map((item: any, i: number) => (
+                                    <div key={i} className="p-item-detail">
+                                      <span className="p-item-name">{item.name}</span>
+                                      {item.description && <span className="p-item-desc">• {item.description}</span>}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                              {idx < sections.length - 1 && <div className="section-divider"></div>}
+                            </Fragment>
+                          ))}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
-              </div>
-
-              <div className="modal-footer">
-                <div className="footer-left">
-                  <span className="step-counter-badge">Step {menuStep}/3</span>
+                  )}
                 </div>
-                <div className="footer-right">
-                  {menuStep > 1 && (
-                    <button className="btn btn-outline" onClick={() => setMenuStep(prev => prev - 1)}>Back</button>
-                  )}
 
-                  {menuStep < 3 ? (
-                    <button
-                      className="btn btn-primary-blue"
-                      onClick={() => setMenuStep(prev => prev + 1)}
-                      disabled={menuStep === 1 && !menuIdentity.name}
-                    >
-                      Next
-                    </button>
-                  ) : (
-                    <button
-                      className="btn btn-primary-blue"
-                      onClick={() => {
-                        if (menuEditingId) {
-                          setMenus(prev => prev.map(m => m.id === menuEditingId ? {
-                            ...m,
-                            name: menuIdentity.name,
-                            price: parseInt(menuIdentity.price) || 0,
-                            minMembers: menuIdentity.minMembers,
-                            maxMembers: menuIdentity.maxMembers,
-                            foodType: menuIdentity.foodType,
-                            image: menuIdentity.image,
-                            sections: [...sections]
-                          } : m));
-                        } else {
-                          const newMenuObj = {
-                            id: menus.length + 1,
-                            name: menuIdentity.name,
-                            price: parseInt(menuIdentity.price) || 0,
-                            status: 'Active',
-                            category: activeCategory,
-                            minMembers: menuIdentity.minMembers,
-                            maxMembers: menuIdentity.maxMembers,
-                            foodType: menuIdentity.foodType,
-                            image: menuIdentity.image,
-                            sections: [...sections]
-                          };
-                          setMenus(prev => [...prev, newMenuObj]);
-                        }
-                        resetAddMenu();
-                      }}
-                    >
-                      Save Menu
-                    </button>
-                  )}
+                <div className="modal-footer">
+                  <div className="footer-left">
+                    <span className="step-counter-badge">Step {menuStep}/3</span>
+                  </div>
+                  <div className="footer-right">
+                    {menuStep > 1 && (
+                      <button className="btn btn-outline" onClick={() => setMenuStep(prev => prev - 1)}>Back</button>
+                    )}
+
+                    {menuStep < 3 ? (
+                      <button
+                        className="btn btn-primary-blue"
+                        onClick={() => setMenuStep(prev => prev + 1)}
+                        disabled={menuStep === 1 && !menuIdentity.name}
+                      >
+                        Next
+                      </button>
+                    ) : (
+                      <button
+                        className="btn btn-primary-blue"
+                        onClick={() => {
+                          if (menuEditingId) {
+                            setMenus(prev => prev.map(m => m.id === menuEditingId ? {
+                              ...m,
+                              name: menuIdentity.name,
+                              price: parseInt(menuIdentity.price) || 0,
+                              minMembers: menuIdentity.minMembers,
+                              maxMembers: menuIdentity.maxMembers,
+                              foodType: menuIdentity.foodType,
+                              image: menuIdentity.image,
+                              sections: [...sections]
+                            } : m));
+                          } else {
+                            const newMenuObj = {
+                              id: menus.length + 1,
+                              name: menuIdentity.name,
+                              price: parseInt(menuIdentity.price) || 0,
+                              status: 'Active',
+                              category: activeCategory,
+                              minMembers: menuIdentity.minMembers,
+                              maxMembers: menuIdentity.maxMembers,
+                              foodType: menuIdentity.foodType,
+                              image: menuIdentity.image,
+                              sections: [...sections]
+                            };
+                            setMenus(prev => [...prev, newMenuObj]);
+                          }
+                          resetAddMenu();
+                        }}
+                      >
+                        Save Menu
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
       ) : (
         <div className="settings-content-v4" style={{ height: 'auto', minHeight: '700px' }}>
           {/* Internal Sidebar (Standard Settings Tabs) */}
           <div className="settings-tabs-v4">
-            <button 
+            <button
               className={`settings-tab-btn-v4 ${availabilitySubTab === 'schedule' ? 'active' : ''}`}
               onClick={() => setAvailabilitySubTab('schedule')}
             >
               Weekly Schedule
             </button>
-            <button 
+            <button
               className={`settings-tab-btn-v4 ${availabilitySubTab === 'leaves' ? 'active' : ''}`}
               onClick={() => setAvailabilitySubTab('leaves')}
             >
@@ -2500,15 +2592,15 @@ const ServiceSettings = () => {
                 <>
                   <h3 className="pane-title" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontWeight: 'bold', fontSize: '1.25rem', color: '#1e293b', marginBottom: '1.5rem' }}>
                     Weekly Schedule
-                    <button 
-                      className="btn btn-sm" 
+                    <button
+                      className="btn btn-sm"
                       onClick={() => applyToAllOpenDays(0)}
-                      style={{ 
-                        padding: '0.5rem 1rem', 
-                        fontSize: '0.85rem', 
-                        color: '#3b82f6', 
-                        border: '1px solid #bfdbfe', 
-                        backgroundColor: 'white', 
+                      style={{
+                        padding: '0.5rem 1rem',
+                        fontSize: '0.85rem',
+                        color: '#3b82f6',
+                        border: '1px solid #bfdbfe',
+                        backgroundColor: 'white',
                         borderRadius: '6px',
                         fontWeight: '600',
                         cursor: 'pointer'
@@ -2517,13 +2609,13 @@ const ServiceSettings = () => {
                       Apply Mon to All
                     </button>
                   </h3>
-                  
+
                   <div className="availability-list" style={{ marginTop: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                     {weeklySchedule.map((day, index) => (
                       <div key={day.day} className="availability-row-v4" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', padding: '1.25rem 0', borderBottom: '1px solid #f1f5f9' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
                           <div className="day-label-v4" style={{ fontWeight: '600', fontSize: '1rem', color: '#1e293b' }}>{day.day}</div>
-                          
+
                           <div className="status-toggle-wrapper-v4" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                             <label className="service-switch" style={{ margin: 0 }}>
                               <input type="checkbox" checked={day.isOpen} onChange={(e) => handleScheduleChange(index, 'isOpen', e.target.checked)} />
@@ -2545,19 +2637,19 @@ const ServiceSettings = () => {
                                   return `${(hours % 12 || 12).toString().padStart(2, '0')}:${m} ${hours >= 12 ? 'PM' : 'AM'}`;
                                 })() : '--:-- --'}
                               </span>
-                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2.5" style={{ flexShrink: 0, pointerEvents: 'none' }}><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                              <input 
-                                type="time" 
-                                value={day.openTime} 
+                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2.5" style={{ flexShrink: 0, pointerEvents: 'none' }}><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
+                              <input
+                                type="time"
+                                value={day.openTime}
                                 disabled={!day.isOpen}
                                 onChange={(e) => handleScheduleChange(index, 'openTime', e.target.value)}
                                 style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer' }}
                               />
                             </div>
                           </div>
-                          
+
                           <span className="time-separator-v4" style={{ color: '#94a3b8', fontSize: '0.9rem', fontWeight: '600', minWidth: '15px', textAlign: 'center' }}>to</span>
-                          
+
                           <div className={`time-input-group-v4 ${!day.isOpen ? 'disabled' : ''}`} style={{ flex: 1, minWidth: 0 }}>
                             <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '1px solid #e2e8f0', borderRadius: '8px', backgroundColor: 'white', padding: '0.625rem 0.75rem', width: '100%' }}>
                               <span style={{ fontSize: '0.95rem', color: '#1e293b', fontWeight: '500' }}>
@@ -2567,10 +2659,10 @@ const ServiceSettings = () => {
                                   return `${(hours % 12 || 12).toString().padStart(2, '0')}:${m} ${hours >= 12 ? 'PM' : 'AM'}`;
                                 })() : '--:-- --'}
                               </span>
-                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2.5" style={{ flexShrink: 0, pointerEvents: 'none' }}><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                              <input 
-                                type="time" 
-                                value={day.closeTime} 
+                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2.5" style={{ flexShrink: 0, pointerEvents: 'none' }}><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
+                              <input
+                                type="time"
+                                value={day.closeTime}
                                 disabled={!day.isOpen}
                                 onChange={(e) => handleScheduleChange(index, 'closeTime', e.target.value)}
                                 style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer' }}
@@ -2628,7 +2720,7 @@ const ServiceSettings = () => {
                     {nextConfirmedBooking && (
                       <div className="pause-footer-v4">
                         <span className="pause-footer-text-v4">
-                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
                           Next confirmed booking: <strong>{(() => {
                             const date = new Date(nextConfirmedBooking);
                             return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
@@ -2662,12 +2754,12 @@ const ServiceSettings = () => {
                               <span className="leave-date-v4" style={{ fontWeight: '600', color: '#1e293b' }}>{leave.date}</span>
                               <span className="leave-reason-v4" style={{ padding: '2px 8px', backgroundColor: '#f1f5f9', borderRadius: '4px', fontSize: '0.75rem', color: '#64748b' }}>{leave.reason}</span>
                             </div>
-                            <button 
-                              className="leave-remove-v4" 
+                            <button
+                              className="leave-remove-v4"
                               style={{ border: 'none', background: 'transparent', color: '#ef4444', cursor: 'pointer', padding: '4px' }}
                               onClick={() => handleDeleteLeave(leave.id)}
                             >
-                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>
                             </button>
                           </div>
                         ))
@@ -2689,13 +2781,13 @@ const ServiceSettings = () => {
               <div className="otp-popup-card-v4" style={{ maxWidth: '450px' }}>
                 <h3 className="otp-popup-title-v4">Add Leave</h3>
                 <p className="otp-popup-subtitle-v4" style={{ marginBottom: '1.5rem' }}>Select a date or range for your business leave.</p>
-                
+
                 <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.25rem' }}>
                   <div className="form-group" style={{ flex: 1 }}>
                     <label className="input-label">Start Date</label>
-                    <input 
-                      type="date" 
-                      className="input-field" 
+                    <input
+                      type="date"
+                      className="input-field"
                       min={new Date().toISOString().split('T')[0]}
                       value={newLeaveDate}
                       onChange={(e) => setNewLeaveDate(e.target.value)}
@@ -2703,9 +2795,9 @@ const ServiceSettings = () => {
                   </div>
                   <div className="form-group" style={{ flex: 1 }}>
                     <label className="input-label">End Date (Optional)</label>
-                    <input 
-                      type="date" 
-                      className="input-field" 
+                    <input
+                      type="date"
+                      className="input-field"
                       min={newLeaveDate || new Date().toISOString().split('T')[0]}
                       max={newLeaveDate ? (() => {
                         const d = new Date(newLeaveDate);
@@ -2720,9 +2812,9 @@ const ServiceSettings = () => {
 
                 <div className="form-group" style={{ marginBottom: '1.5rem' }}>
                   <label className="input-label">Reason (Optional)</label>
-                  <input 
-                    type="text" 
-                    className="input-field" 
+                  <input
+                    type="text"
+                    className="input-field"
                     placeholder="e.g. Festival, Personal"
                     value={newLeaveReason}
                     onChange={(e) => setNewLeaveReason(e.target.value)}
@@ -4040,18 +4132,191 @@ const PlanAbstract = () => (
 const PlanSparkles = () => (
   <div className="plan-sparkles-v4">
     <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" className="sparkle-1">
-      <path d="M12 0l3 9 9 3-9 3-3 9-3-9-9-3 9-3z"/>
+      <path d="M12 0l3 9 9 3-9 3-3 9-3-9-9-3 9-3z" />
     </svg>
     <svg width="6" height="6" viewBox="0 0 24 24" fill="currentColor" className="sparkle-2">
-      <path d="M12 0l3 9 9 3-9 3-3 9-3-9-9-3 9-3z"/>
+      <path d="M12 0l3 9 9 3-9 3-3 9-3-9-9-3 9-3z" />
     </svg>
     <svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor" className="sparkle-3">
-      <path d="M12 0l3 9 9 3-9 3-3 9-3-9-9-3 9-3z"/>
+      <path d="M12 0l3 9 9 3-9 3-3 9-3-9-9-3 9-3z" />
     </svg>
   </div>
 );
 
-const SubscriptionPlanModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) => {
+const CheckoutModal = ({ isOpen, plan, onClose }: { isOpen: boolean, plan: any, onClose: () => void }) => {
+  const [couponCode, setCouponCode] = useState('');
+  const [isApplied, setIsApplied] = useState(false);
+  const [error, setError] = useState('');
+  const [discount, setDiscount] = useState(0);
+
+  if (!isOpen || !plan) return null;
+
+  // Calculations
+  const baseAmount = parseInt(plan.total.replace(/[^0-9]/g, ''));
+  const platformDiscount = plan.platformDiscount || 0;
+
+  // Tax is calculated on the plane base amount (per user example)
+  const gstAmount = Math.round(baseAmount * 0.18);
+
+  // Final payable = (Base + GST) - Platform Discount - Coupon Discount
+  const initialTotal = baseAmount + gstAmount;
+  const finalPayable = initialTotal - platformDiscount - discount;
+
+  const handleApplyCoupon = () => {
+    if (couponCode.toUpperCase() === 'SAVE10') {
+      const disc = Math.round(baseAmount * 0.1);
+      setDiscount(disc);
+      setIsApplied(true);
+      setError('');
+    } else if (couponCode.toUpperCase() === 'WELCOME') {
+      setDiscount(500);
+      setIsApplied(true);
+      setError('');
+    } else if (couponCode.trim() === '') {
+      setError('Please enter code');
+    } else {
+      setError('Invalid code');
+      setIsApplied(false);
+      setDiscount(0);
+    }
+  };
+
+  return (
+    <div className="modal-overlay-v4" onClick={onClose}>
+      <div className="modal-content-v4 checkout-modal-v5" onClick={e => e.stopPropagation()}>
+        <div className="modal-header-v4">
+          <h3 className="modal-title-v5">Confirm Plan Upgrade</h3>
+          <button className="modal-close-v4" onClick={onClose}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <div className="modal-body-v4 compact-body-v5">
+          <div className="checkout-summary-v5">
+            {/* 1. Selected Plan Card */}
+            <div className={`checkout-plan-preview-v5 ${plan.premiumClass}`}>
+              <div className="preview-top-v5">
+                <h4>{plan.name} - {plan.duration.split('•')[0].trim()}</h4>
+              </div>
+              <div className="preview-bottom-v5">
+                <div className="bottom-left-v5">
+                  <span className="price-bold-v5">{plan.price}</span>
+                  <span className="month-muted-v5">/month</span>
+                </div>
+                {plan.hasSavings && (
+                  <div className="savings-badge-v5">
+                    You save {plan.yearlyLabel.replace('Save ', '')}
+                  </div>
+                )}
+              </div>
+              <div className="premium-accent-v5"></div>
+              <div className="subtle-sparkle-v5">✨</div>
+            </div>
+
+            {/* 2. Coupon Section */}
+            <div className="coupon-card-v5">
+              <label className="coupon-label-v5">Apply Coupon</label>
+              <div className="coupon-input-group-v5">
+                <input
+                  type="text"
+                  placeholder="Enter code"
+                  className={`coupon-input-v5 ${error ? 'error-v5' : ''} ${isApplied ? 'success-v5' : ''}`}
+                  value={couponCode}
+                  onChange={(e) => {
+                    setCouponCode(e.target.value);
+                    if (error) setError('');
+                  }}
+                  disabled={isApplied}
+                />
+                {!isApplied ? (
+                  <button className="apply-btn-v5" onClick={handleApplyCoupon}>Apply</button>
+                ) : (
+                  <button className="remove-btn-v5" onClick={() => {
+                    setIsApplied(false);
+                    setDiscount(0);
+                    setCouponCode('');
+                  }}>Remove</button>
+                )}
+              </div>
+              {error && <p className="feedback-error-v5">{error}</p>}
+              {isApplied && <p className="feedback-success-v5">Coupon applied -₹{discount.toLocaleString('en-IN')}</p>}
+            </div>
+
+            {/* 3. Order Summary */}
+            <div className="billing-summary-v5">
+              <div className="summary-section-header-v5">Order Summary</div>
+              <div className="summary-row-v5">
+                <span>Plan Amount</span>
+                <span>₹{baseAmount.toLocaleString('en-IN')}</span>
+              </div>
+
+              {platformDiscount > 0 && (
+                <div className="summary-row-v5 discount-active-v5">
+                  <span>myMooment Discount</span>
+                  <span>-₹{platformDiscount.toLocaleString('en-IN')}</span>
+                </div>
+              )}
+
+              <div className={`summary-row-v5 ${isApplied ? 'discount-active-v5' : 'discount-none-v5'}`}>
+                <span>Coupon Discount</span>
+                <span>{isApplied ? `-₹${discount.toLocaleString('en-IN')}` : '₹0'}</span>
+              </div>
+
+              <div className="summary-row-v5">
+                <span>GST (18%)</span>
+                <span>₹{gstAmount.toLocaleString('en-IN')}</span>
+              </div>
+
+              <div className="summary-divider-v5"></div>
+
+              <div className="summary-row-v5 final-row-v5">
+                <span className="final-label-v5">Final Payable</span>
+                <span className="final-amount-v5">₹{finalPayable.toLocaleString('en-IN')}</span>
+              </div>
+            </div>
+
+            {/* 4. Payment Method Section */}
+            <div className="payment-context-v5">
+              <div className="context-label-v5">Auto-renew Payment Method</div>
+              <div className="method-display-v5">
+                <div className="method-left-v5">
+                  <span className="upi-icon-v5">⚡</span>
+                  <span className="method-name-v5">UPI ••••9823</span>
+                </div>
+                <button className="change-link-v5">Change →</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="modal-footer-v4 footer-vertical-v5">
+          {/* 5. CTA Section */}
+          <button className={`btn-v4 dominant-btn-v5 ${plan.premiumClass}`} onClick={onClose}>
+            Proceed to Pay
+          </button>
+          <button className="cancel-link-v5" onClick={onClose}>Cancel</button>
+
+          <div className="footer-meta-v5">
+            <p className="redirect-text-v5">You’ll be redirected to secure payment</p>
+            <div className="trust-badges-v5">
+              <span className="trust-item-v5">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                </svg>
+                Secure payment via Razorpay
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const SubscriptionPlanModal = ({ isOpen, onClose, onSelectPlan }: { isOpen: boolean, onClose: () => void, onSelectPlan: (plan: any) => void }) => {
   if (!isOpen) return null;
 
   const plans = [
@@ -4061,12 +4326,13 @@ const SubscriptionPlanModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: 
       price: '₹599',
       total: 'Total ₹1,797',
       yearlyCost: '₹7,188/year',
-      yearlyLabel: 'Current yearly pricing',
+      yearlyLabel: 'Normal yearly pricing',
       badge: null,
       isActive: false,
-      premiumClass: 'growth-premium',
-      btnText: 'Switch to 3 Months',
+      premiumClass: 'starter-premium',
+      btnText: 'Switch Plan',
       hasSavings: false,
+      platformDiscount: 0,
       features: ['TDS Filing Support', 'Free Listing & Onboarding', 'Monthly Reports Access']
     },
     {
@@ -4078,9 +4344,10 @@ const SubscriptionPlanModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: 
       yearlyLabel: 'Save ₹1,200/year',
       badge: 'Most Popular',
       isActive: true,
-      premiumClass: 'starter-premium',
+      premiumClass: 'growth-premium',
       btnText: 'Current Active Plan',
       hasSavings: true,
+      platformDiscount: 999,
       features: ['TDS Filing Support', 'Faster Payout Tracking', 'Priority Vendor Support']
     },
     {
@@ -4094,8 +4361,9 @@ const SubscriptionPlanModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: 
       badgeColor: '#10b981',
       isActive: false,
       premiumClass: 'saving-premium',
-      btnText: 'Switch to 12 Months',
+      btnText: 'Switch Plan',
       hasSavings: true,
+      platformDiscount: 1800,
       features: ['Full TDS Tracking', 'Priority Payout Support', 'Long-Term Savings Benefits']
     }
   ];
@@ -4112,7 +4380,7 @@ const SubscriptionPlanModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: 
             </svg>
           </button>
         </div>
-        
+
         <div className="modal-body-v4">
           <div className="subscription-plans-grid-v4">
             {plans.map((plan, idx) => (
@@ -4129,20 +4397,24 @@ const SubscriptionPlanModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: 
                 )}
                 <h5>{plan.name}</h5>
                 <div className="plan-duration-v4">{plan.duration}</div>
-                
+
                 <div className="plan-price-large-v4">{plan.price} <span>/mo</span></div>
-                
-                
-                <div className="plan-savings-strip-v4">
-                  <span className={`yearly-price-v4 ${plan.hasSavings ? 'struck' : ''}`}>
-                    {plan.yearlyCost}
-                  </span>
-                  <span className={`yearly-label-v4 ${plan.hasSavings ? 'savings' : ''}`}>
-                    {plan.yearlyLabel}
-                  </span>
+
+                <div className="plan-savings-strip-v6">
+                  <div className="yearly-compare-v6">
+                    <span className={`yearly-price-v6 ${plan.hasSavings ? 'struck-v6' : ''}`}>
+                      {plan.yearlyCost}
+                    </span>
+                    {plan.hasSavings && (
+                      <span className="savings-green-v6">{plan.yearlyLabel}</span>
+                    )}
+                  </div>
                 </div>
-                
-                <button className={`plan-btn-v4 ${plan.isActive ? 'current' : 'switch'}`}>
+
+                <button
+                  className={`plan-btn-v4 ${plan.isActive ? 'current' : 'switch'}`}
+                  onClick={() => !plan.isActive && onSelectPlan(plan)}
+                >
                   {plan.btnText || (plan.isActive ? 'Current Plan' : 'Switch Plan')}
                 </button>
 
@@ -4169,17 +4441,17 @@ const SubscriptionPlanModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: 
   );
 };
 
-const AccountEditModal = ({ 
-  show, 
-  onClose, 
-  type, 
-  step, 
-  setStep, 
-  value, 
-  setValue, 
-  otp, 
-  setOtp, 
-  onConfirm 
+const AccountEditModal = ({
+  show,
+  onClose,
+  type,
+  step,
+  setStep,
+  value,
+  setValue,
+  otp,
+  setOtp,
+  onConfirm
 }: any) => {
   if (!show) return null;
 
@@ -4211,8 +4483,8 @@ const AccountEditModal = ({
               </div>
               <div className="modal-footer-v4">
                 <button className="btn-secondary-v4" onClick={onClose}>Cancel</button>
-                <button 
-                  className="btn btn-primary-blue" 
+                <button
+                  className="btn btn-primary-blue"
                   disabled={!value}
                   onClick={() => setStep(2)}
                 >
@@ -4236,8 +4508,8 @@ const AccountEditModal = ({
               </div>
               <div className="modal-footer-v4">
                 <button className="btn-secondary-v4" onClick={() => setStep(1)}>Back</button>
-                <button 
-                  className="btn btn-primary-blue" 
+                <button
+                  className="btn btn-primary-blue"
                   disabled={otp.length < 6}
                   onClick={onConfirm}
                 >
