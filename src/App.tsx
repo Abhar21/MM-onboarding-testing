@@ -1458,10 +1458,10 @@ const Coupons = () => {
           <thead>
             <tr>
               <th>Coupon Code</th>
+              <th>Applied for</th>
               <th>Type</th>
               <th>Value</th>
               <th>Validity</th>
-              <th>Usage</th>
               <th>Status</th>
               <th>Actions</th>
             </tr>
@@ -1470,10 +1470,14 @@ const Coupons = () => {
             {(coupons as any[]).filter(c => c.source === activeTab).map(coupon => (
               <tr key={coupon.id}>
                 <td className="coupon-code-cell">
-                  <div className="code-pill-wrapper-v7">
-                    <code>{coupon.code}</code>
-                    {/* Only show 'Orders' badge in Platform Coupons, but show 'Subscription' badge everywhere */}
-                    {(coupon.applicability === 'subscription' || (activeTab === 'platform' && coupon.applicability === 'orders')) && (
+                  <code>{coupon.code}</code>
+                </td>
+                <td className="applied-for-cell-v7">
+                  <div className="applied-badges-container-v7">
+                    {/* Merge Platform + Subscription, but remove Platform for Orders */}
+                    {coupon.source === 'platform' && coupon.applicability === 'subscription' ? (
+                      <span className="platform-subs-merged-badge-v8">Platform Subscription</span>
+                    ) : (
                       <span className={`applicability-badge-v7 ${coupon.applicability || 'orders'}`}>
                         {coupon.applicability === 'subscription' ? 'Subscription' : 'Orders'}
                       </span>
@@ -1483,7 +1487,6 @@ const Coupons = () => {
                 <td>{coupon.type}</td>
                 <td>{coupon.value}</td>
                 <td className="validity-container-cell-v5">{renderValidity(coupon.validFrom, coupon.validTo)}</td>
-                <td>{coupon.usage}</td>
                 <td><span className={`status-tag-v4 ${coupon.status.toLowerCase()}`}>{coupon.status}</span></td>
                 <td className="actions-cell-v4">
                   {activeTab === 'vendor' ? (
