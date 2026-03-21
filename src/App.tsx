@@ -1273,18 +1273,28 @@ const CouponPreviewModal = ({ isOpen, onClose, couponData }: { isOpen: boolean, 
             <div className="preview-divider dashed"></div>
 
             <div className="preview-details-grid">
-              <div className="detail-item">
-                <div className="detail-label">Min. Booking Amount</div>
-                <div className="detail-value">₹ {couponData.minAmount || '0'}</div>
+              {couponData.applicability !== 'subscription' && (
+                <>
+                  <div className="detail-item">
+                    <div className="detail-label">Min. Booking Amount</div>
+                    <div className="detail-value">₹ {couponData.minAmount || '0'}</div>
+                  </div>
+                  <div className="detail-item">
+                    <div className="detail-label">Maximum Discount Cap</div>
+                    <div className="detail-value">₹ {couponData.maxCap || '0'}</div>
+                  </div>
+                </>
+              )}
+              
+              <div className="detail-item full-width">
+                <div className="detail-label">Applicability</div>
+                <div className="detail-value">
+                  {couponData.applicability === 'subscription' 
+                    ? 'Starter, Growth & Savings plans' 
+                    : 'All Menu Categories'}
+                </div>
               </div>
-              <div className="detail-item">
-                <div className="detail-label">Maximum Discount Cap</div>
-                <div className="detail-value">₹ {couponData.maxCap || '0'}</div>
-              </div>
-              <div className="detail-item">
-                <div className="detail-label">Usage Limit</div>
-                <div className="detail-value">{couponData.usage}</div>
-              </div>
+
               <div className="detail-item full-width">
                 <div className="detail-label">Validity Period</div>
                 <div className="detail-value">

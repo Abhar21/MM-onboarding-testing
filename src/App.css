@@ -11080,8 +11080,11 @@ input:checked + .slider-v4:before {
 }
 
 .center-preview-v6 .realtime-preview-card-v4 {
-  transform: scale(1.05);
+  width: 420px;
+  max-width: 100%;
   margin: 0 !important;
+  box-shadow: none !important;
+  border: none !important;
 }
 
 /* --- Coupon Applicability & Badges v7 --- */
