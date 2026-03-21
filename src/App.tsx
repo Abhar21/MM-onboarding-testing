@@ -846,7 +846,17 @@ const Documents = ({ hideHeader = false }: { hideHeader?: boolean }) => {
   );
 };
 
-const CouponCreateModal = ({ isOpen, onClose, onSave }: { isOpen: boolean, onClose: () => void, onSave: (coupon: any) => void }) => {
+const CouponCreateModal = ({
+  isOpen,
+  onClose,
+  onSave,
+  initialData = null
+}: {
+  isOpen: boolean,
+  onClose: () => void,
+  onSave: (coupon: any) => void,
+  initialData?: any
+}) => {
   const [form, setForm] = useState({
     code: '',
     discountType: 'percentage', // percentage | flat
@@ -859,8 +869,45 @@ const CouponCreateModal = ({ isOpen, onClose, onSave }: { isOpen: boolean, onClo
     isUnlimited: false,
     perUserLimit: '1',
     validFrom: '',
-    validTo: ''
+    validTo: '',
+    status: 'Active'
   });
+
+  useEffect(() => {
+    if (initialData) {
+      setForm({
+        code: initialData.code || '',
+        discountType: initialData.type === 'Percentage' ? 'percentage' : 'flat',
+        discountValue: initialData.value ? initialData.value.replace(/[^\d.]/g, '') : '',
+        maxCap: initialData.maxCap || '',
+        applicability: initialData.applicability || 'all',
+        selectedTargets: initialData.selectedTargets || (initialData.applicability === 'all' ? ['Breakfast', 'Lunch', 'Snacks', 'Dinner'] : []),
+        minAmount: initialData.minAmount || '',
+        totalLimit: initialData.totalLimit || '',
+        isUnlimited: initialData.isUnlimited || (initialData.usage && initialData.usage.includes('∞')),
+        perUserLimit: initialData.perUserLimit || '1',
+        validFrom: initialData.validFrom || '',
+        validTo: initialData.validTo || '',
+        status: initialData.status || 'Active'
+      });
+    } else {
+      setForm({
+        code: '',
+        discountType: 'percentage',
+        discountValue: '',
+        maxCap: '',
+        applicability: 'all',
+        selectedTargets: [],
+        minAmount: '',
+        totalLimit: '',
+        isUnlimited: false,
+        perUserLimit: '1',
+        validFrom: '',
+        validTo: '',
+        status: 'Active'
+      });
+    }
+  }, [initialData, isOpen]);
 
   const generateCode = () => {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -887,8 +934,8 @@ const CouponCreateModal = ({ isOpen, onClose, onSave }: { isOpen: boolean, onClo
       <div className="coupon-modal-content-v4" onClick={e => e.stopPropagation()}>
         <header className="coupon-modal-header-v4">
           <div className="header-left">
-            <h2 className="section-title">Create New Coupon</h2>
-            <p className="section-subtitle">Set up your promotional offer and visibility rules.</p>
+            <h2 className="section-title">{initialData ? 'Edit Coupon' : 'Create New Coupon'}</h2>
+            <p className="section-subtitle">{initialData ? 'Update your coupon settings and status.' : 'Set up your promotional offer and visibility rules.'}</p>
           </div>
           <button className="close-modal-btn-v4" onClick={onClose}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
@@ -899,9 +946,23 @@ const CouponCreateModal = ({ isOpen, onClose, onSave }: { isOpen: boolean, onClo
           <div className="coupon-form-layout-v4">
             <div className="coupon-form-main-v4">
               <div className="coupon-card-v4 single-form-card-v4">
-                {/* Section 1: Basic Details */}
+                {/* Section 1: Coupon Details */}
                 <div className="form-section-v4">
-                  <h3 className="card-heading-v4">Basic Details</h3>
+                  <div className="card-header-with-action-v4">
+                    <h3 className="card-heading-v4">Coupon Details</h3>
+                    {initialData && (
+                      <div className="coupon-status-toggle-wrapper-v4">
+                        <span className="status-label-v4">Status:</span>
+                        <button 
+                          className={`coupon-status-toggle-v4 ${form.status === 'Active' ? 'active' : 'paused'}`}
+                          onClick={() => setForm({ ...form, status: form.status === 'Active' ? 'Paused' : 'Active' })}
+                        >
+                          <div className="toggle-thumb-v4"></div>
+                          <span className="toggle-text-v4">{form.status}</span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
                   <div className="form-grid-v4">
                     <div className="form-group-v4 full-width-v4">
                       <label>Coupon Code</label>
@@ -1065,13 +1126,16 @@ const CouponCreateModal = ({ isOpen, onClose, onSave }: { isOpen: boolean, onClo
                       ))}
                     </div>
                   )}
+                  <p className="helper-text-v4" style={{ marginTop: '0.75rem', paddingLeft: '0.25rem' }}>
+                    Coupon will be applicable to all Menu's inside these {form.applicability === 'all' ? 'services' : 'selected categories'}
+                  </p>
                 </div>
 
                 {/* Card Footer with primary action */}
-                <div className="coupon-card-footer-v4" style={{ 
-                  marginTop: '0rem', 
-                  padding: '1.5rem 2rem 2.5rem 2rem', 
-                  display: 'flex', 
+                <div className="coupon-card-footer-v4" style={{
+                  marginTop: '0rem',
+                  padding: '1.25rem 2rem 1.25rem 2rem',
+                  display: 'flex',
                   justifyContent: 'flex-end',
                   borderTop: '1px solid #f1f5f9'
                 }}>
@@ -1079,18 +1143,18 @@ const CouponCreateModal = ({ isOpen, onClose, onSave }: { isOpen: boolean, onClo
                     className="btn-primary-v4"
                     disabled={!isFormValid}
                     onClick={() => onSave(form)}
-                    style={{ 
-                      minWidth: '240px', 
-                      height: '52px',
+                    style={{
+                      minWidth: '240px',
+                      height: '48px',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       fontSize: '1rem',
-                      fontWeight: '600',
+                      fontWeight: '700',
                       padding: '0 2rem'
                     }}
                   >
-                    Create Coupon
+                    {initialData ? 'Save Changes' : 'Create Coupon'}
                   </button>
                 </div>
               </div>
@@ -1098,14 +1162,14 @@ const CouponCreateModal = ({ isOpen, onClose, onSave }: { isOpen: boolean, onClo
 
             <aside className="coupon-preview-panel-v4">
               <div className="preview-sticky-v4">
-                                <h4 className="preview-title-v4">Coupon Preview</h4>
+                <h4 className="preview-title-v4">Coupon Preview</h4>
                 <div className="realtime-preview-card-v4 vendor-view hybrid">
                   <div className="preview-curve-v4 left"></div>
                   <div className="preview-curve-v4 right"></div>
 
                   <div className="preview-header-vendor">
-                    <div className="status-badge active">
-                      <span className="dot"></span> Active
+                    <div className={`status-badge ${form.status.toLowerCase()}`}>
+                      <span className="dot"></span> {form.status}
                     </div>
                     <div className="preview-main-info">
                       <div className="preview-discount-badge highlighted">
@@ -1140,8 +1204,8 @@ const CouponCreateModal = ({ isOpen, onClose, onSave }: { isOpen: boolean, onClo
                     <div className="detail-item full-width">
                       <div className="detail-label">Validity Period</div>
                       <div className="detail-value">
-                        {form.validFrom ? new Date(form.validFrom).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Today'} 
-                        {' — '} 
+                        {form.validFrom ? new Date(form.validFrom).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Today'}
+                        {' — '}
                         {form.validTo ? new Date(form.validTo).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : 'No Expiry'}
                       </div>
                     </div>
@@ -1167,9 +1231,10 @@ const CouponCreateModal = ({ isOpen, onClose, onSave }: { isOpen: boolean, onClo
 
 const Coupons = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [editingCoupon, setEditingCoupon] = useState<any>(null);
   const [coupons, setCoupons] = useState([
-    { id: '1', code: 'WELCOME10', type: 'Percentage', value: '10%', status: 'Active', usage: '45/100', validTo: '2026-03-31' },
-    { id: '2', code: 'FLAT500', type: 'Flat Amount', value: '₹500', status: 'Paused', usage: '12/50', validTo: '2026-04-15' },
+    { id: '1', code: 'WELCOME10', type: 'Percentage', value: '10%', status: 'Active', usage: '45/100', validTo: '2026-03-31', maxCap: '500', minAmount: '1000' },
+    { id: '2', code: 'FLAT500', type: 'Flat Amount', value: '₹500', status: 'Paused', usage: '12/50', validTo: '2026-04-15', minAmount: '2000' },
   ]);
 
   const getDaysRemaining = (dateStr: string) => {
@@ -1194,18 +1259,42 @@ const Coupons = () => {
     ));
   };
 
+  const handleEditCoupon = (coupon: any) => {
+    setEditingCoupon(coupon);
+    setShowCreateModal(true);
+  };
+
   const handleSaveCoupon = (formData: any) => {
-    const newCoupon = {
-      id: Math.random().toString(36).substr(2, 9),
-      code: formData.code,
-      type: formData.discountType === 'percentage' ? 'Percentage' : 'Flat Amount',
-      value: formData.discountType === 'percentage' ? `${formData.discountValue}%` : `₹${formData.discountValue}`,
-      status: 'Active',
-      usage: `0/${formData.totalLimit || '∞'}`,
-      validTo: formData.validTo
-    };
-    setCoupons(prev => [newCoupon, ...prev]);
+    if (editingCoupon) {
+      setCoupons(prev => prev.map(c =>
+        c.id === editingCoupon.id ? {
+          ...c,
+          code: formData.code,
+          type: formData.discountType === 'percentage' ? 'Percentage' : 'Flat Amount',
+          value: formData.discountType === 'percentage' ? `${formData.discountValue}%` : `₹${formData.discountValue}`,
+          status: formData.status,
+          usage: `${c.usage.split('/')[0]}/${formData.isUnlimited ? '∞' : (formData.totalLimit || '∞')}`,
+          validTo: formData.validTo,
+          maxCap: formData.maxCap,
+          minAmount: formData.minAmount
+        } : c
+      ));
+    } else {
+      const newCoupon = {
+        id: Math.random().toString(36).substr(2, 9),
+        code: formData.code,
+        type: formData.discountType === 'percentage' ? 'Percentage' : 'Flat Amount',
+        value: formData.discountType === 'percentage' ? `${formData.discountValue}%` : `₹${formData.discountValue}`,
+        status: 'Active',
+        usage: `0/${formData.isUnlimited ? '∞' : (formData.totalLimit || '∞')}`,
+        validTo: formData.validTo,
+        maxCap: formData.maxCap,
+        minAmount: formData.minAmount
+      };
+      setCoupons(prev => [newCoupon, ...prev]);
+    }
     setShowCreateModal(false);
+    setEditingCoupon(null);
   };
 
   return (
@@ -1251,7 +1340,7 @@ const Coupons = () => {
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
                     )}
                   </button>
-                  <button className="icon-btn-v4" title="Edit Coupon">
+                  <button className="icon-btn-v4" title="Edit Coupon" onClick={() => handleEditCoupon(coupon)}>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                   </button>
                 </td>
@@ -1263,8 +1352,12 @@ const Coupons = () => {
 
       <CouponCreateModal
         isOpen={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
+        onClose={() => {
+          setShowCreateModal(false);
+          setEditingCoupon(null);
+        }}
         onSave={handleSaveCoupon}
+        initialData={editingCoupon}
       />
     </div>
   );
