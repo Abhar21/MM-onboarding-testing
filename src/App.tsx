@@ -846,6 +846,430 @@ const Documents = ({ hideHeader = false }: { hideHeader?: boolean }) => {
   );
 };
 
+const CouponCreateModal = ({ isOpen, onClose, onSave }: { isOpen: boolean, onClose: () => void, onSave: (coupon: any) => void }) => {
+  const [form, setForm] = useState({
+    code: '',
+    discountType: 'percentage', // percentage | flat
+    discountValue: '',
+    maxCap: '',
+    applicability: 'all', // all | specific | subscription
+    selectedTargets: [] as string[],
+    minAmount: '',
+    totalLimit: '',
+    isUnlimited: false,
+    perUserLimit: '1',
+    validFrom: '',
+    validTo: ''
+  });
+
+  const generateCode = () => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let code = '';
+    for (let i = 0; i < 8; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+    setForm({ ...form, code });
+  };
+
+  const toggleTarget = (target: string) => {
+    setForm(prev => ({
+      ...prev,
+      selectedTargets: prev.selectedTargets.includes(target)
+        ? prev.selectedTargets.filter(t => t !== target)
+        : [...prev.selectedTargets, target]
+    }));
+  };
+
+  const isFormValid = !!(form.code && form.discountValue && (form.applicability === 'all' || form.selectedTargets.length > 0));
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="coupon-modal-overlay-v4" onClick={onClose}>
+      <div className="coupon-modal-content-v4" onClick={e => e.stopPropagation()}>
+        <header className="coupon-modal-header-v4">
+          <div className="header-left">
+            <h2 className="section-title">Create New Coupon</h2>
+            <p className="section-subtitle">Set up your promotional offer and visibility rules.</p>
+          </div>
+          <button className="close-modal-btn-v4" onClick={onClose}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </header>
+
+        <div className="coupon-modal-body-v4">
+          <div className="coupon-form-layout-v4">
+            <div className="coupon-form-main-v4">
+              <div className="coupon-card-v4 single-form-card-v4">
+                {/* Section 1: Basic Details */}
+                <div className="form-section-v4">
+                  <h3 className="card-heading-v4">Basic Details</h3>
+                  <div className="form-grid-v4">
+                    <div className="form-group-v4 full-width-v4">
+                      <label>Coupon Code</label>
+                      <div className="input-with-action-v4 coupon-code-input-v4">
+                        <input
+                          type="text"
+                          placeholder="e.g. SAVE500"
+                          value={form.code}
+                          onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })}
+                        />
+                        <button className="btn-generate-v4" onClick={generateCode}>Generate</button>
+                      </div>
+                    </div>
+
+                    <div className="form-group-v4">
+                      <label>Discount Type</label>
+                      <div className="toggle-group-v4">
+                        <button
+                          className={form.discountType === 'percentage' ? 'active' : ''}
+                          onClick={() => setForm({ ...form, discountType: 'percentage' })}
+                        >
+                          % Percentage
+                        </button>
+                        <button
+                          className={form.discountType === 'flat' ? 'active' : ''}
+                          onClick={() => setForm({ ...form, discountType: 'flat' })}
+                        >
+                          ₹ Flat Amount
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="form-group-v4">
+                      <label>Discount Value</label>
+                      <div className="input-prefix-v4">
+                        <span className="prefix-v4">{form.discountType === 'percentage' ? '%' : '₹'}</span>
+                        <input
+                          type="number"
+                          placeholder="0.00"
+                          value={form.discountValue}
+                          onChange={(e) => setForm({ ...form, discountValue: e.target.value })}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="section-divider-v4"></div>
+
+                {/* Section 2: Conditions & Limits */}
+                <div className="form-section-v4">
+                  <h3 className="card-heading-v4">Conditions & Limits</h3>
+                  <div className="form-grid-v4">
+                    <div className="form-group-v4">
+                      <label>Minimum Booking Amount</label>
+                      <div className="input-prefix-v4">
+                        <span className="prefix-v4">₹</span>
+                        <input type="number" placeholder="0" value={form.minAmount} onChange={(e) => setForm({ ...form, minAmount: e.target.value })} />
+                      </div>
+                      <span className="helper-text-v4">Only applies if order exceeds this amount</span>
+                    </div>
+
+                    <div className={`form-group-v4 ${form.discountType === 'flat' ? 'disabled-group-v4' : ''}`}>
+                      <label>Maximum Discount Cap</label>
+                      <div className="input-prefix-v4">
+                        <span className="prefix-v4">₹</span>
+                        <input
+                          type="number"
+                          placeholder={form.discountType === 'flat' ? 'Not Applicable' : 'No Limit'}
+                          disabled={form.discountType === 'flat'}
+                          value={form.discountType === 'flat' ? '' : form.maxCap}
+                          onChange={(e) => setForm({ ...form, maxCap: e.target.value })}
+                        />
+                      </div>
+                      <span className="helper-text-v4">{form.discountType === 'flat' ? 'Optional: Only for percentage discounts' : 'Maximum value this coupon can deduct'}</span>
+                    </div>
+
+                    <div className="form-group-v4">
+                      <label>Total Uses</label>
+                      <input
+                        type="number"
+                        placeholder="Unlimited"
+                        disabled={form.isUnlimited}
+                        value={form.totalLimit}
+                        onChange={(e) => setForm({ ...form, totalLimit: e.target.value })}
+                      />
+                      <label className={`checkbox-toggle-v4 ${form.isUnlimited ? 'active' : ''}`}>
+                        <input
+                          type="checkbox"
+                          checked={form.isUnlimited}
+                          onChange={(e) => setForm({ ...form, isUnlimited: e.target.checked })}
+                        />
+                        <div className="checkbox-custom-v4">
+                          {form.isUnlimited && (
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+                              <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                          )}
+                        </div>
+                        <span style={{ textTransform: 'uppercase', letterSpacing: '0.02em' }}>UNLIMITED</span>
+                      </label>
+                    </div>
+
+                    <div className="form-group-v4">
+                      <label>Per User Usage Limit</label>
+                      <input type="number" value={form.perUserLimit} onChange={(e) => setForm({ ...form, perUserLimit: e.target.value })} />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="section-divider-v4"></div>
+
+                {/* Section 3: Validity */}
+                <div className="form-section-v4">
+                  <h3 className="card-heading-v4">Validity</h3>
+                  <div className="form-grid-v4">
+                    <div className="form-group-v4">
+                      <label>Valid From</label>
+                      <input type="date" value={form.validFrom} onChange={(e) => setForm({ ...form, validFrom: e.target.value })} />
+                    </div>
+                    <div className="form-group-v4">
+                      <label>Valid To</label>
+                      <input type="date" value={form.validTo} onChange={(e) => setForm({ ...form, validTo: e.target.value })} />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="section-divider-v4"></div>
+
+                {/* Section 4: Applicability */}
+                <div className="form-section-v4">
+                  <h3 className="card-heading-v4">Applicability</h3>
+                  <div className="radio-group-v4">
+                    <label className={`radio-item-v4 ${form.applicability === 'all' ? 'active' : ''}`}>
+                      <input type="radio" name="app" checked={form.applicability === 'all'} onChange={() => setForm({ ...form, applicability: 'all', selectedTargets: ['Breakfast', 'Lunch', 'Snacks', 'Dinner'] })} />
+                      <div className="radio-content-v4">
+                        <strong>All Categories</strong>
+                        <span>Valid across your entire menu and offerings</span>
+                      </div>
+                    </label>
+                    <label className={`radio-item-v4 ${form.applicability === 'specific' ? 'active' : ''}`}>
+                      <input type="radio" name="app" checked={form.applicability === 'specific'} onChange={() => setForm({ ...form, applicability: 'specific', selectedTargets: [] })} />
+                      <div className="radio-content-v4">
+                        <strong>Specific Categories</strong>
+                        <span>Target specific menu categories</span>
+                      </div>
+                    </label>
+                  </div>
+
+                  {(form.applicability === 'all' || form.applicability === 'specific') && (
+                    <div className="chip-container-v4">
+                      {['Breakfast', 'Lunch', 'Snacks', 'Dinner'].map(cat => (
+                        <button
+                          key={cat}
+                          className={`nav-chip-v4 ${form.selectedTargets.includes(cat) ? 'active' : ''}`}
+                          onClick={() => form.applicability === 'specific' && toggleTarget(cat)}
+                          style={{ cursor: form.applicability === 'all' ? 'default' : 'pointer' }}
+                        >
+                          {cat}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Card Footer with primary action */}
+                <div className="coupon-card-footer-v4" style={{ 
+                  marginTop: '0rem', 
+                  padding: '1.5rem 2rem 2.5rem 2rem', 
+                  display: 'flex', 
+                  justifyContent: 'flex-end',
+                  borderTop: '1px solid #f1f5f9'
+                }}>
+                  <button
+                    className="btn-primary-v4"
+                    disabled={!isFormValid}
+                    onClick={() => onSave(form)}
+                    style={{ 
+                      minWidth: '240px', 
+                      height: '52px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '1rem',
+                      fontWeight: '600',
+                      padding: '0 2rem'
+                    }}
+                  >
+                    Create Coupon
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <aside className="coupon-preview-panel-v4">
+              <div className="preview-sticky-v4">
+                                <h4 className="preview-title-v4">Coupon Preview</h4>
+                <div className="realtime-preview-card-v4 vendor-view hybrid">
+                  <div className="preview-curve-v4 left"></div>
+                  <div className="preview-curve-v4 right"></div>
+
+                  <div className="preview-header-vendor">
+                    <div className="status-badge active">
+                      <span className="dot"></span> Active
+                    </div>
+                    <div className="preview-main-info">
+                      <div className="preview-discount-badge highlighted">
+                        {form.discountValue || '0'}{form.discountType === 'percentage' ? '%' : '₹'} <span className="off-text">OFF</span>
+                      </div>
+                      <div className="preview-code-display">
+                        <span className="label">CODE:</span>
+                        <span className="code text-uppercase">{form.code || 'AUTUMN25'}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="preview-divider dashed"></div>
+
+                  <div className="preview-details-grid">
+                    <div className="detail-item">
+                      <div className="detail-label">Min. Booking Amount</div>
+                      <div className="detail-value">₹ {form.minAmount || '0'}</div>
+                    </div>
+                    <div className="detail-item">
+                      <div className="detail-label">Maximum Discount Cap</div>
+                      <div className="detail-value text-capitalize">₹ {form.maxCap || '0'}</div>
+                    </div>
+                    <div className="detail-item">
+                      <div className="detail-label">Total Usage Limit</div>
+                      <div className="detail-value">{form.totalLimit || 'Unlimited'}</div>
+                    </div>
+                    <div className="detail-item">
+                      <div className="detail-label">Per User Limit</div>
+                      <div className="detail-value">{form.perUserLimit || 'Unlimited'}</div>
+                    </div>
+                    <div className="detail-item full-width">
+                      <div className="detail-label">Validity Period</div>
+                      <div className="detail-value">
+                        {form.validFrom ? new Date(form.validFrom).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Today'} 
+                        {' — '} 
+                        {form.validTo ? new Date(form.validTo).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : 'No Expiry'}
+                      </div>
+                    </div>
+                    <div className="detail-item full-width">
+                      <div className="detail-label">Applicability</div>
+                      <div className="detail-value">
+                        {form.applicability === 'all' ? 'All Categories' : (form.selectedTargets.length > 0 ? form.selectedTargets.join(', ') : 'Not selected')}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </div>
+
+        {/* Sticky footer removed */}
+
+      </div>
+    </div>
+  );
+};
+
+const Coupons = () => {
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [coupons, setCoupons] = useState([
+    { id: '1', code: 'WELCOME10', type: 'Percentage', value: '10%', status: 'Active', usage: '45/100', validTo: '2026-03-31' },
+    { id: '2', code: 'FLAT500', type: 'Flat Amount', value: '₹500', status: 'Paused', usage: '12/50', validTo: '2026-04-15' },
+  ]);
+
+  const getDaysRemaining = (dateStr: string) => {
+    if (!dateStr) return 'No expiry';
+    const expiry = new Date(dateStr);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const diffTime = expiry.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    const formattedDate = new Date(dateStr).toLocaleDateString('en-GB', {
+      day: '2-digit', month: 'short', year: 'numeric'
+    });
+
+    if (diffDays < 0) return `Expired on ${formattedDate}`;
+    return `Till ${formattedDate} (${diffDays} days left)`;
+  };
+
+  const toggleStatus = (id: string) => {
+    setCoupons(prev => prev.map(c =>
+      c.id === id ? { ...c, status: c.status === 'Active' ? 'Paused' : 'Active' } : c
+    ));
+  };
+
+  const handleSaveCoupon = (formData: any) => {
+    const newCoupon = {
+      id: Math.random().toString(36).substr(2, 9),
+      code: formData.code,
+      type: formData.discountType === 'percentage' ? 'Percentage' : 'Flat Amount',
+      value: formData.discountType === 'percentage' ? `${formData.discountValue}%` : `₹${formData.discountValue}`,
+      status: 'Active',
+      usage: `0/${formData.totalLimit || '∞'}`,
+      validTo: formData.validTo
+    };
+    setCoupons(prev => [newCoupon, ...prev]);
+    setShowCreateModal(false);
+  };
+
+  return (
+    <div className="coupons-container-v4">
+      <div className="section-header-v4">
+        <div className="header-left">
+          <h2 className="section-title">Coupons</h2>
+          <p className="section-subtitle">Manage your promotional offers and discounts.</p>
+        </div>
+        <button className="btn-primary-v4" onClick={() => setShowCreateModal(true)}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '8px' }}><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          Create Coupon
+        </button>
+      </div>
+
+      <div className="coupons-list-card-v4">
+        <table className="coupons-table-v4">
+          <thead>
+            <tr>
+              <th>Coupon Code</th>
+              <th>Type</th>
+              <th>Value</th>
+              <th>Validity</th>
+              <th>Usage</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {coupons.map(coupon => (
+              <tr key={coupon.id}>
+                <td className="coupon-code-cell"><code>{coupon.code}</code></td>
+                <td>{coupon.type}</td>
+                <td>{coupon.value}</td>
+                <td style={{ minWidth: '180px' }}>{getDaysRemaining((coupon as any).validTo)}</td>
+                <td>{coupon.usage}</td>
+                <td><span className={`status-tag-v4 ${coupon.status.toLowerCase()}`}>{coupon.status}</span></td>
+                <td className="actions-cell-v4">
+                  <button className="icon-btn-v4" title={coupon.status === 'Active' ? 'Pause Coupon' : 'Resume Coupon'} onClick={() => toggleStatus(coupon.id)}>
+                    {coupon.status === 'Active' ? (
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+                    ) : (
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                    )}
+                  </button>
+                  <button className="icon-btn-v4" title="Edit Coupon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <CouponCreateModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onSave={handleSaveCoupon}
+      />
+    </div>
+  );
+};
+
 const Settings = ({
   setProfileData,
   profileForm,
@@ -1063,7 +1487,7 @@ const Settings = ({
                     <div className="payment-method-horizontal-v4">
                       <span className="payment-label-v4">Payment method: </span>
                       <span className="payment-value-text-v4">UPI ••••9823</span>
-                      <button className="change-payment-link-v4" onClick={() => {}}>Change</button>
+                      <button className="change-payment-link-v4" onClick={() => { }}>Change</button>
                     </div>
                   </div>
                 </div>
@@ -4066,7 +4490,8 @@ const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
               setEditOtp={setEditOtp}
             />
           )}
-          {!['dashboard', 'tickets', 'documents', 'service-settings', 'profile', 'settings', 'ratings'].includes(activeTab) && (
+          {activeTab === 'coupons' && <Coupons />}
+          {!['dashboard', 'tickets', 'documents', 'service-settings', 'profile', 'settings', 'ratings', 'coupons'].includes(activeTab) && (
             <div className="placeholder-screen">
               <h2>{activeTab.charAt(0).toUpperCase() + activeTab.slice(1).replace('-', ' ')}</h2>
               <p>This screen is coming soon.</p>
