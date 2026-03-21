@@ -1229,13 +1229,91 @@ const CouponCreateModal = ({
   );
 };
 
+const CouponPreviewModal = ({ isOpen, onClose, couponData }: { isOpen: boolean, onClose: () => void, couponData: any }) => {
+  if (!isOpen || !couponData) return null;
+
+  const isPercentage = couponData.type === 'Percentage';
+  const displayValue = isPercentage ? couponData.value.replace('%', '') : couponData.value.replace('₹', '');
+
+  return (
+    <div className="coupon-modal-overlay-v4 preview-modal-v6" onClick={onClose}>
+      <div className="coupon-modal-container-v4 preview-only-v6" onClick={e => e.stopPropagation()}>
+        <div className="modal-header-v4">
+          <div className="header-left-v4">
+            <h2 className="modal-title-v4">Coupon Preview</h2>
+            <p className="modal-subtitle-v4">Full visibility of the platform reward structure</p>
+          </div>
+          <button className="close-btn-v4" onClick={onClose}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </div>
+        
+        <div className="modal-body-v4 center-preview-v6">
+          <div className="realtime-preview-card-v4 vendor-view hybrid">
+            <div className="preview-curve-v4 left"></div>
+            <div className="preview-curve-v4 right"></div>
+
+            <div className="preview-header-vendor">
+              <div className={`status-badge active`}>
+                <span className="dot"></span> ACTIVE
+              </div>
+              <div className="preview-main-info">
+                <div className="preview-discount-badge highlighted">
+                  {displayValue}{isPercentage ? '%' : '₹'} <span className="off-text">OFF</span>
+                </div>
+                <div className="preview-code-display">
+                  <span className="label">CODE:</span>
+                  <span className="code text-uppercase">{couponData.code}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="preview-divider dashed"></div>
+
+            <div className="preview-details-grid">
+              <div className="detail-item">
+                <div className="detail-label">Min. Booking Amount</div>
+                <div className="detail-value">₹ {couponData.minAmount || '0'}</div>
+              </div>
+              <div className="detail-item">
+                <div className="detail-label">Maximum Discount Cap</div>
+                <div className="detail-value">₹ {couponData.maxCap || '0'}</div>
+              </div>
+              <div className="detail-item">
+                <div className="detail-label">Usage Limit</div>
+                <div className="detail-value">{couponData.usage}</div>
+              </div>
+              <div className="detail-item full-width">
+                <div className="detail-label">Validity Period</div>
+                <div className="detail-value">
+                  {new Date(couponData.validFrom).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                  {' — '}
+                  {new Date(couponData.validTo).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                </div>
+              </div>
+              <div className="detail-item full-width">
+                <div className="detail-label">Coupon Source</div>
+                <div className="detail-value text-capitalize">{couponData.source} Managed</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const Coupons = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingCoupon, setEditingCoupon] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState<'vendor' | 'platform'>('vendor');
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
+  const [previewCoupon, setPreviewCoupon] = useState<any>(null);
   const [coupons, setCoupons] = useState([
-    { id: '1', code: 'WELCOME10', type: 'Percentage', value: '10%', status: 'Active', usage: '45/100', validFrom: '2026-03-01', validTo: '2026-03-31', maxCap: '500', minAmount: '1000' },
-    { id: '2', code: 'FLAT500', type: 'Flat Amount', value: '₹500', status: 'Paused', usage: '12/50', validFrom: '2026-03-20', validTo: '2026-04-15', minAmount: '2000' },
-    { id: '3', code: 'PROMO20', type: 'Percentage', value: '20%', status: 'Active', usage: '5/100', validFrom: '2026-03-10', validTo: '2026-04-22', maxCap: '1000', minAmount: '5000' }
+    { id: '1', code: 'WELCOME10', type: 'Percentage', value: '10%', status: 'Active', usage: '45/100', validFrom: '2026-03-01', validTo: '2026-03-31', maxCap: '500', minAmount: '1000', source: 'vendor' },
+    { id: '2', code: 'FLAT500', type: 'Flat Amount', value: '₹500', status: 'Paused', usage: '12/50', validFrom: '2026-03-20', validTo: '2026-04-15', minAmount: '2000', source: 'vendor' },
+    { id: '3', code: 'PLATFORM25', type: 'Percentage', value: '25%', status: 'Active', usage: '1050/5000', validFrom: '2026-01-01', validTo: '2026-12-31', maxCap: '1000', minAmount: '2000', source: 'platform' },
+    { id: '4', code: 'HOLIDAY15', type: 'Percentage', value: '15%', status: 'Active', usage: '800/∞', validFrom: '2026-03-15', validTo: '2026-04-30', maxCap: '750', minAmount: '1500', source: 'platform' },
   ]);
 
   const renderValidity = (validFrom: string, validTo: string) => {
@@ -1309,6 +1387,7 @@ const Coupons = () => {
           value: formData.discountType === 'percentage' ? `${formData.discountValue}%` : `₹${formData.discountValue}`,
           status: formData.status,
           usage: `${c.usage.split('/')[0]}/${formData.isUnlimited ? '∞' : (formData.totalLimit || '∞')}`,
+          validFrom: formData.validFrom || c.validFrom,
           validTo: formData.validTo,
           maxCap: formData.maxCap,
           minAmount: formData.minAmount
@@ -1322,9 +1401,11 @@ const Coupons = () => {
         value: formData.discountType === 'percentage' ? `${formData.discountValue}%` : `₹${formData.discountValue}`,
         status: 'Active',
         usage: `0/${formData.isUnlimited ? '∞' : (formData.totalLimit || '∞')}`,
+        validFrom: formData.validFrom || new Date().toISOString().split('T')[0],
         validTo: formData.validTo,
         maxCap: formData.maxCap,
-        minAmount: formData.minAmount
+        minAmount: formData.minAmount,
+        source: 'vendor'
       };
       setCoupons(prev => [newCoupon, ...prev]);
     }
@@ -1333,16 +1414,40 @@ const Coupons = () => {
   };
 
   return (
-    <div className="coupons-container-v4">
+    <div className="coupons-container-v6">
+      <h1 className="page-main-title-v6">Coupons Hub</h1>
+      <div className="coupons-tabs-v6">
+        <button 
+          className={`tab-btn-v6 ${activeTab === 'vendor' ? 'active' : ''}`}
+          onClick={() => setActiveTab('vendor')}
+        >
+          My Coupons
+          <span className="count-badge-v6">{(coupons as any[]).filter(c => c.source === 'vendor').length}</span>
+        </button>
+        <button 
+          className={`tab-btn-v6 ${activeTab === 'platform' ? 'active' : ''}`}
+          onClick={() => setActiveTab('platform')}
+        >
+          Platform Coupons
+          <span className="count-badge-v6">{(coupons as any[]).filter(c => c.source === 'platform').length}</span>
+        </button>
+      </div>
+
       <div className="section-header-v4">
         <div className="header-left">
-          <h2 className="section-title">Coupons</h2>
-          <p className="section-subtitle">Manage your promotional offers and discounts.</p>
+          <h2 className="section-title">{activeTab === 'vendor' ? 'My Coupons' : 'Platform Coupons'}</h2>
+          <p className="section-subtitle">
+            {activeTab === 'vendor' 
+              ? 'Manage your store-specific promotional offers.' 
+              : 'View system-wide rewards and discount campaigns available to your store.'}
+          </p>
         </div>
-        <button className="btn-primary-v4" onClick={() => setShowCreateModal(true)}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '8px' }}><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-          Create Coupon
-        </button>
+        {activeTab === 'vendor' && (
+          <button className="btn-primary-v4" onClick={() => setShowCreateModal(true)}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '8px' }}><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            Create Coupon
+          </button>
+        )}
       </div>
 
       <div className="coupons-list-card-v4">
@@ -1359,25 +1464,35 @@ const Coupons = () => {
             </tr>
           </thead>
           <tbody>
-            {coupons.map(coupon => (
+            {(coupons as any[]).filter(c => c.source === activeTab).map(coupon => (
               <tr key={coupon.id}>
-                <td className="coupon-code-cell"><code>{coupon.code}</code></td>
+                <td className="coupon-code-cell">
+                  <code>{coupon.code}</code>
+                </td>
                 <td>{coupon.type}</td>
                 <td>{coupon.value}</td>
                 <td className="validity-container-cell-v5">{renderValidity(coupon.validFrom, coupon.validTo)}</td>
                 <td>{coupon.usage}</td>
                 <td><span className={`status-tag-v4 ${coupon.status.toLowerCase()}`}>{coupon.status}</span></td>
                 <td className="actions-cell-v4">
-                  <button className="icon-btn-v4" title={coupon.status === 'Active' ? 'Pause Coupon' : 'Resume Coupon'} onClick={() => toggleStatus(coupon.id)}>
-                    {coupon.status === 'Active' ? (
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
-                    ) : (
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-                    )}
-                  </button>
-                  <button className="icon-btn-v4" title="Edit Coupon" onClick={() => handleEditCoupon(coupon)}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                  </button>
+                  {activeTab === 'vendor' ? (
+                    <>
+                      <button className="icon-btn-v4" title={coupon.status === 'Active' ? 'Pause Coupon' : 'Resume Coupon'} onClick={() => toggleStatus(coupon.id)}>
+                        {coupon.status === 'Active' ? (
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+                        ) : (
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                        )}
+                      </button>
+                      <button className="icon-btn-v4" title="Edit Coupon" onClick={() => handleEditCoupon(coupon)}>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                      </button>
+                    </>
+                  ) : (
+                    <button className="icon-btn-v4" title="View Preview" onClick={() => { setPreviewCoupon(coupon); setShowPreviewModal(true); }}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}
@@ -1393,6 +1508,12 @@ const Coupons = () => {
         }}
         onSave={handleSaveCoupon}
         initialData={editingCoupon}
+      />
+
+      <CouponPreviewModal 
+        isOpen={showPreviewModal}
+        onClose={() => setShowPreviewModal(false)}
+        couponData={previewCoupon}
       />
     </div>
   );

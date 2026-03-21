@@ -10094,12 +10094,15 @@ input:checked + .slider-v4:before {
 }
 
 .coupon-code-cell code {
-  background: #f1f5f9;
-  padding: 0.4rem 0.8rem;
+  background: #f0f7ff;
+  padding: 6px 14px;
   border-radius: 8px;
-  font-weight: 600;
-  color: #0077ff;
-  font-family: 'JetBrains Mono', monospace;
+  font-weight: 800;
+  color: #1a73e8;
+  font-size: 1rem;
+  display: inline-block;
+  letter-spacing: 0.02em;
+  border: 1px solid rgba(26, 115, 232, 0.1);
 }
 
 .status-tag-v4 {
@@ -10961,4 +10964,122 @@ input:checked + .slider-v4:before {
   padding-top: 1rem !important;
   padding-bottom: 1rem !important;
   vertical-align: middle !important;
+}
+
+/* --- Vendor vs Platform Coupons v6 --- */
+.coupons-tabs-v6 {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.tab-btn-v6 {
+  background: none;
+  border: none;
+  padding: 1rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+  transition: all 0.2s;
+}
+
+.tab-btn-v6:hover {
+  color: #1e293b;
+}
+
+.tab-btn-v6.active {
+  color: #1a73e8;
+}
+
+.tab-btn-v6.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #1a73e8;
+}
+
+.count-badge-v6 {
+  background: #f1f5f9;
+  color: #64748b;
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 99px;
+}
+
+.tab-btn-v6.active .count-badge-v6 {
+  background: #e8f0fe;
+  color: #1a73e8;
+}
+
+.code-with-badge-v6 {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.platform-badge-v6 {
+  width: fit-content;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #6366f1;
+  background: #eef2ff;
+  padding: 2px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+.view-only-v6 {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.view-only-v6:hover {
+  background: transparent !important;
+  color: inherit !important;
+}
+
+/* --- Page Main Title v6 --- */
+.page-main-title-v6 {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 2rem;
+  letter-spacing: -0.025em;
+  font-family: 'Outfit', sans-serif;
+}
+
+/* --- Coupon Preview Modal v6 --- */
+.preview-modal-v6 .coupon-modal-container-v4 {
+  width: 500px !important;
+  max-width: 95vw;
+  border-radius: 20px !important;
+  overflow: hidden;
+}
+
+.center-preview-v6 {
+  display: flex !important;
+  justify-content: center !important;
+  padding: 40px !important;
+  background: #f8fafc !important;
+}
+
+.preview-modal-v6 .modal-header-v4 {
+  background: #ffffff;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.center-preview-v6 .realtime-preview-card-v4 {
+  transform: scale(1.05);
+  margin: 0 !important;
 }
