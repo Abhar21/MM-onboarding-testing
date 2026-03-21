@@ -11083,3 +11083,32 @@ input:checked + .slider-v4:before {
   transform: scale(1.05);
   margin: 0 !important;
 }
+
+/* --- Coupon Applicability & Badges v7 --- */
+.code-pill-wrapper-v7 {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-start;
+}
+
+.applicability-badge-v7 {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.applicability-badge-v7.orders {
+  color: #1a73e8;
+  background: #eef6ff;
+  border: 1px solid rgba(26, 115, 232, 0.15);
+}
+
+.applicability-badge-v7.subscription {
+  color: #6366f1;
+  background: #f5f3ff;
+  border: 1px solid rgba(99, 102, 241, 0.15);
+}

@@ -877,6 +877,7 @@ const CouponCreateModal = ({
     if (initialData) {
       setForm({
         code: initialData.code || '',
+        applicability: initialData.applicability || 'orders',
         discountType: initialData.type === 'Percentage' ? 'percentage' : 'flat',
         discountValue: initialData.value ? initialData.value.replace(/[^\d.]/g, '') : '',
         maxCap: initialData.maxCap || '',
@@ -893,7 +894,8 @@ const CouponCreateModal = ({
     } else {
       setForm({
         code: '',
-        discountType: 'percentage',
+        applicability: 'orders',
+    discountType: 'percentage',
         discountValue: '',
         maxCap: '',
         applicability: 'all',
@@ -1310,10 +1312,10 @@ const Coupons = () => {
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [previewCoupon, setPreviewCoupon] = useState<any>(null);
   const [coupons, setCoupons] = useState([
-    { id: '1', code: 'WELCOME10', type: 'Percentage', value: '10%', status: 'Active', usage: '45/100', validFrom: '2026-03-01', validTo: '2026-03-31', maxCap: '500', minAmount: '1000', source: 'vendor' },
-    { id: '2', code: 'FLAT500', type: 'Flat Amount', value: '₹500', status: 'Paused', usage: '12/50', validFrom: '2026-03-20', validTo: '2026-04-15', minAmount: '2000', source: 'vendor' },
-    { id: '3', code: 'PLATFORM25', type: 'Percentage', value: '25%', status: 'Active', usage: '1050/5000', validFrom: '2026-01-01', validTo: '2026-12-31', maxCap: '1000', minAmount: '2000', source: 'platform' },
-    { id: '4', code: 'HOLIDAY15', type: 'Percentage', value: '15%', status: 'Active', usage: '800/∞', validFrom: '2026-03-15', validTo: '2026-04-30', maxCap: '750', minAmount: '1500', source: 'platform' },
+    { id: '1', code: 'WELCOME10', type: 'Percentage', value: '10%', status: 'Active', usage: '45/100', validFrom: '2026-03-01', validTo: '2026-03-31', maxCap: '500', minAmount: '1000', source: 'vendor', applicability: 'orders' },
+    { id: '2', code: 'FLAT500', type: 'Flat Amount', value: '₹500', status: 'Paused', usage: '12/50', validFrom: '2026-03-20', validTo: '2026-04-15', minAmount: '2000', source: 'vendor', applicability: 'orders' },
+    { id: '3', code: 'PLATFORM25', type: 'Percentage', value: '25%', status: 'Active', usage: '1050/5000', validFrom: '2026-01-01', validTo: '2026-12-31', maxCap: '1000', minAmount: '2000', source: 'platform', applicability: 'subscription' },
+    { id: '4', code: 'HOLIDAY15', type: 'Percentage', value: '15%', status: 'Active', usage: '800/∞', validFrom: '2026-03-15', validTo: '2026-04-30', maxCap: '750', minAmount: '1500', source: 'platform', applicability: 'orders' },
   ]);
 
   const renderValidity = (validFrom: string, validTo: string) => {
@@ -1405,7 +1407,8 @@ const Coupons = () => {
         validTo: formData.validTo,
         maxCap: formData.maxCap,
         minAmount: formData.minAmount,
-        source: 'vendor'
+        source: 'vendor',
+        applicability: formData.applicability || 'orders'
       };
       setCoupons(prev => [newCoupon, ...prev]);
     }
@@ -1467,7 +1470,15 @@ const Coupons = () => {
             {(coupons as any[]).filter(c => c.source === activeTab).map(coupon => (
               <tr key={coupon.id}>
                 <td className="coupon-code-cell">
-                  <code>{coupon.code}</code>
+                  <div className="code-pill-wrapper-v7">
+                    <code>{coupon.code}</code>
+                    {/* Only show 'Orders' badge in Platform Coupons, but show 'Subscription' badge everywhere */}
+                    {(coupon.applicability === 'subscription' || (activeTab === 'platform' && coupon.applicability === 'orders')) && (
+                      <span className={`applicability-badge-v7 ${coupon.applicability || 'orders'}`}>
+                        {coupon.applicability === 'subscription' ? 'Subscription' : 'Orders'}
+                      </span>
+                    )}
+                  </div>
                 </td>
                 <td>{coupon.type}</td>
                 <td>{coupon.value}</td>
