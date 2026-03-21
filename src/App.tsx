@@ -1233,24 +1233,59 @@ const Coupons = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingCoupon, setEditingCoupon] = useState<any>(null);
   const [coupons, setCoupons] = useState([
-    { id: '1', code: 'WELCOME10', type: 'Percentage', value: '10%', status: 'Active', usage: '45/100', validTo: '2026-03-31', maxCap: '500', minAmount: '1000' },
-    { id: '2', code: 'FLAT500', type: 'Flat Amount', value: '₹500', status: 'Paused', usage: '12/50', validTo: '2026-04-15', minAmount: '2000' },
+    { id: '1', code: 'WELCOME10', type: 'Percentage', value: '10%', status: 'Active', usage: '45/100', validFrom: '2026-03-01', validTo: '2026-03-31', maxCap: '500', minAmount: '1000' },
+    { id: '2', code: 'FLAT500', type: 'Flat Amount', value: '₹500', status: 'Paused', usage: '12/50', validFrom: '2026-03-20', validTo: '2026-04-15', minAmount: '2000' },
+    { id: '3', code: 'PROMO20', type: 'Percentage', value: '20%', status: 'Active', usage: '5/100', validFrom: '2026-03-10', validTo: '2026-04-22', maxCap: '1000', minAmount: '5000' }
   ]);
 
-  const getDaysRemaining = (dateStr: string) => {
-    if (!dateStr) return 'No expiry';
-    const expiry = new Date(dateStr);
+  const renderValidity = (validFrom: string, validTo: string) => {
+    if (!validTo) return <div>No expiry</div>;
+    
+    const start = new Date(validFrom || new Date());
+    const expiry = new Date(validTo);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const diffTime = expiry.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-    const formattedDate = new Date(dateStr).toLocaleDateString('en-GB', {
-      day: '2-digit', month: 'short', year: 'numeric'
-    });
+    const timeToExpiry = expiry.getTime() - today.getTime();
+    const daysToExpiry = Math.ceil(timeToExpiry / (1000 * 60 * 60 * 24));
 
-    if (diffDays < 0) return `Expired on ${formattedDate}`;
-    return `Till ${formattedDate} (${diffDays} days left)`;
+    const timeToStart = start.getTime() - today.getTime();
+    const daysToStart = Math.ceil(timeToStart / (1000 * 60 * 60 * 24));
+
+    const formatDate = (date: Date) => {
+      return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+    };
+
+    let statusText = '';
+    let statusClass = '';
+
+    if (daysToStart > 0) {
+      statusText = `Starts in ${daysToStart} days`;
+      statusClass = 'status-pending';
+    } else if (daysToExpiry < 0) {
+      statusText = 'Expired';
+      statusClass = 'status-expired';
+    } else if (daysToExpiry === 0) {
+      statusText = 'Expires today';
+      statusClass = 'status-warning';
+    } else if (daysToExpiry <= 3) {
+      statusText = `${daysToExpiry} days left`;
+      statusClass = 'status-warning';
+    } else {
+      statusText = `${daysToExpiry} days left`;
+      statusClass = 'status-neutral';
+    }
+
+    return (
+      <div className="validity-cell-v5">
+        <div className="date-range-v5">
+          {formatDate(start)} → {formatDate(expiry)}
+        </div>
+        <div className={`status-label-v5 ${statusClass}`}>
+          {statusText}
+        </div>
+      </div>
+    );
   };
 
   const toggleStatus = (id: string) => {
@@ -1329,7 +1364,7 @@ const Coupons = () => {
                 <td className="coupon-code-cell"><code>{coupon.code}</code></td>
                 <td>{coupon.type}</td>
                 <td>{coupon.value}</td>
-                <td style={{ minWidth: '180px' }}>{getDaysRemaining((coupon as any).validTo)}</td>
+                <td className="validity-container-cell-v5">{renderValidity(coupon.validFrom, coupon.validTo)}</td>
                 <td>{coupon.usage}</td>
                 <td><span className={`status-tag-v4 ${coupon.status.toLowerCase()}`}>{coupon.status}</span></td>
                 <td className="actions-cell-v4">
