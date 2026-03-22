@@ -928,7 +928,7 @@ const CouponCreateModal = ({
     }));
   };
 
-  const isFormValid = !!(form.code && form.discountValue && (form.applicability === 'all' || form.selectedTargets.length > 0));
+  const isFormValid = !!(form.code && form.discountValue && (form.scope === 'all' || form.selectedTargets.length > 0));
 
   if (!isOpen) return null;
 
@@ -1215,7 +1215,7 @@ const CouponCreateModal = ({
                     <div className="detail-item full-width">
                       <div className="detail-label">Applicability</div>
                       <div className="detail-value">
-                        {form.applicability === 'all' ? 'All Categories' : (form.selectedTargets.length > 0 ? form.selectedTargets.join(', ') : 'Not selected')}
+                        {form.scope === 'all' ? 'All Categories' : (form.selectedTargets.length > 0 ? form.selectedTargets.join(', ') : 'Not selected')}
                       </div>
                     </div>
                   </div>
@@ -4517,11 +4517,13 @@ const BookingDetailModal = ({
     }
   };
 
-  const nextAction = {
+  const nextActionsMap: Record<string, { label: string; next: string }> = {
     'Pending': { label: 'Accept Booking', next: 'Confirmed' },
     'Confirmed': { label: 'Start Preparing', next: 'Preparing' },
     'Preparing': { label: 'Mark Completed', next: 'Completed' }
-  }[booking.status as keyof typeof nextAction];
+  };
+
+  const nextAction = nextActionsMap[booking.status];
 
   const [showMenuDetail, setShowMenuDetail] = useState(false);
 
