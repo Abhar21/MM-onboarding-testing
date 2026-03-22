@@ -12187,3 +12187,557 @@ input:checked + .slider-v4:before {
   background: #e2e8f0;
   color: #0f172a;
 }
+
+/* Reports Section V13 */
+.reports-container-v13 {
+  padding: 1rem;
+}
+
+.reports-header-v13 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.reports-title-v13 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+.reports-tabs-v13 {
+  display: flex;
+  gap: 2rem;
+  border-bottom: 1px solid #e2e8f0;
+  width: 100%;
+}
+
+.report-tab-btn-v13 {
+  padding: 0.75rem 0.5rem;
+  border: none;
+  background: transparent;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -1px;
+}
+
+.report-tab-btn-v13:hover {
+  color: #1e293b;
+}
+
+.report-tab-btn-v13.active {
+  color: #0077ff;
+  border-bottom-color: #0077ff;
+}
+
+.report-stats-grid-v13 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.report-stat-card-v13 {
+  background: #ffffff;
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+}
+
+.report-stat-card-v13 label {
+  display: block;
+  font-size: 0.875rem;
+  color: #64748b;
+  margin-bottom: 0.5rem;
+}
+
+.report-stat-card-v13 h3 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 0.5rem 0;
+}
+
+.trend {
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+.trend.positive {
+  color: #10b981;
+}
+
+.report-chart-placeholder-v13 {
+  background: #f8fafc;
+  border: 2px dashed #e2e8f0;
+  border-radius: 16px;
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8;
+}
+
+.status-indicator-v13 {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  margin-bottom: 0.5rem;
+}
+
+.status-indicator-v13.verified {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.report-table-container-v13 {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+}
+
+.report-table-v13 {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.report-table-v13 th {
+  background: #f8fafc;
+  padding: 1rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #64748b;
+  font-weight: 700;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.report-table-v13 td {
+  padding: 1.25rem 1rem;
+  font-size: 0.875rem;
+  color: #1e293b;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.badge-v13 {
+  padding: 0.25rem 0.625rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.badge-v13.success {
+  background: #ecfdf5;
+  color: #059669;
+}
+
+.download-link {
+  background: none;
+  border: none;
+  color: #0077ff;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  font-size: 0.875rem;
+}
+
+.download-link:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 640px) {
+  .reports-header-v13 {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* TDS Reports V14 */
+.tds-report-v14 {
+  padding: 0.5rem;
+}
+
+.tds-section-header-v14 {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+  gap: 1.5rem;
+}
+
+.tds-header-title-group h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 0.25rem 0;
+}
+
+.tds-header-title-group p {
+  color: #64748b;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.tds-header-filters-v14 {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.tds-filter-select-v14 {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  color: #1e293b;
+  background-color: #ffffff;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.tds-summary-grid-v14 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.tds-summary-card-v14 {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.tds-card-icon-v14 {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.tds-card-icon-v14.payout {
+  background: #eff6ff;
+  color: #3b82f6;
+  font-weight: 700;
+}
+
+.tds-card-icon-v14.tax {
+  background: #fef2f2;
+  color: #ef4444;
+}
+
+.tds-card-info-v14 label {
+  display: block;
+  font-size: 0.875rem;
+  color: #64748b;
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+}
+
+.tds-value-group-v14 {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.tds-main-value-v14 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.tds-helper-v14 {
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.tds-sub-helper-v14 {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  margin: 0.25rem 0 0 0;
+}
+
+.tds-main-grid-v14 {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.tds-card-v14 {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  height: 100%;
+}
+
+.tds-card-header-v14 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.tds-card-header-v14 h4 {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.tds-status-badge-v14 {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.tds-status-badge-v14.filed {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.tds-info-groups-v14 {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.tds-info-group-v14 {
+  display: flex;
+  gap: 2rem;
+}
+
+.tds-info-item-v14 label {
+  display: block;
+  font-size: 0.75rem;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.tds-info-item-v14 span {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.tds-timeline-box-v14 {
+  display: flex;
+  background: #f8fafc;
+  padding: 1.25rem;
+  border-radius: 10px;
+  gap: 3rem;
+  border: 1px solid #f1f5f9;
+}
+
+.tds-timeline-item-v14 {
+  display: flex;
+  flex-direction: column;
+}
+
+.tds-timeline-item-v14 label {
+  display: block;
+  font-size: 0.75rem;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.tds-timeline-item-v14 span {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.tds-upcoming-v14 {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: #fffbeb;
+  border: 1px solid #fef3c7;
+  border-radius: 10px;
+  color: #92400e;
+  font-size: 0.875rem;
+}
+
+.tds-upcoming-v14 strong {
+  font-weight: 700;
+}
+
+.tds-trust-footer-v14 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+.tds-trust-footer-v14 p {
+  font-size: 0.8125rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.tds-trust-footer-v14 strong {
+  color: #1e293b;
+}
+
+.tds-text-btn-v14 {
+  background: none;
+  border: none;
+  color: #0077ff;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  padding: 0;
+}
+
+.tds-text-btn-v14:hover {
+  text-decoration: underline;
+}
+
+.certificate-card-v14 {
+  display: flex;
+  flex-direction: column;
+}
+
+.tds-cert-icon-v14 {
+  font-size: 1.5rem;
+}
+
+.tds-cert-desc-v14 {
+  font-size: 0.875rem;
+  color: #64748b;
+  line-height: 1.5;
+  margin: 0 0 1.5rem 0;
+}
+
+.tds-cert-details-v14 {
+  background: #f8fafc;
+  padding: 1.25rem;
+  border-radius: 10px;
+  margin-bottom: 2rem;
+  flex-grow: 1;
+}
+
+.tds-cert-item-v14 {
+  margin-bottom: 1rem;
+}
+
+.tds-cert-item-v14 label {
+  display: block;
+  font-size: 0.75rem;
+  color: #64748b;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.tds-cert-item-v14 span {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.tds-cert-note-v14 {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  margin: 0;
+  font-style: italic;
+}
+
+.tds-download-btn-v14 {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.875rem;
+  background: #0077ff;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tds-download-btn-v14:hover {
+  background: #0066dd;
+  box-shadow: 0 4px 12px rgba(0, 119, 255, 0.2);
+}
+
+.tds-footer-v14 {
+  display: flex;
+  justify-content: flex-end;
+  font-size: 0.75rem;
+  color: #94a3b8;
+  margin-top: 1rem;
+}
+
+@media (max-width: 1024px) {
+  .tds-main-grid-v14 {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .tds-section-header-v14 {
+    flex-direction: column;
+  }
+  .tds-header-filters-v14 {
+    width: 100%;
+  }
+  .tds-filter-select-v14 {
+    flex: 1;
+  }
+  .tds-timeline-box-v14 {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .tds-info-group-v14 {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
+
+.tds-timeline-item-v14.highlighted label {
+  color: #f43f5e;
+}
+
+.tds-timeline-item-v14.highlighted span {
+  color: #e11d48;
+}

@@ -4699,6 +4699,241 @@ const BookingDetailModal = ({
   );
 };
 
+const Reports = () => {
+  const [activeReportTab, setActiveReportTab] = useState('Revenue');
+
+  const tabs = ['Revenue', 'GST', 'TDS'];
+
+  return (
+    <div className="reports-container-v13">
+      <div className="reports-header-v13">
+        <h2 className="reports-title-v13">Reports & Analytics</h2>
+        <div className="reports-tabs-v13">
+          {tabs.map(tab => (
+            <button
+              key={tab}
+              className={`report-tab-btn-v13 ${activeReportTab === tab ? 'active' : ''}`}
+              onClick={() => setActiveReportTab(tab)}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="report-content-v13">
+        {activeReportTab === 'Revenue' && (
+          <div className="revenue-report-v13">
+            <div className="report-stats-grid-v13">
+              <div className="report-stat-card-v13">
+                <label>Total Earnings</label>
+                <h3>₹4,25,000</h3>
+                <span className="trend positive">↑ 12% vs last month</span>
+              </div>
+              <div className="report-stat-card-v13">
+                <label>Pending Payouts</label>
+                <h3>₹95,000</h3>
+                <span className="trend">Next payout: 24 Mar</span>
+              </div>
+              <div className="report-stat-card-v13">
+                <label>Completed Bookings</label>
+                <h3>28</h3>
+                <span className="trend positive">↑ 4 this month</span>
+              </div>
+            </div>
+            
+            <div className="report-chart-placeholder-v13">
+              <div className="placeholder-text">Earnings Chart (Weekly/Monthly view)</div>
+            </div>
+          </div>
+        )}
+
+        {activeReportTab === 'GST' && (
+          <div className="gst-report-v13">
+            <div className="report-stats-grid-v13">
+              <div className="report-stat-card-v13">
+                <label>Taxable Amount</label>
+                <h3>₹3,60,169</h3>
+                <p>Current Quarter</p>
+              </div>
+              <div className="report-stat-card-v13">
+                <label>Output GST (18%)</label>
+                <h3>₹64,831</h3>
+                <p>To be reconciled</p>
+              </div>
+              <div className="report-stat-card-v13">
+                <label>Filing Status</label>
+                <div className="status-indicator-v13 verified">Up to Date</div>
+                <p>Last filed: Feb 2026</p>
+              </div>
+            </div>
+
+            <div className="report-table-container-v13">
+              <table className="report-table-v13">
+                <thead>
+                  <tr>
+                    <th>Month</th>
+                    <th>Taxable Value</th>
+                    <th>GST Amount</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>February 2026</td>
+                    <td>₹1,25,000</td>
+                    <td>₹22,500</td>
+                    <td><span className="badge-v13 success">Filed</span></td>
+                    <td><button className="download-link">Download GSTR-1</button></td>
+                  </tr>
+                  <tr>
+                    <td>January 2026</td>
+                    <td>₹1,10,000</td>
+                    <td>₹19,800</td>
+                    <td><span className="badge-v13 success">Filed</span></td>
+                    <td><button className="download-link">Download GSTR-1</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {activeReportTab === 'TDS' && (
+          <div className="tds-report-v14">
+            <div className="tds-section-header-v14">
+              <div className="tds-header-title-group">
+                <h3>TDS Compliance Dashboard</h3>
+                <p>Track your Tax Deducted at Source (TDS) and download certificates.</p>
+              </div>
+              <div className="tds-header-filters-v14">
+                <select className="tds-filter-select-v14">
+                  <option>FY 2025-26</option>
+                  <option>FY 2024-25</option>
+                </select>
+                <select className="tds-filter-select-v14">
+                  <option>Quarter 3 (Oct-Dec)</option>
+                  <option>Quarter 2 (Jul-Sep)</option>
+                  <option>Quarter 1 (Apr-Jun)</option>
+                  <option>Quarter 4 (Jan-Mar)</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="tds-summary-grid-v14">
+              <div className="tds-summary-card-v14">
+                <div className="tds-card-icon-v14 payout">₹</div>
+                <div className="tds-card-info-v14">
+                  <label>Total Net Payout</label>
+                  <div className="tds-value-group-v14">
+                    <span className="tds-main-value-v14">₹1,01,500</span>
+                    <span className="tds-helper-v14">(after TDS deduction)</span>
+                  </div>
+                </div>
+              </div>
+              <div className="tds-summary-card-v14">
+                <div className="tds-card-icon-v14 tax">🧾</div>
+                <div className="tds-card-info-v14">
+                  <label>Total TDS Deducted</label>
+                  <div className="tds-value-group-v14">
+                    <span className="tds-main-value-v14">₹2,900</span>
+                  </div>
+                  <p className="tds-sub-helper-v14">Deposited with Income Tax Department</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="tds-main-grid-v14">
+              <div className="tds-status-section-v14">
+                <div className="tds-card-v14">
+                  <div className="tds-card-header-v14">
+                    <h4>TDS Return Status</h4>
+                    <span className="tds-status-badge-v14 filed">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                      </svg>
+                      Filed
+                    </span>
+                  </div>
+                  
+                  <div className="tds-info-groups-v14">
+                    <div className="tds-info-group-v14">
+                      <div className="tds-info-item-v14">
+                        <label>Return Type</label>
+                        <span>Form 26Q</span>
+                      </div>
+                      <div className="tds-info-item-v14">
+                        <label>Filing Period</label>
+                        <span>Q3 FY 2025-26</span>
+                      </div>
+                    </div>
+                    
+                    <div className="tds-timeline-box-v14">
+                      <div className="tds-timeline-item-v14">
+                        <label>Filed On</label>
+                        <span>January 10, 2026</span>
+                      </div>
+                      <div className="tds-timeline-item-v14 highlighted">
+                        <label>Due Date</label>
+                        <span>January 15, 2026</span>
+                      </div>
+                    </div>
+
+                    <div className="tds-upcoming-v14">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                      </svg>
+                      <span><strong>Next Filing:</strong> Q4 (Due on April 30, 2026)</span>
+                    </div>
+
+                    <div className="tds-trust-footer-v14">
+                      <p>Filed by <strong>myMOOMENT</strong> with the Income Tax Department</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="tds-certificate-section-v14">
+                <div className="tds-card-v14 certificate-card-v14">
+                  <div className="tds-card-header-v14">
+                    <h4>Your TDS Certificate (Form 16A)</h4>
+                    <div className="tds-cert-icon-v14">📄</div>
+                  </div>
+                  <p className="tds-cert-desc-v14">Use this certificate while filing your income tax return (ITR).</p>
+                  
+                  <div className="tds-cert-details-v14">
+                    <div className="tds-cert-item-v14">
+                      <label>Issued on</label>
+                      <span>15 Nov 2025</span>
+                    </div>
+                    <p className="tds-cert-note-v14">Includes all TDS deducted for selected period</p>
+                  </div>
+
+                  <button className="tds-download-btn-v14">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="7 10 12 15 17 10"></polyline>
+                      <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Download Form 16A
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="tds-footer-v14">
+              <span>Last updated: Mar 20, 2026</span>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
 const Bookings = () => {
   const [bookings, setBookings] = useState([
     {
@@ -5257,14 +5492,6 @@ const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
           )
         },
         {
-          id: 'revenue', label: 'Revenue', icon: (
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="12" y1="1" x2="12" y2="23"></line>
-              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-            </svg>
-          )
-        },
-        {
           id: 'reports', label: 'Reports', icon: (
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <line x1="18" y1="20" x2="18" y2="10"></line>
@@ -5423,7 +5650,8 @@ const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
           )}
           {activeTab === 'coupons' && <Coupons />}
           {activeTab === 'bookings' && <Bookings />}
-          {!['dashboard', 'tickets', 'documents', 'service-settings', 'profile', 'settings', 'ratings', 'coupons', 'bookings'].includes(activeTab) && (
+          {activeTab === 'reports' && <Reports />}
+          {!['dashboard', 'tickets', 'documents', 'service-settings', 'profile', 'settings', 'ratings', 'coupons', 'bookings', 'reports'].includes(activeTab) && (
             <div className="placeholder-screen">
               <h2>{activeTab.charAt(0).toUpperCase() + activeTab.slice(1).replace('-', ' ')}</h2>
               <p>This screen is coming soon.</p>
