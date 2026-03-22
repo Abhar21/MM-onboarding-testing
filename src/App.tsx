@@ -862,7 +862,8 @@ const CouponCreateModal = ({
     discountType: 'percentage', // percentage | flat
     discountValue: '',
     maxCap: '',
-    applicability: 'all', // all | specific | subscription
+    scope: 'all', // all | specific (formerly applicability)
+    context: 'orders', // orders | subscription
     selectedTargets: [] as string[],
     minAmount: '',
     totalLimit: '',
@@ -877,12 +878,12 @@ const CouponCreateModal = ({
     if (initialData) {
       setForm({
         code: initialData.code || '',
-        applicability: initialData.applicability || 'orders',
+        context: initialData.applicability || 'orders',
         discountType: initialData.type === 'Percentage' ? 'percentage' : 'flat',
         discountValue: initialData.value ? initialData.value.replace(/[^\d.]/g, '') : '',
         maxCap: initialData.maxCap || '',
-        applicability: initialData.applicability || 'all',
-        selectedTargets: initialData.selectedTargets || (initialData.applicability === 'all' ? ['Breakfast', 'Lunch', 'Snacks', 'Dinner'] : []),
+        scope: initialData.scope || 'all',
+        selectedTargets: initialData.selectedTargets || (initialData.scope === 'all' ? ['Breakfast', 'Lunch', 'Snacks', 'Dinner'] : []),
         minAmount: initialData.minAmount || '',
         totalLimit: initialData.totalLimit || '',
         isUnlimited: initialData.isUnlimited || (initialData.usage && initialData.usage.includes('∞')),
@@ -894,11 +895,11 @@ const CouponCreateModal = ({
     } else {
       setForm({
         code: '',
-        applicability: 'orders',
-    discountType: 'percentage',
+        context: 'orders',
+        discountType: 'percentage',
         discountValue: '',
         maxCap: '',
-        applicability: 'all',
+        scope: 'all',
         selectedTargets: [],
         minAmount: '',
         totalLimit: '',
@@ -955,7 +956,7 @@ const CouponCreateModal = ({
                     {initialData && (
                       <div className="coupon-status-toggle-wrapper-v4">
                         <span className="status-label-v4">Status:</span>
-                        <button 
+                        <button
                           className={`coupon-status-toggle-v4 ${form.status === 'Active' ? 'active' : 'paused'}`}
                           onClick={() => setForm({ ...form, status: form.status === 'Active' ? 'Paused' : 'Active' })}
                         >
@@ -1098,15 +1099,15 @@ const CouponCreateModal = ({
                 <div className="form-section-v4">
                   <h3 className="card-heading-v4">Applicability</h3>
                   <div className="radio-group-v4">
-                    <label className={`radio-item-v4 ${form.applicability === 'all' ? 'active' : ''}`}>
-                      <input type="radio" name="app" checked={form.applicability === 'all'} onChange={() => setForm({ ...form, applicability: 'all', selectedTargets: ['Breakfast', 'Lunch', 'Snacks', 'Dinner'] })} />
+                    <label className={`radio-item-v4 ${form.scope === 'all' ? 'active' : ''}`}>
+                      <input type="radio" name="app" checked={form.scope === 'all'} onChange={() => setForm({ ...form, scope: 'all', selectedTargets: ['Breakfast', 'Lunch', 'Snacks', 'Dinner'] })} />
                       <div className="radio-content-v4">
                         <strong>All Categories</strong>
                         <span>Valid across your entire menu and offerings</span>
                       </div>
                     </label>
-                    <label className={`radio-item-v4 ${form.applicability === 'specific' ? 'active' : ''}`}>
-                      <input type="radio" name="app" checked={form.applicability === 'specific'} onChange={() => setForm({ ...form, applicability: 'specific', selectedTargets: [] })} />
+                    <label className={`radio-item-v4 ${form.scope === 'specific' ? 'active' : ''}`}>
+                      <input type="radio" name="app" checked={form.scope === 'specific'} onChange={() => setForm({ ...form, scope: 'specific', selectedTargets: [] })} />
                       <div className="radio-content-v4">
                         <strong>Specific Categories</strong>
                         <span>Target specific menu categories</span>
@@ -1114,14 +1115,14 @@ const CouponCreateModal = ({
                     </label>
                   </div>
 
-                  {(form.applicability === 'all' || form.applicability === 'specific') && (
+                  {(form.scope === 'all' || form.scope === 'specific') && (
                     <div className="chip-container-v4">
                       {['Breakfast', 'Lunch', 'Snacks', 'Dinner'].map(cat => (
                         <button
                           key={cat}
                           className={`nav-chip-v4 ${form.selectedTargets.includes(cat) ? 'active' : ''}`}
-                          onClick={() => form.applicability === 'specific' && toggleTarget(cat)}
-                          style={{ cursor: form.applicability === 'all' ? 'default' : 'pointer' }}
+                          onClick={() => form.scope === 'specific' && toggleTarget(cat)}
+                          style={{ cursor: form.scope === 'all' ? 'default' : 'pointer' }}
                         >
                           {cat}
                         </button>
@@ -1129,7 +1130,7 @@ const CouponCreateModal = ({
                     </div>
                   )}
                   <p className="helper-text-v4" style={{ marginTop: '0.75rem', paddingLeft: '0.25rem' }}>
-                    Coupon will be applicable to all Menu's inside these {form.applicability === 'all' ? 'services' : 'selected categories'}
+                    Coupon will be applicable to all Menu's inside these {form.scope === 'all' ? 'services' : 'selected categories'}
                   </p>
                 </div>
 
@@ -1249,7 +1250,7 @@ const CouponPreviewModal = ({ isOpen, onClose, couponData }: { isOpen: boolean, 
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
           </button>
         </div>
-        
+
         <div className="modal-body-v4 center-preview-v6">
           <div className="realtime-preview-card-v4 vendor-view hybrid">
             <div className="preview-curve-v4 left"></div>
@@ -1285,12 +1286,12 @@ const CouponPreviewModal = ({ isOpen, onClose, couponData }: { isOpen: boolean, 
                   </div>
                 </>
               )}
-              
+
               <div className="detail-item full-width">
                 <div className="detail-label">Applicability</div>
                 <div className="detail-value">
-                  {couponData.applicability === 'subscription' 
-                    ? 'Starter, Growth & Savings plans' 
+                  {couponData.applicability === 'subscription'
+                    ? 'Starter, Growth & Savings plans'
                     : 'All Menu Categories'}
                 </div>
               </div>
@@ -1330,7 +1331,7 @@ const Coupons = () => {
 
   const renderValidity = (validFrom: string, validTo: string) => {
     if (!validTo) return <div>No expiry</div>;
-    
+
     const start = new Date(validFrom || new Date());
     const expiry = new Date(validTo);
     const today = new Date();
@@ -1430,14 +1431,14 @@ const Coupons = () => {
     <div className="coupons-container-v6">
       <h1 className="page-main-title-v6">Coupons Hub</h1>
       <div className="coupons-tabs-v6">
-        <button 
+        <button
           className={`tab-btn-v6 ${activeTab === 'vendor' ? 'active' : ''}`}
           onClick={() => setActiveTab('vendor')}
         >
           My Coupons
           <span className="count-badge-v6">{(coupons as any[]).filter(c => c.source === 'vendor').length}</span>
         </button>
-        <button 
+        <button
           className={`tab-btn-v6 ${activeTab === 'platform' ? 'active' : ''}`}
           onClick={() => setActiveTab('platform')}
         >
@@ -1450,8 +1451,8 @@ const Coupons = () => {
         <div className="header-left">
           <h2 className="section-title">{activeTab === 'vendor' ? 'My Coupons' : 'Platform Coupons'}</h2>
           <p className="section-subtitle">
-            {activeTab === 'vendor' 
-              ? 'Manage your store-specific promotional offers.' 
+            {activeTab === 'vendor'
+              ? 'Manage your store-specific promotional offers.'
               : 'View system-wide rewards and discount campaigns available to your store.'}
           </p>
         </div>
@@ -1534,7 +1535,7 @@ const Coupons = () => {
         initialData={editingCoupon}
       />
 
-      <CouponPreviewModal 
+      <CouponPreviewModal
         isOpen={showPreviewModal}
         onClose={() => setShowPreviewModal(false)}
         couponData={previewCoupon}
@@ -4490,6 +4491,663 @@ const Ratings = () => {
 };
 
 
+/* ─────────────────── BOOKINGS MANAGEMENT ─────────────────── */
+
+const BookingDetailModal = ({
+  isOpen,
+  onClose,
+  booking,
+  onUpdateStatus
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  booking: any;
+  onUpdateStatus: (id: string, newStatus: string) => void;
+}) => {
+  if (!isOpen || !booking) return null;
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'Pending': return '#f59e0b';
+      case 'Confirmed': return '#3b82f6';
+      case 'Preparing': return '#8b5cf6';
+      case 'Completed': return '#10b981';
+      case 'Cancelled': return '#ef4444';
+      default: return '#64748b';
+    }
+  };
+
+  const nextAction = {
+    'Pending': { label: 'Accept Booking', next: 'Confirmed' },
+    'Confirmed': { label: 'Start Preparing', next: 'Preparing' },
+    'Preparing': { label: 'Mark Completed', next: 'Completed' }
+  }[booking.status as keyof typeof nextAction];
+
+  const [showMenuDetail, setShowMenuDetail] = useState(false);
+
+  return (
+    <div className="modal-overlay-v4" onClick={onClose} style={{ zIndex: 10000 }}>
+      <div className="booking-detail-modal-v7" onClick={e => e.stopPropagation()}>
+        <div className="detail-modal-header-v7">
+          <div className="header-left-v7">
+            <span className="booking-id-tag-v7">{booking.id}</span>
+            <div className="status-badge-v7" style={{ backgroundColor: getStatusColor(booking.status) + '15', color: getStatusColor(booking.status) }}>
+              <span className="dot" style={{ backgroundColor: getStatusColor(booking.status) }}></span>
+              {booking.status}
+            </div>
+          </div>
+          <button className="close-btn-v7" onClick={onClose}>&times;</button>
+        </div>
+
+        <div className="detail-modal-body-v7">
+          <div className="detail-section-v7">
+            <h4 className="section-title-v7">Customer Information</h4>
+            <div className="info-grid-v7">
+              <div className="info-item-v7">
+                <label>Name</label>
+                <span>{booking.customer}</span>
+              </div>
+              <div className="info-item-v7">
+                <label>Phone</label>
+                <span>{booking.phone || '+91 91234 56789'}</span>
+              </div>
+              <div className="info-item-v7">
+                <label>Email</label>
+                <span>{booking.email || 'customer@example.com'}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="detail-section-v7">
+            <h4 className="section-title-v7">Event Details</h4>
+            <div className="info-grid-v7">
+              <div className="info-item-v7">
+                <label>Event Date</label>
+                <span>{new Date(booking.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+              </div>
+              <div className="info-item-v7">
+                <label>Category</label>
+                <span>{booking.serviceCategory}</span>
+              </div>
+              <div className={`info-item-v7 menu-clickable-v11 ${showMenuDetail ? 'active' : ''}`} onClick={() => setShowMenuDetail(!showMenuDetail)}>
+                <label>Menu Name</label>
+                <div className="menu-name-wrapper-v11">
+                  <span>{booking.menuName}</span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="chevron-icon">
+                    <polyline points={showMenuDetail ? "18 15 12 9 6 15" : "6 9 12 15 18 9"}></polyline>
+                  </svg>
+                </div>
+              </div>
+              <div className="info-item-v7">
+                <label>Guest Count</label>
+                <span>{booking.guests} Guests</span>
+              </div>
+            </div>
+
+            {showMenuDetail && booking.menuSelection && (
+              <div className="menu-selection-breakdown-v11">
+                {booking.menuSelection.map((section: any, idx: number) => (
+                  <div key={idx} className="menu-section-card-v11">
+                    <div className="section-header-v11">
+                      <span className="section-name-v11">{section.name}</span>
+                      <span className={`section-type-badge-v11 ${section.type === 'All Items' ? 'all' : 'selected'}`}>
+                        {section.type === 'All Items' ? 'All Items Included' : 'Customer Selected'}
+                      </span>
+                    </div>
+                    <div className="section-items-grid-v11">
+                      {section.items.map((item: string, i: number) => (
+                        <span key={i} className="menu-item-pill-v11">{item}</span>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="detail-section-v7">
+            <h4 className="section-title-v7">Payment Summary</h4>
+            <div className="payment-card-v11">
+              <div className="payment-row-v11 main">
+                <label>Total Booking Value</label>
+                <span>₹{booking.amount.toLocaleString()}</span>
+              </div>
+              <div className="payment-divider-v11"></div>
+              <div className="payment-row-v11">
+                <label>Advance Received</label>
+                <span className="received-v11">₹{booking.paid.toLocaleString()}</span>
+              </div>
+              <div className="payment-row-v11">
+                <label>Pending Collection</label>
+                <span className="pending-v11">₹{(booking.amount - booking.paid).toLocaleString()}</span>
+              </div>
+              <div className="payment-divider-v11"></div>
+              <div className="payout-details-v11">
+                <div className="payout-row-small-v11">
+                  <label>Payout:</label>
+                  <span>₹{booking.paid.toLocaleString()}</span>
+                </div>
+                <div className="payout-row-small-v11">
+                  <label>Expected on:</label>
+                  <span>{(() => {
+                    const date = new Date(booking.date);
+                    date.setDate(date.getDate() + 2);
+                    return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+                  })()}</span>
+                </div>
+              </div>
+              <div className="collection-warning-v11">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                <span>Collect remaining amount on event day</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="detail-section-v7 docs-section-v12">
+            <h4 className="section-title-v7">Documents</h4>
+            <div className="documents-card-v12">
+              {['Upcoming', 'Preparing'].includes(booking.status) && (
+                <div className="document-item-v12">
+                  <div className="doc-info-v12">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    <span>Advance Receipt</span>
+                  </div>
+                  <button className="doc-action-v12" title="Download">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v2"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                  </button>
+                </div>
+              )}
+              {booking.status === 'Completed' && (
+                <div className="document-item-v12">
+                  <div className="doc-info-v12">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    <span>Booking Invoice</span>
+                  </div>
+                  <button className="doc-action-v12" title="Download">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v2"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                  </button>
+                </div>
+              )}
+              {booking.status === 'Cancelled' && (
+                <div className="document-item-v12">
+                  <div className="doc-info-v12">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    <span>Credit Note</span>
+                  </div>
+                  <button className="doc-action-v12" title="Download">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v2"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                  </button>
+                </div>
+              )}
+          </div>
+        </div>
+      </div>
+
+      <div className="detail-modal-footer-v7">
+          {booking.status === 'Pending' && (
+            <button className="btn-secondary-v7 reject" onClick={() => onUpdateStatus(booking.id, 'Cancelled')}>Reject</button>
+          )}
+          {booking.status !== 'Completed' && booking.status !== 'Cancelled' && booking.status !== 'Pending' && (
+            <button className="btn-outline-v7 cancel" onClick={() => onUpdateStatus(booking.id, 'Cancelled')}>Cancel Booking</button>
+          )}
+          {nextAction && (
+            <button className="btn-primary-v7" onClick={() => onUpdateStatus(booking.id, nextAction.next)}>{nextAction.label}</button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const Bookings = () => {
+  const [bookings, setBookings] = useState([
+    {
+      id: 'BK-12401',
+      customer: 'Amit Khurana',
+      date: new Date().toISOString().split('T')[0], // Today
+      time: '12:30 PM',
+      type: 'Wedding Catering',
+      serviceCategory: 'Lunch',
+      menuName: 'Premium Sadhya Menu',
+      guests: 200,
+      amount: 145000,
+      paid: 50000,
+      status: 'Preparing',
+      menuSelection: [
+        { name: 'Starters', type: 'Selected', items: ['Paneer Tikka', 'Hara Bhara Kabab'] },
+        { name: 'Main Course', type: 'All Items', items: ['Paneer Butter Masala', 'Dal Makhani', 'Veg Pulao', 'Butter Naan'] },
+        { name: 'Desserts', type: 'Selected', items: ['Gulab Jamun', 'Rasmalai'] }
+      ],
+      timeline: [
+        { status: 'Pending', time: '15 Mar, 09:00 AM' },
+        { status: 'Confirmed', time: '15 Mar, 02:30 PM' },
+        { status: 'Preparing', time: '20 Mar, 08:00 AM' }
+      ]
+    },
+    {
+      id: 'BK-12405',
+      customer: 'Siddharth Malhotra',
+      date: '2026-03-22', // Upcoming
+      time: '07:30 PM',
+      type: 'Corporate Gala',
+      serviceCategory: 'Dinner',
+      menuName: 'Executive Buffet',
+      guests: 150,
+      amount: 85000,
+      paid: 30000,
+      status: 'Upcoming',
+      menuSelection: [
+        { name: 'Dinner', type: 'Selected', items: ['Jeera Rice', 'Paneer Tikka', 'Butter Naan'] },
+        { name: 'Drinks', type: 'All Items', items: ['Butter Milk', 'Fresh Lime Soda'] }
+      ],
+      timeline: [
+        { status: 'Pending', time: '18 Mar, 11:15 AM' },
+        { status: 'Confirmed', time: '18 Mar, 05:00 PM' }
+      ]
+    },
+    {
+      id: 'BK-12398',
+      customer: 'Ananya Pandey',
+      date: '2026-03-20', // Yesterday
+      time: '04:30 PM',
+      type: 'Engagement Party',
+      serviceCategory: 'Snacks',
+      menuName: 'High Tea Special',
+      guests: 80,
+      amount: 45000,
+      paid: 45000,
+      status: 'Completed',
+      menuSelection: [
+        { name: 'Breakfast', type: 'All Items', items: ['Samosa', 'Chai', 'Sandwich'] }
+      ],
+      timeline: [
+        { status: 'Pending', time: '10 Mar, 10:00 AM' },
+        { status: 'Confirmed', time: '10 Mar, 12:00 PM' },
+        { status: 'Preparing', time: '19 Mar, 09:00 AM' },
+        { status: 'Completed', time: '20 Mar, 11:00 PM' }
+      ]
+    },
+    {
+      id: 'BK-12410',
+      customer: 'Varun Dhawan',
+      date: '2026-03-24',
+      time: '08:00 PM',
+      type: 'Private Dinner',
+      serviceCategory: 'Dinner',
+      menuName: 'Romantic Four-Course',
+      guests: 12,
+      amount: 15000,
+      paid: 0,
+      status: 'Upcoming',
+      menuSelection: [
+        { name: 'Dinner', type: 'Selected', items: ['Salad', 'Soup', 'Main Course'] }
+      ],
+      timeline: [
+        { status: 'Pending', time: '21 Mar, 08:30 AM' }
+      ]
+    },
+    {
+      id: 'BK-12412',
+      customer: 'Kareena Kapoor',
+      date: '2026-03-25',
+      time: '01:00 PM',
+      type: 'Baby Shower',
+      serviceCategory: 'Lunch',
+      menuName: 'Healthy Salads & Juice',
+      guests: 40,
+      amount: 35000,
+      paid: 10000,
+      status: 'Upcoming',
+      menuSelection: [
+        { name: 'Lunch', type: 'All Items', items: ['Healthy Salad', 'Fresh Juice'] }
+      ],
+      timeline: [
+        { status: 'Pending', time: '20 Mar, 04:00 PM' },
+        { status: 'Confirmed', time: '21 Mar, 10:00 AM' }
+      ]
+    },
+    {
+      id: 'BK-12415',
+      customer: 'Ranbir Kapoor',
+      date: '2026-03-26',
+      time: '09:00 PM',
+      type: 'Bachelors Party',
+      serviceCategory: 'Dinner',
+      menuName: 'Royal North Indian',
+      guests: 25,
+      amount: 60000,
+      paid: 20000,
+      status: 'Upcoming',
+      menuSelection: [
+        { name: 'Dinner', type: 'All Items', items: ['Naan', 'Butter Chicken', 'Dal Tadka'] }
+      ],
+      timeline: [
+        { status: 'Pending', time: '21 Mar, 11:00 AM' }
+      ]
+    }
+  ]);
+
+  const [filter, setFilter] = useState('All');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [dateRange, setDateRange] = useState({ from: '', to: '' });
+  const [rangeShortcut, setRangeShortcut] = useState('All');
+  const [selectedBooking, setSelectedBooking] = useState<any>(null);
+  const [showDetail, setShowDetail] = useState(false);
+  const [bookingsPage, setBookingsPage] = useState(1);
+  const bookingsPerPage = 5;
+
+  const handleShortcutChange = (shortcut: string) => {
+    setRangeShortcut(shortcut);
+    setBookingsPage(1);
+    const now = new Date();
+    if (shortcut === 'Today') {
+      const todayStr = now.toISOString().split('T')[0];
+      setDateRange({ from: todayStr, to: todayStr });
+    } else if (shortcut === 'This Month') {
+      const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+      const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
+      setDateRange({ from: firstDay, to: lastDay });
+    } else if (shortcut === 'Last Month') {
+      const firstDay = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString().split('T')[0];
+      const lastDay = new Date(now.getFullYear(), now.getMonth(), 0).toISOString().split('T')[0];
+      setDateRange({ from: firstDay, to: lastDay });
+    } else if (shortcut === 'All') {
+      setDateRange({ from: '', to: '' });
+    }
+  };
+
+  const today = new Date().toISOString().split('T')[0];
+  const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+
+  const stats = {
+    today: bookings.filter(b => b.date === today).length,
+    upcoming: bookings.filter(b => b.date > today && b.status !== 'Cancelled').length,
+    completed: bookings.filter(b => b.status === 'Completed' || (b.date === yesterday && b.status !== 'Cancelled')).length
+  };
+
+  const filteredBookings = bookings.filter(b => {
+    // 1. Search Filter
+    const matchesSearch = b.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      b.customer.toLowerCase().includes(searchTerm.toLowerCase());
+    if (!matchesSearch) return false;
+
+    // 2. Status Filter
+    let matchesStatus = true;
+    if (filter === 'Upcoming') matchesStatus = b.date > today && b.status !== 'Cancelled';
+    else if (filter === 'Preparing') matchesStatus = b.date === today && b.status !== 'Cancelled' && b.status !== 'Completed';
+    else if (filter === 'Completed') matchesStatus = b.status === 'Completed' || (b.date === yesterday && b.status !== 'Cancelled');
+    else if (filter === 'Cancelled') matchesStatus = b.status === 'Cancelled';
+
+    if (!matchesStatus) return false;
+
+    // 3. Date Range Filter
+    if (dateRange.from && b.date < dateRange.from) return false;
+    if (dateRange.to && b.date > dateRange.to) return false;
+
+    return true;
+  });
+
+  const totalBookingsPages = Math.ceil(filteredBookings.length / bookingsPerPage);
+  const paginatedBookings = filteredBookings.slice(
+    (bookingsPage - 1) * bookingsPerPage,
+    bookingsPage * bookingsPerPage
+  );
+  const bookingsStartEntry = filteredBookings.length > 0 ? (bookingsPage - 1) * bookingsPerPage + 1 : 0;
+  const bookingsEndEntry = Math.min(bookingsPage * bookingsPerPage, filteredBookings.length);
+
+  const handleUpdateStatus = (id: string, newStatus: string) => {
+    setBookings(prev => prev.map(b => {
+      if (b.id === id) {
+        const now = new Date();
+        const timeStr = `${now.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}, ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+        return {
+          ...b,
+          status: newStatus,
+          timeline: [...b.timeline, { status: newStatus, time: timeStr }]
+        };
+      }
+      return b;
+    }));
+    setShowDetail(false);
+  };
+
+  const getDaysBadge = (booking: any) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const eventDate = new Date(booking.date);
+    eventDate.setHours(0, 0, 0, 0);
+
+    const diffTime = eventDate.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 0) return <span className="urgent-badge-v7">TODAY</span>;
+    if (diffDays > 0 && booking.status === 'Upcoming') {
+      return <span className="upcoming-badge-v11">IN {diffDays} {diffDays === 1 ? 'DAY' : 'DAYS'}</span>;
+    }
+    return null;
+  };
+
+  const getStatusClass = (status: string) => status.toLowerCase();
+
+  return (
+    <div className="bookings-screen-v7">
+      <div className="page-header-v7">
+        <h1 className="page-title-v7">Bookings Management</h1>
+        <p className="page-sub-v7">Monitor and manage your upcoming events and operations</p>
+      </div>
+
+      <div className="summary-cards-v7">
+        <div className="summary-card-v7">
+          <div className="card-icon-v7 today">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+          </div>
+          <div className="card-info-v7">
+            <span className="label">Today's Events</span>
+            <span className="value">{stats.today}</span>
+          </div>
+        </div>
+        <div className="summary-card-v7">
+          <div className="card-icon-v7 upcoming">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path></svg>
+          </div>
+          <div className="card-info-v7">
+            <span className="label">Upcoming</span>
+            <span className="value">{stats.upcoming}</span>
+          </div>
+        </div>
+        <div className="summary-card-v7">
+          <div className="card-icon-v7 completed">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+          </div>
+          <div className="card-info-v7">
+            <span className="label">Total Completed</span>
+            <span className="value">{stats.completed}</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="content-container-v7">
+        <div className="search-filter-v8">
+          <div className="filter-header-v10">
+            <h2 className="table-title-v11">Bookings Table</h2>
+            <div className="top-right-filters-v11">
+              <div className="search-box-v8">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input 
+                  type="text" 
+                  placeholder="Search Booking ID or Customer name" 
+                  value={searchTerm}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    setBookingsPage(1);
+                  }}
+                />
+              </div>
+              <div className="filter-box-v8">
+                <select value={filter} onChange={(e) => {
+                  setFilter(e.target.value);
+                  setBookingsPage(1);
+                }}>
+                  <option value="All">All Bookings</option>
+                  <option value="Upcoming">Upcoming</option>
+                  <option value="Preparing">Preparing</option>
+                  <option value="Completed">Completed</option>
+                  <option value="Cancelled">Cancelled</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div className="secondary-filters-v11">
+            <div className="status-group-v11">
+              <h3 className="section-title-v10">Status</h3>
+              <div className="shortcut-pills-v9">
+                {['All', 'Today', 'This Month', 'Last Month'].map(s => (
+                  <button 
+                    key={s} 
+                    className={`shortcut-btn-v9 ${rangeShortcut === s ? 'active' : ''}`}
+                    onClick={() => handleShortcutChange(s)}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="date-picker-group-v9">
+              <div className="date-input-v9">
+                <label>From</label>
+                <input 
+                  type="date" 
+                  value={dateRange.from} 
+                  onChange={(e) => { setDateRange(prev => ({ ...prev, from: e.target.value })); setRangeShortcut('Custom'); setBookingsPage(1); }}
+                />
+              </div>
+              <div className="date-input-v9">
+                <label>To</label>
+                <input 
+                  type="date" 
+                  value={dateRange.to} 
+                  onChange={(e) => { setDateRange(prev => ({ ...prev, to: e.target.value })); setRangeShortcut('Custom'); setBookingsPage(1); }}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bookings-policy-notice-v11">
+          <div className="notice-icon-v11">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+          </div>
+          <div className="notice-text-v11">
+            <p><strong>Note:</strong> Collect balance amount directly from the customer after event completion or on event day. Invoice generated after balance amount successfully taken from the user. <strong>myMooment is not responsible for the balance amount.</strong></p>
+          </div>
+        </div>
+
+        <div className="table-responsive-v7">
+          <table className="bookings-table-v7">
+            <thead>
+              <tr>
+                <th>Booking ID</th>
+                <th>Customer</th>
+                <th>Event Date</th>
+                <th>Type</th>
+                <th>Advance Payout</th>
+                <th>Balance</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {paginatedBookings.map(b => (
+                <tr key={b.id}>
+                  <td>
+                    <span className="id-text-v7">{b.id}</span>
+                    {getDaysBadge(b)}
+                  </td>
+                  <td>
+                    <div className="customer-cell-v7">
+                      <span className="name">{b.customer}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div className="event-date-cell-v11">
+                      <span className="event-date-v11">{new Date(b.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</span>
+                      <span className="event-time-v11">{(b as any).time}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div className="booking-type-cell-v11">
+                      <span className="type-category-v11">{(b as any).serviceCategory}</span>
+                      <span className="type-menu-v11">{(b as any).menuName}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div className="amount-cell-v7">
+                      <span className="total">₹ {b.paid.toLocaleString()}</span>
+                      <span className="payout">Payout in {Math.ceil((new Date(b.date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) + 2}d</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div className="balance-cell-v11">
+                      <span className="balance-value-v11">₹ {(b.amount - b.paid).toLocaleString()}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span className={`status-pill-v7 ${getStatusClass(b.status)}`}>{b.status}</span>
+                  </td>
+                  <td>
+                    <button className="btn-view-v7" onClick={() => { setSelectedBooking(b); setShowDetail(true); }}>View Details</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="settings-pagination-v4">
+          <div className="pagination-info-v4">
+            Showing {bookingsStartEntry} to {bookingsEndEntry} of {filteredBookings.length} entries
+          </div>
+          <div className="pagination-controls-v4">
+            <button
+              className="pagination-btn-v4 prev-btn"
+              disabled={bookingsPage === 1}
+              onClick={() => setBookingsPage(p => Math.max(1, p - 1))}
+            >
+              Prev
+            </button>
+            {[...Array(totalBookingsPages)].map((_, i) => (
+              <button
+                key={i + 1}
+                className={`pagination-btn-v4 page-number-v4 ${bookingsPage === i + 1 ? 'active' : ''}`}
+                onClick={() => setBookingsPage(i + 1)}
+              >
+                {i + 1}
+              </button>
+            ))}
+            {totalBookingsPages > 5 && <span className="pagination-ellipsis-v4">...</span>}
+            <button
+              className="pagination-btn-v4 next-btn"
+              disabled={bookingsPage === totalBookingsPages}
+              onClick={() => setBookingsPage(p => Math.min(totalBookingsPages, p + 1))}
+            >
+              Next
+            </button>
+          </div>
+        </div>
+
+        </div>
+
+      <BookingDetailModal 
+        isOpen={showDetail} 
+        onClose={() => setShowDetail(false)} 
+        booking={selectedBooking} 
+        onUpdateStatus={handleUpdateStatus} 
+      />
+    </div >
+  );
+};
+
 /* ─────────────────── DASHBOARD ─────────────────── */
 const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
 
@@ -4764,7 +5422,8 @@ const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
             />
           )}
           {activeTab === 'coupons' && <Coupons />}
-          {!['dashboard', 'tickets', 'documents', 'service-settings', 'profile', 'settings', 'ratings', 'coupons'].includes(activeTab) && (
+          {activeTab === 'bookings' && <Bookings />}
+          {!['dashboard', 'tickets', 'documents', 'service-settings', 'profile', 'settings', 'ratings', 'coupons', 'bookings'].includes(activeTab) && (
             <div className="placeholder-screen">
               <h2>{activeTab.charAt(0).toUpperCase() + activeTab.slice(1).replace('-', ' ')}</h2>
               <p>This screen is coming soon.</p>
