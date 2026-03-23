@@ -1562,6 +1562,101 @@ const Settings = ({
   const [activeTab, setActiveTab] = useState('account');
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
 
+  // Change Password State
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [passwordStep, setPasswordStep] = useState<'current' | 'new' | 'otp' | 'success'>('current');
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+    showCurrent: false,
+    showNew: false,
+    showConfirm: false
+  });
+  const [otpData, setOtpData] = useState({
+    sent: false,
+    code: '',
+    expiry: 0,
+    retries: 0
+  });
+  const [passwordError, setPasswordError] = useState('');
+
+  const handleClosePasswordModal = () => {
+    setShowPasswordModal(false);
+    setPasswordStep('current');
+    setPasswordForm({
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: '',
+      showCurrent: false,
+      showNew: false,
+      showConfirm: false
+    });
+    setPasswordError('');
+    setOtpData({ sent: false, code: '', expiry: 0, retries: 0 });
+  };
+
+  const validatePassword = (pass: string) => {
+    const minLength = pass.length >= 8;
+    const hasUpper = /[A-Z]/.test(pass);
+    const hasLower = /[a-z]/.test(pass);
+    const hasNumber = /[0-9]/.test(pass);
+    const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(pass);
+    return { minLength, hasUpper, hasLower, hasNumber, hasSpecial };
+  };
+
+  // Login Activity State
+  const [showRemoveDeviceModal, setShowRemoveDeviceModal] = useState(false);
+  const [showLogoutAllModal, setShowLogoutAllModal] = useState(false);
+  const [selectedSession, setSelectedSession] = useState<any>(null);
+  const [sessions, setSessions] = useState([
+    { id: 1, device: 'MacBook Pro 16"', browser: 'Chrome', status: 'Current Session', location: 'Mumbai, India', icon: 'laptop', current: true },
+    { id: 2, device: 'iPhone 13 Pro', browser: 'Safari', time: 'Yesterday at 10:45 AM', location: 'Mumbai, India', icon: 'mobile', current: false },
+    { id: 3, device: 'Windows PC', browser: 'Edge', time: 'Oct 24, 2023 at 4:30 PM', location: 'Delhi, India', icon: 'monitor', current: false },
+  ]);
+
+  const handleRemoveDevice = (session: any) => {
+    setSelectedSession(session);
+    setShowRemoveDeviceModal(true);
+  };
+
+  const confirmRemoveDevice = () => {
+    if (selectedSession) {
+      setSessions(prev => prev.filter(s => s.id !== selectedSession.id));
+      setShowRemoveDeviceModal(false);
+      setSelectedSession(null);
+    }
+  };
+
+  const handleLogoutAll = () => {
+    setShowLogoutAllModal(true);
+  };
+
+  const confirmLogoutAll = () => {
+    setSessions(prev => prev.filter(s => s.current));
+    setShowLogoutAllModal(false);
+  };
+
+  // Danger Zone State
+  const [accountStatus, setAccountStatus] = useState<'active' | 'inactive' | 'pending-closure'>('active');
+  const [showDeactivateModal, setShowDeactivateModal] = useState(false);
+  const [showClosureModal, setShowClosureModal] = useState(false);
+  const [deactivateStep, setDeactivateStep] = useState<'confirm' | 'password' | 'success'>('confirm');
+  const [closureStep, setClosureStep] = useState<'warning' | 'reason' | 'otp' | 'success'>('warning');
+  const [closureReason, setClosureReason] = useState('');
+  const [deactivatePassword, setDeactivatePassword] = useState('');
+  const [closureOtp, setClosureOtp] = useState('');
+
+  const handleCloseDangerModals = () => {
+    setShowDeactivateModal(false);
+    setShowClosureModal(false);
+    setDeactivateStep('confirm');
+    setClosureStep('warning');
+    setDeactivatePassword('');
+    setClosureOtp('');
+    setClosureReason('');
+  };
+
   const tabs = [
     { id: 'account', label: 'Account' },
     { id: 'documents', label: 'Documents' },
@@ -1886,6 +1981,40 @@ const Settings = ({
                 </div>
               )}
 
+              {accountStatus === 'inactive' && (
+                <div className="status-banner-v4 inactive-v4">
+                  <div className="banner-content-v4">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                      <line x1="12" y1="9" x2="12" y2="13"></line>
+                      <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                    <div className="banner-text-v4">
+                      <strong>Account Inactive</strong>
+                      <span>Your business profile is currently hidden from customers.</span>
+                    </div>
+                  </div>
+                  <button className="banner-btn-v4" onClick={() => setAccountStatus('active')}>Reactivate Account</button>
+                </div>
+              )}
+
+              {accountStatus === 'pending-closure' && (
+                <div className="status-banner-v4 closure-banner-v4">
+                  <div className="banner-content-v4">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <line x1="12" y1="8" x2="12" y2="12"></line>
+                      <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    <div className="banner-text-v4">
+                      <strong>Account Closure Requested</strong>
+                      <span>Your account is scheduled for permanent closure. Contact support to cancel.</span>
+                    </div>
+                  </div>
+                  <button className="banner-btn-v4 secondary-v4" onClick={() => window.open('mailto:support@example.com')}>Contact Support</button>
+                </div>
+              )}
+
               <h4 className="sub-title-margin">Billing History</h4>
               <div className="billing-history-container-v4">
                 <div className="table-responsive">
@@ -1980,7 +2109,7 @@ const Settings = ({
                   <h4 className="security-label-major-v4">Password</h4>
                   <span className="security-subtext-v4">Last changed 3 months ago</span>
                 </div>
-                <button className="btn-outline-blue-v4">Change Password</button>
+                <button className="btn-outline-blue-v4" onClick={() => setShowPasswordModal(true)}>Change Password</button>
               </div>
 
               <div className="login-activity-section-v4">
@@ -1989,15 +2118,11 @@ const Settings = ({
                     <h3 className="section-title-v4">Login Activity</h3>
                     <p className="section-description-v4">Here is a list of devices that have logged into your account. Revoke any sessions that you do not recognize.</p>
                   </div>
-                  <button className="btn-outline-red-v4">Logout all devices</button>
+                  <button className="btn-outline-red-v4" onClick={handleLogoutAll}>Logout all devices</button>
                 </div>
 
                 <div className="sessions-card-v4">
-                  {[
-                    { id: 1, device: 'MacBook Pro 16"', browser: 'Chrome', status: 'Current Session', location: 'Mumbai, India', icon: 'laptop', current: true },
-                    { id: 2, device: 'iPhone 13 Pro', browser: 'Safari', time: 'Yesterday at 10:45 AM', location: 'Mumbai, India', icon: 'mobile', current: false },
-                    { id: 3, device: 'Windows PC', browser: 'Edge', time: 'Oct 24, 2023 at 4:30 PM', location: 'Delhi, India', icon: 'monitor', current: false },
-                  ].map(session => (
+                  {sessions.map(session => (
                     <div key={session.id} className="session-item-v4">
                       <div className="session-icon-container-v4">
                         {session.icon === 'laptop' && (
@@ -2019,7 +2144,7 @@ const Settings = ({
                         </div>
                       </div>
                       {!session.current && (
-                        <button className="revoke-session-btn-v4">
+                        <button className="revoke-session-btn-v4" onClick={() => handleRemoveDevice(session)}>
                           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                         </button>
                       )}
@@ -2039,7 +2164,16 @@ const Settings = ({
                     <strong>Deactivate Account</strong>
                     <span>Temporarily hide your business from the platform. You can reactivate anytime.</span>
                   </div>
-                  <button className="danger-action-btn-v4">Deactivate</button>
+                  <button 
+                    className="danger-action-btn-v4"
+                    onClick={() => {
+                      setDeactivateStep('confirm');
+                      setShowDeactivateModal(true);
+                    }}
+                    disabled={accountStatus !== 'active'}
+                  >
+                    {accountStatus === 'inactive' ? 'Deactivated' : 'Deactivate'}
+                  </button>
                 </div>
                 <div className="danger-divider-v4"></div>
                 <div className="danger-item-v4">
@@ -2047,7 +2181,16 @@ const Settings = ({
                     <strong>Request Account Closure</strong>
                     <span>Permanently close your partner account. This action cannot be undone.</span>
                   </div>
-                  <button className="danger-action-btn-v4 closure">Request Closure</button>
+                  <button 
+                    className="danger-action-btn-v4 closure"
+                    onClick={() => {
+                      setClosureStep('warning');
+                      setShowClosureModal(true);
+                    }}
+                    disabled={accountStatus === 'pending-closure'}
+                  >
+                    {accountStatus === 'pending-closure' ? 'Closure Requested' : 'Request Closure'}
+                  </button>
                 </div>
                 <p className="danger-notice-v4">
                   Note: For security reasons, direct account deletion is not allowed. Please contact support if you need immediate assistance.
@@ -2057,6 +2200,463 @@ const Settings = ({
           )}
         </div>
       </div>
+
+      {/* Change Password Modal */}
+      {showPasswordModal && (
+        <div className="bank-modal-overlay-v4">
+          <div className="password-modal-v4 centered-modal-v4">
+            <div className="modal-header-v4">
+              <div className="modal-title-group-v4">
+                <div className="modal-icon-v4 lock-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                </div>
+                <div>
+                  <h3>Change Password</h3>
+                  <p>
+                    {passwordStep === 'current' && "Verify your current password to continue."}
+                    {passwordStep === 'otp' && "Verify code sent to your email."}
+                    {passwordStep === 'new' && "Create a strong new password."}
+                    {passwordStep === 'success' && "Password updated successfully."}
+                  </p>
+                </div>
+              </div>
+              <button className="modal-close-v4" onClick={handleClosePasswordModal}>×</button>
+            </div>
+
+            <div className="modal-body-v4">
+              {passwordStep === 'current' && (
+                <div className="password-step-container-v4">
+                  <p className="step-desc-v4">For your security, please verify your identity by entering your current password.</p>
+                  <div className="form-group-v4">
+                    <label>CURRENT PASSWORD</label>
+                    <div className="password-input-wrapper-v4">
+                      <input
+                        type={passwordForm.showCurrent ? "text" : "password"}
+                        placeholder="Enter current password"
+                        value={passwordForm.currentPassword}
+                        onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
+                      />
+                      <button 
+                        className="p-toggle-v4"
+                        onClick={() => setPasswordForm({ ...passwordForm, showCurrent: !passwordForm.showCurrent })}
+                      >
+                        {passwordForm.showCurrent ? <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg> : <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>}
+                      </button>
+                    </div>
+                    {passwordError && <div className="p-error-v4">{passwordError}</div>}
+                    <button 
+                      className="forgot-p-link-v4"
+                      onClick={() => {
+                        setPasswordStep('otp');
+                        setOtpData({ ...otpData, sent: true });
+                      }}
+                    >
+                      Forgot password?
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {passwordStep === 'otp' && (
+                <div className="password-step-container-v4 centered-step-v4">
+                  <div className="otp-icon-v4">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                  </div>
+                  <p className="otp-hint-v4">Enter the 6-digit code sent to emails</p>
+                  <div className="otp-field-row-v4">
+                    <input
+                      type="text"
+                      maxLength={6}
+                      placeholder="••••••"
+                      className="otp-field-v4"
+                      value={otpData.code}
+                      onChange={(e) => setOtpData({ ...otpData, code: e.target.value })}
+                    />
+                  </div>
+                  <div className="otp-expiry-v4">Valid for 05:00</div>
+                  <button className="resend-btn-v4" disabled={otpData.retries >= 3}>Resend Code</button>
+                </div>
+              )}
+
+              {passwordStep === 'new' && (
+                <div className="password-step-container-v4">
+                  <div className="form-group-v4">
+                    <label>NEW PASSWORD</label>
+                    <div className="password-input-wrapper-v4">
+                      <input
+                        type={passwordForm.showNew ? "text" : "password"}
+                        placeholder="Min. 8 characters"
+                        value={passwordForm.newPassword}
+                        onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+                      />
+                      <button 
+                        className="p-toggle-v4"
+                        onClick={() => setPasswordForm({ ...passwordForm, showNew: !passwordForm.showNew })}
+                      >
+                        {passwordForm.showNew ? <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg> : <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="p-strength-v4">
+                    <div className="strength-labels-v4">
+                      <span className={validatePassword(passwordForm.newPassword).minLength ? 'v' : ''}>8+ chars</span>
+                      <span className={validatePassword(passwordForm.newPassword).hasUpper ? 'v' : ''}>Upper</span>
+                      <span className={validatePassword(passwordForm.newPassword).hasNumber ? 'v' : ''}>Number</span>
+                      <span className={validatePassword(passwordForm.newPassword).hasSpecial ? 'v' : ''}>Special</span>
+                    </div>
+                    <div className="strength-bar-v4">
+                      <div className={`bar-fill-v4 strength-${Object.values(validatePassword(passwordForm.newPassword)).filter(Boolean).length}`}></div>
+                    </div>
+                  </div>
+
+                  <div className="form-group-v4" style={{ marginTop: '1.25rem' }}>
+                    <label>CONFIRM NEW PASSWORD</label>
+                    <div className="password-input-wrapper-v4">
+                      <input
+                        type={passwordForm.showConfirm ? "text" : "password"}
+                        placeholder="Repeat new password"
+                        value={passwordForm.confirmPassword}
+                        onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
+                      />
+                      <button 
+                        className="p-toggle-v4"
+                        onClick={() => setPasswordForm({ ...passwordForm, showConfirm: !passwordForm.showConfirm })}
+                      >
+                        {passwordForm.showConfirm ? <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg> : <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>}
+                      </button>
+                    </div>
+                  </div>
+                  {passwordForm.newPassword && passwordForm.confirmPassword && passwordForm.newPassword !== passwordForm.confirmPassword && (
+                    <div className="p-error-v4">Passwords do not match</div>
+                  )}
+                </div>
+              )}
+
+              {passwordStep === 'success' && (
+                <div className="password-step-container-v4 centered-step-v4">
+                  <div className="success-circle-v4 large">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  </div>
+                  <h4 className="success-title-v4">Password Updated!</h4>
+                  <p className="success-desc-v4">Your account is now more secure. Please use your new password the next time you log in.</p>
+                </div>
+              )}
+            </div>
+
+            <div className="modal-footer-v4">
+              {passwordStep !== 'success' && (
+                <button className="cancel-btn-v4" onClick={handleClosePasswordModal}>Cancel</button>
+              )}
+              
+              {passwordStep === 'current' && (
+                <button 
+                  className="submit-btn-v4"
+                  disabled={!passwordForm.currentPassword}
+                  onClick={() => {
+                    // Mock verification
+                    if (passwordForm.currentPassword === 'password123') {
+                      setPasswordStep('new');
+                      setPasswordError('');
+                    } else {
+                      setPasswordError('Incorrect current password');
+                    }
+                  }}
+                >
+                  Continue
+                </button>
+              )}
+
+              {passwordStep === 'otp' && (
+                <button 
+                  className="submit-btn-v4"
+                  disabled={otpData.code.length !== 6}
+                  onClick={() => setPasswordStep('new')}
+                >
+                  Verify & Continue
+                </button>
+              )}
+
+              {passwordStep === 'new' && (
+                <button 
+                  className="submit-btn-v4"
+                  disabled={
+                    !Object.values(validatePassword(passwordForm.newPassword)).every(Boolean) ||
+                    passwordForm.newPassword !== passwordForm.confirmPassword
+                  }
+                  onClick={() => setPasswordStep('success')}
+                >
+                  Reset Password
+                </button>
+              )}
+
+              {passwordStep === 'success' && (
+                <button className="submit-btn-v4 full-width-v4" onClick={handleClosePasswordModal}>Back to Security</button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Remove Device Confirmation Modal */}
+      {showRemoveDeviceModal && (
+        <div className="bank-modal-overlay-v4">
+          <div className="confirmation-modal-v4 centered-modal-v4">
+            <div className="conf-modal-content-v4">
+              <div className="conf-icon-container-v4 remove-icon-bg">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              </div>
+              <h3 className="conf-title-v4">Remove Device?</h3>
+              <p className="conf-desc-v4">Are you sure you want to remove the device? By removing, they will logout on their device.</p>
+              <div className="conf-actions-v4">
+                <button className="conf-btn-secondary-v4" onClick={() => setShowRemoveDeviceModal(false)}>Cancel</button>
+                <button className="conf-btn-danger-v4" onClick={confirmRemoveDevice}>Remove</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Logout All Devices Confirmation Modal */}
+      {showLogoutAllModal && (
+        <div className="bank-modal-overlay-v4">
+          <div className="confirmation-modal-v4 centered-modal-v4">
+            <div className="conf-modal-content-v4">
+              <div className="conf-icon-container-v4 logout-icon-bg">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+              </div>
+              <h3 className="conf-title-v4">Logout all devices?</h3>
+              <p className="conf-desc-v4">Are you sure you want to logout all devices?</p>
+              <div className="conf-actions-v4">
+                <button className="conf-btn-secondary-v4" onClick={() => setShowLogoutAllModal(false)}>Cancel</button>
+                <button className="conf-btn-danger-v4" onClick={confirmLogoutAll}>Logout All</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Deactivate Account Modal */}
+      {showDeactivateModal && (
+        <div className="bank-modal-overlay-v4">
+          <div className="password-modal-v4 centered-modal-v4">
+            <div className="modal-header-v4">
+              <div className="header-content-v4">
+                <div>
+                  <h3>Deactivate Account</h3>
+                  <p>Step {deactivateStep === 'confirm' ? '1' : deactivateStep === 'password' ? '2' : '3'} of 3</p>
+                </div>
+              </div>
+              <button className="close-modal-btn-v4" onClick={handleCloseDangerModals}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
+            </div>
+
+            <div className="modal-body-v4">
+              {deactivateStep === 'confirm' && (
+                <div className="password-step-container-v4">
+                  <p className="step-desc-v4">Deactivating your account will temporarily hide your business profile, services, and coupons from all customers. You can reactivate your account at any time by logging back in.</p>
+                  <div className="deactivate-warning-v4">
+                    <strong style={{ display: 'block', marginBottom: '8px', fontSize: '0.9rem', color: '#1e293b' }}>What happens next?</strong>
+                    <ul style={{ margin: 0, paddingLeft: '1.25rem', fontSize: '0.85rem', color: '#64748b', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <li>Customers cannot book your services.</li>
+                      <li>Your active coupons will be paused.</li>
+                      <li>Existing bookings will remain active.</li>
+                    </ul>
+                  </div>
+                </div>
+              )}
+
+              {deactivateStep === 'password' && (
+                <div className="password-step-container-v4">
+                  <p className="step-desc-v4">For security, please enter your password to confirm deactivation.</p>
+                  <div className="form-group-v4">
+                    <label>PASSWORD</label>
+                    <div className="password-input-wrapper-v4">
+                      <input 
+                        type="password" 
+                        placeholder="Enter your password"
+                        value={deactivatePassword}
+                        onChange={(e) => setDeactivatePassword(e.target.value)}
+                        className="full-width-input-v4"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {deactivateStep === 'success' && (
+                <div className="password-step-container-v4 centered-step-v4">
+                  <div className="success-circle-v4 large inactive-bg-v4">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  </div>
+                  <h4 className="success-title-v4">Account Deactivated</h4>
+                  <p className="success-desc-v4">Your account is now inactive. You can reactivate it anytime from your settings.</p>
+                </div>
+              )}
+            </div>
+
+            <div className="danger-modal-footer-v4">
+              {deactivateStep === 'confirm' && (
+                <>
+                  <button className="cancel-btn-v4" onClick={handleCloseDangerModals}>Keep Active</button>
+                  <button className="btn-v4 primary-v4" onClick={() => setDeactivateStep('password')}>Continue</button>
+                </>
+              )}
+              {deactivateStep === 'password' && (
+                <>
+                  <button className="cancel-btn-v4" onClick={() => setDeactivateStep('confirm')}>Back</button>
+                  <button 
+                    className="btn-v4 primary-v4" 
+                    onClick={() => {
+                      setAccountStatus('inactive');
+                      setDeactivateStep('success');
+                    }}
+                    disabled={!deactivatePassword}
+                  >
+                    Confirm Deactivation
+                  </button>
+                </>
+              )}
+              {deactivateStep === 'success' && (
+                <button className="btn-v4 primary-v4 full-width-v4" onClick={handleCloseDangerModals} style={{ background: '#64748b' }}>Done</button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Account Closure Modal */}
+      {showClosureModal && (
+        <div className="bank-modal-overlay-v4">
+          <div className="password-modal-v4 centered-modal-v4 closure-modal-border-v4">
+            <div className="modal-header-v4">
+              <div className="header-content-v4">
+                <div>
+                  <h3 className="closure-modal-title-v4">Request Account Closure</h3>
+                  <p>Step {closureStep === 'warning' ? '1' : closureStep === 'reason' ? '2' : closureStep === 'otp' ? '3' : '4'} of 4</p>
+                </div>
+              </div>
+              <button className="close-modal-btn-v4" onClick={handleCloseDangerModals}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
+            </div>
+
+            <div className="modal-body-v4">
+              {closureStep === 'warning' && (
+                <div className="password-step-container-v4">
+                  <div className="closure-danger-alert-v4">
+                    <strong>Irreversible Action!</strong>
+                    <p>Closing your account will permanently delete your business profile, booking history, and all associated data. This action cannot be undone.</p>
+                  </div>
+                  <div className="deactivate-warning-v4">
+                    <strong style={{ display: 'block', marginBottom: '8px', fontSize: '0.9rem', color: '#1e293b' }}>What you'll lose:</strong>
+                    <ul style={{ margin: 0, paddingLeft: '1.25rem', fontSize: '0.85rem', color: '#64748b', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <li>Access to your partner dashboard.</li>
+                      <li>All your historical booking records.</li>
+                      <li>Your rating and reviews (cannot be recovered).</li>
+                    </ul>
+                  </div>
+                </div>
+              )}
+
+              {closureStep === 'reason' && (
+                <div className="password-step-container-v4">
+                  <p className="step-desc-v4">We're sorry to see you go. Please tell us why you're closing your account (optional).</p>
+                  <div className="form-group-v4">
+                    <label>REASON FOR LEAVING</label>
+                    <select 
+                      className="select-field-v4"
+                      value={closureReason}
+                      onChange={(e) => setClosureReason(e.target.value)}
+                      style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc', fontSize: '0.9rem', color: '#1e293b' }}
+                    >
+                      <option value="">Select a reason</option>
+                      <option value="expensive">Subscription is too expensive</option>
+                      <option value="features">Missing features I need</option>
+                      <option value="ui">UI is difficult to use</option>
+                      <option value="business">Closing my business</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+                  {closureReason === 'other' && (
+                    <div className="form-group-v4" style={{ marginTop: '1rem' }}>
+                      <textarea 
+                        className="textarea-field-v4" 
+                        placeholder="Tell us more..."
+                        style={{ height: '80px', width: '100%', borderRadius: '8px', border: '1px solid #e2e8f0', padding: '0.75rem', fontSize: '0.9rem' }}
+                      ></textarea>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {closureStep === 'otp' && (
+                <div className="password-step-container-v4 centered-step-v4">
+                  <div className="otp-icon-v4">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                  </div>
+                  <p className="otp-hint-v4">For safety, enter the 6-digit code sent to your registered email to verify closure.</p>
+                  <div className="otp-field-row-v4">
+                    <input
+                      type="text"
+                      maxLength={6}
+                      placeholder="••••••"
+                      className="otp-field-v4 otp-closure-field-v4"
+                      value={closureOtp}
+                      onChange={(e) => setClosureOtp(e.target.value)}
+                    />
+                  </div>
+                  <button className="resend-btn-v4" style={{ color: '#ef4444' }}>Resend Code</button>
+                </div>
+              )}
+
+              {closureStep === 'success' && (
+                <div className="password-step-container-v4 centered-step-v4">
+                  <div className="success-circle-v4 large closure-bg-v4">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  </div>
+                  <h4 className="success-title-v4">Request Submitted</h4>
+                  <p className="success-desc-v4">Your account closure request is being processed. This typically takes 24-48 hours. You will receive an email once it's finalized.</p>
+                </div>
+              )}
+            </div>
+
+            <div className="danger-modal-footer-v4">
+              {closureStep === 'warning' && (
+                <>
+                  <button className="cancel-btn-v4" onClick={handleCloseDangerModals}>Cancel</button>
+                  <button className="btn-v4 closure-btn-v4" onClick={() => setClosureStep('reason')}>Continue</button>
+                </>
+              )}
+              {closureStep === 'reason' && (
+                <>
+                  <button className="cancel-btn-v4" onClick={() => setClosureStep('warning')}>Back</button>
+                  <button className="btn-v4 closure-btn-v4" onClick={() => setClosureStep('otp')}>Next</button>
+                </>
+              )}
+              {closureStep === 'otp' && (
+                <>
+                  <button className="cancel-btn-v4" onClick={() => setClosureStep('reason')}>Back</button>
+                  <button 
+                    className="btn-v4 closure-btn-v4" 
+                    onClick={() => {
+                      setAccountStatus('pending-closure');
+                      setClosureStep('success');
+                    }}
+                    disabled={closureOtp.length !== 6}
+                  >
+                    Confirm Permanent Closure
+                  </button>
+                </>
+              )}
+              {closureStep === 'success' && (
+                <button className="btn-v4 primary-v4 full-width-v4" onClick={handleCloseDangerModals}>Done</button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

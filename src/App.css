@@ -14050,3 +14050,649 @@ input:checked + .slider-v4:before {
   text-transform: uppercase;
   letter-spacing: 0.025em;
 }
+
+/* Change Password & Security Tab Styles */
+.security-tab-v4 {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.security-card-v4 {
+  background: white;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  margin-top: 1rem;
+}
+
+.security-card-header-v4 {
+  padding: 1.5rem;
+  border-bottom: 1px solid #f1f5f9;
+  background-color: #f8fafc;
+}
+
+.s-title-group-v4 {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.s-icon-v4 {
+  width: 48px;
+  height: 48px;
+  background-color: #eff6ff;
+  color: #3b82f6;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.s-title-group-v4 h3 {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.s-title-group-v4 p {
+  margin: 2px 0 0 0;
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.security-items-list-v4 {
+  display: flex;
+  flex-direction: column;
+}
+
+.security-item-row-v4 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.security-item-row-v4:last-child {
+  border-bottom: none;
+}
+
+.si-info-v4 {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.si-info-v4 label {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #1e293b;
+}
+
+.si-info-v4 span {
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.si-status-off-v4 {
+  color: #ef4444 !important;
+  font-weight: 600;
+}
+
+.si-action-btn-v4 {
+  padding: 0.6rem 1.25rem;
+  background-color: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.si-action-btn-v4:hover {
+  background-color: #f8fafc;
+  border-color: #cbd5e1;
+  color: #1e293b;
+}
+
+.si-action-btn-v4.secondary {
+  color: #3b82f6;
+  border-color: #3b82f6;
+}
+
+.si-action-btn-v4.secondary:hover {
+  background-color: #eff6ff;
+}
+
+/* Password Modal specific refinements */
+.password-modal-v4 {
+  width: 100%;
+  max-width: 440px;
+  background: white;
+  border-radius: 24px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.lock-icon {
+  background-color: #fee2e2 !important;
+  color: #ef4444 !important;
+}
+
+.password-step-container-v4 {
+  display: flex;
+  flex-direction: column;
+}
+
+.step-desc-v4 {
+  font-size: 0.9rem;
+  color: #64748b;
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.centered-modal-v4 {
+  margin: auto;
+}
+
+.password-input-wrapper-v4 {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-input-wrapper-v4 input {
+  width: 100%;
+  padding-right: 3rem !important;
+}
+
+.p-toggle-v4 {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  color: #94a3b8;
+  padding: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.p-toggle-v4:hover {
+  color: #64748b;
+}
+
+.forgot-p-link-v4 {
+  background: none;
+  border: none;
+  color: #3b82f6;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0;
+  margin-top: 10px;
+  cursor: pointer;
+  text-align: left;
+  display: inline-block;
+}
+
+.forgot-p-link-v4:hover {
+  text-decoration: underline;
+}
+
+.p-error-v4 {
+  color: #ef4444;
+  font-size: 0.8rem;
+  margin-top: 6px;
+  font-weight: 500;
+}
+
+/* Strength meter */
+.p-strength-v4 {
+  margin-top: 12px;
+  padding: 12px;
+  background-color: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #f1f5f9;
+}
+
+.strength-labels-v4 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-bottom: 10px;
+}
+
+.strength-labels-v4 span {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.strength-labels-v4 span.v {
+  color: #22c55e;
+  font-weight: 600;
+}
+
+.strength-labels-v4 span.v::before {
+  content: '✓';
+}
+
+.strength-bar-v4 {
+  height: 4px;
+  background-color: #e2e8f0;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.bar-fill-v4 {
+  height: 100%;
+  width: 0;
+  transition: all 0.3s ease;
+}
+
+.bar-fill-v4.strength-1 { width: 20%; background-color: #ef4444; }
+.bar-fill-v4.strength-2 { width: 40%; background-color: #f97316; }
+.bar-fill-v4.strength-3 { width: 70%; background-color: #eab308; }
+.bar-fill-v4.strength-4 { width: 90%; background-color: #22c55e; }
+.bar-fill-v4.strength-5 { width: 100%; background-color: #16a34a; }
+
+/* OTP Styles */
+.centered-step-v4 {
+  align-items: center;
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.otp-icon-v4 {
+  width: 80px;
+  height: 80px;
+  background-color: #eff6ff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.otp-hint-v4 {
+  font-size: 0.95rem;
+  color: #475569;
+  line-height: 1.5;
+  margin-bottom: 2rem;
+}
+
+.otp-field-v4 {
+  width: 100%;
+  max-width: 240px;
+  height: 56px;
+  text-align: center;
+  font-size: 1.75rem !important;
+  letter-spacing: 0.5rem;
+  font-weight: 700 !important;
+  border-radius: 12px !important;
+  background-color: #f8fafc !important;
+  border: 2px solid #e2e8f0 !important;
+}
+
+.otp-field-v4:focus {
+  border-color: #3b82f6 !important;
+  background-color: #fff !important;
+}
+
+.otp-expiry-v4 {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  margin-top: 1.5rem;
+}
+
+.resend-btn-v4 {
+  background: none;
+  border: none;
+  color: #3b82f6;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-top: 12px;
+  cursor: pointer;
+}
+
+.resend-btn-v4:disabled {
+  color: #cbd5e1;
+  cursor: not-allowed;
+}
+
+/* Success step */
+.success-circle-v4.large {
+  width: 72px;
+  height: 72px;
+  background-color: #22c55e;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 0 0 8px #f0fdf4;
+}
+
+.success-title-v4 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 0.5rem;
+}
+
+.success-desc-v4 {
+  font-size: 0.95rem;
+  color: #64748b;
+  line-height: 1.5;
+}
+
+.full-width-v4 {
+  width: 100% !important;
+}
+
+/* Confirmation Modals (Remove Device / Logout All) */
+.confirmation-modal-v4 {
+  width: 100%;
+  max-width: 400px;
+  background: white;
+  border-radius: 24px;
+  padding: 2rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  animation: modalScaleIn 0.2s ease-out;
+}
+
+@keyframes modalScaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.conf-modal-content-v4 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.conf-icon-container-v4 {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.remove-icon-bg {
+  background-color: #fee2e2;
+}
+
+.logout-icon-bg {
+  background-color: #fee2e2;
+}
+
+.conf-title-v4 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 0.75rem 0;
+}
+
+.conf-desc-v4 {
+  font-size: 1rem;
+  color: #64748b;
+  line-height: 1.5;
+  margin: 0 0 2rem 0;
+}
+
+.conf-actions-v4 {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+}
+
+.conf-btn-secondary-v4 {
+  flex: 1;
+  padding: 0.875rem;
+  background-color: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e293b;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.conf-btn-secondary-v4:hover {
+  background-color: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.conf-btn-danger-v4 {
+  flex: 1;
+  padding: 0.875rem;
+  background-color: #ef4444;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.conf-btn-danger-v4:hover {
+  background-color: #dc2626;
+  box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.2);
+}
+
+/* Danger Zone Status Banners */
+.status-banner-v4 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  border-left: 4px solid;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.inactive-v4 {
+  background-color: #f8fafc;
+  border-left-color: #64748b;
+  border: 1px solid #e2e8f0;
+}
+
+.closure-banner-v4 {
+  background-color: #fef2f2;
+  border-left-color: #ef4444;
+  border: 1px solid #fee2e2;
+}
+
+.banner-content-v4 {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.banner-text-v4 {
+  display: flex;
+  flex-direction: column;
+}
+
+.banner-text-v4 strong {
+  font-size: 1rem;
+  color: #1e293b;
+}
+
+.banner-text-v4 span {
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.banner-btn-v4 {
+  padding: 0.6rem 1.25rem;
+  background-color: #1e293b;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.banner-btn-v4:hover {
+  background-color: #0f172a;
+}
+
+.banner-btn-v4.secondary-v4 {
+  background-color: white;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+}
+
+.banner-btn-v4.secondary-v4:hover {
+  background-color: #f8fafc;
+}
+
+/* Danger Zone Modals Refinements */
+.deactivate-icon-bg {
+  background-color: #f1f5f9 !important;
+}
+
+.closure-icon-bg {
+  background-color: #fef2f2 !important;
+}
+
+.deactivate-warning-v4 {
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-top: 1rem;
+}
+
+.closure-danger-alert-v4 {
+  background-color: #fef2f2;
+  border: 1px solid #fee2e2;
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.closure-danger-alert-v4 strong {
+  color: #ef4444;
+  display: block;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.closure-danger-alert-v4 p {
+  color: #991b1b;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.closure-modal-border-v4 {
+  border: 2px solid #fee2e2 !important;
+}
+
+.closure-modal-title-v4 {
+  color: #ef4444 !important;
+}
+
+.otp-closure-field-v4 {
+  border-color: #fee2e2 !important;
+}
+
+.otp-closure-field-v4:focus {
+  border-color: #ef4444 !important;
+}
+
+.closure-btn-v4 {
+  background: #ef4444 !important;
+  color: white !important;
+}
+
+.closure-btn-v4:hover {
+  background: #dc2626 !important;
+  box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.2);
+}
+
+.closure-bg-v4 {
+  background-color: #ef4444 !important;
+}
+
+.inactive-bg-v4 {
+  background-color: #64748b !important;
+}
+
+/* Danger Modal Footer - Equal Width & Swapped Priority */
+.danger-modal-footer-v4 {
+  margin-top: 2rem;
+  display: flex;
+  gap: 1rem;
+}
+
+.danger-modal-footer-v4 button {
+  flex: 1 !important;
+  padding: 0.6rem 1.25rem !important;
+  border-radius: 12px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.2s !important;
+  font-size: 0.875rem !important;
+}
+
+/* Cancel became filled with primary color as requested */
+.danger-modal-footer-v4 .cancel-btn-v4 {
+  background-color: #3b82f6 !important;
+  color: white !important;
+  border: none !important;
+}
+
+.danger-modal-footer-v4 .cancel-btn-v4:hover {
+  background-color: #2563eb !important;
+  box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.2);
+}
+
+/* Continue/Dangerous action became outline only as requested */
+.danger-modal-footer-v4 .btn-v4.primary-v4,
+.danger-modal-footer-v4 .btn-v4.closure-btn-v4 {
+  background-color: transparent !important;
+  border: 1px solid #e2e8f0 !important;
+  color: #64748b !important;
+  box-shadow: none !important;
+}
+
+.danger-modal-footer-v4 .btn-v4.primary-v4:hover,
+.danger-modal-footer-v4 .btn-v4.closure-btn-v4:hover {
+  background-color: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+  color: #1e293b !important;
+}
+
+/* Exceptions for success step buttons */
+.danger-modal-footer-v4 .full-width-v4 {
+  background-color: #3b82f6 !important;
+  color: white !important;
+  border: none !important;
+}
