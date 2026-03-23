@@ -5322,6 +5322,37 @@ const Reports = () => {
     { id: 'BK-12220', date: '01 Feb 2026', gross: 95000, tds: 950, net: 94050, status: 'Paid' },
   ];
 
+  const gstBookings = [
+    { id: 'BK-12401', date: '20 Mar 2026', state: 'Maharashtra', type: 'B2C', taxable: 42373, cgst: 3813, sgst: 3813, igst: 0, total: 7626 },
+    { id: 'BK-12395', date: '17 Mar 2026', state: 'Karnataka', type: 'B2C', taxable: 25424, cgst: 0, sgst: 0, igst: 4576, total: 4576 },
+    { id: 'BK-12388', date: '15 Mar 2026', state: 'Maharashtra', type: 'B2B', taxable: 84746, cgst: 7627, sgst: 7627, igst: 0, total: 15254 },
+    { id: 'BK-12380', date: '12 Mar 2026', state: 'Maharashtra', type: 'B2C', taxable: 16949, cgst: 1525, sgst: 1525, igst: 0, total: 3050 },
+    { id: 'BK-12372', date: '10 Mar 2026', state: 'Delhi', type: 'B2C', taxable: 33898, cgst: 0, sgst: 0, igst: 6102, total: 6102 },
+    { id: 'BK-12365', date: '08 Mar 2026', state: 'Maharashtra', type: 'B2C', taxable: 21186, cgst: 1907, sgst: 1907, igst: 0, total: 3814 },
+    { id: 'BK-12354', date: '05 Mar 2026', state: 'Gujarat', type: 'B2B', taxable: 110169, cgst: 0, sgst: 0, igst: 19831, total: 19831 },
+    { id: 'BK-12344', date: '02 Mar 2026', state: 'Maharashtra', type: 'B2C', taxable: 46610, cgst: 4195, sgst: 4195, igst: 0, total: 8390 },
+    { id: 'BK-12330', date: '01 Mar 2026', state: 'Maharashtra', type: 'B2C', taxable: 74576, cgst: 6712, sgst: 6712, igst: 0, total: 13424 },
+    { id: 'BK-12315', date: '28 Feb 2026', state: 'Karnataka', type: 'B2C', taxable: 29661, cgst: 0, sgst: 0, igst: 5339, total: 5339 },
+    { id: 'BK-12300', date: '25 Feb 2026', state: 'Maharashtra', type: 'B2B', taxable: 55085, cgst: 4958, sgst: 4958, igst: 0, total: 9916 },
+    { id: 'BK-12285', date: '22 Feb 2026', state: 'Tamil Nadu', type: 'B2C', taxable: 38136, cgst: 0, sgst: 0, igst: 6864, total: 6864 },
+  ];
+
+  const [gstPage, setGstPage] = useState(1);
+  const [selectedFY, setSelectedFY] = useState('FY 2025-26');
+  const [selectedMonthTab, setSelectedMonthTab] = useState('Mar');
+
+  const monthsList = ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar'];
+  const fullMonthNames: Record<string, string> = {
+    'Apr': 'April', 'May': 'May', 'Jun': 'June', 'Jul': 'July', 'Aug': 'August', 'Sep': 'September',
+    'Oct': 'October', 'Nov': 'November', 'Dec': 'December', 'Jan': 'January', 'Feb': 'February', 'Mar': 'March'
+  };
+
+  const gstRowsPerPage = 8;
+  const indexOfLastGst = gstPage * gstRowsPerPage;
+  const indexOfFirstGst = indexOfLastGst - gstRowsPerPage;
+  const currentGstRows = gstBookings.slice(indexOfFirstGst, indexOfLastGst);
+  const totalGstPages = Math.ceil(gstBookings.length / gstRowsPerPage);
+
   const indexOfLastRow = currentPage * rowsPerPage;
   const indexOfFirstRow = indexOfLastRow - rowsPerPage;
   const currentRows = tdsData.slice(indexOfFirstRow, indexOfLastRow);
@@ -5374,240 +5405,225 @@ const Reports = () => {
         )}
 
         {activeReportTab === 'GST' && (
-          <div className="gst-dashboard-v14">
-            {/* Header / Info */}
-            <div className="tds-section-header-v14">
-              <div className="tds-header-title-group">
-                <h3>GST Compliance Hub</h3>
-                <p>Track your GST liability, Input Tax Credit (ITC), and filing status.</p>
+          <div className="gst-dashboard-v20 v22">
+            {/* 1. Header with FY Selector */}
+            <div className="reports-section-header-v20">
+              <div className="section-title-group-v20">
+                <h3>GST Reporting & Compliance</h3>
+                <p>Tax insights and compliance support for {fullMonthNames[selectedMonthTab]} {selectedFY}</p>
               </div>
-              <div className="tds-header-filters-v14">
-                <select className="tds-filter-select-v14">
+              <div className="section-filters-v20">
+                <select 
+                  className="period-select-v20 fy-select-v22" 
+                  value={selectedFY}
+                  onChange={(e) => setSelectedFY(e.target.value)}
+                >
                   <option>FY 2025-26</option>
                   <option>FY 2024-25</option>
                 </select>
-                <select className="tds-filter-select-v14">
-                  <option>Quarter 3 (Oct-Dec)</option>
-                  <option>Quarter 2 (Jul-Sep)</option>
-                  <option>Quarter 1 (Apr-Jun)</option>
-                  <option>Quarter 4 (Jan-Mar)</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Hero Calculation Section */}
-            <div className="gst-hero-v14">
-              <div className="hero-main-v14">
-                <label>Net GST Payable</label>
-                <div className="hero-price-v14">₹16,850</div>
-                <div className="hero-calc-v14">
-                  <div className="calc-item-v14"><span>GST Collected</span> <strong>₹18,200</strong></div>
-                  <span className="calc-operator-v14">−</span>
-                  <div className="calc-item-v14"><span>ITC</span> <strong>₹450</strong></div>
-                  <span className="calc-operator-v14">−</span>
-                  <div className="calc-item-v14"><span>Reversed</span> <strong>₹900</strong></div>
-                </div>
-              </div>
-              <div className="hero-status-hub-v14">
-                <div className="status-badge-v14 pending">Payment Pending</div>
-                <p className="due-date-v14">Due by Jan 20, 2026</p>
-              </div>
-            </div>
-
-            {/* Summary Grid */}
-            <div className="tds-summary-grid-v14">
-              <div className="tds-summary-card-v14">
-                <div className="tds-card-icon-v14 payout">📦</div>
-                <div className="tds-card-info-v14">
-                  <label>Total Booking Value</label>
-                  <div className="tds-value-group-v14">
-                    <span className="tds-main-value-v14">₹1,01,111</span>
-                  </div>
-                  <p className="tds-sub-helper-v14">Exclusive of GST</p>
-                </div>
-              </div>
-              <div className="tds-summary-card-v14">
-                <div className="tds-card-icon-v14 tax">💹</div>
-                <div className="tds-card-info-v14">
-                  <label>GST Collected</label>
-                  <div className="tds-value-group-v14">
-                    <span className="tds-main-value-v14">₹18,200</span>
-                  </div>
-                  <p className="tds-sub-helper-v14">Collected from customers</p>
-                </div>
-              </div>
-              <div className="tds-summary-card-v14">
-                <div className="tds-card-icon-v14 payout">📥</div>
-                <div className="tds-card-info-v14">
-                  <label>Input Tax Credit (ITC)</label>
-                  <div className="tds-value-group-v14">
-                    <span className="tds-main-value-v14">₹450</span>
-                  </div>
-                  <p className="tds-sub-helper-v14">GST paid on platform commission</p>
-                </div>
-              </div>
-              <div className="tds-summary-card-v14">
-                <div className="tds-card-icon-v14 tax">🔄</div>
-                <div className="tds-card-info-v14">
-                  <label>GST Reversed</label>
-                  <div className="tds-value-group-v14">
-                    <span className="tds-main-value-v14">₹900</span>
-                  </div>
-                  <p className="tds-sub-helper-v14">From cancelled bookings</p>
+                <div className="export-actions-v20">
+                  <button className="export-btn-v20 excel">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    Download {selectedMonthTab} Report
+                  </button>
+                  <button className="export-btn-v20 pdf">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    Download Summary
+                  </button>
                 </div>
               </div>
             </div>
 
-            <div className="tds-main-grid-v14">
-              <div className="tds-status-section-v14">
+            {/* 2. Month Navigation Tabs */}
+            <div className="gst-month-nav-v22">
+              {monthsList.map((m) => {
+                const fyParts = selectedFY.replace('FY ', '').split('-');
+                const yearSuffix = ['Jan', 'Feb', 'Mar'].includes(m) ? fyParts[1] : fyParts[0].slice(-2);
+                return (
+                  <button 
+                    key={m}
+                    className={`month-tab-v22 ${selectedMonthTab === m ? 'active' : ''}`}
+                    onClick={() => setSelectedMonthTab(m)}
+                  >
+                    {m} '{yearSuffix}
+                  </button>
+                );
+              })}
+            </div>
 
-                {/* Actionable GST Compliance Hub */}
-                <div className="tds-card-v14" style={{ marginTop: '1.5rem' }}>
-                  <div className="tds-card-header-v14">
-                    <h4>GST Filing & Compliance</h4>
-                    <div className="compliance-urgency-v14 warning">Due in 12 days</div>
-                  </div>
-                  
-                  {/* Current Month Highlights */}
-                  <div className="gst-current-highlight-v14">
-                    <div className="current-month-info-v14">
-                      <label>Action Required for</label>
-                      <h3>December 2025</h3>
-                    </div>
-                    <div className="current-metrics-v14">
-                      <div className="metric-item-v14">
-                        <label>GST Payable</label>
-                        <span className="value-v14 highlight">₹12,450</span>
-                      </div>
-                      <div className="metric-item-v14">
-                        <label>GSTR-1 Due</label>
-                        <span className="value-v14">Jan 11, 2026</span>
-                      </div>
-                      <div className="metric-item-v14">
-                        <label>GSTR-3B Due</label>
-                        <span className="value-v14">Jan 20, 2026</span>
-                      </div>
-                    </div>
-                    <button className="gst-download-cta-v14">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                      Download GST Report
-                    </button>
-                  </div>
+            {/* 3. Summary Grid + FY Insight */}
+            <div className="gst-metrics-row-v22">
+              {/* FY Insight Card - Moved to First */}
+              <div className="fy-insight-card-v22">
+                <div className="fy-insight-content-v22">
+                  <div className="fy-label-v22">{selectedFY} Overview</div>
+                  <div className="fy-total-v22">₹9,18,450</div>
+                  <div className="fy-desc-v22">Total GST collected in this Financial Year</div>
+                </div>
+              </div>
 
-                  {/* Monthly History List */}
-                  <div className="gst-history-list-v14">
-                    <label className="history-label-v14">Filing History</label>
-                    <div className="history-item-v14">
-                      <div className="history-main-v14">
-                        <span className="history-month-v14">November 2025</span>
-                        <span className="history-status-v14 filed">Filed on Dec 18, 2025</span>
+              <div className="gst-summary-grid-v20 v22">
+                <div className="gst-summary-card-v20 highlight">
+                  <label>Taxable Amount</label>
+                  <div className="card-main-v20">
+                    <span className="value-v20">₹4,25,840</span>
+                    <span className="sub-v20">For {fullMonthNames[selectedMonthTab]}</span>
+                  </div>
+                </div>
+                <div className="gst-summary-card-v20">
+                  <label>GST Payable</label>
+                  <div className="card-main-v20">
+                    <span className="value-v20">₹73,251</span>
+                    <span className="sub-v20">After adjustments</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 4. Deadlines & Breakdown Row */}
+            <div className="gst-middle-grid-v20">
+              <div className="gst-deadlines-section-v20">
+                <div className="inner-card-v20">
+                  <h4>Upcoming Filing Deadlines</h4>
+                  <div className="deadline-items-v20">
+                    <div className="deadline-item-v20 highlight-status">
+                      <div className="deadline-info-v20">
+                        <label>GSTR-1 (Outward Supplies)</label>
+                        <span>Due by <strong>{selectedMonthTab === 'Mar' ? 'April 11, 2026' : 'Next Month 11th'}</strong></span>
                       </div>
-                      <div className="history-amount-v14">
-                        <label>Tax Paid</label>
-                        <span>₹14,200</span>
-                      </div>
+                      <span className="status-indicator-v20 critical">Next Action</span>
                     </div>
-                    <div className="history-item-v14">
-                      <div className="history-main-v14">
-                        <span className="history-month-v14">October 2025</span>
-                        <span className="history-status-v14 filed">Filed on Nov 19, 2025</span>
+                    <div className="deadline-item-v20">
+                      <div className="deadline-info-v20">
+                        <label>GSTR-3B (Summary Return)</label>
+                        <span>Due by <strong>{selectedMonthTab === 'Mar' ? 'April 20, 2026' : 'Next Month 20th'}</strong></span>
                       </div>
-                      <div className="history-amount-v14">
-                        <label>Tax Paid</label>
-                        <span>₹11,800</span>
-                      </div>
+                      <span className="status-indicator-v20">Upcoming</span>
+                    </div>
+                    <div className="missed-alert-v20">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="20 6 9 17 4 12"></polyline></svg>
+                      <span>No missed deadlines for {selectedMonthTab}</span>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="tds-certificate-section-v14">
-                <div className="tds-card-v14 gst-breakdown-card-v19">
-                  <div className="tds-card-header-v14">
-                    <h4>GST Breakdown & Exports</h4>
-                    <select className="gst-month-select-v19">
-                      <option>March 2026</option>
-                      <option>February 2026</option>
-                      <option>January 2026</option>
-                    </select>
+              <div className="gst-type-breakdown-v20">
+                <div className="inner-card-v20 secondary-bg">
+                  <h4>GST Split ({selectedMonthTab})</h4>
+                  <div className="gst-breakdown-list-v23">
+                    <div className="gst-breakdown-item-v23">
+                      <span className="label-v23">CGST (within state)</span>
+                      <span className="value-v23">₹17,246</span>
+                    </div>
+                    <div className="gst-breakdown-item-v23">
+                      <span className="label-v23">SGST (within state)</span>
+                      <span className="value-v23">₹17,246</span>
+                    </div>
+                    <div className="gst-breakdown-item-v23">
+                      <span className="label-v23">IGST (interstate)</span>
+                      <span className="value-v23">₹42,158</span>
+                    </div>
+                    <div className="gst-breakdown-divider-v23"></div>
+                    <div className="gst-breakdown-item-v23 total">
+                      <span className="label-v23">Total GST</span>
+                      <span className="value-v23">₹76,651</span>
+                    </div>
                   </div>
+                </div>
+              </div>
+            </div>
 
-                  <div className="gst-breakdown-content-v19">
-                    {/* Primary Breakdown */}
-                    <div className="gst-main-metrics-v19">
-                      <div className="gst-metric-row-v19 total">
-                        <label>Total GST Collected</label>
-                        <span className="value-v19">₹18,200</span>
-                      </div>
-                      <div className="gst-metric-group-v19">
-                        <div className="gst-metric-row-v19">
-                          <label>Within State GST (CGST + SGST)</label>
-                          <span className="value-v19">₹7,200</span>
-                        </div>
-                        <div className="gst-nested-details-v19">
-                          <div className="nested-detail-item-v19">
-                            <label>SGST (9%)</label>
-                            <span>₹3,600</span>
-                          </div>
-                          <div className="nested-detail-item-v19">
-                            <label>CGST (9%)</label>
-                            <span>₹3,600</span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="gst-metric-row-v19">
-                        <label>Interstate GST (IGST)</label>
-                        <span className="value-v19">₹11,000</span>
-                      </div>
-                    </div>
+            {/* 5. Detailed GST Table */}
+            <div className="gst-table-section-v20">
+              <div className="table-header-v20">
+                <h4>Detailed GST Breakdown - {fullMonthNames[selectedMonthTab]} {selectedFY}</h4>
+              </div>
+              <div className="gst-table-container-v20">
+                <table className="gst-table-v20">
+                  <thead>
+                    <tr>
+                      <th>Booking ID</th>
+                      <th>Date</th>
+                      <th>State</th>
+                      <th>Type</th>
+                      <th>Taxable Amt</th>
+                      <th>CGST</th>
+                      <th>SGST</th>
+                      <th>IGST</th>
+                      <th>Total GST</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {currentGstRows.map((row, idx) => (
+                      <tr key={idx}>
+                        <td className="booking-id-v20">{row.id}</td>
+                        <td className="date-v20">{row.date}</td>
+                        <td className="state-v20">{row.state}</td>
+                        <td><span className={`type-tag-v20 ${row.type.toLowerCase()}`}>{row.type}</span></td>
+                        <td>₹{row.taxable.toLocaleString('en-IN')}</td>
+                        <td>{row.cgst > 0 ? `₹${row.cgst.toLocaleString('en-IN')}` : '-'}</td>
+                        <td>{row.sgst > 0 ? `₹${row.sgst.toLocaleString('en-IN')}` : '-'}</td>
+                        <td>{row.igst > 0 ? `₹${row.igst.toLocaleString('en-IN')}` : '-'}</td>
+                        <td className="total-cell-v20">₹{row.total.toLocaleString('en-IN')}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
 
-                    <div className="gst-secondary-sections-v19">
-                      {/* Adjustments */}
-                      <div className="gst-adjustment-card-v19">
-                        <div className="adj-header-v19">
-                          <div className="adj-title-v19">
-                            <label>Adjustments</label>
-                            <span>GST Reversed (Cancelled Orders)</span>
-                          </div>
-                          <span className="adj-value-v19 negative">- ₹900</span>
-                        </div>
-                      </div>
-
-                      {/* ITC Section */}
-                      <div className="gst-itc-section-v19">
-                        <div className="itc-header-v19">
-                          <div className="itc-title-v19">
-                            <label>ITC on Commission</label>
-                            <span className="itc-helper-v19">GST paid on platform commission</span>
-                          </div>
-                          <span className="itc-value-v19 positive">₹450</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Export Actions */}
-                    <div className="gst-export-actions-v19">
-                      <button className="export-btn-primary-v19">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                        Download GST Report (Excel)
+              <div className="tds-pagination-v15">
+                <div className="pagination-info-v15">
+                  Showing {indexOfFirstGst + 1} to {Math.min(indexOfLastGst, gstBookings.length)} of {gstBookings.length} entries
+                </div>
+                <div className="pagination-controls-v15">
+                  <button 
+                    className="pagi-btn-v15" 
+                    onClick={() => setGstPage(prev => Math.max(prev - 1, 1))}
+                    disabled={gstPage === 1}
+                  >
+                    Previous
+                  </button>
+                  <div className="pagi-numbers-v15">
+                    {[...Array(totalGstPages)].map((_, i) => (
+                      <button 
+                        key={i} 
+                        className={`pagi-num-v15 ${gstPage === i + 1 ? 'active' : ''}`}
+                        onClick={() => setGstPage(i + 1)}
+                      >
+                        {i + 1}
                       </button>
-                      <button className="export-btn-secondary-v19">
-                        Download Summary (PDF)
-                      </button>
-                    </div>
-
-                    {/* Footer Info */}
-                    <div className="gst-footer-info-v19">
-                      <p className="helper-v19">Includes all GST details for your bookings. Share with your CA for filing.</p>
-                      <p className="disclaimer-v19">System-generated report. Please verify before filing GST returns.</p>
-                    </div>
+                    ))}
                   </div>
+                  <button 
+                    className="pagi-btn-v15" 
+                    onClick={() => setGstPage(prev => Math.min(prev + 1, totalGstPages))}
+                    disabled={gstPage === totalGstPages}
+                  >
+                    Next
+                  </button>
                 </div>
               </div>
             </div>
 
-            <div className="tds-footer-v14">
-              <span>Last updated: Mar 22, 2026 • 17:05 IST</span>
+            {/* 4. Reporting Footnote & Compliance Guidance */}
+            <div className="gst-footer-advice-v20">
+              <div className="advice-card-v20 share-ca">
+                <div className="advice-meta-v20">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                  <p>Share this report with your <strong>Chartered Accountant (CA)</strong> for final GST filing.</p>
+                </div>
+              </div>
+              <div className="advice-card-v20 disclaimer">
+                <div className="advice-meta-v20">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                  <p>System-generated report based on your bookings. Please <strong>verify all details</strong> before filing.</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="reports-footnote-v20">
+              Last updated: Mar 23, 2026 • Reporting data synced with payout cycles
             </div>
           </div>
         )}
