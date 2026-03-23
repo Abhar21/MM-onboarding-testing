@@ -5303,6 +5303,29 @@ const BookingDetailModal = ({
 
 const Reports = () => {
   const [activeReportTab, setActiveReportTab] = useState('Revenue');
+  const [currentPage, setCurrentPage] = useState(1);
+  const rowsPerPage = 10;
+
+  const tdsData = [
+    { id: 'BK-12401', date: '20 Mar 2026', gross: 50000, tds: 500, net: 49500, status: 'Paid' },
+    { id: 'BK-12398', date: '18 Mar 2026', gross: 45000, tds: 450, net: 44550, status: 'Paid' },
+    { id: 'BK-12385', date: '15 Mar 2026', gross: 75000, tds: 750, net: 74250, status: 'Pending' },
+    { id: 'BK-12372', date: '12 Mar 2026', gross: 30000, tds: 300, net: 29700, status: 'Paid' },
+    { id: 'BK-12359', date: '10 Mar 2026', gross: 120000, tds: 1200, net: 118800, status: 'Paid' },
+    { id: 'BK-12344', date: '05 Mar 2026', gross: 55000, tds: 550, net: 54450, status: 'Paid' },
+    { id: 'BK-12330', date: '01 Mar 2026', gross: 88000, tds: 880, net: 87120, status: 'Paid' },
+    { id: 'BK-12295', date: '25 Feb 2026', gross: 42000, tds: 420, net: 41580, status: 'Paid' },
+    { id: 'BK-12280', date: '20 Feb 2026', gross: 60000, tds: 600, net: 59400, status: 'Paid' },
+    { id: 'BK-12265', date: '15 Feb 2026', gross: 70000, tds: 700, net: 69300, status: 'Paid' },
+    { id: 'BK-12250', date: '10 Feb 2026', gross: 35000, tds: 350, net: 34650, status: 'Paid' },
+    { id: 'BK-12235', date: '05 Feb 2026', gross: 48000, tds: 480, net: 47520, status: 'Paid' },
+    { id: 'BK-12220', date: '01 Feb 2026', gross: 95000, tds: 950, net: 94050, status: 'Paid' },
+  ];
+
+  const indexOfLastRow = currentPage * rowsPerPage;
+  const indexOfFirstRow = indexOfLastRow - rowsPerPage;
+  const currentRows = tdsData.slice(indexOfFirstRow, indexOfLastRow);
+  const totalPages = Math.ceil(tdsData.length / rowsPerPage);
 
   const tabs = ['Revenue', 'GST', 'TDS'];
 
@@ -5708,6 +5731,84 @@ const Reports = () => {
                       <line x1="12" y1="15" x2="12" y2="3"></line>
                     </svg>
                     Download Form 16A
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* TDS Breakdown Table Section */}
+            <div className="tds-breakdown-section-v15">
+              <div className="tds-breakdown-header-v15">
+                <div className="header-left-v15">
+                  <h4>Booking Wise TDS Breakdown</h4>
+                  <p className="tds-note-v15">TDS @1% is deducted on applicable bookings</p>
+                </div>
+                <div className="header-right-v15">
+                  <span className="total-label-v15">Total TDS:</span>
+                  <span className="total-value-v15">₹2,900</span>
+                </div>
+              </div>
+
+              <div className="tds-table-container-v15">
+                <table className="tds-table-v15">
+                  <thead>
+                    <tr>
+                      <th>Booking ID</th>
+                      <th>Event Date</th>
+                      <th>Gross Amount</th>
+                      <th>TDS Amount</th>
+                      <th>Net Paid</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {currentRows.map((row, idx) => (
+                      <tr key={idx}>
+                        <td className="booking-id-v15">{row.id}</td>
+                        <td>{row.date}</td>
+                        <td>₹{row.gross.toLocaleString('en-IN')}</td>
+                        <td className="tds-amt-v15">-₹{row.tds.toLocaleString('en-IN')}</td>
+                        <td className="net-paid-v15">₹{row.net.toLocaleString('en-IN')}</td>
+                        <td>
+                          <span className={`status-pill-v15 ${row.status.toLowerCase()}`}>
+                            {row.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="tds-pagination-v15">
+                <div className="pagination-info-v15">
+                  Showing {indexOfFirstRow + 1} to {Math.min(indexOfLastRow, tdsData.length)} of {tdsData.length} entries
+                </div>
+                <div className="pagination-controls-v15">
+                  <button 
+                    className="pagi-btn-v15" 
+                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                    disabled={currentPage === 1}
+                  >
+                    Previous
+                  </button>
+                  <div className="pagi-numbers-v15">
+                    {[...Array(totalPages)].map((_, i) => (
+                      <button 
+                        key={i} 
+                        className={`pagi-num-v15 ${currentPage === i + 1 ? 'active' : ''}`}
+                        onClick={() => setCurrentPage(i + 1)}
+                      >
+                        {i + 1}
+                      </button>
+                    ))}
+                  </div>
+                  <button 
+                    className="pagi-btn-v15" 
+                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                    disabled={currentPage === totalPages}
+                  >
+                    Next
                   </button>
                 </div>
               </div>

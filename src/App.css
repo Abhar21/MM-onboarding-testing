@@ -15930,3 +15930,205 @@ input:checked+.slider-v4:before {
   from { transform: translateY(10px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
+
+/* TDS Breakdown Section V15 */
+.tds-breakdown-section-v15 {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  margin-top: 24px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.tds-breakdown-header-v15 {
+  padding: 20px 24px;
+  border-bottom: 1px solid #f1f5f9;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  background: #f8fafc;
+}
+
+.header-left-v15 h4 {
+  margin: 0 0 4px 0;
+  font-size: 1.1rem;
+  color: #1e293b;
+  font-weight: 700;
+}
+
+.tds-note-v15 {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.header-right-v15 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.total-label-v15 {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.total-value-v15 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.tds-table-container-v15 {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.tds-table-v15 {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.tds-table-v15 th {
+  padding: 14px 24px;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  color: #64748b;
+  background: white;
+  border-bottom: 1px solid #f1f5f9;
+  font-weight: 600;
+}
+
+.tds-table-v15 td {
+  padding: 16px 24px;
+  font-size: 0.9rem;
+  color: #334155;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.tds-table-v15 tr:last-child td {
+  border-bottom: none;
+}
+
+.tds-table-v15 tr:hover td {
+  background: #fcfdfe;
+}
+
+.booking-id-v15 {
+  font-weight: 600;
+  color: #7c3aed;
+}
+
+.tds-amt-v15 {
+  color: #ef4444;
+  font-weight: 500;
+}
+
+.net-paid-v15 {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.status-pill-v15 {
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+}
+
+.status-pill-v15.paid {
+  background: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid #dcfce7;
+}
+
+.status-pill-v15.pending {
+  background: #fffbeb;
+  color: #d97706;
+  border: 1px solid #fef3c7;
+}
+
+.tds-pagination-v15 {
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f8fafc;
+  border-top: 1px solid #f1f5f9;
+}
+
+.pagination-info-v15 {
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.pagination-controls-v15 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pagi-btn-v15 {
+  padding: 6px 12px;
+  border: 1px solid #e2e8f0;
+  background: white;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pagi-btn-v15:hover:not(:disabled) {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.pagi-btn-v15:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagi-numbers-v15 {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pagi-num-v15 {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  background: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pagi-num-v15:hover {
+  background: #f1f5f9;
+}
+
+.pagi-num-v15.active {
+  background: #7c3aed;
+  color: white;
+  border-color: #7c3aed;
+}
