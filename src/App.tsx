@@ -1646,8 +1646,6 @@ const Settings = ({
   const [closureReason, setClosureReason] = useState('');
   const [deactivatePassword, setDeactivatePassword] = useState('');
   const [closureOtp, setClosureOtp] = useState('');
-  const [subscriptionStatus, setSubscriptionStatus] = useState<'active' | 'cancelled'>('active');
-  const [showCancelSubModal, setShowCancelSubModal] = useState(false);
 
   const handleCloseDangerModals = () => {
     setShowDeactivateModal(false);
@@ -1659,9 +1657,6 @@ const Settings = ({
     setClosureReason('');
   };
 
-  const handleCloseSubscriptionModal = () => {
-    setShowCancelSubModal(false);
-  };
 
   const tabs = [
     { id: 'account', label: 'Account' },
@@ -6602,6 +6597,9 @@ const CheckoutModal = ({ isOpen, plan, onClose }: { isOpen: boolean, plan: any, 
               </div>
               <div className="premium-accent-v5"></div>
               <div className="subtle-sparkle-v5">✨</div>
+            </div>
+            <div className="subscription-note-v5">
+              <span>Note:</span> This payment will reflect after current subscription is completed
             </div>
 
             {/* 2. Coupon Section */}
