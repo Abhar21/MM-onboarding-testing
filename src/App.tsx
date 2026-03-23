@@ -1646,6 +1646,8 @@ const Settings = ({
   const [closureReason, setClosureReason] = useState('');
   const [deactivatePassword, setDeactivatePassword] = useState('');
   const [closureOtp, setClosureOtp] = useState('');
+  const [subscriptionStatus, setSubscriptionStatus] = useState<'active' | 'cancelled'>('active');
+  const [showCancelSubModal, setShowCancelSubModal] = useState(false);
 
   const handleCloseDangerModals = () => {
     setShowDeactivateModal(false);
@@ -1655,6 +1657,10 @@ const Settings = ({
     setDeactivatePassword('');
     setClosureOtp('');
     setClosureReason('');
+  };
+
+  const handleCloseSubscriptionModal = () => {
+    setShowCancelSubModal(false);
   };
 
   const tabs = [
@@ -1823,7 +1829,7 @@ const Settings = ({
             <div className="settings-pane-v4">
               <h3 className="pane-title">Subscription Plan</h3>
 
-              <div className="active-plan-container-v4 main-display-v4 starter-premium">
+              <div className="active-plan-container-v4 main-display-v4 growth-premium">
                 <div className="plan-card-bg-v4">
                   <PlanAbstract />
                   <PlanSparkles />
@@ -1845,18 +1851,17 @@ const Settings = ({
                     </div>
                   </div>
 
-                  <div className="auto-renew-segment-v4">
-                    <div className="status-group-v4 vertical-stack-v4">
-                      <div className="status-label-v4">Auto-renew: <span className={autoRenew ? 'status-on' : 'status-off'}>{autoRenew ? 'ON' : 'OFF'}</span></div>
-                      <div className="status-value-v4 emphasized-v4">{autoRenew ? 'Renews on April 01, 2026' : 'Expires on April 01, 2026'}</div>
-                      <button className="manage-renew-btn-v4 inline-action-v4" onClick={() => setShowAutoRenewModal(true)}>
-                        Manage Auto-renew
-                      </button>
+                  <div className="auto-renew-segment-v4 horizontal-layout-v4">
+                    <div className="info-column-v4">
+                      <div className="info-label-v4">Next billing date</div>
+                      <div className="info-value-v4 emphasized-v4">April 01, 2026</div>
                     </div>
-                    <div className="payment-method-horizontal-v4">
-                      <span className="payment-label-v4">Payment method: </span>
-                      <span className="payment-value-text-v4">UPI ••••9823</span>
-                      <button className="change-payment-link-v4" onClick={() => { }}>Change</button>
+                    <div className="info-column-v4">
+                      <div className="info-label-v4">Payment Method</div>
+                      <div className="info-value-v4">
+                        <span className="emphasized-v4">UPI ••••9823</span>
+                        <button className="change-payment-link-v4" onClick={() => { }}>Change</button>
+                      </div>
                     </div>
                   </div>
                 </div>
