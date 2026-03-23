@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, Fragment } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Routes, Route, useNavigate, Navigate, Link } from 'react-router-dom';
 import './App.css';
 import './ratings.css';
@@ -2205,23 +2205,24 @@ const ServiceSettings = () => {
 
   const [overallStatus, setOverallStatus] = useState('All changes saved');
   const [overlapError, setOverlapError] = useState<string | null>(null);
+  const [dietFilter, setDietFilter] = useState('All');
 
   const [menus, setMenus] = useState([
     {
       id: 1, name: 'Standard Breakfast', price: 250, status: 'Active', category: 'breakfast',
-      minMembers: '20', maxMembers: '100', foodType: 'Veg', image: null as string | null,
+      minMembers: '20', maxMembers: '100', dietType: 'Veg', image: null as string | null,
       sections: [
         { name: 'Starters', type: 'All Included', limit: 0, items: [{ name: 'Idli', description: 'Steamed rice cakes', image: null as string | null }] }
       ]
     },
     {
       id: 2, name: 'Premium Lunch Buffet', price: 650, status: 'Active', category: 'lunch',
-      minMembers: '50', maxMembers: '200', foodType: 'Veg', image: null as string | null,
+      minMembers: '50', maxMembers: '200', dietType: 'Veg', image: null as string | null,
       sections: []
     },
     {
       id: 3, name: 'Evening Hi-Tea', price: 180, status: 'Disabled', category: 'snacks',
-      minMembers: '15', maxMembers: '50', foodType: 'Veg', image: null as string | null,
+      minMembers: '15', maxMembers: '50', dietType: 'Veg', image: null as string | null,
       sections: []
     },
   ]);
@@ -2230,7 +2231,7 @@ const ServiceSettings = () => {
   const [menuIdentity, setMenuIdentity] = useState({
     name: '',
     image: null as string | null,
-    foodType: 'Veg',
+    dietType: 'Veg',
     price: '',
     minMembers: '',
     maxMembers: ''
@@ -2285,7 +2286,7 @@ const ServiceSettings = () => {
     setMenuIdentity({
       name: '',
       image: null,
-      foodType: 'Veg',
+      dietType: 'Veg',
       price: '',
       minMembers: '',
       maxMembers: ''
@@ -2298,6 +2299,8 @@ const ServiceSettings = () => {
   };
 
   const currentSettings = settings[activeCategory as keyof typeof settings];
+
+  const totalItemsCount = sections.reduce((acc, sec) => acc + (sec.items?.length || 0), 0);
 
   const handleToggle = () => {
     setSettings(prev => ({
@@ -2629,8 +2632,21 @@ const ServiceSettings = () => {
                     </button>
                   </div>
 
+                  <div className="menu-filter-bar-v4">
+                    {['All', 'Veg', 'Non-Veg'].map(filter => (
+                      <button
+                        key={filter}
+                        className={`filter-pill-v4 ${dietFilter === filter ? 'active' : ''}`}
+                        onClick={() => setDietFilter(filter)}
+                      >
+                        {filter !== 'All' && <span className={`filter-dot-v4 ${filter === 'Veg' ? 'veg' : 'non-veg'}`}></span>}
+                        {filter}
+                      </button>
+                    ))}
+                  </div>
+
                   <div className="menu-list">
-                    {menus.filter(m => m.category === activeCategory).map(menu => (
+                    {menus.filter(m => m.category === activeCategory && (dietFilter === 'All' || m.dietType === dietFilter)).map(menu => (
                       <div key={menu.id} className="menu-card">
                         <div className="menu-card-header">
                           <div className="menu-header-left">
@@ -2645,9 +2661,15 @@ const ServiceSettings = () => {
                             </div>
                             <div className="menu-main-info">
                               <h4>{menu.name}</h4>
+                              <div className="menu-diet-status-v4">
+                                <span className={`diet-tag-v4 ${menu.dietType === 'Veg' ? 'veg' : 'non-veg'}`}>
+                                  <svg width="8" height="8" viewBox="0 0 12 12" fill="none"><rect x="0.5" y="0.5" width="11" height="11" rx="1.5" stroke="currentColor" strokeWidth="2"/><circle cx="6" cy="6" r="3" fill="currentColor" /></svg>
+                                  {menu.dietType}
+                                </span>
+                                <span className={`status-badge ${menu.status.toLowerCase()}`}>{menu.status}</span>
+                              </div>
                               <div className="menu-meta">
                                 <span className="menu-price">₹{menu.price}</span>
-                                <span className={`status-badge ${menu.status.toLowerCase()}`}>{menu.status}</span>
                               </div>
                             </div>
                           </div>
@@ -2660,7 +2682,7 @@ const ServiceSettings = () => {
                                   price: menu.price.toString(),
                                   minMembers: menu.minMembers,
                                   maxMembers: menu.maxMembers,
-                                  foodType: menu.foodType,
+                                  dietType: menu.dietType,
                                   image: menu.image
                                 });
                                 setSections([...menu.sections]);
@@ -2824,28 +2846,24 @@ const ServiceSettings = () => {
                           </div>
                         </div>
 
-                        <div className="form-section-flat">
-                          <div className="form-group" style={{ marginBottom: '1.5rem' }}>
-                            <label className="input-label">Food Type</label>
-                            <div className="radio-group-pills">
-                              {['Veg', 'Non-Veg'].map(type => (
-                                <button
-                                  key={type}
-                                  className={`pill-btn ${type === 'Veg' ? 'pill-veg' : 'pill-non-veg'} ${menuIdentity.foodType === type ? 'active' : ''}`}
-                                  onClick={() => setMenuIdentity(prev => ({ ...prev, foodType: type }))}
-                                >
-                                  <span className="pill-icon">
-                                    {type === 'Veg' ? (
+                          <div className="form-section-flat">
+                            <div className="form-group" style={{ marginBottom: '1.5rem' }}>
+                              <label className="input-label">Diet Type</label>
+                              <div className="radio-group-pills">
+                                {['Veg', 'Non-Veg'].map(type => (
+                                  <button
+                                    key={type}
+                                    className={`pill-btn ${type === 'Veg' ? 'pill-veg' : 'pill-non-veg'} ${menuIdentity.dietType === type ? 'active' : ''}`}
+                                    onClick={() => setMenuIdentity(prev => ({ ...prev, dietType: type }))}
+                                  >
+                                    <span className="pill-icon">
                                       <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="0.5" y="0.5" width="11" height="11" rx="1.5" stroke="currentColor" /><circle cx="6" cy="6" r="3" fill="currentColor" /></svg>
-                                    ) : (
-                                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="0.5" y="0.5" width="11" height="11" rx="1.5" stroke="currentColor" /><circle cx="6" cy="6" r="3" fill="currentColor" /></svg>
-                                    )}
-                                  </span>
-                                  {type}
-                                </button>
-                              ))}
+                                    </span>
+                                    {type}
+                                  </button>
+                                ))}
+                              </div>
                             </div>
-                          </div>
 
                           <div className="form-group" style={{ maxWidth: '320px', marginBottom: '1.5rem' }}>
                             <label className="input-label">Price Per Person</label>
@@ -3045,68 +3063,69 @@ const ServiceSettings = () => {
                             <label className="input-label">Items in this Section</label>
                             <div className="item-cards-list">
                               {currentSection.items.map((item, i) => (
-                                <div key={i} className="item-input-card">
-                                  <div className="item-form-grid">
-                                    <div className="item-form-image">
-                                      <div className="item-upload-mini" onClick={() => {
-                                        const input = document.createElement('input');
-                                        input.type = 'file';
-                                        input.accept = 'image/*';
-                                        input.onchange = (e) => {
-                                          const file = (e.target as HTMLInputElement).files?.[0];
-                                          if (file) {
-                                            const reader = new FileReader();
-                                            reader.onloadend = () => {
-                                              const newItems = [...currentSection.items];
-                                              newItems[i].image = reader.result as string;
-                                              setCurrentSection(prev => ({ ...prev, items: newItems }));
-                                            };
-                                            reader.readAsDataURL(file);
-                                          }
-                                        };
-                                        input.click();
-                                      }}>
-                                        {item.image ? (
-                                          <img src={item.image} alt="Item" className="uploaded-mini-thumb" />
-                                        ) : (
-                                          <div className="upload-placeholder-mini">
-                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                                            <span>Photo</span>
-                                          </div>
-                                        )}
-                                      </div>
-                                    </div>
-                                    <div className="item-form-details">
-                                      <div className="form-group">
-                                        <input
-                                          type="text"
-                                          className="input-field item-name-field"
-                                          placeholder="Item Name"
-                                          value={item.name}
-                                          onChange={(e) => {
+                                <div key={i} className="section-item-row-v5">
+                                  {/* ... contents ... */}
+                                  <div className="item-photo-column-v5">
+                                    <div className="photo-upload-mini-v5" onClick={() => {
+                                      const input = document.createElement('input');
+                                      input.type = 'file';
+                                      input.accept = 'image/*';
+                                      input.onchange = (e: any) => {
+                                        const file = e.target.files?.[0];
+                                        if (file) {
+                                          const reader = new FileReader();
+                                          reader.onloadend = () => {
                                             const newItems = [...currentSection.items];
-                                            newItems[i].name = e.target.value;
+                                            newItems[i].image = reader.result as string;
                                             setCurrentSection(prev => ({ ...prev, items: newItems }));
-                                          }}
-                                        />
-                                      </div>
-                                      <div className="form-group">
-                                        <textarea
-                                          className="input-field item-desc-field"
-                                          placeholder="Short Description (max 1000 chars)"
-                                          maxLength={1000}
-                                          value={item.description}
-                                          onChange={(e) => {
-                                            const newItems = [...currentSection.items];
-                                            newItems[i].description = e.target.value;
-                                            setCurrentSection(prev => ({ ...prev, items: newItems }));
-                                          }}
-                                        />
-                                      </div>
+                                          };
+                                          reader.readAsDataURL(file);
+                                        }
+                                      };
+                                      input.click();
+                                    }}>
+                                      {item.image ? (
+                                        <img src={item.image} alt="Item" className="uploaded-mini-thumb-v5" />
+                                      ) : (
+                                        <div className="upload-placeholder-mini-v5">
+                                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                                          <span>Photo</span>
+                                        </div>
+                                      )}
                                     </div>
                                   </div>
+
+                                  <div className="item-fields-column-v5">
+                                    <div className="form-group-compact-v5">
+                                      <input
+                                        type="text"
+                                        className="input-field item-name-field-v5"
+                                        placeholder="Item Name"
+                                        value={item.name}
+                                        onChange={(e) => {
+                                          const newItems = [...currentSection.items];
+                                          newItems[i].name = e.target.value;
+                                          setCurrentSection(prev => ({ ...prev, items: newItems }));
+                                        }}
+                                      />
+                                    </div>
+                                    <div className="form-group-compact-v5">
+                                      <textarea
+                                        className="textarea-field item-desc-field-v5"
+                                        placeholder="Short Description (max 1000 chars)"
+                                        maxLength={1000}
+                                        value={item.description}
+                                        onChange={(e) => {
+                                          const newItems = [...currentSection.items];
+                                          newItems[i].description = e.target.value;
+                                          setCurrentSection(prev => ({ ...prev, items: newItems }));
+                                        }}
+                                      />
+                                    </div>
+                                  </div>
+
                                   {currentSection.items.length > 1 && (
-                                    <button className="item-remove-btn" onClick={() => {
+                                    <button className="item-remove-btn-v5" onClick={() => {
                                       setCurrentSection(prev => ({ ...prev, items: prev.items.filter((_, idx) => idx !== i) }));
                                     }}>
                                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
@@ -3140,9 +3159,6 @@ const ServiceSettings = () => {
                               Save Section
                             </button>
                           </div>
-                          <div className="section-save-hint">
-                            save the current section to create the new section
-                          </div>
                         </div>
                       )}
                     </div>
@@ -3150,55 +3166,46 @@ const ServiceSettings = () => {
 
                   {menuStep === 3 && (
                     <div className="step-content">
-                      <div className="preview-card">
-                        <div className="preview-identity">
-                          <div className="preview-img-box">
+                      <div className="preview-card-v5">
+                        <div className="preview-header-v5">
+                          <div className="preview-img-box-v5">
                             <img
                               src={menuIdentity.image || "https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?w=160&h=160&fit=crop"}
                               alt="Menu Preview"
-                              className="thumbnail-80"
                             />
                           </div>
-                          <div className="preview-info">
-                            <h4 className="preview-menu-name">{menuIdentity.name || 'Untitled Menu'}</h4>
-                            <div className="preview-sub-meta">
-                              <span className="preview-category-count">
-                                {activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1)} • {sections.length} Sections
-                              </span>
-                              <span className={`food-type-tag ${menuIdentity.foodType.toLowerCase()}`}>
-                                <span className="p-type-icon">
-                                  {menuIdentity.foodType === 'Veg' ? (
-                                    <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><rect x="0.5" y="0.5" width="11" height="11" rx="1.5" stroke="currentColor" /><circle cx="6" cy="6" r="3" fill="currentColor" /></svg>
-                                  ) : (
-                                    <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><rect x="0.5" y="0.5" width="11" height="11" rx="1.5" stroke="currentColor" /><circle cx="6" cy="6" r="3" fill="currentColor" /></svg>
-                                  )}
-                                </span>
-                                {menuIdentity.foodType}
+                          <div className="preview-info-v5">
+                            <div className="preview-title-row-v5">
+                              <h4 className="preview-menu-name-v5">{menuIdentity.name || 'Untitled Menu'}</h4>
+                              <span className={`diet-tag-v4 ${menuIdentity.dietType === 'Veg' ? 'veg' : 'non-veg'}`}>
+                                <svg width="8" height="8" viewBox="0 0 12 12" fill="none"><rect x="0.5" y="0.5" width="11" height="11" rx="1.5" stroke="currentColor" strokeWidth="2"/><circle cx="6" cy="6" r="3" fill="currentColor" /></svg>
+                                {menuIdentity.dietType}
                               </span>
                             </div>
+                            <div className="preview-summary-v5">
+                              {activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1)} • {sections.length} Sections • {totalItemsCount} Items
+                            </div>
+                            <div className="preview-price-v5">₹{menuIdentity.price || '0'}</div>
                           </div>
                         </div>
-                        <div className="preview-sections-v2">
+
+                        <div className="preview-sections-v5">
                           {sections.map((sec, idx) => (
-                            <Fragment key={idx}>
-                              <div className="preview-section-item-flat">
-                                <div className="p-sec-header">
-                                  <span className="p-sec-name">{sec.name}</span>
-                                  <span className="p-sec-summary">
-                                    {sec.type?.toLowerCase().trim() === 'all included' ? '→ all included' : `→ choose any ${sec.limit} from ${sec.items.length} items`}
-                                  </span>
-                                </div>
-                                <div className="p-sec-items-detailed-list">
-                                  {sec.items.map((item: any, i: number) => (
-                                    <div key={i} className="p-item-detail">
-                                      <span className="p-item-name">{item.name}</span>
-                                      {item.description && <span className="p-item-desc">• {item.description}</span>}
-                                    </div>
-                                  ))}
-                                </div>
+                            <div key={idx} className="preview-section-block-v5">
+                              <div className="p-sec-header-v5">
+                                <h5 className="p-sec-title-v5">{sec.name}</h5>
+                                <span className="p-sec-type-badge-v5">
+                                  {sec.type?.toLowerCase().trim() === 'all included' ? 'All included' : `Choose ${sec.limit}`}
+                                </span>
                               </div>
-                              {idx < sections.length - 1 && <div className="section-divider"></div>}
-                            </Fragment>
+                              <div className="p-sec-items-v5">
+                                {sec.items.map((item: any, i: number) => (
+                                  <div key={i} className="p-item-v5">
+                                    <div className="p-item-name-v5">{item.name}</div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
                           ))}
                         </div>
                       </div>
@@ -3234,20 +3241,20 @@ const ServiceSettings = () => {
                               price: parseInt(menuIdentity.price) || 0,
                               minMembers: menuIdentity.minMembers,
                               maxMembers: menuIdentity.maxMembers,
-                              foodType: menuIdentity.foodType,
+                              dietType: menuIdentity.dietType,
                               image: menuIdentity.image,
                               sections: [...sections]
                             } : m));
                           } else {
                             const newMenuObj = {
-                              id: menus.length + 1,
+                              id: Date.now(),
                               name: menuIdentity.name,
                               price: parseInt(menuIdentity.price) || 0,
                               status: 'Active',
                               category: activeCategory,
                               minMembers: menuIdentity.minMembers,
                               maxMembers: menuIdentity.maxMembers,
-                              foodType: menuIdentity.foodType,
+                              dietType: menuIdentity.dietType,
                               image: menuIdentity.image,
                               sections: [...sections]
                             };
@@ -4899,72 +4906,85 @@ const Reports = () => {
               </div>
 
               <div className="tds-certificate-section-v14">
-                <div className="tds-card-v14">
+                <div className="tds-card-v14 gst-breakdown-card-v19">
                   <div className="tds-card-header-v14">
                     <h4>GST Breakdown & Exports</h4>
-                    <div className="gst-export-actions-v14">
-                      <button className="gst-export-primary-v14">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    <select className="gst-month-select-v19">
+                      <option>March 2026</option>
+                      <option>February 2026</option>
+                      <option>January 2026</option>
+                    </select>
+                  </div>
+
+                  <div className="gst-breakdown-content-v19">
+                    {/* Primary Breakdown */}
+                    <div className="gst-main-metrics-v19">
+                      <div className="gst-metric-row-v19 total">
+                        <label>Total GST Collected</label>
+                        <span className="value-v19">₹18,200</span>
+                      </div>
+                      <div className="gst-metric-group-v19">
+                        <div className="gst-metric-row-v19">
+                          <label>Within State GST (CGST + SGST)</label>
+                          <span className="value-v19">₹7,200</span>
+                        </div>
+                        <div className="gst-nested-details-v19">
+                          <div className="nested-detail-item-v19">
+                            <label>SGST (9%)</label>
+                            <span>₹3,600</span>
+                          </div>
+                          <div className="nested-detail-item-v19">
+                            <label>CGST (9%)</label>
+                            <span>₹3,600</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="gst-metric-row-v19">
+                        <label>Interstate GST (IGST)</label>
+                        <span className="value-v19">₹11,000</span>
+                      </div>
+                    </div>
+
+                    <div className="gst-secondary-sections-v19">
+                      {/* Adjustments */}
+                      <div className="gst-adjustment-card-v19">
+                        <div className="adj-header-v19">
+                          <div className="adj-title-v19">
+                            <label>Adjustments</label>
+                            <span>GST Reversed (Cancelled Orders)</span>
+                          </div>
+                          <span className="adj-value-v19 negative">- ₹900</span>
+                        </div>
+                      </div>
+
+                      {/* ITC Section */}
+                      <div className="gst-itc-section-v19">
+                        <div className="itc-header-v19">
+                          <div className="itc-title-v19">
+                            <label>ITC on Commission</label>
+                            <span className="itc-helper-v19">GST paid on platform commission</span>
+                          </div>
+                          <span className="itc-value-v19 positive">₹450</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Export Actions */}
+                    <div className="gst-export-actions-v19">
+                      <button className="export-btn-primary-v19">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                         Download GST Report (Excel)
                       </button>
-                      <button className="gst-export-secondary-v14">PDF Summary</button>
+                      <button className="export-btn-secondary-v19">
+                        Download Summary (PDF)
+                      </button>
                     </div>
-                  </div>
 
-                  <div className="gst-export-info-box-v14">
-                    <p className="gst-export-helper-v14">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                      This report includes all GST details for your bookings. Share with your CA for filing.
-                    </p>
-                    <p className="gst-export-disclaimer-v14">System-generated report. Please verify before filing.</p>
-                  </div>
-
-                  <div className="gst-types-v14">
-                    <div className="gst-type-item-v14">
-                      <div className="type-label-group-v14">
-                        <span className="type-dot-v14 interstate"></span>
-                        <label>Interstate (IGST) - B2C</label>
-                      </div>
-                      <span className="type-value-v14">₹10,500</span>
+                    {/* Footer Info */}
+                    <div className="gst-footer-info-v19">
+                      <p className="helper-v19">Includes all GST details for your bookings. Share with your CA for filing.</p>
+                      <p className="disclaimer-v19">System-generated report. Please verify before filing GST returns.</p>
                     </div>
-                    <div className="gst-type-item-v14">
-                      <div className="type-label-group-v14">
-                        <span className="type-dot-v14 intrastate"></span>
-                        <label>Within State (CGST + SGST) - B2C</label>
-                      </div>
-                      <span className="type-value-v14">₹7,200</span>
-                    </div>
-                    <div className="gst-type-item-v14">
-                      <div className="type-label-group-v14">
-                        <span className="type-dot-v14 b2b"></span>
-                        <label>B2B Bookings (Taxable)</label>
-                      </div>
-                      <span className="type-value-v14">₹500</span>
-                    </div>
-                  </div>
-
-                  <div className="mini-table-container-v14">
-                    <table className="mini-gst-table-v14">
-                      <thead>
-                        <tr>
-                          <th>Booking</th>
-                          <th>Taxable</th>
-                          <th>GST</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr className="expandable-v14">
-                          <td>BK-9901</td>
-                          <td>₹4,500</td>
-                          <td>₹810</td>
-                        </tr>
-                        <tr className="expandable-v14">
-                          <td>BK-9884</td>
-                          <td>₹2,200</td>
-                          <td>₹396</td>
-                        </tr>
-                      </tbody>
-                    </table>
                   </div>
                 </div>
               </div>
