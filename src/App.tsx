@@ -1851,13 +1851,6 @@ const Settings = ({
                       <div className="info-label-v4">Next billing date</div>
                       <div className="info-value-v4 emphasized-v4">April 01, 2026</div>
                     </div>
-                    <div className="info-column-v4">
-                      <div className="info-label-v4">Payment Method</div>
-                      <div className="info-value-v4">
-                        <span className="emphasized-v4">UPI ••••9823</span>
-                        <button className="change-payment-link-v4" onClick={() => { }}>Change</button>
-                      </div>
-                    </div>
                   </div>
                 </div>
 
