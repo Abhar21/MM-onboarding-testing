@@ -9984,6 +9984,8 @@ input:checked+.slider-v4:before {
 
 .compact-body-v5 {
   padding: 0 24px 20px !important;
+  max-height: 450px;
+  overflow-y: auto;
 }
 
 .checkout-plan-preview-v5 {
@@ -10285,7 +10287,7 @@ input:checked+.slider-v4:before {
   flex-direction: column !important;
   align-items: center !important;
   gap: 12px !important;
-  margin-top: 24px !important;
+  margin-top: 12px !important;
   justify-content: center !important;
 }
 
@@ -15685,4 +15687,96 @@ input:checked+.slider-v4:before {
   display: flex;
   align-items: center;
   gap: 0.25rem;
+}
+/* GSTIN Section Styling in Checkout Modal */
+.gstin-card-v5 {
+  margin-top: 1.25rem;
+  margin-bottom: 1.5rem;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.gstin-input-wrapper-v5 {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.gstin-label-v5 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.gstin-input-v5 {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.gstin-input-v5:focus {
+  outline: none;
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+.gstin-validation-v5 {
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px dashed #e2e8f0;
+}
+
+.gstin-checkbox-label-v5 {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+  color: #1e293b;
+  cursor: pointer;
+  line-height: 1.4;
+}
+
+.gstin-checkbox-label-v5 input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  cursor: pointer;
+}
+
+.gstin-helper-v5 {
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  color: #64748b;
+  padding-left: 1.75rem;
+}
+
+/* Disabled state for Proceed button */
+.dominant-btn-v5.disabled-v5 {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(1);
+}
+
+/* Sticky Trust Strap for Checkout Modal */
+.trust-badges-v5.sticky-strap-v5 {
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+  padding: 0.6rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: #64748b;
+  border-radius: 0 0 12px 12px;
+  gap: 0.4rem;
+}
+
+.trust-badges-v5.sticky-strap-v5 svg {
+  color: #16a34a;
 }

@@ -6534,6 +6534,8 @@ const CheckoutModal = ({ isOpen, plan, onClose }: { isOpen: boolean, plan: any, 
   const [isApplied, setIsApplied] = useState(false);
   const [error, setError] = useState('');
   const [discount, setDiscount] = useState(0);
+  const [gstin, setGstin] = useState('');
+  const [isGstinConfirmed, setIsGstinConfirmed] = useState(false);
 
   if (!isOpen || !plan) return null;
 
@@ -6631,6 +6633,37 @@ const CheckoutModal = ({ isOpen, plan, onClose }: { isOpen: boolean, plan: any, 
               {isApplied && <p className="feedback-success-v5">Coupon applied -₹{discount.toLocaleString('en-IN')}</p>}
             </div>
 
+            {/* 2.1 GSTIN Section (Optional) */}
+            <div className="gstin-card-v5">
+              <div className="gstin-input-wrapper-v5">
+                <label className="gstin-label-v5">Enter GSTIN (optional)</label>
+                <input
+                  type="text"
+                  placeholder="Enter GSTIN (optional)"
+                  className="gstin-input-v5"
+                  value={gstin}
+                  onChange={(e) => {
+                    setGstin(e.target.value);
+                    if (e.target.value.trim() === '') setIsGstinConfirmed(false);
+                  }}
+                />
+              </div>
+              
+              {gstin.trim() !== '' && (
+                <div className="gstin-validation-v5">
+                  <label className="gstin-checkbox-label-v5">
+                    <input
+                      type="checkbox"
+                      checked={isGstinConfirmed}
+                      onChange={(e) => setIsGstinConfirmed(e.target.checked)}
+                    />
+                    <span>I confirm this GSTIN belongs to my business</span>
+                  </label>
+                  <p className="gstin-helper-v5">GST can be claimed only by the GSTIN holder</p>
+                </div>
+              )}
+            </div>
+
             {/* 3. Order Summary */}
             <div className="billing-summary-v5">
               <div className="summary-section-header-v5">Order Summary</div>
@@ -6680,22 +6713,23 @@ const CheckoutModal = ({ isOpen, plan, onClose }: { isOpen: boolean, plan: any, 
 
         <div className="modal-footer-v4 footer-vertical-v5">
           {/* 5. CTA Section */}
-          <button className={`btn-v4 dominant-btn-v5 ${plan.premiumClass}`} onClick={onClose}>
+          <button 
+            className={`btn-v4 dominant-btn-v5 ${plan.premiumClass} ${(gstin.trim() !== '' && !isGstinConfirmed) ? 'disabled-v5' : ''}`} 
+            onClick={(gstin.trim() !== '' && !isGstinConfirmed) ? undefined : onClose}
+            disabled={gstin.trim() !== '' && !isGstinConfirmed}
+          >
             Proceed to Pay
           </button>
-          <button className="cancel-link-v5" onClick={onClose}>Cancel</button>
 
-          <div className="footer-meta-v5">
-            <p className="redirect-text-v5">You’ll be redirected to secure payment</p>
-            <div className="trust-badges-v5">
-              <span className="trust-item-v5">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                </svg>
-                Secure payment via Razorpay
-              </span>
-            </div>
-          </div>
+        </div>
+
+        <div className="trust-badges-v5 sticky-strap-v5">
+          <span className="trust-item-v5">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+            Secure payment via Razorpay
+          </span>
         </div>
       </div>
     </div>
