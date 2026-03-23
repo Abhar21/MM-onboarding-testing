@@ -6524,6 +6524,9 @@ const CheckoutModal = ({ isOpen, plan, onClose }: { isOpen: boolean, plan: any, 
   const [discount, setDiscount] = useState(0);
   const [gstin, setGstin] = useState('');
   const [isGstinConfirmed, setIsGstinConfirmed] = useState(false);
+  const [savedUpiId, setSavedUpiId] = useState('UPI ••••9823');
+  const [showUpiModal, setShowUpiModal] = useState(false);
+  const [tempUpiId, setTempUpiId] = useState('');
 
   if (!isOpen || !plan) return null;
 
@@ -6694,11 +6697,46 @@ const CheckoutModal = ({ isOpen, plan, onClose }: { isOpen: boolean, plan: any, 
               <div className="method-display-v5">
                 <div className="method-left-v5">
                   <span className="upi-icon-v5">⚡</span>
-                  <span className="method-name-v5">UPI ••••9823</span>
+                  <span className="method-name-v5">{savedUpiId}</span>
                 </div>
-                <button className="change-link-v5">Change →</button>
+                <button className="change-link-v5" onClick={() => {
+                  setTempUpiId(savedUpiId.replace('UPI • ', '').replace('UPI ••••', ''));
+                  setShowUpiModal(true);
+                }}>Change &rarr;</button>
               </div>
             </div>
+
+            {/* Nested UPI Change Popup */}
+            {showUpiModal && (
+              <div className="upi-modal-overlay-v6">
+                <div className="upi-modal-content-v6">
+                  <div className="upi-modal-header-v6">
+                    <h4>Change UPI ID</h4>
+                    <button className="upi-close-v6" onClick={() => setShowUpiModal(false)}>&times;</button>
+                  </div>
+                  <div className="upi-modal-body-v6">
+                    <label>Enter new UPI ID</label>
+                    <input 
+                      type="text" 
+                      placeholder="e.g. user@upi" 
+                      value={tempUpiId}
+                      onChange={(e) => setTempUpiId(e.target.value)}
+                      autoFocus
+                    />
+                    <p className="upi-hint-v6">Verification might take a few seconds.</p>
+                  </div>
+                  <div className="upi-modal-footer-v6">
+                    <button className="upi-cancel-btn-v6" onClick={() => setShowUpiModal(false)}>Cancel</button>
+                    <button className="upi-save-btn-v6" onClick={() => {
+                      if (tempUpiId.trim()) {
+                        setSavedUpiId(`UPI • ${tempUpiId}`);
+                        setShowUpiModal(false);
+                      }
+                    }}>Save Changes</button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
