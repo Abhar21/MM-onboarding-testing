@@ -5352,6 +5352,19 @@ const Reports = () => {
   const indexOfFirstGst = indexOfLastGst - gstRowsPerPage;
   const currentGstRows = gstBookings.slice(indexOfFirstGst, indexOfLastGst);
   const totalGstPages = Math.ceil(gstBookings.length / gstRowsPerPage);
+  
+  const getNextMonthInfo = (month: string) => {
+    const months = ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar'];
+    const idx = months.indexOf(month);
+    const nextIdx = (idx + 1) % 12;
+    const nextMonth = months[nextIdx];
+    
+    // If we transition across Mar -> Apr, it's the next FY
+    // But conceptually here we just need the month name and a relative indicator
+    return { name: nextMonth, fullName: fullMonthNames[nextMonth] };
+  };
+
+  const nextMonthInfo = getNextMonthInfo(selectedMonthTab);
 
   const indexOfLastRow = currentPage * rowsPerPage;
   const indexOfFirstRow = indexOfLastRow - rowsPerPage;
@@ -5473,8 +5486,8 @@ const Reports = () => {
                 <div className="gst-summary-card-v20">
                   <label>GST Payable</label>
                   <div className="card-main-v20">
-                    <span className="value-v20">₹73,251</span>
-                    <span className="sub-v20">After adjustments</span>
+                    <span className="value-v20">₹73,051</span>
+                    <span className="sub-v20">After ITC adjustments</span>
                   </div>
                 </div>
               </div>
@@ -5491,18 +5504,37 @@ const Reports = () => {
                         <label>GSTR-1 (Outward Supplies)</label>
                         <span>Due by <strong>{selectedMonthTab === 'Mar' ? 'April 11, 2026' : 'Next Month 11th'}</strong></span>
                       </div>
-                      <span className="status-indicator-v20 critical">Next Action</span>
+                      <span className="status-indicator-v20 critical" style={{ display: (selectedFY === 'FY 2025-26' && selectedMonthTab === 'Mar') ? 'block' : 'none' }}>Due in 5 days</span>
                     </div>
                     <div className="deadline-item-v20">
                       <div className="deadline-info-v20">
                         <label>GSTR-3B (Summary Return)</label>
                         <span>Due by <strong>{selectedMonthTab === 'Mar' ? 'April 20, 2026' : 'Next Month 20th'}</strong></span>
                       </div>
-                      <span className="status-indicator-v20">Upcoming</span>
+                      <span className="status-indicator-v20" style={{ display: (selectedFY === 'FY 2025-26' && selectedMonthTab === 'Mar') ? 'block' : 'none' }}>Due in 14 days</span>
                     </div>
                     <div className="missed-alert-v20">
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="20 6 9 17 4 12"></polyline></svg>
                       <span>No missed deadlines for {selectedMonthTab}</span>
+                    </div>
+
+                    <div className="deadline-divider-v24"></div>
+                    
+                    <div className="next-cycle-v24">
+                      <div className="next-cycle-header-v24">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        <span>Next Filing Cycle: {nextMonthInfo.fullName}</span>
+                      </div>
+                      <div className="next-cycle-items-v24">
+                        <div className="next-cycle-item-v24">
+                          <label>GSTR-1</label>
+                          <span>Due {nextMonthInfo.name === 'Mar' ? 'April 11' : 'Next Month 11th'}</span>
+                        </div>
+                        <div className="next-cycle-item-v24">
+                          <label>GSTR-3B</label>
+                          <span>Due {nextMonthInfo.name === 'Mar' ? 'April 20' : 'Next Month 20th'}</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -5525,9 +5557,18 @@ const Reports = () => {
                       <span className="value-v23">₹42,158</span>
                     </div>
                     <div className="gst-breakdown-divider-v23"></div>
-                    <div className="gst-breakdown-item-v23 total">
-                      <span className="label-v23">Total GST</span>
+                    <div className="gst-breakdown-item-v23 collected">
+                      <span className="label-v23">GST Collected</span>
                       <span className="value-v23">₹76,651</span>
+                    </div>
+                    <div className="gst-breakdown-item-v23 itc">
+                      <span className="label-v23">ITC Available</span>
+                      <span className="value-v23 positive">₹3,600</span>
+                    </div>
+                    <div className="gst-breakdown-divider-v23"></div>
+                    <div className="gst-breakdown-item-v23 payable">
+                      <span className="label-v23">GST Payable</span>
+                      <span className="value-v23">₹73,051</span>
                     </div>
                   </div>
                 </div>
