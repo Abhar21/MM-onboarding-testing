@@ -2157,7 +2157,7 @@ const Settings = ({
                     <strong>Deactivate Account</strong>
                     <span>Temporarily hide your business from the platform. You can reactivate anytime.</span>
                   </div>
-                  <button 
+                  <button
                     className="danger-action-btn-v4"
                     onClick={() => {
                       setDeactivateStep('confirm');
@@ -2174,7 +2174,7 @@ const Settings = ({
                     <strong>Request Account Closure</strong>
                     <span>Permanently close your partner account. This action cannot be undone.</span>
                   </div>
-                  <button 
+                  <button
                     className="danger-action-btn-v4 closure"
                     onClick={() => {
                       setClosureStep('warning');
@@ -2229,7 +2229,7 @@ const Settings = ({
                         value={passwordForm.currentPassword}
                         onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
                       />
-                      <button 
+                      <button
                         className="p-toggle-v4"
                         onClick={() => setPasswordForm({ ...passwordForm, showCurrent: !passwordForm.showCurrent })}
                       >
@@ -2237,7 +2237,7 @@ const Settings = ({
                       </button>
                     </div>
                     {passwordError && <div className="p-error-v4">{passwordError}</div>}
-                    <button 
+                    <button
                       className="forgot-p-link-v4"
                       onClick={() => {
                         setPasswordStep('otp');
@@ -2282,7 +2282,7 @@ const Settings = ({
                         value={passwordForm.newPassword}
                         onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
                       />
-                      <button 
+                      <button
                         className="p-toggle-v4"
                         onClick={() => setPasswordForm({ ...passwordForm, showNew: !passwordForm.showNew })}
                       >
@@ -2312,7 +2312,7 @@ const Settings = ({
                         value={passwordForm.confirmPassword}
                         onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
                       />
-                      <button 
+                      <button
                         className="p-toggle-v4"
                         onClick={() => setPasswordForm({ ...passwordForm, showConfirm: !passwordForm.showConfirm })}
                       >
@@ -2341,9 +2341,9 @@ const Settings = ({
               {passwordStep !== 'success' && (
                 <button className="cancel-btn-v4" onClick={handleClosePasswordModal}>Cancel</button>
               )}
-              
+
               {passwordStep === 'current' && (
-                <button 
+                <button
                   className="submit-btn-v4"
                   disabled={!passwordForm.currentPassword}
                   onClick={() => {
@@ -2361,7 +2361,7 @@ const Settings = ({
               )}
 
               {passwordStep === 'otp' && (
-                <button 
+                <button
                   className="submit-btn-v4"
                   disabled={otpData.code.length !== 6}
                   onClick={() => setPasswordStep('new')}
@@ -2371,7 +2371,7 @@ const Settings = ({
               )}
 
               {passwordStep === 'new' && (
-                <button 
+                <button
                   className="submit-btn-v4"
                   disabled={
                     !Object.values(validatePassword(passwordForm.newPassword)).every(Boolean) ||
@@ -2466,8 +2466,8 @@ const Settings = ({
                   <div className="form-group-v4">
                     <label>PASSWORD</label>
                     <div className="password-input-wrapper-v4">
-                      <input 
-                        type="password" 
+                      <input
+                        type="password"
                         placeholder="Enter your password"
                         value={deactivatePassword}
                         onChange={(e) => setDeactivatePassword(e.target.value)}
@@ -2499,8 +2499,8 @@ const Settings = ({
               {deactivateStep === 'password' && (
                 <>
                   <button className="cancel-btn-v4" onClick={() => setDeactivateStep('confirm')}>Back</button>
-                  <button 
-                    className="btn-v4 primary-v4" 
+                  <button
+                    className="btn-v4 primary-v4"
                     onClick={() => {
                       setAccountStatus('inactive');
                       setDeactivateStep('success');
@@ -2558,7 +2558,7 @@ const Settings = ({
                   <p className="step-desc-v4">We're sorry to see you go. Please tell us why you're closing your account (optional).</p>
                   <div className="form-group-v4">
                     <label>REASON FOR LEAVING</label>
-                    <select 
+                    <select
                       className="select-field-v4"
                       value={closureReason}
                       onChange={(e) => setClosureReason(e.target.value)}
@@ -2574,8 +2574,8 @@ const Settings = ({
                   </div>
                   {closureReason === 'other' && (
                     <div className="form-group-v4" style={{ marginTop: '1rem' }}>
-                      <textarea 
-                        className="textarea-field-v4" 
+                      <textarea
+                        className="textarea-field-v4"
                         placeholder="Tell us more..."
                         style={{ height: '80px', width: '100%', borderRadius: '8px', border: '1px solid #e2e8f0', padding: '0.75rem', fontSize: '0.9rem' }}
                       ></textarea>
@@ -2631,8 +2631,8 @@ const Settings = ({
               {closureStep === 'otp' && (
                 <>
                   <button className="cancel-btn-v4" onClick={() => setClosureStep('reason')}>Back</button>
-                  <button 
-                    className="btn-v4 closure-btn-v4" 
+                  <button
+                    className="btn-v4 closure-btn-v4"
                     onClick={() => {
                       setAccountStatus('pending-closure');
                       setClosureStep('success');
@@ -3256,7 +3256,7 @@ const ServiceSettings = () => {
                               <h4>{menu.name}</h4>
                               <div className="menu-diet-status-v4">
                                 <span className={`diet-tag-v4 ${menu.dietType === 'Veg' ? 'veg' : 'non-veg'}`}>
-                                  <svg width="8" height="8" viewBox="0 0 12 12" fill="none"><rect x="0.5" y="0.5" width="11" height="11" rx="1.5" stroke="currentColor" strokeWidth="2"/><circle cx="6" cy="6" r="3" fill="currentColor" /></svg>
+                                  <svg width="8" height="8" viewBox="0 0 12 12" fill="none"><rect x="0.5" y="0.5" width="11" height="11" rx="1.5" stroke="currentColor" strokeWidth="2" /><circle cx="6" cy="6" r="3" fill="currentColor" /></svg>
                                   {menu.dietType}
                                 </span>
                                 <span className={`status-badge ${menu.status.toLowerCase()}`}>{menu.status}</span>
@@ -3439,24 +3439,24 @@ const ServiceSettings = () => {
                           </div>
                         </div>
 
-                          <div className="form-section-flat">
-                            <div className="form-group" style={{ marginBottom: '1.5rem' }}>
-                              <label className="input-label">Diet Type</label>
-                              <div className="radio-group-pills">
-                                {['Veg', 'Non-Veg'].map(type => (
-                                  <button
-                                    key={type}
-                                    className={`pill-btn ${type === 'Veg' ? 'pill-veg' : 'pill-non-veg'} ${menuIdentity.dietType === type ? 'active' : ''}`}
-                                    onClick={() => setMenuIdentity(prev => ({ ...prev, dietType: type }))}
-                                  >
-                                    <span className="pill-icon">
-                                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="0.5" y="0.5" width="11" height="11" rx="1.5" stroke="currentColor" /><circle cx="6" cy="6" r="3" fill="currentColor" /></svg>
-                                    </span>
-                                    {type}
-                                  </button>
-                                ))}
-                              </div>
+                        <div className="form-section-flat">
+                          <div className="form-group" style={{ marginBottom: '1.5rem' }}>
+                            <label className="input-label">Diet Type</label>
+                            <div className="radio-group-pills">
+                              {['Veg', 'Non-Veg'].map(type => (
+                                <button
+                                  key={type}
+                                  className={`pill-btn ${type === 'Veg' ? 'pill-veg' : 'pill-non-veg'} ${menuIdentity.dietType === type ? 'active' : ''}`}
+                                  onClick={() => setMenuIdentity(prev => ({ ...prev, dietType: type }))}
+                                >
+                                  <span className="pill-icon">
+                                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="0.5" y="0.5" width="11" height="11" rx="1.5" stroke="currentColor" /><circle cx="6" cy="6" r="3" fill="currentColor" /></svg>
+                                  </span>
+                                  {type}
+                                </button>
+                              ))}
                             </div>
+                          </div>
 
                           <div className="form-group" style={{ maxWidth: '320px', marginBottom: '1.5rem' }}>
                             <label className="input-label">Price Per Person</label>
@@ -3771,7 +3771,7 @@ const ServiceSettings = () => {
                             <div className="preview-title-row-v5">
                               <h4 className="preview-menu-name-v5">{menuIdentity.name || 'Untitled Menu'}</h4>
                               <span className={`diet-tag-v4 ${menuIdentity.dietType === 'Veg' ? 'veg' : 'non-veg'}`}>
-                                <svg width="8" height="8" viewBox="0 0 12 12" fill="none"><rect x="0.5" y="0.5" width="11" height="11" rx="1.5" stroke="currentColor" strokeWidth="2"/><circle cx="6" cy="6" r="3" fill="currentColor" /></svg>
+                                <svg width="8" height="8" viewBox="0 0 12 12" fill="none"><rect x="0.5" y="0.5" width="11" height="11" rx="1.5" stroke="currentColor" strokeWidth="2" /><circle cx="6" cy="6" r="3" fill="currentColor" /></svg>
                                 {menuIdentity.dietType}
                               </span>
                             </div>
@@ -5341,27 +5341,43 @@ const Reports = () => {
   const [selectedFY, setSelectedFY] = useState('FY 2025-26');
   const [selectedMonthTab, setSelectedMonthTab] = useState('Mar');
 
+  const [selectedRevenueFY, setSelectedRevenueFY] = useState('FY 2025-26');
+  const [selectedRevenueMonth, setSelectedRevenueMonth] = useState('Oct');
+
   const monthsList = ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar'];
   const fullMonthNames: Record<string, string> = {
     'Apr': 'April', 'May': 'May', 'Jun': 'June', 'Jul': 'July', 'Aug': 'August', 'Sep': 'September',
     'Oct': 'October', 'Nov': 'November', 'Dec': 'December', 'Jan': 'January', 'Feb': 'February', 'Mar': 'March'
   };
 
+  const revenueHeights = [45, 60, 55, 75, 85, 70, 90, 80, 65, 95, 88, 100];
+  const currentMonthIdx = monthsList.indexOf(selectedRevenueMonth);
+  const currentMonthVal = revenueHeights[currentMonthIdx];
+  const lastMonthVal = currentMonthIdx > 0 ? revenueHeights[currentMonthIdx - 1] : 75; // Fallback
+  const growthValue = ((currentMonthVal - lastMonthVal) / lastMonthVal * 100).toFixed(1);
+  const isGrowthPositive = parseFloat(growthValue) >= 0;
+
   const gstRowsPerPage = 8;
   const indexOfLastGst = gstPage * gstRowsPerPage;
   const indexOfFirstGst = indexOfLastGst - gstRowsPerPage;
   const currentGstRows = gstBookings.slice(indexOfFirstGst, indexOfLastGst);
   const totalGstPages = Math.ceil(gstBookings.length / gstRowsPerPage);
-  
+
   const getNextMonthInfo = (month: string) => {
     const months = ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar'];
     const idx = months.indexOf(month);
     const nextIdx = (idx + 1) % 12;
+    const deadlineIdx = (idx + 2) % 12;
     const nextMonth = months[nextIdx];
-    
+    const deadlineMonth = months[deadlineIdx];
+
     // If we transition across Mar -> Apr, it's the next FY
     // But conceptually here we just need the month name and a relative indicator
-    return { name: nextMonth, fullName: fullMonthNames[nextMonth] };
+    return {
+      name: nextMonth,
+      fullName: fullMonthNames[nextMonth],
+      deadlineMonthName: fullMonthNames[deadlineMonth]
+    };
   };
 
   const nextMonthInfo = getNextMonthInfo(selectedMonthTab);
@@ -5392,27 +5408,193 @@ const Reports = () => {
 
       <div className="report-content-v13">
         {activeReportTab === 'Revenue' && (
-          <div className="revenue-report-v13">
-            <div className="report-stats-grid-v13">
-              <div className="report-stat-card-v13">
-                <label>Total Earnings</label>
-                <h3>₹4,25,000</h3>
-                <span className="trend positive">↑ 12% vs last month</span>
+          <div className="revenue-dashboard-v24">
+            {/* 1. Header with FY Selector & Export */}
+            <div className="reports-section-header-v20">
+              <div className="section-title-group-v20">
+                <h3>Revenue Analytics</h3>
+                <p>Performance insights and earnings summary for {fullMonthNames[selectedRevenueMonth]} {selectedRevenueFY}</p>
               </div>
-              <div className="report-stat-card-v13">
-                <label>Pending Payouts</label>
-                <h3>₹95,000</h3>
-                <span className="trend">Next payout: 24 Mar</span>
-              </div>
-              <div className="report-stat-card-v13">
-                <label>Completed Bookings</label>
-                <h3>28</h3>
-                <span className="trend positive">↑ 4 this month</span>
+              <div className="section-filters-v20">
+                <select
+                  className="period-select-v20 fy-select-v22"
+                  value={selectedRevenueFY}
+                  onChange={(e) => setSelectedRevenueFY(e.target.value)}
+                >
+                  <option>FY 2025-26</option>
+                  <option>FY 2024-25</option>
+                </select>
               </div>
             </div>
 
-            <div className="report-chart-placeholder-v13">
-              <div className="placeholder-text">Earnings Chart (Weekly/Monthly view)</div>
+            {/* 2. Month Navigation Tabs */}
+            <div className="gst-month-nav-v22">
+              {monthsList.map((m) => {
+                const fyParts = selectedRevenueFY.replace('FY ', '').split('-');
+                const yearSuffix = ['Jan', 'Feb', 'Mar'].includes(m) ? fyParts[1] : fyParts[0].slice(-2);
+                return (
+                  <button
+                    key={m}
+                    className={`month-tab-v22 ${selectedRevenueMonth === m ? 'active' : ''}`}
+                    onClick={() => setSelectedRevenueMonth(m)}
+                  >
+                    {m} '{yearSuffix}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* 3. Revenue Summary Stats */}
+            <div className="revenue-stats-grid-v24">
+              <div className="revenue-card-v24 main">
+                <div className="card-label-v24">Total Revenue</div>
+                <div className="card-value-v24">₹4,25,840</div>
+                <div className="card-trend-v24 positive">↑ 12% vs last month</div>
+              </div>
+              <div className="revenue-card-v24">
+                <div className="card-label-v24">Net Earnings</div>
+                <div className="card-value-v24">₹4,21,582</div>
+                <div className="card-footer-v24">After all deductions</div>
+              </div>
+              <div className="revenue-card-v24">
+                <div className="card-label-v24">TDS Deducted</div>
+                <div className="card-value-v24">₹4,258</div>
+                <div className="card-footer-v24">TDS @ 1%</div>
+              </div>
+            </div>
+
+            {/* 4. Revenue Trend & Performance Grid */}
+            <div className="revenue-middle-grid-v24">
+              <div className="revenue-trend-section-v24">
+                <div className="inner-card-v24">
+                  <div className="card-header-v24">
+                    <h4>Monthly Revenue Trend</h4>
+                    <span className="fy-label-v24">{selectedRevenueFY}</span>
+                  </div>
+                  <div className="trend-chart-v24">
+                    {monthsList.map((m, idx) => {
+                      const val = revenueHeights[idx];
+                      return (
+                        <div key={m} className={`trend-bar-col-v24 ${selectedRevenueMonth === m ? 'active' : ''}`} onClick={() => setSelectedRevenueMonth(m)}>
+                          <div className="bar-wrapper-v24">
+                            <div className="bar-v24" style={{ height: `${val}%` }}>
+                              <span className="bar-tooltip-v24">₹{(val * 4500).toLocaleString()}</span>
+                            </div>
+                          </div>
+                          <span className="bar-label-v24">{m}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <div className="trend-summary-v24">
+                    <div className="trend-summary-item-v24">
+                      <label>{fullMonthNames[selectedRevenueMonth]} Revenue</label>
+                      <div className="value-v24">₹{(currentMonthVal * 4500).toLocaleString()}</div>
+                    </div>
+                    <div className="trend-summary-item-v24">
+                      <label>vs Last Month</label>
+                      <div className={`growth-v24 ${isGrowthPositive ? 'positive' : 'negative'}`}>
+                        {isGrowthPositive ? '↑' : '↓'} {Math.abs(parseFloat(growthValue))}%
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="performance-split-grid-v24">
+                <div className="inner-card-v24">
+                  <h4>Booking Performance</h4>
+                  <div className="performance-list-v24">
+                    <div className="perf-item-v24">
+                      <label>Total Bookings</label>
+                      <span>32</span>
+                    </div>
+                    <div className="perf-item-v24">
+                      <label>Completed</label>
+                      <span className="completed-v24">28</span>
+                    </div>
+                    <div className="perf-item-v24">
+                      <label>Cancelled</label>
+                      <span className="cancelled-v24">4</span>
+                    </div>
+                    <div className="perf-divider-v24"></div>
+                    <div className="perf-item-v24 conversion">
+                      <label>Conversion Rate</label>
+                      <span>87.5%</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="inner-card-v24">
+                  <h4>Revenue Breakdown</h4>
+                  <div className="breakdown-list-v24">
+                    <div className="breakdown-item-v24">
+                      <div className="breakdown-info-v24">
+                        <span className="dot b2b"></span>
+                        <label>B2B Revenue</label>
+                      </div>
+                      <span>₹2,85,400</span>
+                    </div>
+                    <div className="breakdown-item-v24">
+                      <div className="breakdown-info-v24">
+                        <span className="dot b2c"></span>
+                        <label>B2C Revenue</label>
+                      </div>
+                      <span>₹1,40,440</span>
+                    </div>
+                    <div className="progress-bar-v24">
+                      <div className="progress-fill-v24 b2b" style={{ width: '67%' }}></div>
+                      <div className="progress-fill-v24 b2c" style={{ width: '33%' }}></div>
+                    </div>
+                    <div className="breakdown-footer-v24">
+                      <span>67% B2B</span>
+                      <span>33% B2C</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 5. Payout Summary */}
+            <div className="payout-summary-section-v24">
+              <div className="inner-card-v24">
+                <div className="card-header-v24">
+                  <h4>Payout Summary</h4>
+                  <div className="payout-helper-v24">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                    Payouts are processed based on booking schedule
+                  </div>
+                </div>
+                <div className="payout-grid-v24">
+                  <div className="payout-status-card-v24 paid">
+                    <label>Paid Amount</label>
+                    <div className="payout-value-v24">₹3,25,000</div>
+                    <span className="status-tag-v24">Successfully Settled</span>
+                  </div>
+                  <div className="payout-status-card-v24 upcoming">
+                    <label>Upcoming Payout</label>
+                    <div className="payout-value-v24">₹65,850</div>
+                    <span className="status-tag-v24">Expected by 28 Mar</span>
+                  </div>
+                  <div className="payout-status-card-v24 processing">
+                    <label>Processing Payout</label>
+                    <div className="payout-value-v24">₹35,000</div>
+                    <span className="status-tag-v24">Initiated</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 6. Notes & Disclaimer */}
+            <div className="revenue-footer-advice-v24">
+              <div className="advice-meta-v24">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                <div className="advice-texts-v24">
+                  <p>Figures are based on completed bookings for the selected period.</p>
+                  <p>Payouts may vary based on settlement schedule and customer collection.</p>
+                </div>
+              </div>
             </div>
           </div>
         )}
@@ -5426,8 +5608,8 @@ const Reports = () => {
                 <p>Tax insights and compliance support for {fullMonthNames[selectedMonthTab]} {selectedFY}</p>
               </div>
               <div className="section-filters-v20">
-                <select 
-                  className="period-select-v20 fy-select-v22" 
+                <select
+                  className="period-select-v20 fy-select-v22"
                   value={selectedFY}
                   onChange={(e) => setSelectedFY(e.target.value)}
                 >
@@ -5453,7 +5635,7 @@ const Reports = () => {
                 const fyParts = selectedFY.replace('FY ', '').split('-');
                 const yearSuffix = ['Jan', 'Feb', 'Mar'].includes(m) ? fyParts[1] : fyParts[0].slice(-2);
                 return (
-                  <button 
+                  <button
                     key={m}
                     className={`month-tab-v22 ${selectedMonthTab === m ? 'active' : ''}`}
                     onClick={() => setSelectedMonthTab(m)}
@@ -5519,20 +5701,20 @@ const Reports = () => {
                     </div>
 
                     <div className="deadline-divider-v24"></div>
-                    
+
                     <div className="next-cycle-v24">
                       <div className="next-cycle-header-v24">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
                         <span>Next Filing Cycle: {nextMonthInfo.fullName}</span>
                       </div>
                       <div className="next-cycle-items-v24">
                         <div className="next-cycle-item-v24">
                           <label>GSTR-1</label>
-                          <span>Due {nextMonthInfo.name === 'Mar' ? 'April 11' : 'Next Month 11th'}</span>
+                          <span>Deadline {nextMonthInfo.deadlineMonthName} 11th</span>
                         </div>
                         <div className="next-cycle-item-v24">
                           <label>GSTR-3B</label>
-                          <span>Due {nextMonthInfo.name === 'Mar' ? 'April 20' : 'Next Month 20th'}</span>
+                          <span>Deadline {nextMonthInfo.deadlineMonthName} 20th</span>
                         </div>
                       </div>
                     </div>
@@ -5593,6 +5775,7 @@ const Reports = () => {
                       <th>SGST</th>
                       <th>IGST</th>
                       <th>Total GST</th>
+                      <th>Invoice</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -5607,6 +5790,13 @@ const Reports = () => {
                         <td>{row.sgst > 0 ? `₹${row.sgst.toLocaleString('en-IN')}` : '-'}</td>
                         <td>{row.igst > 0 ? `₹${row.igst.toLocaleString('en-IN')}` : '-'}</td>
                         <td className="total-cell-v20">₹{row.total.toLocaleString('en-IN')}</td>
+                        <td>
+                          {row.type === 'B2B' ? (
+                            <a href="#" className="download-invoice-link-v24" onClick={(e) => e.preventDefault()}>
+                              Download PDF
+                            </a>
+                          ) : '-'}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -5618,8 +5808,8 @@ const Reports = () => {
                   Showing {indexOfFirstGst + 1} to {Math.min(indexOfLastGst, gstBookings.length)} of {gstBookings.length} entries
                 </div>
                 <div className="pagination-controls-v15">
-                  <button 
-                    className="pagi-btn-v15" 
+                  <button
+                    className="pagi-btn-v15"
                     onClick={() => setGstPage(prev => Math.max(prev - 1, 1))}
                     disabled={gstPage === 1}
                   >
@@ -5627,8 +5817,8 @@ const Reports = () => {
                   </button>
                   <div className="pagi-numbers-v15">
                     {[...Array(totalGstPages)].map((_, i) => (
-                      <button 
-                        key={i} 
+                      <button
+                        key={i}
                         className={`pagi-num-v15 ${gstPage === i + 1 ? 'active' : ''}`}
                         onClick={() => setGstPage(i + 1)}
                       >
@@ -5636,8 +5826,8 @@ const Reports = () => {
                       </button>
                     ))}
                   </div>
-                  <button 
-                    className="pagi-btn-v15" 
+                  <button
+                    className="pagi-btn-v15"
                     onClick={() => setGstPage(prev => Math.min(prev + 1, totalGstPages))}
                     disabled={gstPage === totalGstPages}
                   >
@@ -5842,8 +6032,8 @@ const Reports = () => {
                   Showing {indexOfFirstRow + 1} to {Math.min(indexOfLastRow, tdsData.length)} of {tdsData.length} entries
                 </div>
                 <div className="pagination-controls-v15">
-                  <button 
-                    className="pagi-btn-v15" 
+                  <button
+                    className="pagi-btn-v15"
                     onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                     disabled={currentPage === 1}
                   >
@@ -5851,8 +6041,8 @@ const Reports = () => {
                   </button>
                   <div className="pagi-numbers-v15">
                     {[...Array(totalPages)].map((_, i) => (
-                      <button 
-                        key={i} 
+                      <button
+                        key={i}
                         className={`pagi-num-v15 ${currentPage === i + 1 ? 'active' : ''}`}
                         onClick={() => setCurrentPage(i + 1)}
                       >
@@ -5860,8 +6050,8 @@ const Reports = () => {
                       </button>
                     ))}
                   </div>
-                  <button 
-                    className="pagi-btn-v15" 
+                  <button
+                    className="pagi-btn-v15"
                     onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                     disabled={currentPage === totalPages}
                   >
@@ -5904,7 +6094,8 @@ const Bookings = () => {
         { status: 'Pending', time: '15 Mar, 09:00 AM' },
         { status: 'Confirmed', time: '15 Mar, 02:30 PM' },
         { status: 'Preparing', time: '20 Mar, 08:00 AM' }
-      ]
+      ],
+      taxType: 'B2C'
     },
     {
       id: 'BK-12405',
@@ -5925,7 +6116,8 @@ const Bookings = () => {
       timeline: [
         { status: 'Pending', time: '18 Mar, 11:15 AM' },
         { status: 'Confirmed', time: '18 Mar, 05:00 PM' }
-      ]
+      ],
+      taxType: 'B2B'
     },
     {
       id: 'BK-12398',
@@ -5947,7 +6139,8 @@ const Bookings = () => {
         { status: 'Confirmed', time: '10 Mar, 12:00 PM' },
         { status: 'Preparing', time: '19 Mar, 09:00 AM' },
         { status: 'Completed', time: '20 Mar, 11:00 PM' }
-      ]
+      ],
+      taxType: 'B2B'
     },
     {
       id: 'BK-12410',
@@ -5966,7 +6159,8 @@ const Bookings = () => {
       ],
       timeline: [
         { status: 'Pending', time: '21 Mar, 08:30 AM' }
-      ]
+      ],
+      taxType: 'B2C'
     },
     {
       id: 'BK-12412',
@@ -5986,7 +6180,8 @@ const Bookings = () => {
       timeline: [
         { status: 'Pending', time: '20 Mar, 04:00 PM' },
         { status: 'Confirmed', time: '21 Mar, 10:00 AM' }
-      ]
+      ],
+      taxType: 'B2B'
     },
     {
       id: 'BK-12415',
@@ -6005,7 +6200,8 @@ const Bookings = () => {
       ],
       timeline: [
         { status: 'Pending', time: '21 Mar, 11:00 AM' }
-      ]
+      ],
+      taxType: 'B2C'
     }
   ]);
 
@@ -6232,6 +6428,7 @@ const Bookings = () => {
                 <th>Booking ID</th>
                 <th>Customer</th>
                 <th>Event Date</th>
+                <th>Event</th>
                 <th>Type</th>
                 <th>Advance Payout</th>
                 <th>Balance</th>
@@ -6264,6 +6461,11 @@ const Bookings = () => {
                     </div>
                   </td>
                   <td>
+                    <div className="tax-type-badge-container-v24">
+                      <span className={`tax-type-badge-v24 ${(b as any).taxType?.toLowerCase()}`}>{(b as any).taxType}</span>
+                    </div>
+                  </td>
+                  <td>
                     <div className="amount-cell-v7">
                       <span className="total">₹ {b.paid.toLocaleString()}</span>
                       <span className="payout">Payout in {Math.ceil((new Date(b.date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) + 2}d</span>
@@ -6278,7 +6480,14 @@ const Bookings = () => {
                     <span className={`status-pill-v7 ${getStatusClass(b.status)}`}>{b.status}</span>
                   </td>
                   <td>
-                    <button className="btn-view-v7" onClick={() => { setSelectedBooking(b); setShowDetail(true); }}>View Details</button>
+                    <div className="actions-cell-v24">
+                      <button className="btn-view-v7" onClick={() => { setSelectedBooking(b); setShowDetail(true); }}>View</button>
+                      {b.status === 'Completed' && (b as any).taxType === 'B2B' && (
+                        <a href="#" className="download-invoice-link-v24 action-btn" onClick={(e) => e.preventDefault()}>
+                          Download Invoice
+                        </a>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -6800,7 +7009,7 @@ const CheckoutModal = ({ isOpen, plan, onClose }: { isOpen: boolean, plan: any, 
                   }}
                 />
               </div>
-              
+
               {gstin.trim() !== '' && (
                 <div className="gstin-validation-v5">
                   <label className="gstin-checkbox-label-v5">
@@ -6874,9 +7083,9 @@ const CheckoutModal = ({ isOpen, plan, onClose }: { isOpen: boolean, plan: any, 
                   </div>
                   <div className="upi-modal-body-v6">
                     <label>Enter new UPI ID</label>
-                    <input 
-                      type="text" 
-                      placeholder="e.g. user@upi" 
+                    <input
+                      type="text"
+                      placeholder="e.g. user@upi"
                       value={tempUpiId}
                       onChange={(e) => setTempUpiId(e.target.value)}
                       autoFocus
@@ -6900,8 +7109,8 @@ const CheckoutModal = ({ isOpen, plan, onClose }: { isOpen: boolean, plan: any, 
 
         <div className="modal-footer-v4 footer-vertical-v5">
           {/* 5. CTA Section */}
-          <button 
-            className={`btn-v4 dominant-btn-v5 ${plan.premiumClass} ${(gstin.trim() !== '' && !isGstinConfirmed) ? 'disabled-v5' : ''}`} 
+          <button
+            className={`btn-v4 dominant-btn-v5 ${plan.premiumClass} ${(gstin.trim() !== '' && !isGstinConfirmed) ? 'disabled-v5' : ''}`}
             onClick={(gstin.trim() !== '' && !isGstinConfirmed) ? undefined : onClose}
             disabled={gstin.trim() !== '' && !isGstinConfirmed}
           >
