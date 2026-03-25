@@ -6539,6 +6539,124 @@ const Bookings = () => {
   );
 };
 
+/* ─────────────────── HOME VIEW ─────────────────── */
+const HomeView = ({ setActiveTab }: { setActiveTab: (tab: string) => void }) => {
+  const todayDate = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+
+  return (
+    <div className="home-view-v25">
+      <div className="home-header-v25">
+        <div>
+          <h1 className="home-title-v25">Dashboard Overview</h1>
+          <div className="home-header-meta-v25">
+            <p className="home-date-v25">{todayDate}</p>
+            <div className="header-divider-v25"></div>
+            <div className="home-rating-badge-v25">
+               <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+               <span>4.3 Rating</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="home-main-grid-v25">
+        {/* 1. Today Overview Metrics Grid */}
+        <div className="home-stats-grid-v25">
+          <div className="home-stat-card-v25 main">
+            <span className="stat-card-label-v25">Today's Revenue</span>
+            <span className="stat-card-value-v25">₹45,800</span>
+          </div>
+
+          <div className="home-stat-card-v25">
+            <span className="stat-card-label-v25">Today's Bookings</span>
+            <span className="stat-card-value-v25">04</span>
+          </div>
+
+          <div className="home-stat-card-v25">
+            <span className="stat-card-label-v25">Upcoming (24h)</span>
+            <span className="stat-card-value-v25">03</span>
+          </div>
+        </div>
+
+        <div className="home-layout-columns-v25">
+          {/* Left Column: Daily Bookings Performance Graph */}
+          <div className="home-col-left-v25">
+             <div className="home-card-v25 bookings-graph-card-v25">
+               <div className="card-header-v25">
+                 <h3 className="card-title-v25">Daily Bookings Performance</h3>
+                 <div className="month-label-v25">Last 7 Days</div>
+               </div>
+               <div className="graph-container-v25">
+                 {[
+                   { day: 'Mon', value: 12 },
+                   { day: 'Tue', value: 18 },
+                   { day: 'Wed', value: 15 },
+                   { day: 'Thu', value: 24 },
+                   { day: 'Fri', value: 28 },
+                   { day: 'Sat', value: 32, active: true },
+                   { day: 'Sun', value: 25 },
+                 ].map((d, i) => (
+                   <div key={i} className="graph-bar-wrapper-v25">
+                     <div 
+                       className={`graph-bar-v25 ${d.active ? 'active' : ''}`} 
+                       style={{ height: `${(d.value / 35) * 95}%` }}
+                       data-value={d.value}
+                     ></div>
+                     <span className="day-label-v25">{d.day}</span>
+                   </div>
+                 ))}
+               </div>
+             </div>
+          </div>
+
+          {/* Right Column: Upcoming Bookings */}
+          <div className="home-col-right-v25">
+            <div className="home-card-v25 upcoming-list-card-v25">
+              <div className="card-header-v25">
+                <h3 className="card-title-v25">Upcoming Bookings</h3>
+                <button className="view-all-link-v25" onClick={() => setActiveTab('bookings')}>View All &rarr;</button>
+              </div>
+              <div className="upcoming-mini-list-v25">
+                {[
+                  { id: 'BK-12405', title: 'Dinner - Stylish Dinner menu 1', date: 'Today', time: '10:00 AM', timer: 'Starts in 2h 15m', guests: 150, collect: '₹63,000' },
+                  { id: 'BK-12410', title: 'Lunch - Executive Meal Pack', date: 'Today', time: '04:00 PM', timer: 'Starts in 8h 15m', guests: 45, collect: '₹25,200' },
+                  { id: 'BK-12415', title: 'Dinner - Premium Buffet Menu 2', date: 'Tomorrow', time: '09:00 AM', timer: 'Starts in 25h', guests: 300, collect: '₹1,05,000' },
+                  { id: 'BK-12420', title: 'Lunch - Standard Business Lunch', date: 'Tomorrow', time: '12:30 PM', timer: 'Starts in 28h', guests: 80, collect: '₹39,200' },
+                  { id: 'BK-12425', title: 'Dinner - Gourmet Celebration', date: '26 Mar', time: '08:00 PM', timer: 'Starts in 52h', guests: 120, collect: '₹1,00,800' },
+                ].map((booking, idx) => (
+                  <div key={idx} className="mini-booking-item-v25">
+                    <div className="booking-time-v25">
+                      <strong>{booking.date}</strong>
+                      <span>{booking.time}</span>
+                    </div>
+                    <div className="booking-main-info-v25">
+                      <p>{booking.id} • {booking.title}</p>
+                      <div className="booking-meta-line-v25">
+                        <div className="booking-timer-v25">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                          {booking.timer}
+                        </div>
+                        <div className="booking-guests-v25">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                          {booking.guests} Guests
+                        </div>
+                        <div className="booking-collect-v25">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="12" y1="15" x2="12" y2="15"/><circle cx="12" cy="12" r="3"/></svg>
+                          Collect: {booking.collect}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 /* ─────────────────── DASHBOARD ─────────────────── */
 const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
 
@@ -6767,18 +6885,7 @@ const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
       </aside>
       <main className="dashboard-main">
         <div className="dashboard-content no-header">
-          {activeTab === 'dashboard' && (
-            <>
-              <div className="dashboard-welcome-card">
-                <h2>Welcome to your Dashboard!</h2>
-                <p>Everything you need to manage your business in one place.</p>
-              </div>
-              <div className="dashboard-grid">
-                <div className="dashboard-stats-card">Stats coming soon...</div>
-                <div className="dashboard-stats-card">Recent Activity...</div>
-              </div>
-            </>
-          )}
+          {activeTab === 'dashboard' && <HomeView setActiveTab={setActiveTab} />}
           {activeTab === 'tickets' && <Tickets />}
           {activeTab === 'service-settings' && <ServiceSettings />}
           {activeTab === 'ratings' && <Ratings />}
