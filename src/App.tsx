@@ -4985,6 +4985,15 @@ const Ratings = () => {
   const totalReviews = reviews.length;
   const avgRating = (reviews.reduce((s, r) => s + r.rating, 0) / totalReviews).toFixed(1);
 
+  const getRatingCategory = (rating: number) => {
+    if (rating >= 4.0) return { label: 'Excellent', color: '#10b981', action: 'Boosted visibility applied', icon: '🚀' };
+    if (rating >= 3.5) return { label: 'Good', color: '#3b82f6', action: 'Standard visibility', icon: '✨' };
+    if (rating >= 3.0) return { label: 'Average', color: '#f59e0b', action: 'Monitor performance', icon: '📊' };
+    if (rating >= 2.5) return { label: 'Needs Attention', color: '#f97316', action: 'Provide tips for improvement', icon: '⚠️' };
+    return { label: 'Under Review', color: '#ef4444', action: 'Trigger internal review', icon: '🚨' };
+  };
+  const currentCategory = getRatingCategory(parseFloat(avgRating));
+
   const breakdown: { stars: number; count: number }[] = [5, 4, 3, 2, 1].map(s => ({
     stars: s,
     count: reviews.filter(r => r.rating === s).length,
@@ -5019,9 +5028,35 @@ const Ratings = () => {
               <div className="overall-star-v4">⭐</div>
               <div className="overall-value-v4">{avgRating}</div>
               <div className="overall-label-v4">Overall Rating</div>
+
+              {/* Category Badge */}
+              <div
+                className="rating-category-badge-v4 tooltip-container-v4"
+                style={{
+                  backgroundColor: currentCategory.color + '15',
+                  color: currentCategory.color,
+                  border: `1px solid ${currentCategory.color}30`
+                }}
+              >
+                <span className="category-icon-v4">{currentCategory.icon}</span>
+                <span className="category-label-v4">{currentCategory.label}</span>
+
+                {/* Tooltip */}
+                <div className="category-tooltip-v4">
+                  <div className="tooltip-title">Performance Status</div>
+                  <div className="tooltip-action">{currentCategory.action}</div>
+                  <div className="tooltip-scale">
+                    <div><span>4.0 - 5.0</span> <span>Excellent</span></div>
+                    <div><span>3.5 - 3.9</span> <span>Good</span></div>
+                    <div><span>3.0 - 3.4</span> <span>Average</span></div>
+                    <div><span>2.5 - 2.9</span> <span>Needs Attention</span></div>
+                    <div><span>Below 2.5</span> <span>Under Review</span></div>
+                  </div>
+                </div>
+              </div>
+
               <div className="total-reviews-count-v4">{totalReviews} customer reviews</div>
             </div>
-
             <h3 className="ratings-card-title-v4" style={{ marginTop: '0.5rem' }}>Rating Breakdown</h3>
             <div className="ratings-breakdown-list-v4">
               {breakdown.map(({ stars, count }) => (
@@ -5133,6 +5168,9 @@ const BookingDetailModal = ({
         <div className="detail-modal-header-v7">
           <div className="header-left-v7">
             <span className="booking-id-tag-v7">{booking.id}</span>
+            <div className={`tax-badge-v24 ${booking.taxType === 'B2B' ? 'b2b' : 'b2c'}`}>
+              {booking.taxType || 'B2C'}
+            </div>
             <div className="status-badge-v7" style={{ backgroundColor: getStatusColor(booking.status) + '15', color: getStatusColor(booking.status) }}>
               <span className="dot" style={{ backgroundColor: getStatusColor(booking.status) }}></span>
               {booking.status}
@@ -5186,6 +5224,15 @@ const BookingDetailModal = ({
               </div>
             </div>
 
+            <div className="gst-month-full-v24">
+              <div className="info-item-v7 gst-month-item-v24">
+                <label>GST Month</label>
+                <span className="gst-month-value-v24">
+                  {new Date(booking.date).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}
+                </span>
+              </div>
+            </div>
+
             {showMenuDetail && booking.menuSelection && (
               <div className="menu-selection-breakdown-v11">
                 {booking.menuSelection.map((section: any, idx: number) => (
@@ -5229,26 +5276,103 @@ const BookingDetailModal = ({
                   <label>Payout:</label>
                   <span>₹{booking.paid.toLocaleString()}</span>
                 </div>
-                <div className="payout-row-small-v11">
-                  <label>Expected on:</label>
-                  <span>{(() => {
-                    const date = new Date(booking.date);
-                    date.setDate(date.getDate() + 2);
-                    return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-                  })()}</span>
+                {(() => {
+                  const today = new Date();
+                  today.setHours(0, 0, 0, 0);
+                  const eventDate = new Date(booking.date);
+                  eventDate.setHours(0, 0, 0, 0);
+                  const isUpcoming = booking.status === 'Upcoming';
+                  const isCancelled = booking.status === 'Cancelled';
+
+                  let cancelledTime = new Date().getTime();
+                  if (isCancelled && booking.timeline) {
+                    const cancelledEntry = booking.timeline.find((t: any) => t.status === 'Cancelled');
+                    if (cancelledEntry) {
+                      const parts = cancelledEntry.time.split(', ');
+                      if (parts.length === 2) {
+                        const dateStr = parts[0] + ` ${new Date().getFullYear()} ` + parts[1];
+                        const parsed = new Date(dateStr).getTime();
+                        if (!isNaN(parsed)) cancelledTime = parsed;
+                      }
+                    }
+                  }
+
+                  const diffDays = Math.ceil((eventDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+
+                  // Default
+                  let label = 'Expected on:';
+                  let value = '';
+
+                  const payoutDate = new Date(booking.date);
+                  payoutDate.setDate(payoutDate.getDate() - 1);
+                  const formattedPayoutDate = payoutDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+
+                  if (isCancelled) {
+                    const timeUntilEvent = eventDate.getTime() - cancelledTime;
+                    // Prevent negative days if cancelled after the event (edge case)
+                    const diffDaysToEvent = Math.max(0, Math.ceil(timeUntilEvent / (1000 * 60 * 60 * 24)));
+                    const isVendor = (booking as any).cancelledBy === 'Vendor';
+
+                    if (isVendor) {
+                      label = 'Refund Status:';
+                      value = '100% Advance need to refund';
+                    } else {
+                      label = 'Refund Status:';
+                      if (diffDaysToEvent > 7) {
+                        value = '100% under review';
+                      } else if (diffDaysToEvent >= 5) {
+                        value = '50% under review';
+                      } else if (diffDaysToEvent >= 2) {
+                        value = '25% under review';
+                      } else {
+                        value = '0% under review';
+                      }
+                    }
+                  } else if (isUpcoming && diffDays > 2) {
+                    label = 'Expected on:';
+                    const expDate = new Date(booking.date);
+                    expDate.setDate(expDate.getDate() + 2);
+                    value = expDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+                  } else {
+                    label = 'Payout Credited At:';
+                    value = formattedPayoutDate;
+                  }
+
+                  return (
+                    <>
+                      {isCancelled && (
+                        <div className="payout-row-small-v11 cancelled-by-row" style={{ color: '#ef4444' }}>
+                          <label>Cancelled By:</label>
+                          <span style={{ fontWeight: 600 }}>{(booking as any).cancelledBy || 'Customer'}</span>
+                        </div>
+                      )}
+                      <div className="payout-row-small-v11">
+                        <label>{label}</label>
+                        <span className={value.includes('under review') ? 'status-pill-v7 review' : ''} style={value.includes('under review') || value.includes('refund') ? { color: '#f59e0b', fontWeight: 600 } : {}}>{value}</span>
+                      </div>
+                    </>
+                  );
+                })()}
+              </div>
+              {booking.status !== 'Cancelled' && booking.status !== 'Completed' && (
+                <div className="collection-warning-v11">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                  <span>Collect remaining amount on event day</span>
                 </div>
-              </div>
-              <div className="collection-warning-v11">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                <span>Collect remaining amount on event day</span>
-              </div>
+              )}
+              {booking.status === 'Completed' && (
+                <div className="collection-warning-v11 completed">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                  <span>You marked as booking completed which is remaining amount is collected</span>
+                </div>
+              )}
             </div>
           </div>
 
           <div className="detail-section-v7 docs-section-v12">
             <h4 className="section-title-v7">Documents</h4>
             <div className="documents-card-v12">
-              {['Upcoming', 'Preparing'].includes(booking.status) && (
+              {['Upcoming', 'Preparing', 'Cancelled'].includes(booking.status) && (
                 <div className="document-item-v12">
                   <div className="doc-info-v12">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
@@ -5281,8 +5405,156 @@ const BookingDetailModal = ({
                   </button>
                 </div>
               )}
+              {booking.taxType === 'B2B' && (
+                <div className="document-item-v12 b2b-gst-invoice-v24">
+                  <div className="doc-info-v12">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    <span>B2B GST Invoice</span>
+                  </div>
+                  <button className="doc-action-v12" title="Download">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v2"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
+
+          {booking.status === 'Cancelled' && (
+            <div className="activity-log-v14">
+              <div className="al-header-v14">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                <span>Activity Log</span>
+              </div>
+              <div className="al-body-v14">
+                {(() => {
+                  const getInitials = (name: string) => name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+                  const bookedEntry = booking.timeline.find((t: any) => t.status === 'Pending' || t.status === 'Confirmed');
+                  const bookedTime = bookedEntry ? bookedEntry.time : 'Unknown';
+                  
+                  const cancelledEntry = booking.timeline.find((t: any) => t.status === 'Cancelled');
+                  const cancelledTimeStr = cancelledEntry ? cancelledEntry.time : 'Unknown';
+
+                  const eventDateObj = new Date(booking.date);
+                  eventDateObj.setHours(0, 0, 0, 0);
+
+                  let diffDaysToEvent = 0;
+                  if (cancelledEntry) {
+                    const parts = cancelledEntry.time.split(', ');
+                    if (parts.length === 2) {
+                      const dateStr = parts[0] + ` ${new Date().getFullYear()} ` + parts[1];
+                      const parsed = new Date(dateStr).getTime();
+                      if (!isNaN(parsed)) {
+                         const timeUntilEvent = eventDateObj.getTime() - parsed;
+                         diffDaysToEvent = Math.max(0, Math.ceil(timeUntilEvent / (1000 * 60 * 60 * 24)));
+                      }
+                    }
+                  }
+
+                  const isVendor = (booking as any).cancelledBy === 'Vendor';
+                  const customerName = booking.customer || 'Customer';
+                  
+                  let refundPct = '0%';
+                  if (isVendor) refundPct = '100%';
+                  else {
+                    if (diffDaysToEvent > 7) refundPct = '100%';
+                    else if (diffDaysToEvent >= 5) refundPct = '50%';
+                    else if (diffDaysToEvent >= 2) refundPct = '25%';
+                  }
+
+                  let expRefundDate = 'TBD';
+                  if (cancelledEntry) {
+                    const parts = cancelledEntry.time.split(', ');
+                    if (parts.length === 2) {
+                      const dateStr = parts[0] + ` ${new Date().getFullYear()} ` + parts[1];
+                      const parsed = new Date(dateStr);
+                      parsed.setDate(parsed.getDate() + 2); // 48h resolution
+                      expRefundDate = parsed.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) + ', 05:00 PM';
+                    }
+                  }
+
+                  return (
+                    <>
+                      {/* Node 1: Booking Created */}
+                      <div className="al-item-v14">
+                        <div className="al-icon-wrapper-v14">
+                          <div className="al-icon-v14 al-icon-blue">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                          </div>
+                        </div>
+                        <div className="al-content-v14">
+                          <div className="al-content-top-v14">
+                            <span className="al-title-v14">Booking Created</span>
+                            <span className="al-time-v14">{bookedTime}</span>
+                          </div>
+                          <div className="al-content-bottom-v14">
+                            <div className="al-avatar-v14">{getInitials(customerName)}</div>
+                            <span className="al-subtext-v14">{customerName}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Node 2: Event Date */}
+                      <div className="al-item-v14">
+                        <div className="al-icon-wrapper-v14">
+                          <div className="al-icon-v14 al-icon-orange">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                          </div>
+                        </div>
+                        <div className="al-content-v14">
+                          <div className="al-content-top-v14">
+                            <span className="al-title-v14">Expected Event Date</span>
+                            <span className="al-time-v14">{booking.date}, {booking.time}</span>
+                          </div>
+                          <div className="al-content-bottom-v14">
+                            <div className="al-avatar-v14" style={{background: '#fef3c7', color: '#d97706'}}>E</div>
+                            <span className="al-subtext-v14">{booking.serviceCategory} • {booking.guests} Guests</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Node 3: Cancellation */}
+                      <div className="al-item-v14">
+                        <div className="al-icon-wrapper-v14">
+                          <div className="al-icon-v14 al-icon-red">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                          </div>
+                        </div>
+                        <div className="al-content-v14">
+                          <div className="al-content-top-v14">
+                            <span className="al-title-v14">Booking Cancelled</span>
+                            <span className="al-time-v14">{cancelledTimeStr}</span>
+                          </div>
+                          <div className="al-content-bottom-v14">
+                            <div className="al-avatar-v14" style={{background: '#fee2e2', color: '#b91c1c'}}>{isVendor ? 'VN' : 'CU'}</div>
+                            <span className="al-subtext-v14">Cancelled by <strong>{isVendor ? 'Vendor' : 'Customer'}</strong></span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Node 4: Refund Information */}
+                      <div className="al-item-v14">
+                        <div className="al-icon-wrapper-v14">
+                          <div className="al-icon-v14 al-icon-green">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                          </div>
+                        </div>
+                        <div className="al-content-v14">
+                          <div className="al-content-top-v14">
+                            <span className="al-title-v14">Refund Initiated</span>
+                            <span className="al-time-v14">Expected: {expRefundDate}</span>
+                          </div>
+                          <div className="al-content-bottom-v14">
+                            <div className="al-avatar-v14" style={{background: '#d1fae5', color: '#047857'}}>₹</div>
+                            <span className="al-subtext-v14">Refund Percentage: <strong>{refundPct}</strong> • Status: <strong>Under Review</strong></span>
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  );
+                })()}
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="detail-modal-footer-v7">
@@ -6083,7 +6355,7 @@ const Bookings = () => {
       menuName: 'Premium Sadhya Menu',
       guests: 200,
       amount: 145000,
-      paid: 50000,
+      paid: 43500,
       status: 'Preparing',
       menuSelection: [
         { name: 'Starters', type: 'Selected', items: ['Paneer Tikka', 'Hara Bhara Kabab'] },
@@ -6107,7 +6379,7 @@ const Bookings = () => {
       menuName: 'Executive Buffet',
       guests: 150,
       amount: 85000,
-      paid: 30000,
+      paid: 25500,
       status: 'Upcoming',
       menuSelection: [
         { name: 'Dinner', type: 'Selected', items: ['Jeera Rice', 'Paneer Tikka', 'Butter Naan'] },
@@ -6129,7 +6401,7 @@ const Bookings = () => {
       menuName: 'High Tea Special',
       guests: 80,
       amount: 45000,
-      paid: 45000,
+      paid: 13500,
       status: 'Completed',
       menuSelection: [
         { name: 'Breakfast', type: 'All Items', items: ['Samosa', 'Chai', 'Sandwich'] }
@@ -6152,7 +6424,7 @@ const Bookings = () => {
       menuName: 'Romantic Four-Course',
       guests: 12,
       amount: 15000,
-      paid: 0,
+      paid: 4500,
       status: 'Upcoming',
       menuSelection: [
         { name: 'Dinner', type: 'Selected', items: ['Salad', 'Soup', 'Main Course'] }
@@ -6172,7 +6444,7 @@ const Bookings = () => {
       menuName: 'Healthy Salads & Juice',
       guests: 40,
       amount: 35000,
-      paid: 10000,
+      paid: 10500,
       status: 'Upcoming',
       menuSelection: [
         { name: 'Lunch', type: 'All Items', items: ['Healthy Salad', 'Fresh Juice'] }
@@ -6193,13 +6465,57 @@ const Bookings = () => {
       menuName: 'Royal North Indian',
       guests: 25,
       amount: 60000,
-      paid: 20000,
+      paid: 18000,
       status: 'Upcoming',
       menuSelection: [
         { name: 'Dinner', type: 'All Items', items: ['Naan', 'Butter Chicken', 'Dal Tadka'] }
       ],
       timeline: [
         { status: 'Pending', time: '21 Mar, 11:00 AM' }
+      ],
+      taxType: 'B2C'
+    },
+    {
+      id: 'BK-12418',
+      customer: 'Priya Sharma',
+      date: '2026-03-22',
+      time: '01:00 PM',
+      type: 'Birthday Kids',
+      serviceCategory: 'Lunch',
+      menuName: 'Kids Special Menu',
+      guests: 50,
+      amount: 25000,
+      paid: 7500,
+      status: 'Cancelled',
+      cancelledBy: 'Vendor',
+      menuSelection: [
+        { name: 'Lunch', type: 'Selected', items: ['Mini Pizza', 'Pasta', 'Fries'] }
+      ],
+      timeline: [
+        { status: 'Pending', time: '15 Mar, 10:00 AM' },
+        { status: 'Cancelled', time: `${new Date(Date.now() - 72 * 3600000).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}, 10:00 AM` }
+      ],
+      taxType: 'B2C'
+    },
+    {
+      id: 'BK-12419',
+      customer: 'Rohit Verma',
+      date: '2026-03-28',
+      time: '08:00 PM',
+      type: 'Anniversary Dinner',
+      serviceCategory: 'Dinner',
+      menuName: 'Premium Feast',
+      guests: 30,
+      amount: 45000,
+      paid: 13500,
+      status: 'Cancelled',
+      cancelledBy: 'Customer',
+      menuSelection: [
+        { name: 'Dinner', type: 'Selected', items: ['Dal Makhani', 'Naan'] }
+      ],
+      timeline: [
+        { status: 'Pending', time: '24 Mar, 09:00 AM' },
+        { status: 'Cancelled', time: `${new Date(Date.now() - 12 * 3600000).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}, 08:00 AM` }
       ],
       taxType: 'B2C'
     }
@@ -6303,6 +6619,56 @@ const Bookings = () => {
       return <span className="upcoming-badge-v11">IN {diffDays} {diffDays === 1 ? 'DAY' : 'DAYS'}</span>;
     }
     return null;
+  };
+
+  const getPayoutStatusText = (booking: any) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const eventDate = new Date(booking.date);
+    eventDate.setHours(0, 0, 0, 0);
+
+    const diffHrsToEvent = (eventDate.getTime() - new Date().getTime()) / (1000 * 60 * 60);
+    const diffDaysToEvent = Math.ceil(diffHrsToEvent / 24);
+
+    if (booking.status === 'Preparing' || booking.status === 'Completed') {
+      return 'Payout credited';
+    }
+
+    if (booking.status === 'Upcoming') {
+      if (diffHrsToEvent < 24) {
+        return 'Payout credited';
+      } else {
+        return `Payout in ${Math.max(1, diffDaysToEvent)}d`;
+      }
+    }
+
+    if (booking.status === 'Cancelled') {
+      const cancelledEntry = booking.timeline.find((t: any) => t.status === 'Cancelled');
+      let cancelledTime = new Date().getTime();
+      if (cancelledEntry) {
+        const parts = cancelledEntry.time.split(', ');
+        if (parts.length === 2) {
+          const dateStr = parts[0] + ` ${new Date().getFullYear()} ` + parts[1];
+          const parsed = new Date(dateStr).getTime();
+          if (!isNaN(parsed)) cancelledTime = parsed;
+        }
+      }
+      const diffHrsSinceCancel = (new Date().getTime() - cancelledTime) / (1000 * 60 * 60);
+
+      if (diffHrsSinceCancel > 48) {
+        return 'Payout credited';
+      } else {
+        return 'Under Review';
+      }
+    }
+
+    return 'Pending';
+  };
+
+  const getPayoutStatusClass = (text: string) => {
+    if (text === 'Payout credited') return 'credited';
+    if (text === 'Under Review') return 'review';
+    return 'pending';
   };
 
   const getStatusClass = (status: string) => status.toLowerCase();
@@ -6468,7 +6834,9 @@ const Bookings = () => {
                   <td>
                     <div className="amount-cell-v7">
                       <span className="total">₹ {b.paid.toLocaleString()}</span>
-                      <span className="payout">Payout in {Math.ceil((new Date(b.date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) + 2}d</span>
+                      <span className={`payout ${getPayoutStatusClass(getPayoutStatusText(b))}`}>
+                        {getPayoutStatusText(b)}
+                      </span>
                     </div>
                   </td>
                   <td>
@@ -6482,11 +6850,6 @@ const Bookings = () => {
                   <td>
                     <div className="actions-cell-v24">
                       <button className="btn-view-v7" onClick={() => { setSelectedBooking(b); setShowDetail(true); }}>View</button>
-                      {b.status === 'Completed' && (b as any).taxType === 'B2B' && (
-                        <a href="#" className="download-invoice-link-v24 action-btn" onClick={(e) => e.preventDefault()}>
-                          Download Invoice
-                        </a>
-                      )}
                     </div>
                   </td>
                 </tr>
@@ -6552,8 +6915,8 @@ const HomeView = ({ setActiveTab }: { setActiveTab: (tab: string) => void }) => 
             <p className="home-date-v25">{todayDate}</p>
             <div className="header-divider-v25"></div>
             <div className="home-rating-badge-v25">
-               <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-               <span>4.3 Rating</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+              <span>4.3 Rating</span>
             </div>
           </div>
         </div>
@@ -6581,32 +6944,32 @@ const HomeView = ({ setActiveTab }: { setActiveTab: (tab: string) => void }) => 
         <div className="home-layout-columns-v25">
           {/* Left Column: Daily Bookings Performance Graph */}
           <div className="home-col-left-v25">
-             <div className="home-card-v25 bookings-graph-card-v25">
-               <div className="card-header-v25">
-                 <h3 className="card-title-v25">Daily Bookings Performance</h3>
-                 <div className="month-label-v25">Last 7 Days</div>
-               </div>
-               <div className="graph-container-v25">
-                 {[
-                   { day: 'Mon', value: 12 },
-                   { day: 'Tue', value: 18 },
-                   { day: 'Wed', value: 15 },
-                   { day: 'Thu', value: 24 },
-                   { day: 'Fri', value: 28 },
-                   { day: 'Sat', value: 32, active: true },
-                   { day: 'Sun', value: 25 },
-                 ].map((d, i) => (
-                   <div key={i} className="graph-bar-wrapper-v25">
-                     <div 
-                       className={`graph-bar-v25 ${d.active ? 'active' : ''}`} 
-                       style={{ height: `${(d.value / 35) * 95}%` }}
-                       data-value={d.value}
-                     ></div>
-                     <span className="day-label-v25">{d.day}</span>
-                   </div>
-                 ))}
-               </div>
-             </div>
+            <div className="home-card-v25 bookings-graph-card-v25">
+              <div className="card-header-v25">
+                <h3 className="card-title-v25">Daily Bookings Performance</h3>
+                <div className="month-label-v25">Last 7 Days</div>
+              </div>
+              <div className="graph-container-v25">
+                {[
+                  { day: 'Mon', value: 12 },
+                  { day: 'Tue', value: 18 },
+                  { day: 'Wed', value: 15 },
+                  { day: 'Thu', value: 24 },
+                  { day: 'Fri', value: 28 },
+                  { day: 'Sat', value: 32, active: true },
+                  { day: 'Sun', value: 25 },
+                ].map((d, i) => (
+                  <div key={i} className="graph-bar-wrapper-v25">
+                    <div
+                      className={`graph-bar-v25 ${d.active ? 'active' : ''}`}
+                      style={{ height: `${(d.value / 35) * 95}%` }}
+                      data-value={d.value}
+                    ></div>
+                    <span className="day-label-v25">{d.day}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
 
           {/* Right Column: Upcoming Bookings */}
@@ -6641,7 +7004,7 @@ const HomeView = ({ setActiveTab }: { setActiveTab: (tab: string) => void }) => 
                           {booking.guests} Guests
                         </div>
                         <div className="booking-collect-v25">
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="12" y1="15" x2="12" y2="15"/><circle cx="12" cy="12" r="3"/></svg>
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="5" width="20" height="14" rx="2" /><line x1="12" y1="15" x2="12" y2="15" /><circle cx="12" cy="12" r="3" /></svg>
                           Collect: {booking.collect}
                         </div>
                       </div>

@@ -96,6 +96,93 @@
   margin-top: 4px;
 }
 
+/* Rating Category Badge */
+.rating-category-badge-v4 {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 99px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin: 12px auto;
+  position: relative;
+  cursor: help;
+  transition: transform 0.2s;
+}
+
+.rating-category-badge-v4:hover {
+  transform: translateY(-2px);
+}
+
+.category-icon-v4 {
+  font-size: 1.1rem;
+}
+
+.category-tooltip-v4 {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  background: #1e293b;
+  color: white;
+  padding: 16px;
+  border-radius: 12px;
+  width: 260px;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s;
+  z-index: 100;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+  text-align: left;
+}
+
+.rating-category-badge-v4:hover .category-tooltip-v4 {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+.category-tooltip-v4::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 6px;
+  border-style: solid;
+  border-color: #1e293b transparent transparent transparent;
+}
+
+.tooltip-title {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #94a3b8;
+  margin-bottom: 6px;
+  font-weight: 700;
+}
+
+.tooltip-action {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #334155;
+}
+
+.tooltip-scale {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: #cbd5e1;
+}
+
+.tooltip-scale div {
+  display: flex;
+  justify-content: space-between;
+}
 
 .ratings-stat-card-v4::before {
   content: '';
@@ -147,7 +234,6 @@
   padding: 24px;
   position: sticky;
   top: 20px;
-  overflow: hidden;
 }
 
 .ratings-card-v4.accent-blue-v4::before {
