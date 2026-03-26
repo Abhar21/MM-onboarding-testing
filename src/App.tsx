@@ -5601,24 +5601,18 @@ const BookingDetailModal = ({
 
 const Reports = () => {
   const [activeReportTab, setActiveReportTab] = useState('Revenue');
-  const [currentPage, setCurrentPage] = useState(1);
-  const rowsPerPage = 10;
 
-  const tdsData = [
-    { id: 'BK-12401', date: '20 Mar 2026', gross: 50000, tds: 500, net: 49500, status: 'Paid' },
-    { id: 'BK-12398', date: '18 Mar 2026', gross: 45000, tds: 450, net: 44550, status: 'Paid' },
-    { id: 'BK-12385', date: '15 Mar 2026', gross: 75000, tds: 750, net: 74250, status: 'Pending' },
-    { id: 'BK-12372', date: '12 Mar 2026', gross: 30000, tds: 300, net: 29700, status: 'Paid' },
-    { id: 'BK-12359', date: '10 Mar 2026', gross: 120000, tds: 1200, net: 118800, status: 'Paid' },
-    { id: 'BK-12344', date: '05 Mar 2026', gross: 55000, tds: 550, net: 54450, status: 'Paid' },
-    { id: 'BK-12330', date: '01 Mar 2026', gross: 88000, tds: 880, net: 87120, status: 'Paid' },
-    { id: 'BK-12295', date: '25 Feb 2026', gross: 42000, tds: 420, net: 41580, status: 'Paid' },
-    { id: 'BK-12280', date: '20 Feb 2026', gross: 60000, tds: 600, net: 59400, status: 'Paid' },
-    { id: 'BK-12265', date: '15 Feb 2026', gross: 70000, tds: 700, net: 69300, status: 'Paid' },
-    { id: 'BK-12250', date: '10 Feb 2026', gross: 35000, tds: 350, net: 34650, status: 'Paid' },
-    { id: 'BK-12235', date: '05 Feb 2026', gross: 48000, tds: 480, net: 47520, status: 'Paid' },
-    { id: 'BK-12220', date: '01 Feb 2026', gross: 95000, tds: 950, net: 94050, status: 'Paid' },
+  const monthlyTdsData = [
+    { month: 'Jan', earnings: 120000, tds: 1200, net: 118800 },
+    { month: 'Feb', earnings: 90000, tds: 900, net: 89100 },
+    { month: 'Mar', earnings: 80000, tds: 800, net: 79200 },
   ];
+
+  const tdsTotals = monthlyTdsData.reduce((acc, curr) => ({
+    earnings: acc.earnings + curr.earnings,
+    tds: acc.tds + curr.tds,
+    net: acc.net + curr.net,
+  }), { earnings: 0, tds: 0, net: 0 });
 
   const gstBookings = [
     { id: 'BK-12401', date: '20 Mar 2026', state: 'Maharashtra', type: 'B2C', taxable: 42373, cgst: 3813, sgst: 3813, igst: 0, total: 7626 },
@@ -5641,6 +5635,49 @@ const Reports = () => {
 
   const [selectedRevenueFY, setSelectedRevenueFY] = useState('FY 2025-26');
   const [selectedRevenueMonth, setSelectedRevenueMonth] = useState('Oct');
+  const [selectedTdsQuarter, setSelectedTdsQuarter] = useState('Quarter 2 (Jul-Sep)');
+  const [selectedTdsFY, setSelectedTdsFY] = useState('FY 2025-26');
+
+  const tdsCertificates = [
+    {
+      quarter: 'Q1',
+      period: 'Apr – Jun 2025',
+      status: 'Available',
+      issuedOn: '15 Aug 2025',
+      filedOn: '31 Jul 2025',
+      availableBy: '',
+      fullQuarter: 'Quarter 1 (Apr-Jun)'
+    },
+    {
+      quarter: 'Q2',
+      period: 'Jul – Sep 2025',
+      status: 'Available',
+      issuedOn: '15 Nov 2025',
+      filedOn: '31 Oct 2025',
+      availableBy: '',
+      fullQuarter: 'Quarter 2 (Jul-Sep)'
+    },
+    {
+      quarter: 'Q3',
+      period: 'Oct – Dec 2025',
+      status: 'Processing',
+      issuedOn: '',
+      filedOn: '',
+      availableBy: 'Feb 15, 2026',
+      fullQuarter: 'Quarter 3 (Oct-Dec)'
+    },
+    {
+      quarter: 'Q4',
+      period: 'Jan – Mar 2026',
+      status: 'Pending',
+      issuedOn: '',
+      filedOn: '',
+      availableBy: 'May 15, 2026',
+      fullQuarter: 'Quarter 4 (Jan-Mar)'
+    }
+  ];
+
+  const currentTdsCertificate = tdsCertificates.find(c => c.fullQuarter === selectedTdsQuarter) || tdsCertificates[0];
 
   const monthsList = ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar'];
   const fullMonthNames: Record<string, string> = {
@@ -5679,11 +5716,6 @@ const Reports = () => {
   };
 
   const nextMonthInfo = getNextMonthInfo(selectedMonthTab);
-
-  const indexOfLastRow = currentPage * rowsPerPage;
-  const indexOfFirstRow = indexOfLastRow - rowsPerPage;
-  const currentRows = tdsData.slice(indexOfFirstRow, indexOfLastRow);
-  const totalPages = Math.ceil(tdsData.length / rowsPerPage);
 
   const tabs = ['Revenue', 'GST', 'TDS'];
 
@@ -6165,11 +6197,19 @@ const Reports = () => {
                 <p>Track your Tax Deducted at Source (TDS) and download certificates.</p>
               </div>
               <div className="tds-header-filters-v14">
-                <select className="tds-filter-select-v14">
+                <select 
+                  className="tds-filter-select-v14"
+                  value={selectedTdsFY}
+                  onChange={(e) => setSelectedTdsFY(e.target.value)}
+                >
                   <option>FY 2025-26</option>
                   <option>FY 2024-25</option>
                 </select>
-                <select className="tds-filter-select-v14">
+                <select 
+                  className="tds-filter-select-v14"
+                  value={selectedTdsQuarter}
+                  onChange={(e) => setSelectedTdsQuarter(e.target.value)}
+                >
                   <option>Quarter 3 (Oct-Dec)</option>
                   <option>Quarter 2 (Jul-Sep)</option>
                   <option>Quarter 1 (Apr-Jun)</option>
@@ -6184,7 +6224,7 @@ const Reports = () => {
                 <div className="tds-card-info-v14">
                   <label>Total Net Payout</label>
                   <div className="tds-value-group-v14">
-                    <span className="tds-main-value-v14">₹1,01,500</span>
+                    <span className="tds-main-value-v14">₹{tdsTotals.net.toLocaleString('en-IN')}</span>
                     <span className="tds-helper-v14">(after TDS deduction)</span>
                   </div>
                 </div>
@@ -6194,7 +6234,7 @@ const Reports = () => {
                 <div className="tds-card-info-v14">
                   <label>Total TDS Deducted</label>
                   <div className="tds-value-group-v14">
-                    <span className="tds-main-value-v14">₹2,900</span>
+                    <span className="tds-main-value-v14">₹{tdsTotals.tds.toLocaleString('en-IN')}</span>
                   </div>
                   <p className="tds-sub-helper-v14">Deposited with Income Tax Department</p>
                 </div>
@@ -6202,165 +6242,125 @@ const Reports = () => {
             </div>
 
             <div className="tds-main-grid-v14">
-              <div className="tds-status-section-v14">
-                <div className="tds-card-v14">
-                  <div className="tds-card-header-v14">
-                    <h4>TDS Return Status</h4>
-                    <span className="tds-status-badge-v14 filed">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                        <polyline points="20 6 9 17 4 12"></polyline>
-                      </svg>
-                      Filed
-                    </span>
+              {/* TDS Breakdown Table Section - Now on the Left */}
+              <div className="tds-breakdown-section-v15 tds-card-v14 no-padding">
+                <div className="tds-breakdown-header-v15">
+                  <div className="header-left-v15">
+                    <h4>Monthly TDS Breakdown</h4>
+                    <div className="tds-title-subtitle-v25">
+                      {currentTdsCertificate.quarter} ({currentTdsCertificate.period})
+                    </div>
+                    <p className="tds-note-v15">Summary of your earnings, tax deductions, and net payouts</p>
                   </div>
-
-                  <div className="tds-info-groups-v14">
-                    <div className="tds-info-group-v14">
-                      <div className="tds-info-item-v14">
-                        <label>Return Type</label>
-                        <span>Form 26Q</span>
-                      </div>
-                      <div className="tds-info-item-v14">
-                        <label>Filing Period</label>
-                        <span>Q3 FY 2025-26</span>
-                      </div>
-                    </div>
-
-                    <div className="tds-timeline-box-v14">
-                      <div className="tds-timeline-item-v14">
-                        <label>Filed On</label>
-                        <span>January 10, 2026</span>
-                      </div>
-                      <div className="tds-timeline-item-v14 highlighted">
-                        <label>Due Date</label>
-                        <span>January 15, 2026</span>
-                      </div>
-                    </div>
-
-                    <div className="tds-upcoming-v14">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <line x1="12" y1="8" x2="12" y2="12"></line>
-                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                  <div className="header-right-v15">
+                    <button className="tds-export-btn-v16" onClick={() => {/* Download Excel Logic */}}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
                       </svg>
-                      <span><strong>Next Filing:</strong> Q4 (Due on April 30, 2026)</span>
-                    </div>
-
-                    <div className="tds-trust-footer-v14">
-                      <p>Filed by <strong>myMOOMENT</strong> with the Income Tax Department</p>
-                    </div>
+                      Download as Excel
+                    </button>
                   </div>
                 </div>
+
+                <div className="tds-table-container-v15">
+                  <table className="tds-table-v15 monthly-tds">
+                    <thead>
+                      <tr>
+                        <th className="tds-col-month-v16">Month</th>
+                        <th className="tds-col-num-v16">Total Earnings</th>
+                        <th className="tds-col-num-v16">
+                          TDS Deducted
+                          <div className="tds-info-tooltip-v16" title="TDS deducted and deposited with the Income Tax Department on your behalf">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <circle cx="12" cy="12" r="10"></circle>
+                              <line x1="12" y1="16" x2="12" y2="12"></line>
+                              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                            </svg>
+                          </div>
+                        </th>
+                        <th className="tds-col-num-v16">Net Received</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {monthlyTdsData.map((row, idx) => (
+                        <tr key={idx}>
+                          <td className="tds-cell-month-v16">{row.month}</td>
+                          <td className="tds-cell-num-v16">₹{row.earnings.toLocaleString('en-IN')}</td>
+                          <td className="tds-cell-num-v16 tds-amt-v15">₹{row.tds.toLocaleString('en-IN')}</td>
+                          <td className="tds-cell-num-v16 net-paid-v15">₹{row.net.toLocaleString('en-IN')}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                    <tfoot>
+                      <tr className="tds-total-row-v16">
+                        <td className="tds-cell-month-v16">Total</td>
+                        <td className="tds-cell-num-v16">₹{tdsTotals.earnings.toLocaleString('en-IN')}</td>
+                        <td className="tds-cell-num-v16 tds-amt-v15">₹{tdsTotals.tds.toLocaleString('en-IN')}</td>
+                        <td className="tds-cell-num-v16 net-paid-total-v16">₹{tdsTotals.net.toLocaleString('en-IN')}</td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+
+                <p className="tds-helper-bottom-v16">This data matches your Form 16A and can be used for income tax filing.</p>
               </div>
 
-              <div className="tds-certificate-section-v14">
-                <div className="tds-card-v14 certificate-card-v14">
-                  <div className="tds-card-header-v14">
+              {/* TDS Certificate Section - Now on the Right */}
+              <div className={`tds-card-v14 certificate-card-v14 ${currentTdsCertificate.status.toLowerCase()}`}>
+                <div className="tds-card-header-v14">
+                  <div className="tds-header-text-v14">
                     <h4>Your TDS Certificate (Form 16A)</h4>
-                    <div className="tds-cert-icon-v14">📄</div>
-                  </div>
-                  <p className="tds-cert-desc-v14">Use this certificate while filing your income tax return (ITR).</p>
-
-                  <div className="tds-cert-details-v14">
-                    <div className="tds-cert-item-v14">
-                      <label>Issued on</label>
-                      <span>15 Nov 2025</span>
+                    <div className="tds-cert-quarter-v14">
+                      Quarter: {currentTdsCertificate.quarter} ({currentTdsCertificate.period})
                     </div>
-                    <p className="tds-cert-note-v14">Includes all TDS deducted for selected period</p>
                   </div>
+                  <div className={`tds-cert-status-badge-v14 ${currentTdsCertificate.status.toLowerCase()}`}>
+                    {currentTdsCertificate.status === 'Available' && '✅ Available'}
+                    {currentTdsCertificate.status === 'Processing' && '⏳ Processing'}
+                    {currentTdsCertificate.status === 'Pending' && '❌ Pending'}
+                  </div>
+                </div>
+                
+                <p className="tds-cert-desc-v14">Use this certificate while filing your income tax return (ITR).</p>
 
-                  <button className="tds-download-btn-v14">
+                <div className="tds-cert-details-v14">
+                  {currentTdsCertificate.status === 'Available' ? (
+                    <>
+                      <div className="tds-cert-item-v14">
+                        <label>Issued on: {currentTdsCertificate.issuedOn}</label>
+                        <div className="tds-filing-context-v14">
+                          Based on TDS return filed on: {currentTdsCertificate.filedOn}
+                        </div>
+                      </div>
+                      <p className="tds-cert-note-v14">Includes all TDS deducted for {currentTdsCertificate.period}</p>
+                    </>
+                  ) : (
+                    <div className="tds-cert-processing-v14">
+                      <div className="tds-cert-item-v14">
+                        <label>Available by: {currentTdsCertificate.availableBy}</label>
+                      </div>
+                      <p className="tds-cert-note-v14">TDS return is being filed with the Income Tax Department</p>
+                    </div>
+                  )}
+                </div>
+
+                <div className="tds-cert-footer-v14">
+                  <button 
+                    className="tds-download-btn-v14"
+                    disabled={currentTdsCertificate.status !== 'Available'}
+                  >
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                       <polyline points="7 10 12 15 17 10"></polyline>
                       <line x1="12" y1="15" x2="12" y2="3"></line>
                     </svg>
-                    Download Form 16A
+                    {currentTdsCertificate.status === 'Available' ? 'Download Certificate (Form 16A)' : 'Download Temporarily Unavailable'}
                   </button>
+                  <p className="tds-cert-helper-v14">This certificate will also reflect in your Form 26AS</p>
                 </div>
               </div>
-            </div>
-
-            {/* TDS Breakdown Table Section */}
-            <div className="tds-breakdown-section-v15">
-              <div className="tds-breakdown-header-v15">
-                <div className="header-left-v15">
-                  <h4>Booking Wise TDS Breakdown</h4>
-                  <p className="tds-note-v15">TDS @1% is deducted on applicable bookings</p>
-                </div>
-                <div className="header-right-v15">
-                  <span className="total-label-v15">Total TDS:</span>
-                  <span className="total-value-v15">₹2,900</span>
-                </div>
-              </div>
-
-              <div className="tds-table-container-v15">
-                <table className="tds-table-v15">
-                  <thead>
-                    <tr>
-                      <th>Booking ID</th>
-                      <th>Event Date</th>
-                      <th>Gross Amount</th>
-                      <th>TDS Amount</th>
-                      <th>Net Paid</th>
-                      <th>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {currentRows.map((row, idx) => (
-                      <tr key={idx}>
-                        <td className="booking-id-v15">{row.id}</td>
-                        <td>{row.date}</td>
-                        <td>₹{row.gross.toLocaleString('en-IN')}</td>
-                        <td className="tds-amt-v15">-₹{row.tds.toLocaleString('en-IN')}</td>
-                        <td className="net-paid-v15">₹{row.net.toLocaleString('en-IN')}</td>
-                        <td>
-                          <span className={`status-pill-v15 ${row.status.toLowerCase()}`}>
-                            {row.status}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              <div className="tds-pagination-v15">
-                <div className="pagination-info-v15">
-                  Showing {indexOfFirstRow + 1} to {Math.min(indexOfLastRow, tdsData.length)} of {tdsData.length} entries
-                </div>
-                <div className="pagination-controls-v15">
-                  <button
-                    className="pagi-btn-v15"
-                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                    disabled={currentPage === 1}
-                  >
-                    Previous
-                  </button>
-                  <div className="pagi-numbers-v15">
-                    {[...Array(totalPages)].map((_, i) => (
-                      <button
-                        key={i}
-                        className={`pagi-num-v15 ${currentPage === i + 1 ? 'active' : ''}`}
-                        onClick={() => setCurrentPage(i + 1)}
-                      >
-                        {i + 1}
-                      </button>
-                    ))}
-                  </div>
-                  <button
-                    className="pagi-btn-v15"
-                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                    disabled={currentPage === totalPages}
-                  >
-                    Next
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div className="tds-footer-v14">
-              <span>Last updated: Mar 20, 2026</span>
             </div>
           </div>
         )}

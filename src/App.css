@@ -13358,9 +13358,14 @@ input:checked+.slider-v4:before {
 
 .tds-main-grid-v14 {
   display: grid;
-  grid-template-columns: 1.5fr 1fr;
+  grid-template-columns: 1fr 420px;
+  align-items: stretch;
   gap: 1.5rem;
   margin-bottom: 2rem;
+}
+
+.tds-card-v14.no-padding {
+  padding: 0;
 }
 
 .tds-card-v14 {
@@ -13369,13 +13374,48 @@ input:checked+.slider-v4:before {
   border-radius: 12px;
   padding: 1.5rem;
   height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .tds-card-header-v14 {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   margin-bottom: 1.5rem;
+}
+
+.tds-cert-quarter-v14 {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin-top: 0.25rem;
+  font-weight: 500;
+}
+
+.tds-cert-status-badge-v14 {
+  padding: 0.375rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.tds-cert-status-badge-v14.available {
+  background: #f0fdf4;
+  color: #166534;
+  border: 1px solid #dcfce7;
+}
+
+.tds-cert-status-badge-v14.processing {
+  background: #fffbeb;
+  color: #92400e;
+  border: 1px solid #fef3c7;
+}
+
+.tds-cert-status-badge-v14.pending {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fee2e2;
 }
 
 .tds-card-header-v14 h4 {
@@ -13547,6 +13587,20 @@ input:checked+.slider-v4:before {
   color: #1e293b;
 }
 
+.tds-filing-context-v14 {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-top: 0.25rem;
+  font-weight: 400;
+  text-transform: none;
+}
+
+.tds-cert-processing-v14 {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
 .tds-cert-note-v14 {
   font-size: 0.75rem;
   color: #94a3b8;
@@ -13571,9 +13625,29 @@ input:checked+.slider-v4:before {
   transition: all 0.2s;
 }
 
-.tds-download-btn-v14:hover {
+.tds-download-btn-v14:hover:not(:disabled) {
   background: #0066dd;
   box-shadow: 0 4px 12px rgba(0, 119, 255, 0.2);
+}
+
+.tds-download-btn-v14:disabled {
+  background: #e2e8f0;
+  color: #94a3b8;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.tds-cert-footer-v14 {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.tds-cert-helper-v14 {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  text-align: center;
+  margin: 0;
 }
 
 .tds-footer-v14 {
@@ -13910,6 +13984,16 @@ input:checked+.slider-v4:before {
   font-size: 1rem;
   font-weight: 700;
   color: #0f172a;
+}
+
+.tds-table-container-v15 {
+  padding: 0 24px;
+}
+
+.tds-helper-bottom-v16 {
+  margin: 16px 24px 24px 24px;
+  font-size: 0.85rem;
+  color: #64748b;
 }
 
 .mini-table-container-v14 {
@@ -16137,21 +16221,18 @@ input:checked+.slider-v4:before {
 
 /* TDS Breakdown Section V15 */
 .tds-breakdown-section-v15 {
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  margin-top: 24px;
+  margin-top: 0;
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .tds-breakdown-header-v15 {
-  padding: 20px 24px;
+  padding: 24px;
   border-bottom: 1px solid #f1f5f9;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   background: #f8fafc;
+  border-radius: 12px 12px 0 0;
 }
 
 .header-left-v15 h4 {
@@ -16172,10 +16253,6 @@ input:checked+.slider-v4:before {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: white;
-  padding: 8px 16px;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
 }
 
 .total-label-v15 {
@@ -16199,10 +16276,11 @@ input:checked+.slider-v4:before {
   width: 100%;
   border-collapse: collapse;
   text-align: left;
+  table-layout: fixed;
 }
 
 .tds-table-v15 th {
-  padding: 14px 24px;
+  padding: 14px 16px;
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.025em;
@@ -16213,7 +16291,7 @@ input:checked+.slider-v4:before {
 }
 
 .tds-table-v15 td {
-  padding: 16px 24px;
+  padding: 16px 16px;
   font-size: 0.9rem;
   color: #334155;
   border-bottom: 1px solid #f1f5f9;
@@ -16224,8 +16302,113 @@ input:checked+.slider-v4:before {
 }
 
 .tds-table-v15 tr:hover td {
+  background: #f8fafc;
+}
+
+.tds-title-subtitle-v25 {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-top: 2px;
+  margin-bottom: 4px;
+}
+
+/* Monthly TDS Table V16 Additions */
+.tds-table-v15.monthly-tds th.tds-col-month-v16,
+.tds-table-v15.monthly-tds td.tds-cell-month-v16 {
+  text-align: left;
+  font-weight: 600;
+  width: 12%;
+}
+
+.tds-table-v15.monthly-tds th.tds-col-num-v16,
+.tds-table-v15.monthly-tds td.tds-cell-num-v16 {
+  text-align: right;
+  width: 28%;
+}
+
+/* Specific width for the breakdown columns to ensure headers don't feel too loose */
+.tds-table-v15.monthly-tds th:nth-child(2),
+.tds-table-v15.monthly-tds td:nth-child(2) {
+  width: 28%;
+}
+
+.tds-table-v15.monthly-tds th:nth-child(3),
+.tds-table-v15.monthly-tds td:nth-child(3) {
+  width: 32%;
+}
+
+.tds-cell-num-v16 {
+  padding-right: 24px !important;
+}
+
+
+
+.tds-info-tooltip-v16 {
+  display: inline-flex;
+  vertical-align: middle;
+  margin-left: 6px;
+  color: #94a3b8;
+  cursor: help;
+  transition: color 0.2s;
+}
+
+.tds-info-tooltip-v16:hover {
+  color: #64748b;
+}
+
+.tds-table-toolbar-v16 {
+  display: flex;
+  justify-content: flex-end;
+  padding: 12px 24px 0 24px;
+}
+
+.tds-export-btn-v16 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tds-export-btn-v16:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #1e293b;
+}
+
+.tds-total-row-v16 {
+  background: #f8fafc;
+  border-top: 2px solid #e2e8f0;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.tds-total-row-v16 td {
+  font-weight: 700 !important;
+  color: #0f172a;
+}
+
+.net-paid-total-v16 {
+  color: #10b981 !important;
+  font-size: 1.05rem !important;
+}
+
+.tds-helper-bottom-v16 {
+  margin: 0;
+  padding: 16px 24px;
+  font-size: 0.8rem;
+  color: #64748b;
+  border-top: 1px dashed #e2e8f0;
   background: #fcfdfe;
 }
+
 
 .booking-id-v15 {
   font-weight: 600;
@@ -16238,8 +16421,8 @@ input:checked+.slider-v4:before {
 }
 
 .net-paid-v15 {
-  font-weight: 600;
-  color: #0f172a;
+  font-weight: 700;
+  color: #10b981;
 }
 
 .status-pill-v15 {
