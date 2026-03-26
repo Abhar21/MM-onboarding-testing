@@ -4162,6 +4162,11 @@ const VendorProfile = ({
   ];
 
   const [showBankEditModal, setShowBankEditModal] = useState(false);
+  const [showSetPrimaryModal, setShowSetPrimaryModal] = useState(false);
+  const [pendingPrimaryBank, setPendingPrimaryBank] = useState<BankAccount | null>(null);
+  const [showDeleteBankModal, setShowDeleteBankModal] = useState(false);
+  const [pendingDeleteBank, setPendingDeleteBank] = useState<BankAccount | null>(null);
+  const [selectedBankId, setSelectedBankId] = useState<string | null>(null);
   const [bankForm, setBankForm] = useState({
     bankName: '',
     holderName: '',
@@ -4388,127 +4393,131 @@ const VendorProfile = ({
 
         {activeTab === 'Bank Details' && (
           <div className="bank-tab-v4">
-            {profileData.bank.status === 'Pending Verification' && (
-              <div className="bank-status-banner-v4 success-pending">
-                <div className="banner-icon-v4">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                </div>
-                <div className="banner-content-v4">
-                  <strong>Submitted successfully!</strong>
-                  <p>New bank details submitted takes 12-24 hours for the approval. Current bank remains active for payouts during this period.</p>
-                </div>
+            <div className="bank-tab-header-v4">
+              <div className="bth-left-v4">
+                <h3>Bank Accounts</h3>
+                <p>Manage your bank accounts and payout destinations.</p>
               </div>
-            )}
+              <button
+                className="add-bank-btn-v4"
+                onClick={() => {
+                  setSelectedBankId(null);
+                  setBankForm({
+                    bankName: '',
+                    holderName: '',
+                    accountNumber: '',
+                    confirmAccountNumber: '',
+                    ifsc: '',
+                    accountType: 'savings',
+                    file: null,
+                    fileName: ''
+                  });
+                  setShowBankEditModal(true);
+                }}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                Add Bank Account
+              </button>
+            </div>
 
-            {profileData.bank.status === 'Pending Verification' && profileData.bank.pendingSubmission && (
-              <div className="submitted-details-card-v4">
-                <div className="sd-header-v4">
-                  <h4>Details Submitted for Verification</h4>
-                  <span className="sd-tag-v4">Pending Review</span>
-                </div>
-                <div className="sd-grid-v4">
-                  <div className="sd-item-v4">
-                    <label>BANK NAME</label>
-                    <span>{profileData.bank.pendingSubmission.bankName}</span>
-                  </div>
-                  <div className="sd-item-v4">
-                    <label>ACCOUNT TYPE</label>
-                    <span className="capitalize-v4">{profileData.bank.pendingSubmission.accountType} Account</span>
-                  </div>
-                  <div className="sd-item-v4">
-                    <label>IFSC CODE</label>
-                    <span>{profileData.bank.pendingSubmission.ifsc}</span>
-                  </div>
-                  <div className="sd-item-v4">
-                    <label>HOLDER NAME</label>
-                    <span>{profileData.bank.pendingSubmission.holderName}</span>
-                  </div>
-                  <div className="sd-item-v4">
-                    <label>ACCOUNT NUMBER</label>
-                    <span className="font-mono">
-                      {profileData.bank.pendingSubmission.accountNumber.replace(/.(?=.{4})/g, '*')}
-                    </span>
-                  </div>
-                  <div className="sd-item-v4">
-                    <label>ATTACHMENT</label>
-                    <div className="sd-file-v4">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
-                      <span>{profileData.bank.pendingSubmission.fileName}</span>
+            <div className="bank-accounts-list-v4">
+              {profileData.bankAccounts.map((account: BankAccount) => (
+                <div key={account.id} className={`bank-details-card-v4 ${account.isPrimary ? 'primary-v4' : ''}`}>
+                  <div className="bank-card-top-v4">
+                    <div className="bc-header-left-v4">
+                      <div className="bc-icon-v4">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 21h18"></path><path d="M3 10h18"></path><path d="M5 21V10"></path><path d="M9 21V10"></path><path d="M13 21V10"></path><path d="M17 21V10"></path><path d="M2 5l10-3 10 3"></path></svg>
+                      </div>
+                      <div className="bc-title-wrap-v4">
+                        <div className="bc-title-row-v4">
+                          <h3>{account.bankName}</h3>
+                          <div className="bc-badges-v4">
+                            {account.isPrimary && <span className="primary-badge-v4">Primary Account</span>}
+                            <span className={`v-status-badge-v4 ${account.status.toLowerCase().replace(' ', '-')}`}>
+                              {account.status}
+                            </span>
+                          </div>
+                        </div>
+                        {account.isPrimary ? (
+                          <p className="bc-subtitle-v4 primary-helper-v4">Payouts will be sent to this account.</p>
+                        ) : (
+                          <p className="bc-subtitle-v4">Secondary Account</p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="bc-header-right-v4">
+                      <span className="last-updated-v4">Updated: {account.lastUpdated}</span>
                     </div>
                   </div>
-                </div>
-              </div>
-            )}
 
-            {profileData.bank.status === 'Rejected' && (
-              <div className="bank-status-banner-v4 rejected">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                <div className="rejected-content-v4">
-                  <strong>Bank Details Rejected</strong>
-                  <p>{profileData.bank.rejectionReason || 'Please check your submitted documents and try again.'}</p>
-                </div>
-              </div>
-            )}
-
-            <div className="bank-details-card-v4">
-              <div className="bank-card-top-v4">
-                <div className="bc-header-left-v4">
-                  <div className="bc-icon-v4">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 21h18"></path><path d="M3 10h18"></path><path d="M5 21V10"></path><path d="M9 21V10"></path><path d="M13 21V10"></path><path d="M17 21V10"></path><path d="M2 5l10-3 10 3"></path></svg>
-                  </div>
-                  <div className="bc-title-wrap-v4">
-                    <div className="bc-title-row-v4">
-                      <h3>Bank Account Details</h3>
-                      <span className={`v-status-badge-v4 ${profileData.bank.status.toLowerCase().replace(' ', '-')}`}>
-                        {profileData.bank.status}
-                      </span>
+                  <div className="bank-info-grid-inner-v4">
+                    <div className="bi-column-v4">
+                      <div className="bi-item-v4">
+                        <label>ACCOUNT HOLDER NAME</label>
+                        <span>{account.holderName}</span>
+                      </div>
+                      <div className="bi-item-v4">
+                        <label>ACCOUNT NUMBER</label>
+                        <span className="font-mono">
+                          {(() => {
+                            const cleanNum = account.accountNumber.replace(/\s+/g, '');
+                            const last4 = cleanNum.slice(-4);
+                            return `XXXX XXXX ${last4}`;
+                          })()}
+                        </span>
+                      </div>
                     </div>
-                    <p className="bc-subtitle-v4">Payouts will be sent to this account.</p>
+                    <div className="bi-column-v4">
+                      <div className="bi-item-v4">
+                        <label>IFSC CODE</label>
+                        <span>{account.ifsc}</span>
+                      </div>
+                      <div className="bi-item-v4">
+                        <label>ACCOUNT TYPE</label>
+                        <span className="capitalize-v4">{account.accountType} Account</span>
+                      </div>
+                    </div>
                   </div>
-                </div>
-                <div className="bc-header-right-v4">
-                  <span className="last-updated-v4">Last updated: {profileData.bank.lastUpdated}</span>
-                </div>
-              </div>
 
-              <div className="bank-info-grid-inner-v4">
-                <div className="bi-column-v4">
-                  <div className="bi-item-v4">
-                    <label>BANK NAME</label>
-                    <span>{profileData.bank.bankName}</span>
-                  </div>
-                  <div className="bi-item-v4">
-                    <label>ACCOUNT NUMBER</label>
-                    <span className="font-mono">{profileData.bank.accountNumber}</span>
-                  </div>
-                  <div className="bi-item-v4">
-                    <label>ACCOUNT TYPE</label>
-                    <span>{profileData.bank.accountType}</span>
-                  </div>
-                </div>
-                <div className="bi-column-v4">
-                  <div className="bi-item-v4">
-                    <label>ACCOUNT HOLDER NAME</label>
-                    <span>{profileData.bank.holderName}</span>
-                  </div>
-                  <div className="bi-item-v4">
-                    <label>IFSC CODE</label>
-                    <span>{profileData.bank.ifsc}</span>
-                  </div>
-                </div>
-              </div>
+                    <div className="bank-card-footer-v4">
+                      <div className="bc-footer-left-v4">
+                        {account.isPrimary ? (
+                          <div className="payout-active-tag-v4">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                            Active for Payouts
+                          </div>
+                        ) : (
+                          account.status === 'Verified' && (
+                            <button
+                              className="set-primary-btn-v4"
+                              onClick={() => {
+                                setPendingPrimaryBank(account);
+                                setShowSetPrimaryModal(true);
+                              }}
+                            >
+                              Set as Primary
+                            </button>
+                          )
+                        )}
+                      </div>
 
-              {(profileData.bank.status === 'Verified' || profileData.bank.status === 'Rejected') && (
-                <div className="bank-card-footer-v4">
-                  <button
-                    className="change-bank-btn-v4"
-                    onClick={() => setShowBankEditModal(true)}
-                  >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                    Change Bank Details
-                  </button>
+                      <div className="bc-footer-right-v4">
+                        {!account.isPrimary && (
+                          <button
+                            className="delete-bank-btn-v4"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setPendingDeleteBank(account);
+                              setShowDeleteBankModal(true);
+                            }}
+                          >
+                            Delete
+                          </button>
+                        )}
+                      </div>
+                    </div>
                 </div>
-              )}
+              ))}
             </div>
           </div>
         )}
@@ -4525,7 +4534,7 @@ const VendorProfile = ({
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                 </div>
                 <div>
-                  <h3>Change Bank Details</h3>
+                  <h3>Add Bank Details</h3>
                   <p>Submit new account details for verification.</p>
                 </div>
               </div>
@@ -4629,16 +4638,56 @@ const VendorProfile = ({
               <button className="cancel-btn-v4" onClick={() => setShowBankEditModal(false)}>Cancel</button>
               <button
                 className="submit-btn-v4"
-                disabled={!bankForm.bankName || !bankForm.accountNumber || !bankForm.fileName || bankForm.accountNumber !== bankForm.confirmAccountNumber}
+                disabled={
+                  !bankForm.bankName.trim() ||
+                  !bankForm.holderName.trim() ||
+                  !bankForm.accountNumber.trim() ||
+                  !bankForm.ifsc.trim() ||
+                  !bankForm.fileName ||
+                  bankForm.accountNumber.trim() !== bankForm.confirmAccountNumber.trim()
+                }
                 onClick={() => {
-                  setProfileData((prev: ProfileData) => ({
-                    ...prev,
-                    bank: {
-                      ...prev.bank,
-                      status: 'Pending Verification',
-                      pendingSubmission: { ...bankForm }
+                  setProfileData((prev: ProfileData) => {
+                    if (selectedBankId) {
+                      // Edit existing
+                      return {
+                        ...prev,
+                        bankAccounts: prev.bankAccounts.map(acc =>
+                          acc.id === selectedBankId
+                            ? {
+                              ...acc,
+                              bankName: bankForm.bankName,
+                              holderName: bankForm.holderName,
+                              accountNumber: bankForm.accountNumber,
+                              ifsc: bankForm.ifsc,
+                              accountType: bankForm.accountType === 'savings' ? 'Savings Account' : 'Current Account',
+                              status: 'Pending Verification',
+                              lastUpdated: 'Today'
+                            }
+                            : acc
+                        )
+                      };
+                    } else {
+                      // Add new
+                      const newBank: BankAccount = {
+                        id: `bank-${Date.now()}`,
+                        bankName: bankForm.bankName,
+                        holderName: bankForm.holderName,
+                        accountNumber: bankForm.accountNumber,
+                        ifsc: bankForm.ifsc,
+                        accountType: bankForm.accountType === 'savings' ? 'Savings Account' : 'Current Account',
+                        status: 'Pending Verification',
+                        lastUpdated: 'Today',
+                        isPrimary: prev.bankAccounts.length === 0,
+                        rejectionReason: null,
+                        pendingSubmission: { ...bankForm }
+                      };
+                      return {
+                        ...prev,
+                        bankAccounts: [...prev.bankAccounts, newBank]
+                      };
                     }
-                  }));
+                  });
                   setShowBankEditModal(false);
                 }}
               >
@@ -4759,6 +4808,75 @@ const VendorProfile = ({
           </div>
         </div>
       )}
+
+      {/* Set as Primary Confirmation Modal */}
+      {showSetPrimaryModal && (
+        <div className="bank-modal-overlay-v4">
+          <div className="confirmation-modal-v4 centered-modal-v4">
+            <div className="conf-modal-content-v4">
+              <div className="conf-icon-container-v4 primary-icon-bg">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+              </div>
+              <h3 className="conf-title-v4">Make Primary?</h3>
+              <p className="conf-desc-v4">Are you sure you want to make <strong>{pendingPrimaryBank?.bankName}</strong> as your primary account? Payouts will be sent to this account.</p>
+              <div className="conf-actions-v4">
+                <button className="conf-btn-secondary-v4" onClick={() => { setShowSetPrimaryModal(false); setPendingPrimaryBank(null); }}>Cancel</button>
+                <button
+                  className="conf-btn-primary-v4"
+                  onClick={() => {
+                    if (pendingPrimaryBank) {
+                      setProfileData((prev: any) => ({
+                        ...prev,
+                        bankAccounts: prev.bankAccounts.map((acc: any) => ({
+                          ...acc,
+                          isPrimary: acc.id === pendingPrimaryBank.id
+                        }))
+                      }));
+                      setShowSetPrimaryModal(false);
+                      setPendingPrimaryBank(null);
+                    }
+                  }}
+                >
+                  Yes, Make Primary
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Bank Confirmation Modal */}
+      {showDeleteBankModal && (
+        <div className="bank-modal-overlay-v4">
+          <div className="confirmation-modal-v4 centered-modal-v4">
+            <div className="conf-modal-content-v4">
+              <div className="conf-icon-container-v4 remove-icon-bg">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+              </div>
+              <h3 className="conf-title-v4">Delete Bank Account?</h3>
+              <p className="conf-desc-v4">Are you sure you want to delete <strong>{pendingDeleteBank?.bankName}</strong> ({pendingDeleteBank?.accountNumber.slice(-4)})? This action cannot be undone.</p>
+              <div className="conf-actions-v4">
+                <button className="conf-btn-secondary-v4" onClick={() => { setShowDeleteBankModal(false); setPendingDeleteBank(null); }}>Cancel</button>
+                <button
+                  className="conf-btn-danger-v4"
+                  onClick={() => {
+                    if (pendingDeleteBank) {
+                      setProfileData((prev: any) => ({
+                        ...prev,
+                        bankAccounts: prev.bankAccounts.filter((acc: any) => acc.id !== pendingDeleteBank.id)
+                      }));
+                      setShowDeleteBankModal(false);
+                      setPendingDeleteBank(null);
+                    }
+                  }}
+                >
+                  Yes, Delete Bank
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -4768,6 +4886,20 @@ interface ProfileDocument {
   identifier: string;
   date: string;
   status: string;
+}
+
+interface BankAccount {
+  id: string;
+  bankName: string;
+  holderName: string;
+  accountNumber: string;
+  ifsc: string;
+  accountType: string;
+  status: string;
+  lastUpdated: string;
+  isPrimary: boolean;
+  rejectionReason: string | null;
+  pendingSubmission: any;
 }
 
 interface ProfileData {
@@ -4807,17 +4939,7 @@ interface ProfileData {
     agreement: string;
   };
   documents: ProfileDocument[];
-  bank: {
-    bankName: string;
-    holderName: string;
-    accountNumber: string;
-    ifsc: string;
-    accountType: string;
-    status: string;
-    lastUpdated: string;
-    rejectionReason: string | null;
-    pendingSubmission: any;
-  };
+  bankAccounts: BankAccount[];
 }
 
 /* ─────────────────── RATINGS SCREEN ─────────────────── */
@@ -5946,53 +6068,49 @@ const Reports = () => {
                   <option>FY 2025-26</option>
                   <option>FY 2024-25</option>
                 </select>
-                <div className="export-actions-v20">
-                  <button className="export-btn-v20 excel">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                    Download {selectedMonthTab} Report
-                  </button>
-                  <button className="export-btn-v20 pdf">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                    Download Summary
-                  </button>
-                </div>
+                <select
+                  className="period-select-v20 month-select-v22"
+                  value={selectedMonthTab}
+                  onChange={(e) => setSelectedMonthTab(e.target.value)}
+                >
+                  {monthsList.map((m) => {
+                    const fyParts = selectedFY.replace('FY ', '').split('-');
+                    const yearSuffix = ['Jan', 'Feb', 'Mar'].includes(m) ? fyParts[1] : fyParts[0].slice(-2);
+                    return (
+                      <option key={m} value={m}>
+                        {m} '{yearSuffix}
+                      </option>
+                    );
+                  })}
+                </select>
               </div>
             </div>
 
-            {/* 2. Month Navigation Tabs */}
-            <div className="gst-month-nav-v22">
-              {monthsList.map((m) => {
-                const fyParts = selectedFY.replace('FY ', '').split('-');
-                const yearSuffix = ['Jan', 'Feb', 'Mar'].includes(m) ? fyParts[1] : fyParts[0].slice(-2);
-                return (
-                  <button
-                    key={m}
-                    className={`month-tab-v22 ${selectedMonthTab === m ? 'active' : ''}`}
-                    onClick={() => setSelectedMonthTab(m)}
-                  >
-                    {m} '{yearSuffix}
-                  </button>
-                );
-              })}
-            </div>
 
             {/* 3. Summary Grid + FY Insight */}
             <div className="gst-metrics-row-v22">
               {/* FY Insight Card - Moved to First */}
               <div className="fy-insight-card-v22">
                 <div className="fy-insight-content-v22">
-                  <div className="fy-label-v22">{selectedFY} Overview</div>
-                  <div className="fy-total-v22">₹9,18,450</div>
-                  <div className="fy-desc-v22">Total GST collected in this Financial Year</div>
+                  <div className="fy-label-v22">Taxable Amount</div>
+                  <div className="fy-total-v22">₹4,25,840</div>
+                  <div className="fy-desc-v22">Total taxable value for {fullMonthNames[selectedMonthTab]} {selectedFY}</div>
                 </div>
               </div>
 
               <div className="gst-summary-grid-v20 v22">
                 <div className="gst-summary-card-v20 highlight">
-                  <label>Taxable Amount</label>
+                  <label>Total GST this Month</label>
                   <div className="card-main-v20">
-                    <span className="value-v20">₹4,25,840</span>
-                    <span className="sub-v20">For {fullMonthNames[selectedMonthTab]}</span>
+                    <span className="value-v20">₹76,651</span>
+                    <span className="sub-v20">Calculated for {selectedMonthTab}</span>
+                  </div>
+                </div>
+                <div className="gst-summary-card-v20">
+                  <label>ITC available</label>
+                  <div className="card-main-v20">
+                    <span className="value-v20">₹3,600</span>
+                    <span className="sub-v20">Available for credit</span>
                   </div>
                 </div>
                 <div className="gst-summary-card-v20">
@@ -6087,81 +6205,27 @@ const Reports = () => {
               </div>
             </div>
 
-            {/* 5. Detailed GST Table */}
-            <div className="gst-table-section-v20">
-              <div className="table-header-v20">
-                <h4>Detailed GST Breakdown - {fullMonthNames[selectedMonthTab]} {selectedFY}</h4>
-              </div>
-              <div className="gst-table-container-v20">
-                <table className="gst-table-v20">
-                  <thead>
-                    <tr>
-                      <th>Booking ID</th>
-                      <th>Date</th>
-                      <th>State</th>
-                      <th>Type</th>
-                      <th>Taxable Amt</th>
-                      <th>CGST</th>
-                      <th>SGST</th>
-                      <th>IGST</th>
-                      <th>Total GST</th>
-                      <th>Invoice</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {currentGstRows.map((row, idx) => (
-                      <tr key={idx}>
-                        <td className="booking-id-v20">{row.id}</td>
-                        <td className="date-v20">{row.date}</td>
-                        <td className="state-v20">{row.state}</td>
-                        <td><span className={`type-tag-v20 ${row.type.toLowerCase()}`}>{row.type}</span></td>
-                        <td>₹{row.taxable.toLocaleString('en-IN')}</td>
-                        <td>{row.cgst > 0 ? `₹${row.cgst.toLocaleString('en-IN')}` : '-'}</td>
-                        <td>{row.sgst > 0 ? `₹${row.sgst.toLocaleString('en-IN')}` : '-'}</td>
-                        <td>{row.igst > 0 ? `₹${row.igst.toLocaleString('en-IN')}` : '-'}</td>
-                        <td className="total-cell-v20">₹{row.total.toLocaleString('en-IN')}</td>
-                        <td>
-                          {row.type === 'B2B' ? (
-                            <a href="#" className="download-invoice-link-v24" onClick={(e) => e.preventDefault()}>
-                              Download PDF
-                            </a>
-                          ) : '-'}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
 
-              <div className="tds-pagination-v15">
-                <div className="pagination-info-v15">
-                  Showing {indexOfFirstGst + 1} to {Math.min(indexOfLastGst, gstBookings.length)} of {gstBookings.length} entries
-                </div>
-                <div className="pagination-controls-v15">
-                  <button
-                    className="pagi-btn-v15"
-                    onClick={() => setGstPage(prev => Math.max(prev - 1, 1))}
-                    disabled={gstPage === 1}
-                  >
-                    Previous
+            {/* 3. GST Documents Section */}
+            <div className="gst-documents-section-v25">
+              <div className="gst-documents-card-v25">
+                <h4>GST Documents</h4>
+                <div className="gst-documents-grid-v25">
+                  <button className="gst-download-btn-v25">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
+                    Download GSTR-1 Data
                   </button>
-                  <div className="pagi-numbers-v15">
-                    {[...Array(totalGstPages)].map((_, i) => (
-                      <button
-                        key={i}
-                        className={`pagi-num-v15 ${gstPage === i + 1 ? 'active' : ''}`}
-                        onClick={() => setGstPage(i + 1)}
-                      >
-                        {i + 1}
-                      </button>
-                    ))}
-                  </div>
-                  <button
-                    className="pagi-btn-v15"
-                    onClick={() => setGstPage(prev => Math.min(prev + 1, totalGstPages))}
-                    disabled={gstPage === totalGstPages}
-                  >
-                    Next
+                  <button className="gst-download-btn-v25">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
+                    Download GSTR-3B Summary
+                  </button>
+                  <button className="gst-download-btn-v25">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><line x1="12" y1="18" x2="12" y2="12" /><polyline points="9 15 12 12 15 15" /></svg>
+                    Download B2B Invoices
+                  </button>
+                  <button className="gst-download-btn-v25 optional">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" /></svg>
+                    Download GST Summary <span className="optional-tag-v25">(optional)</span>
                   </button>
                 </div>
               </div>
@@ -6183,9 +6247,6 @@ const Reports = () => {
               </div>
             </div>
 
-            <div className="reports-footnote-v20">
-              Last updated: Mar 23, 2026 • Reporting data synced with payout cycles
-            </div>
           </div>
         )}
 
@@ -6197,7 +6258,7 @@ const Reports = () => {
                 <p>Track your Tax Deducted at Source (TDS) and download certificates.</p>
               </div>
               <div className="tds-header-filters-v14">
-                <select 
+                <select
                   className="tds-filter-select-v14"
                   value={selectedTdsFY}
                   onChange={(e) => setSelectedTdsFY(e.target.value)}
@@ -6205,7 +6266,7 @@ const Reports = () => {
                   <option>FY 2025-26</option>
                   <option>FY 2024-25</option>
                 </select>
-                <select 
+                <select
                   className="tds-filter-select-v14"
                   value={selectedTdsQuarter}
                   onChange={(e) => setSelectedTdsQuarter(e.target.value)}
@@ -6253,7 +6314,7 @@ const Reports = () => {
                     <p className="tds-note-v15">Summary of your earnings, tax deductions, and net payouts</p>
                   </div>
                   <div className="header-right-v15">
-                    <button className="tds-export-btn-v16" onClick={() => {/* Download Excel Logic */}}>
+                    <button className="tds-export-btn-v16" onClick={() => {/* Download Excel Logic */ }}>
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                         <polyline points="7 10 12 15 17 10"></polyline>
@@ -6322,7 +6383,7 @@ const Reports = () => {
                     {currentTdsCertificate.status === 'Pending' && '❌ Pending'}
                   </div>
                 </div>
-                
+
                 <p className="tds-cert-desc-v14">Use this certificate while filing your income tax return (ITR).</p>
 
                 <div className="tds-cert-details-v14">
@@ -6347,7 +6408,7 @@ const Reports = () => {
                 </div>
 
                 <div className="tds-cert-footer-v14">
-                  <button 
+                  <button
                     className="tds-download-btn-v14"
                     disabled={currentTdsCertificate.status !== 'Available'}
                   >
@@ -6724,7 +6785,7 @@ const Bookings = () => {
       const cancelledEntry = booking.timeline.find((t: any) => t.status === 'Cancelled');
       let isVendor = false;
       let cancelledTime = new Date().getTime();
-      
+
       if (cancelledEntry) {
         if (cancelledEntry.role === 'Vendor') isVendor = true;
         const parts = cancelledEntry.time.split(', ');
@@ -6737,7 +6798,7 @@ const Bookings = () => {
 
       const diffHrsToEventCancel = (new Date(booking.date).getTime() - cancelledTime) / (1000 * 60 * 60);
       const diffDaysToEventCancel = Math.max(0, Math.ceil(diffHrsToEventCancel / 24));
-      
+
       let refundPct = 0;
 
       if (isVendor) {
@@ -7152,17 +7213,34 @@ const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
       { type: 'FSSAI License', identifier: '12345678901234', date: '14 Feb 2026', status: 'Verified' },
       { type: 'Cancelled Cheque', identifier: 'A/C: ****9012', date: '14 Feb 2026', status: 'Verified' }
     ],
-    bank: {
-      bankName: 'HDFC Bank',
-      holderName: 'User 3',
-      accountNumber: 'XXXX  XXXX  9012',
-      ifsc: 'HDFC0001234',
-      accountType: 'Savings Account',
-      status: 'Verified',
-      lastUpdated: '14 Feb 2026',
-      rejectionReason: null as string | null,
-      pendingSubmission: null as any
-    }
+    bankAccounts: [
+      {
+        id: 'bank-1',
+        bankName: 'HDFC Bank',
+        holderName: 'User 3',
+        accountNumber: 'XXXX  XXXX  9012',
+        ifsc: 'HDFC0001234',
+        accountType: 'Savings Account',
+        status: 'Verified',
+        lastUpdated: '14 Feb 2026',
+        isPrimary: true,
+        rejectionReason: null as string | null,
+        pendingSubmission: null as any
+      },
+      {
+        id: 'bank-2',
+        bankName: 'ICICI Bank',
+        holderName: 'User 3',
+        accountNumber: 'XXXX  XXXX  5678',
+        ifsc: 'ICIC0005678',
+        accountType: 'Savings Account',
+        status: 'Verified',
+        lastUpdated: '10 Mar 2026',
+        isPrimary: false,
+        rejectionReason: null as string | null,
+        pendingSubmission: null as any
+      }
+    ]
   });
 
   const [showEditProfileModal, setShowEditProfileModal] = useState(false);

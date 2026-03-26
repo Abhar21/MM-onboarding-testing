@@ -15435,10 +15435,10 @@ input:checked+.slider-v4:before {
 /* Confirmation Modals (Remove Device / Logout All) */
 .confirmation-modal-v4 {
   width: 100%;
-  max-width: 400px;
+  max-width: 480px;
   background: white;
   border-radius: 24px;
-  padding: 2rem;
+  padding: 2.5rem;
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
   animation: modalScaleIn 0.2s ease-out;
 }
@@ -15502,11 +15502,11 @@ input:checked+.slider-v4:before {
 
 .conf-btn-secondary-v4 {
   flex: 1;
-  padding: 0.875rem;
+  padding: 0.7rem 1.25rem;
   background-color: white;
   border: 1px solid #e2e8f0;
   border-radius: 12px;
-  font-size: 1rem;
+  font-size: 0.9375rem;
   font-weight: 600;
   color: #1e293b;
   cursor: pointer;
@@ -15520,11 +15520,11 @@ input:checked+.slider-v4:before {
 
 .conf-btn-danger-v4 {
   flex: 1;
-  padding: 0.875rem;
+  padding: 0.7rem 1.25rem;
   background-color: #ef4444;
   border: none;
   border-radius: 12px;
-  font-size: 1rem;
+  font-size: 0.9375rem;
   font-weight: 600;
   color: white;
   cursor: pointer;
@@ -15534,6 +15534,28 @@ input:checked+.slider-v4:before {
 .conf-btn-danger-v4:hover {
   background-color: #dc2626;
   box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.2);
+}
+
+.conf-btn-primary-v4 {
+  flex: 1;
+  padding: 0.7rem 1.25rem;
+  background-color: #3b82f6;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.conf-btn-primary-v4:hover {
+  background-color: #2563eb;
+  box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.2);
+}
+
+.primary-icon-bg {
+  background-color: #eff6ff;
 }
 
 /* Danger Zone Status Banners */
@@ -17376,6 +17398,77 @@ input:checked+.slider-v4:before {
   color: #475569;
 }
 
+/* GST Documents Section V25 */
+.gst-documents-section-v25 {
+  margin: 24px 0;
+}
+
+.gst-documents-card-v25 {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.gst-documents-card-v25 h4 {
+  margin: 0 0 20px 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.gst-documents-grid-v25 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.gst-download-btn-v25 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 20px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  color: #1e293b;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  text-decoration: none;
+}
+
+.gst-download-btn-v25:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  color: #7c3aed;
+}
+
+.gst-download-btn-v25 svg {
+  color: #64748b;
+  transition: color 0.2s;
+}
+
+.gst-download-btn-v25:hover svg {
+  color: #7c3aed;
+}
+
+.gst-download-btn-v25.optional {
+  border-style: dashed;
+}
+
+.gst-download-btn-v25 .optional-tag-v25 {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #94a3b8;
+  margin-left: 4px;
+}
+
 .reports-footnote-v20 {
   text-align: center;
   font-size: 0.8rem;
@@ -17526,7 +17619,7 @@ input:checked+.slider-v4:before {
 
 .gst-summary-grid-v20.v22 {
   flex: 2;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
 }
 
 .fy-insight-card-v22 {
@@ -18131,5 +18224,814 @@ input:checked+.slider-v4:before {
 
 .mini-bar-v25.active {
   background: #6366f1;
+}
+
+
+/* ==========================================================================
+   GST Dashboard Redesign (v25) - Minimal & Compliance Focused
+   ========================================================================== */
+
+.gst-dashboard-v25 {
+  padding: 0;
+  animation: fadeIn 0.4s ease-out;
+}
+
+.gst-header-v25 {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 32px;
+}
+
+.gst-title-group-v25 h3 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 4px 0;
+}
+
+.gst-title-group-v25 p {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0;
+}
+
+.gst-filters-v25 {
+  display: flex;
+  gap: 12px;
+}
+
+.gst-select-v25 {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1.5px solid #e2e8f0;
+  background-color: white;
+  font-size: 13px;
+  font-weight: 500;
+  color: #475569;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.gst-select-v25:hover {
+  border-color: #cbd5e1;
+}
+
+.gst-main-grid-v25 {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+/* Summary Card */
+.gst-summary-card-v25 {
+  background: white;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  padding: 24px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.gst-summary-header-v25 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.gst-summary-header-v25 h4 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.gst-download-btn-v25 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #475569;
+  cursor: pointer;
+}
+
+.gst-metrics-stack-v25 {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.gst-metric-item-v25 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 16px;
+  border-bottom: 1px dashed #f1f5f9;
+}
+
+.gst-metric-item-v25.payable {
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-top: 8px;
+  padding-top: 16px;
+  border-top: 2px solid #f1f5f9;
+}
+
+.gst-metric-label-v25 {
+  font-size: 14px;
+  color: #64748b;
+}
+
+.gst-metric-value-v25 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.gst-metric-item-v25.payable .gst-metric-label-v25 {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.gst-metric-item-v25.payable .gst-metric-value-v25 {
+  font-size: 24px;
+  color: #7c3aed; /* Primary focus color */
+}
+
+.gst-payable-helper-v25 {
+  font-size: 12px;
+  color: #94a3b8;
+  margin-top: 4px;
+}
+
+/* Split Card */
+.gst-split-card-v25 {
+  background: #f8fafc;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  padding: 24px;
+}
+
+.gst-split-card-v25 h4 {
+  margin: 0 0 20px 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.gst-split-list-v25 {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.gst-split-item-v25 {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: #64748b;
+}
+
+.gst-split-value-v25 {
+  font-weight: 500;
+  color: #334155;
+}
+
+/* Deadlines Card */
+.gst-deadlines-section-v25 h4 {
+  margin: 0 0 16px 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.gst-deadline-grid-v25 {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.gst-deadline-card-v25 {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.deadline-left-v25 label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 4px;
+}
+
+.deadline-left-v25 span {
+  font-size: 13px;
+  color: #64748b;
+}
+
+.deadline-status-v25 {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.deadline-status-v25.due {
+  background: #fef9c3;
+  color: #854d0e;
+}
+
+.deadline-status-v25.filed {
+  background: #dcfce7;
+  color: #166534;
+}
+
+/* Footer Section */
+.gst-footer-v25 {
+  border-top: 1px solid #f1f5f9;
+  padding-top: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.gst-trust-text-v25 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #94a3b8;
+  font-size: 12.5px;
+}
+
+.gst-timestamp-v25 {
+  color: #cbd5e1;
+  font-size: 12px;
+}
+
+/* ==========================================================================
+   Vendor Profile - Bank Details V4 (Enhanced Multi-Account)
+   ========================================================================== */
+
+.bank-tab-v4 {
+  animation: fadeIn 0.4s ease-out;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.bank-tab-header-v4 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  padding: 24px;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+}
+
+.bth-left-v4 h3 {
+  margin: 0 0 4px 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.bth-left-v4 p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #64748b;
+}
+
+.add-bank-btn-v4 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #7c3aed;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25);
+}
+
+.add-bank-btn-v4:hover {
+  background: #6d28d9;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(124, 58, 237, 0.35);
+}
+
+/* Bank Accounts List */
+.bank-accounts-list-v4 {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(480px, 1fr));
+  gap: 24px;
+}
+
+.bank-details-card-v4 {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 24px;
+  transition: all 0.3s ease;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.bank-details-card-v4:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+}
+
+.bank-details-card-v4.primary-v4 {
+  border: 2px solid #7c3aed30;
+  background: linear-gradient(180deg, #ffffff 0%, #fbf9ff 100%);
+  box-shadow: 0 10px 30px rgba(124, 58, 237, 0.06);
+}
+
+.bank-card-top-v4 {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.bc-header-left-v4 {
+  display: flex;
+  gap: 16px;
+}
+
+.bc-icon-v4 {
+  width: 44px;
+  height: 44px;
+  background: #f1f5f9;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+}
+
+.primary-v4 .bc-icon-v4 {
+  background: #7c3aed10;
+  color: #7c3aed;
+}
+
+.bc-title-wrap-v4 h3 {
+  margin: 0 0 2px 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.bc-title-row-v4 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.bc-badges-v4 {
+  display: flex;
+  gap: 6px;
+}
+
+.bc-subtitle-v4 {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.primary-helper-v4 {
+  color: #7c3aed;
+  font-weight: 600;
+}
+
+.last-updated-v4 {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+/* Status Badges */
+.primary-badge-v4 {
+  background: #7c3aed10;
+  color: #7c3aed;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid #7c3aed20;
+}
+
+.v-status-badge-v4 {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid transparent;
+}
+
+.v-status-badge-v4.verified {
+  background: #f0fdf4;
+  color: #10b981;
+  border-color: #10b98120;
+}
+
+.v-status-badge-v4.pending-verification {
+  background: #fffbeb;
+  color: #f59e0b;
+  border-color: #f59e0b20;
+}
+
+.v-status-badge-v4.rejected {
+  background: #fef2f2;
+  color: #ef4444;
+  border-color: #ef444420;
+}
+
+/* Bank Info Grid */
+.bank-info-grid-inner-v4 {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 24px;
+  padding: 16px;
+  background: #f8fafc;
+  border-radius: 12px;
+}
+
+.primary-v4 .bank-info-grid-inner-v4 {
+  background: #7c3aed05;
+}
+
+.bi-item-v4 {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.bi-item-v4 label {
+  font-size: 10px;
+  font-weight: 700;
+  color: #94a3b8;
+  letter-spacing: 0.05em;
+}
+
+.bi-item-v4 span {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #334155;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  letter-spacing: 0.02em;
+}
+
+.capitalize-v4 {
+  text-transform: capitalize;
+}
+
+/* Card Footer */
+.bank-card-footer-v4 {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 16px;
+  margin-top: auto;
+  min-height: 36px;
+}
+
+.payout-active-tag-v4 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #059669;
+  font-size: 13px;
+  font-weight: 700;
+  margin-right: auto;
+}
+
+.bc-footer-left-v4 {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  margin-right: auto;
+}
+
+.set-primary-btn-v4 {
+  background: none;
+  border: none;
+  color: #7c3aed;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+}
+
+.set-primary-btn-v4:hover {
+  text-decoration: underline;
+}
+
+.delete-bank-btn-v4 {
+  background: none;
+  border: none;
+  color: #ef4444;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+}
+
+.delete-bank-btn-v4:hover {
+  text-decoration: underline;
+}
+
+.primary-icon-bg {
+  background: #eff6ff;
+}
+
+.remove-icon-bg {
+  background: #fef2f2;
+}
+
+.edit-details-btn-v4 {
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  color: #475569;
+  padding: 6px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.edit-details-btn-v4:hover {
+  background: #e2e8f0;
+  color: #1e293b;
+}
+
+/* Bank Modal Specifics */
+.bank-modal-overlay-v4 {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1100;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.bank-modal-v4 {
+  background: white;
+  width: 100%;
+  max-width: 650px;
+  border-radius: 24px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: slideUp 0.3s ease-out;
+}
+
+.modal-header-v4 {
+  padding: 32px;
+  border-bottom: 1px solid #f1f5f9;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.modal-title-group-v4 {
+  display: flex;
+  gap: 20px;
+}
+
+.modal-icon-v4 {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-icon-v4.secure {
+  background: #ecfdf5;
+  color: #10b981;
+}
+
+.modal-title-group-v4 h3 {
+  margin: 0 0 4px 0;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #1e293b;
+}
+
+.modal-title-group-v4 p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #64748b;
+}
+
+.modal-close-v4 {
+  padding: 8px;
+  background: #f1f5f9;
+  border: none;
+  border-radius: 50%;
+  font-size: 24px;
+  color: #94a3b8;
+  cursor: pointer;
+  line-height: 1;
+  transition: all 0.2s;
+}
+
+.modal-close-v4:hover {
+  background: #e2e8f0;
+  color: #1e293b;
+}
+
+.modal-body-v4 {
+  padding: 32px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.bank-form-grid-v4 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.form-group-v4 {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group-v4.full-width-v4 {
+  grid-column: span 2;
+  margin-top: 8px;
+}
+
+.form-group-v4 label {
+  font-size: 11px;
+  font-weight: 800;
+  color: #64748b;
+  letter-spacing: 0.05em;
+}
+
+.form-group-v4 input, .form-group-v4 select {
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1.5px solid #e2e8f0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1e293b;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.form-group-v4 input:focus, .form-group-v4 select:focus {
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.1);
+}
+
+/* Upload Zone */
+.modal-upload-zone-v4 {
+  margin-top: 4px;
+}
+
+.bank-hidden-file-input-v4 {
+  display: none;
+}
+
+.upload-label-v4 {
+  display: block;
+  border: 2px dashed #e2e8f0;
+  border-radius: 16px;
+  padding: 32px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.upload-label-v4:hover {
+  border-color: #7c3aed;
+  background: #fbf9ff;
+}
+
+.upload-placeholder-v4 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  color: #94a3b8;
+}
+
+.upload-placeholder-v4 span {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.file-preview-v4 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: #7c3aed;
+}
+
+.file-preview-v4 span {
+  font-size: 0.95rem;
+  font-weight: 700;
+  max-width: 250px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.remove-file-v4 {
+  background: #fef2f2;
+  color: #ef4444;
+  border: none;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.modal-footer-v4 {
+  padding: 24px 32px;
+  background: #f8fafc;
+  border-top: 1px solid #f1f5f9;
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+}
+
+.cancel-btn-v4 {
+  padding: 12px 24px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.submit-btn-v4 {
+  padding: 12px 32px;
+  background: #7c3aed;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.submit-btn-v4:disabled {
+  background: #cbd5e1;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.submit-btn-v4:hover:not(:disabled) {
+  background: #6d28d9;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25);
 }
 
