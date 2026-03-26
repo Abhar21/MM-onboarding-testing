@@ -5224,15 +5224,6 @@ const BookingDetailModal = ({
               </div>
             </div>
 
-            <div className="gst-month-full-v24">
-              <div className="info-item-v7 gst-month-item-v24">
-                <label>GST Month</label>
-                <span className="gst-month-value-v24">
-                  {new Date(booking.date).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}
-                </span>
-              </div>
-            </div>
-
             {showMenuDetail && booking.menuSelection && (
               <div className="menu-selection-breakdown-v11">
                 {booking.menuSelection.map((section: any, idx: number) => (
@@ -5334,7 +5325,7 @@ const BookingDetailModal = ({
                     expDate.setDate(expDate.getDate() + 2);
                     value = expDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
                   } else {
-                    label = 'Payout Credited At:';
+                    label = 'Payout Processed At:';
                     value = formattedPayoutDate;
                   }
 
@@ -5349,6 +5340,23 @@ const BookingDetailModal = ({
                       <div className="payout-row-small-v11">
                         <label>{label}</label>
                         <span className={value.includes('under review') ? 'status-pill-v7 review' : ''} style={value.includes('under review') || value.includes('refund') ? { color: '#f59e0b', fontWeight: 600 } : {}}>{value}</span>
+                      </div>
+                      <div className="payout-row-small-v11">
+                        <label>GST Month:</label>
+                        <span style={{ fontWeight: 600 }}>{
+                          (() => {
+                            let d = new Date(booking.date);
+                            if (isUpcoming && diffDays > 2) {
+                              d.setDate(d.getDate() + 2);
+                            } else if (isCancelled && cancelledTime > 0) {
+                              d = new Date(cancelledTime);
+                            } else {
+                              d.setDate(d.getDate() - 1);
+                            }
+                            d.setMonth(d.getMonth() + 1);
+                            return d.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+                          })()
+                        }</span>
                       </div>
                     </>
                   );
@@ -5430,7 +5438,7 @@ const BookingDetailModal = ({
                   const getInitials = (name: string) => name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
                   const bookedEntry = booking.timeline.find((t: any) => t.status === 'Pending' || t.status === 'Confirmed');
                   const bookedTime = bookedEntry ? bookedEntry.time : 'Unknown';
-                  
+
                   const cancelledEntry = booking.timeline.find((t: any) => t.status === 'Cancelled');
                   const cancelledTimeStr = cancelledEntry ? cancelledEntry.time : 'Unknown';
 
@@ -5444,15 +5452,15 @@ const BookingDetailModal = ({
                       const dateStr = parts[0] + ` ${new Date().getFullYear()} ` + parts[1];
                       const parsed = new Date(dateStr).getTime();
                       if (!isNaN(parsed)) {
-                         const timeUntilEvent = eventDateObj.getTime() - parsed;
-                         diffDaysToEvent = Math.max(0, Math.ceil(timeUntilEvent / (1000 * 60 * 60 * 24)));
+                        const timeUntilEvent = eventDateObj.getTime() - parsed;
+                        diffDaysToEvent = Math.max(0, Math.ceil(timeUntilEvent / (1000 * 60 * 60 * 24)));
                       }
                     }
                   }
 
                   const isVendor = (booking as any).cancelledBy === 'Vendor';
                   const customerName = booking.customer || 'Customer';
-                  
+
                   let refundPct = '0%';
                   if (isVendor) refundPct = '100%';
                   else {
@@ -5468,7 +5476,7 @@ const BookingDetailModal = ({
                       const dateStr = parts[0] + ` ${new Date().getFullYear()} ` + parts[1];
                       const parsed = new Date(dateStr);
                       parsed.setDate(parsed.getDate() + 2); // 48h resolution
-                      expRefundDate = parsed.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) + ', 05:00 PM';
+                      expRefundDate = parsed.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
                     }
                   }
 
@@ -5506,7 +5514,7 @@ const BookingDetailModal = ({
                             <span className="al-time-v14">{booking.date}, {booking.time}</span>
                           </div>
                           <div className="al-content-bottom-v14">
-                            <div className="al-avatar-v14" style={{background: '#fef3c7', color: '#d97706'}}>E</div>
+                            <div className="al-avatar-v14" style={{ background: '#fef3c7', color: '#d97706' }}>E</div>
                             <span className="al-subtext-v14">{booking.serviceCategory} • {booking.guests} Guests</span>
                           </div>
                         </div>
@@ -5525,8 +5533,11 @@ const BookingDetailModal = ({
                             <span className="al-time-v14">{cancelledTimeStr}</span>
                           </div>
                           <div className="al-content-bottom-v14">
-                            <div className="al-avatar-v14" style={{background: '#fee2e2', color: '#b91c1c'}}>{isVendor ? 'VN' : 'CU'}</div>
-                            <span className="al-subtext-v14">Cancelled by <strong>{isVendor ? 'Vendor' : 'Customer'}</strong></span>
+                            <div className="al-avatar-v14" style={{ background: '#fee2e2', color: '#b91c1c' }}>{isVendor ? 'VN' : 'CU'}</div>
+                            <div className="al-cancel-sub-v14" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                              <span className="al-subtext-v14">Cancelled by <strong>{isVendor ? 'Vendor' : 'Customer'}</strong></span>
+                              {isVendor && <span className="al-subtext-v14" style={{ color: '#d97706' }}>Cancelled by You, Full refund will be issued</span>}
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -5544,8 +5555,11 @@ const BookingDetailModal = ({
                             <span className="al-time-v14">Expected: {expRefundDate}</span>
                           </div>
                           <div className="al-content-bottom-v14">
-                            <div className="al-avatar-v14" style={{background: '#d1fae5', color: '#047857'}}>₹</div>
-                            <span className="al-subtext-v14">Refund Percentage: <strong>{refundPct}</strong> • Status: <strong>Under Review</strong></span>
+                            <div className="al-avatar-v14" style={{ background: '#d1fae5', color: '#047857' }}>₹</div>
+                            <span className="al-subtext-v14">
+                              Refund: <strong>₹{(booking.paid * (parseInt(refundPct) / 100)).toLocaleString()} ({refundPct})</strong> •{' '}
+                              Status: <strong>Processing</strong>
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -5561,9 +5575,21 @@ const BookingDetailModal = ({
           {booking.status === 'Pending' && (
             <button className="btn-secondary-v7 reject" onClick={() => onUpdateStatus(booking.id, 'Cancelled')}>Reject</button>
           )}
-          {booking.status !== 'Completed' && booking.status !== 'Cancelled' && booking.status !== 'Pending' && (
-            <button className="btn-outline-v7 cancel" onClick={() => onUpdateStatus(booking.id, 'Cancelled')}>Cancel Booking</button>
-          )}
+          {(() => {
+            if (booking.status === 'Completed' || booking.status === 'Cancelled' || booking.status === 'Pending') return null;
+
+            const eventDate = new Date(booking.date);
+            eventDate.setHours(0, 0, 0, 0);
+            const diffHrsToEvent = (eventDate.getTime() - new Date().getTime()) / (1000 * 60 * 60);
+
+            const isPayoutProcessed = booking.status === 'Preparing' || (booking.status === 'Upcoming' && diffHrsToEvent < 24);
+
+            if (isPayoutProcessed) return null;
+
+            return (
+              <button className="btn-outline-v7 cancel" onClick={() => onUpdateStatus(booking.id, 'Cancelled')}>Cancel Booking</button>
+            );
+          })()}
           {nextAction && (
             <button className="btn-primary-v7" onClick={() => onUpdateStatus(booking.id, nextAction.next)}>{nextAction.label}</button>
           )}
@@ -6518,6 +6544,48 @@ const Bookings = () => {
         { status: 'Cancelled', time: `${new Date(Date.now() - 12 * 3600000).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}, 08:00 AM` }
       ],
       taxType: 'B2C'
+    },
+    {
+      id: 'BK-12423',
+      customer: 'Suresh Menon',
+      date: '2026-04-12',
+      time: '12:00 PM',
+      type: 'Corporate Retreat',
+      serviceCategory: 'Lunch',
+      menuName: 'Executive Buffet',
+      guests: 150,
+      amount: 120000,
+      paid: 36000,
+      status: 'Upcoming',
+      menuSelection: [
+        { name: 'Lunch', type: 'All Items', items: ['Paneer Tikka', 'Dal Makhani', 'Jeera Rice'] }
+      ],
+      timeline: [
+        { status: 'Pending', time: '20 Mar, 10:00 AM' },
+        { status: 'Confirmed', time: '21 Mar, 04:00 PM' }
+      ],
+      taxType: 'B2B'
+    },
+    {
+      id: 'BK-12428',
+      customer: 'Anita Desai',
+      date: '2026-04-18',
+      time: '07:30 PM',
+      type: 'Wedding Reception',
+      serviceCategory: 'Dinner',
+      menuName: 'Grand Royal Feast',
+      guests: 350,
+      amount: 450000,
+      paid: 135000,
+      status: 'Upcoming',
+      menuSelection: [
+        { name: 'Dinner', type: 'All Items', items: ['Butter Chicken', 'Tandoori Roti', 'Gulab Jamun'] }
+      ],
+      timeline: [
+        { status: 'Pending', time: '15 Mar, 09:30 AM' },
+        { status: 'Confirmed', time: '18 Mar, 11:15 AM' }
+      ],
+      taxType: 'B2C'
     }
   ]);
 
@@ -6554,6 +6622,7 @@ const Bookings = () => {
   const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
 
   const stats = {
+    total: bookings.length,
     today: bookings.filter(b => b.date === today).length,
     upcoming: bookings.filter(b => b.date > today && b.status !== 'Cancelled').length,
     completed: bookings.filter(b => b.status === 'Completed' || (b.date === yesterday && b.status !== 'Cancelled')).length
@@ -6621,7 +6690,11 @@ const Bookings = () => {
     return null;
   };
 
-  const getPayoutStatusText = (booking: any) => {
+  const getPayoutDisplayInfo = (booking: any) => {
+    let amountText = `₹ ${booking.paid.toLocaleString()}`;
+    let statusText = 'Processing';
+    let statusClass = 'pending';
+
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const eventDate = new Date(booking.date);
@@ -6631,21 +6704,29 @@ const Bookings = () => {
     const diffDaysToEvent = Math.ceil(diffHrsToEvent / 24);
 
     if (booking.status === 'Preparing' || booking.status === 'Completed') {
-      return 'Payout credited';
+      statusText = 'Payout processed';
+      statusClass = 'credited';
+      return { amountText, statusText, statusClass };
     }
 
     if (booking.status === 'Upcoming') {
-      if (diffHrsToEvent < 24) {
-        return 'Payout credited';
+      if (diffDaysToEvent <= 2) {
+        statusText = 'Payout processed';
+        statusClass = 'credited';
       } else {
-        return `Payout in ${Math.max(1, diffDaysToEvent)}d`;
+        statusText = `Payout in ${Math.max(1, diffDaysToEvent)}d`;
+        statusClass = 'pending';
       }
+      return { amountText, statusText, statusClass };
     }
 
     if (booking.status === 'Cancelled') {
       const cancelledEntry = booking.timeline.find((t: any) => t.status === 'Cancelled');
+      let isVendor = false;
       let cancelledTime = new Date().getTime();
+      
       if (cancelledEntry) {
+        if (cancelledEntry.role === 'Vendor') isVendor = true;
         const parts = cancelledEntry.time.split(', ');
         if (parts.length === 2) {
           const dateStr = parts[0] + ` ${new Date().getFullYear()} ` + parts[1];
@@ -6653,22 +6734,30 @@ const Bookings = () => {
           if (!isNaN(parsed)) cancelledTime = parsed;
         }
       }
-      const diffHrsSinceCancel = (new Date().getTime() - cancelledTime) / (1000 * 60 * 60);
 
-      if (diffHrsSinceCancel > 48) {
-        return 'Payout credited';
+      const diffHrsToEventCancel = (new Date(booking.date).getTime() - cancelledTime) / (1000 * 60 * 60);
+      const diffDaysToEventCancel = Math.max(0, Math.ceil(diffHrsToEventCancel / 24));
+      
+      let refundPct = 0;
+
+      if (isVendor) {
+        refundPct = 100;
       } else {
-        return 'Under Review';
+        if (diffDaysToEventCancel > 7) refundPct = 100;
+        else if (diffDaysToEventCancel >= 5) refundPct = 50;
+        else if (diffDaysToEventCancel >= 2) refundPct = 25;
+        else refundPct = 0;
       }
+
+      let vendorPct = 100 - refundPct;
+      amountText = `₹ ${(booking.paid * (vendorPct / 100)).toLocaleString()}`;
+      statusText = `${refundPct}% refund`;
+      statusClass = 'review';
+
+      return { amountText, statusText, statusClass };
     }
 
-    return 'Pending';
-  };
-
-  const getPayoutStatusClass = (text: string) => {
-    if (text === 'Payout credited') return 'credited';
-    if (text === 'Under Review') return 'review';
-    return 'pending';
+    return { amountText, statusText, statusClass };
   };
 
   const getStatusClass = (status: string) => status.toLowerCase();
@@ -6681,32 +6770,25 @@ const Bookings = () => {
       </div>
 
       <div className="summary-cards-v7">
-        <div className="summary-card-v7">
-          <div className="card-icon-v7 today">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-          </div>
-          <div className="card-info-v7">
-            <span className="label">Today's Events</span>
-            <span className="value">{stats.today}</span>
-          </div>
+        <div className="bscp-card-v25 light">
+          <span className="bscp-label">Total Bookings</span>
+          <span className="bscp-value">{stats.total}</span>
+          <span className="bscp-sub">Overall history</span>
         </div>
-        <div className="summary-card-v7">
-          <div className="card-icon-v7 upcoming">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path></svg>
-          </div>
-          <div className="card-info-v7">
-            <span className="label">Upcoming</span>
-            <span className="value">{stats.upcoming}</span>
-          </div>
+        <div className="bscp-card-v25 dark">
+          <span className="bscp-label">Today's Events</span>
+          <span className="bscp-value">{stats.today}</span>
+          <span className="bscp-sub green">{stats.today > 0 ? `↑ ${stats.today} events to manage` : 'No events for today'}</span>
         </div>
-        <div className="summary-card-v7">
-          <div className="card-icon-v7 completed">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-          </div>
-          <div className="card-info-v7">
-            <span className="label">Total Completed</span>
-            <span className="value">{stats.completed}</span>
-          </div>
+        <div className="bscp-card-v25 light">
+          <span className="bscp-label">Upcoming</span>
+          <span className="bscp-value">{stats.upcoming}</span>
+          <span className="bscp-sub">Future bookings</span>
+        </div>
+        <div className="bscp-card-v25 light">
+          <span className="bscp-label">Total Completed</span>
+          <span className="bscp-value">{stats.completed}</span>
+          <span className="bscp-sub">Successfully fulfilled</span>
         </div>
       </div>
 
@@ -6832,12 +6914,17 @@ const Bookings = () => {
                     </div>
                   </td>
                   <td>
-                    <div className="amount-cell-v7">
-                      <span className="total">₹ {b.paid.toLocaleString()}</span>
-                      <span className={`payout ${getPayoutStatusClass(getPayoutStatusText(b))}`}>
-                        {getPayoutStatusText(b)}
-                      </span>
-                    </div>
+                    {(() => {
+                      const payoutInfo = getPayoutDisplayInfo(b);
+                      return (
+                        <div className="amount-cell-v7">
+                          <span className="total">{payoutInfo.amountText}</span>
+                          <span className={`payout ${payoutInfo.statusClass}`}>
+                            {payoutInfo.statusText}
+                          </span>
+                        </div>
+                      );
+                    })()}
                   </td>
                   <td>
                     <div className="balance-cell-v11">

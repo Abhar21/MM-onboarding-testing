@@ -11826,65 +11826,73 @@ input:checked+.slider-v4:before {
   margin-bottom: 2rem;
 }
 
-.summary-card-v7 {
-  background: white;
+.bscp-card-v25 {
   padding: 1.5rem;
-  border-radius: 16px;
+  border-radius: 12px;
   display: flex;
-  align-items: center;
-  gap: 1.25rem;
-  box-shadow: none;
-  border: 1px solid #e2e8f0;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.5rem;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.summary-card-v7:hover {
+.bscp-card-v25:hover {
   transform: translateY(-2px);
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
 }
 
-.card-icon-v7 {
-  width: 54px;
-  height: 54px;
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.bscp-card-v25.dark {
+  background: #2c3545;
+  color: white;
+  border: none;
 }
 
-.card-icon-v7.today {
-  background: #eff6ff;
-  color: #3b82f6;
+.bscp-card-v25.light {
+  background: white;
+  color: #0f172a;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-.card-icon-v7.upcoming {
-  background: #fef3c7;
-  color: #d97706;
+.bscp-label {
+  font-size: 0.85rem;
+  font-weight: 500;
 }
 
-.card-icon-v7.completed {
-  background: #ecfdf5;
+.bscp-card-v25.dark .bscp-label {
+  color: #94a3b8;
+}
+
+.bscp-card-v25.light .bscp-label {
+  color: #64748b;
+}
+
+.bscp-value {
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.bscp-card-v25.dark .bscp-value {
+  color: #ffffff;
+}
+
+.bscp-card-v25.light .bscp-value {
+  color: #0f172a;
+}
+
+.bscp-sub {
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-top: 0.25rem;
+}
+
+.bscp-card-v25.dark .bscp-sub.green {
   color: #10b981;
 }
 
-.card-info-v7 {
-  display: flex;
-  flex-direction: column;
-}
-
-.card-info-v7 .label {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #64748b;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 0.25rem;
-}
-
-.card-info-v7 .value {
-  font-size: 1.75rem;
-  font-weight: 800;
-  color: #0f172a;
+.bscp-card-v25.light .bscp-sub {
+  color: #94a3b8;
 }
 
 /* Content Area */
