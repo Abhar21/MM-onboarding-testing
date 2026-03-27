@@ -5721,6 +5721,27 @@ const BookingDetailModal = ({
   );
 };
 
+const monthsList = ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar'];
+const fullMonthNames: Record<string, string> = {
+  'Apr': 'April', 'May': 'May', 'Jun': 'June', 'Jul': 'July', 'Aug': 'August', 'Sep': 'September',
+  'Oct': 'October', 'Nov': 'November', 'Dec': 'December', 'Jan': 'January', 'Feb': 'February', 'Mar': 'March'
+};
+const revenueHeights = [45, 60, 55, 75, 85, 70, 90, 80, 65, 95, 88, 100];
+
+const getNextMonthInfo = (month: string) => {
+  const idx = monthsList.indexOf(month);
+  const nextIdx = (idx + 1) % 12;
+  const deadlineIdx = (idx + 2) % 12;
+  const nextMonth = monthsList[nextIdx];
+  const deadlineMonth = monthsList[deadlineIdx];
+
+  return {
+    name: nextMonth,
+    fullName: fullMonthNames[nextMonth],
+    deadlineMonthName: fullMonthNames[deadlineMonth]
+  };
+};
+
 const Reports = () => {
   const [activeReportTab, setActiveReportTab] = useState('Revenue');
 
@@ -5755,7 +5776,6 @@ const Reports = () => {
   const [selectedFY, setSelectedFY] = useState('FY 2025-26');
   const [selectedMonthTab, setSelectedMonthTab] = useState('Mar');
 
-  const [selectedRevenueFY, setSelectedRevenueFY] = useState('FY 2025-26');
   const [selectedRevenueMonth, setSelectedRevenueMonth] = useState('Oct');
   const [selectedTdsQuarter, setSelectedTdsQuarter] = useState('Quarter 2 (Jul-Sep)');
   const [selectedTdsFY, setSelectedTdsFY] = useState('FY 2025-26');
@@ -5801,18 +5821,7 @@ const Reports = () => {
 
   const currentTdsCertificate = tdsCertificates.find(c => c.fullQuarter === selectedTdsQuarter) || tdsCertificates[0];
 
-  const monthsList = ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar'];
-  const fullMonthNames: Record<string, string> = {
-    'Apr': 'April', 'May': 'May', 'Jun': 'June', 'Jul': 'July', 'Aug': 'August', 'Sep': 'September',
-    'Oct': 'October', 'Nov': 'November', 'Dec': 'December', 'Jan': 'January', 'Feb': 'February', 'Mar': 'March'
-  };
 
-  const revenueHeights = [45, 60, 55, 75, 85, 70, 90, 80, 65, 95, 88, 100];
-  const currentMonthIdx = monthsList.indexOf(selectedRevenueMonth);
-  const currentMonthVal = revenueHeights[currentMonthIdx];
-  const lastMonthVal = currentMonthIdx > 0 ? revenueHeights[currentMonthIdx - 1] : 75; // Fallback
-  const growthValue = ((currentMonthVal - lastMonthVal) / lastMonthVal * 100).toFixed(1);
-  const isGrowthPositive = parseFloat(growthValue) >= 0;
 
   // const gstRowsPerPage = 8;
   // const indexOfLastGst = gstPage * gstRowsPerPage;
@@ -5821,22 +5830,7 @@ const Reports = () => {
   // const totalGstPages = Math.ceil(gstBookings.length / gstRowsPerPage);
 
 
-  const getNextMonthInfo = (month: string) => {
-    const months = ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar'];
-    const idx = months.indexOf(month);
-    const nextIdx = (idx + 1) % 12;
-    const deadlineIdx = (idx + 2) % 12;
-    const nextMonth = months[nextIdx];
-    const deadlineMonth = months[deadlineIdx];
 
-    // If we transition across Mar -> Apr, it's the next FY
-    // But conceptually here we just need the month name and a relative indicator
-    return {
-      name: nextMonth,
-      fullName: fullMonthNames[nextMonth],
-      deadlineMonthName: fullMonthNames[deadlineMonth]
-    };
-  };
 
   const nextMonthInfo = getNextMonthInfo(selectedMonthTab);
 
@@ -5861,195 +5855,10 @@ const Reports = () => {
 
       <div className="report-content-v13">
         {activeReportTab === 'Revenue' && (
-          <div className="revenue-dashboard-v24">
-            {/* 1. Header with FY Selector & Export */}
-            <div className="reports-section-header-v20">
-              <div className="section-title-group-v20">
-                <h3>Revenue Analytics</h3>
-                <p>Performance insights and earnings summary for {fullMonthNames[selectedRevenueMonth]} {selectedRevenueFY}</p>
-              </div>
-              <div className="section-filters-v20">
-                <select
-                  className="period-select-v20 fy-select-v22"
-                  value={selectedRevenueFY}
-                  onChange={(e) => setSelectedRevenueFY(e.target.value)}
-                >
-                  <option>FY 2025-26</option>
-                  <option>FY 2024-25</option>
-                </select>
-              </div>
-            </div>
-
-            {/* 2. Month Navigation Tabs */}
-            <div className="gst-month-nav-v22">
-              {monthsList.map((m) => {
-                const fyParts = selectedRevenueFY.replace('FY ', '').split('-');
-                const yearSuffix = ['Jan', 'Feb', 'Mar'].includes(m) ? fyParts[1] : fyParts[0].slice(-2);
-                return (
-                  <button
-                    key={m}
-                    className={`month-tab-v22 ${selectedRevenueMonth === m ? 'active' : ''}`}
-                    onClick={() => setSelectedRevenueMonth(m)}
-                  >
-                    {m} '{yearSuffix}
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* 3. Revenue Summary Stats */}
-            <div className="revenue-stats-grid-v24">
-              <div className="revenue-card-v24 main">
-                <div className="card-label-v24">Total Revenue</div>
-                <div className="card-value-v24">₹4,25,840</div>
-                <div className="card-trend-v24 positive">↑ 12% vs last month</div>
-              </div>
-              <div className="revenue-card-v24">
-                <div className="card-label-v24">Net Earnings</div>
-                <div className="card-value-v24">₹4,21,582</div>
-                <div className="card-footer-v24">After all deductions</div>
-              </div>
-              <div className="revenue-card-v24">
-                <div className="card-label-v24">TDS Deducted</div>
-                <div className="card-value-v24">₹4,258</div>
-                <div className="card-footer-v24">TDS @ 1%</div>
-              </div>
-            </div>
-
-            {/* 4. Revenue Trend & Performance Grid */}
-            <div className="revenue-middle-grid-v24">
-              <div className="revenue-trend-section-v24">
-                <div className="inner-card-v24">
-                  <div className="card-header-v24">
-                    <h4>Monthly Revenue Trend</h4>
-                    <span className="fy-label-v24">{selectedRevenueFY}</span>
-                  </div>
-                  <div className="trend-chart-v24">
-                    {monthsList.map((m, idx) => {
-                      const val = revenueHeights[idx];
-                      return (
-                        <div key={m} className={`trend-bar-col-v24 ${selectedRevenueMonth === m ? 'active' : ''}`} onClick={() => setSelectedRevenueMonth(m)}>
-                          <div className="bar-wrapper-v24">
-                            <div className="bar-v24" style={{ height: `${val}%` }}>
-                              <span className="bar-tooltip-v24">₹{(val * 4500).toLocaleString()}</span>
-                            </div>
-                          </div>
-                          <span className="bar-label-v24">{m}</span>
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  <div className="trend-summary-v24">
-                    <div className="trend-summary-item-v24">
-                      <label>{fullMonthNames[selectedRevenueMonth]} Revenue</label>
-                      <div className="value-v24">₹{(currentMonthVal * 4500).toLocaleString()}</div>
-                    </div>
-                    <div className="trend-summary-item-v24">
-                      <label>vs Last Month</label>
-                      <div className={`growth-v24 ${isGrowthPositive ? 'positive' : 'negative'}`}>
-                        {isGrowthPositive ? '↑' : '↓'} {Math.abs(parseFloat(growthValue))}%
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="performance-split-grid-v24">
-                <div className="inner-card-v24">
-                  <h4>Booking Performance</h4>
-                  <div className="performance-list-v24">
-                    <div className="perf-item-v24">
-                      <label>Total Bookings</label>
-                      <span>32</span>
-                    </div>
-                    <div className="perf-item-v24">
-                      <label>Completed</label>
-                      <span className="completed-v24">28</span>
-                    </div>
-                    <div className="perf-item-v24">
-                      <label>Cancelled</label>
-                      <span className="cancelled-v24">4</span>
-                    </div>
-                    <div className="perf-divider-v24"></div>
-                    <div className="perf-item-v24 conversion">
-                      <label>Conversion Rate</label>
-                      <span>87.5%</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="inner-card-v24">
-                  <h4>Revenue Breakdown</h4>
-                  <div className="breakdown-list-v24">
-                    <div className="breakdown-item-v24">
-                      <div className="breakdown-info-v24">
-                        <span className="dot b2b"></span>
-                        <label>B2B Revenue</label>
-                      </div>
-                      <span>₹2,85,400</span>
-                    </div>
-                    <div className="breakdown-item-v24">
-                      <div className="breakdown-info-v24">
-                        <span className="dot b2c"></span>
-                        <label>B2C Revenue</label>
-                      </div>
-                      <span>₹1,40,440</span>
-                    </div>
-                    <div className="progress-bar-v24">
-                      <div className="progress-fill-v24 b2b" style={{ width: '67%' }}></div>
-                      <div className="progress-fill-v24 b2c" style={{ width: '33%' }}></div>
-                    </div>
-                    <div className="breakdown-footer-v24">
-                      <span>67% B2B</span>
-                      <span>33% B2C</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* 5. Payout Summary */}
-            <div className="payout-summary-section-v24">
-              <div className="inner-card-v24">
-                <div className="card-header-v24">
-                  <h4>Payout Summary</h4>
-                  <div className="payout-helper-v24">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                    Payouts are processed based on booking schedule
-                  </div>
-                </div>
-                <div className="payout-grid-v24">
-                  <div className="payout-status-card-v24 paid">
-                    <label>Paid Amount</label>
-                    <div className="payout-value-v24">₹3,25,000</div>
-                    <span className="status-tag-v24">Successfully Settled</span>
-                  </div>
-                  <div className="payout-status-card-v24 upcoming">
-                    <label>Upcoming Payout</label>
-                    <div className="payout-value-v24">₹65,850</div>
-                    <span className="status-tag-v24">Expected by 28 Mar</span>
-                  </div>
-                  <div className="payout-status-card-v24 processing">
-                    <label>Processing Payout</label>
-                    <div className="payout-value-v24">₹35,000</div>
-                    <span className="status-tag-v24">Initiated</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* 6. Notes & Disclaimer */}
-            <div className="revenue-footer-advice-v24">
-              <div className="advice-meta-v24">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                <div className="advice-texts-v24">
-                  <p>Figures are based on completed bookings for the selected period.</p>
-                  <p>Payouts may vary based on settlement schedule and customer collection.</p>
-                </div>
-              </div>
-            </div>
-          </div>
+          <RevenueAnalytics 
+            externalMonth={selectedRevenueMonth} 
+            onMonthChange={setSelectedRevenueMonth}
+          />
         )}
 
         {activeReportTab === 'GST' && (
@@ -8388,5 +8197,279 @@ function App() {
   );
 
 }
+
+/* ─────────────────── REVENUE & ANALYTICS SCREEN ─────────────────── */
+
+const RevenueAnalytics = ({
+  externalMonth,
+  onMonthChange,
+  isStandalone = false
+}: {
+  externalMonth?: string;
+  onMonthChange?: (month: string) => void;
+  isStandalone?: boolean;
+}) => {
+  const [selectedMonth, setSelectedMonth] = useState(externalMonth || 'Mar');
+
+  useEffect(() => {
+    if (externalMonth) setSelectedMonth(externalMonth);
+  }, [externalMonth]);
+
+  useEffect(() => {
+    if (onMonthChange) onMonthChange(selectedMonth);
+  }, [selectedMonth, onMonthChange]);
+
+  const currentMonthIdx = monthsList.indexOf(selectedMonth);
+  const currentMonthVal = revenueHeights[currentMonthIdx];
+  const lastMonthVal = currentMonthIdx > 0 ? revenueHeights[currentMonthIdx - 1] : 75;
+  const growthValNum = ((currentMonthVal - lastMonthVal) / lastMonthVal * 100);
+  const growthString = (growthValNum >= 0 ? "+" : "") + growthValNum.toFixed(1) + "%";
+  const currentTrend = growthValNum >= 0 ? 'up' : 'down';
+
+  const summaryCards = [
+    { label: 'Total Revenue', value: `₹${(currentMonthVal * 4500).toLocaleString('en-IN')}`, growth: growthString, icon: '💰', trend: currentTrend },
+    { label: 'Net Earnings', value: `₹${(currentMonthVal * 4400).toLocaleString('en-IN')}`, subtext: 'After deductions', icon: '🏦', trend: currentTrend },
+    { label: 'Total Bookings', value: Math.round(currentMonthVal / 3).toString(), growth: '+8%', icon: '📅', trend: 'up' },
+  ];
+
+  const monthlyTrend = [
+    { month: 'Apr', revenue: 85000 }, { month: 'May', revenue: 92000 }, { month: 'Jun', revenue: 88000 },
+    { month: 'Jul', revenue: 105000 }, { month: 'Aug', revenue: 115000 }, { month: 'Sep', revenue: 108000 },
+    { month: 'Oct', revenue: 125000 }, { month: 'Nov', revenue: 118000 }, { month: 'Dec', revenue: 112000 },
+    { month: 'Jan', revenue: 130000 }, { month: 'Feb', revenue: 128000 }, { month: 'Mar', revenue: 135000 }
+  ];
+
+  const maxRevenue = Math.max(...monthlyTrend.map(d => d.revenue));
+
+  const bookingStats = {
+    total: 148,
+    completed: 132,
+    cancelled: 16,
+    conversion: '89.2%'
+  };
+
+  const revenueSplit = {
+    b2b: 60, // percentage to match reference
+    b2c: 40,
+    b2bAmount: '₹7,45,000',
+    b2cAmount: '₹5,00,000'
+  };
+
+  const payoutSummary = [
+    { label: 'Paid', value: '₹3,25,000', status: 'Settled', color: '#16a34a' },
+    { label: 'Upcoming', value: '₹65,850', status: 'Expected by 28 Mar', color: '#7c3aed' },
+    { label: 'Processing', value: '₹35,000', status: 'Initiated', color: '#f59e0b' }
+  ];
+
+  const [selectedFY, setSelectedFY] = useState('FY 2025-26');
+
+  return (
+    <div className={isStandalone ? "revenue-analytics-v5" : "revenue-tab-inner-v22"}>
+      {!isStandalone && (
+        <div className="reports-section-header-v20">
+          <div className="section-title-group-v20">
+            <h3>Revenue Insights & Trends</h3>
+            <p>Financial performance and growth analysis for {fullMonthNames[selectedMonth]} {selectedFY}</p>
+          </div>
+          <div className="section-filters-v20">
+            <select
+              className="period-select-v20 fy-select-v22"
+              value={selectedFY}
+              onChange={(e) => setSelectedFY(e.target.value)}
+            >
+              <option>FY 2025-26</option>
+              <option>FY 2024-25</option>
+            </select>
+            <select
+              className="period-select-v20 month-select-v22"
+              value={selectedMonth}
+              onChange={(e) => setSelectedMonth(e.target.value)}
+            >
+              {monthsList.map((m) => {
+                const fyParts = selectedFY.replace('FY ', '').split('-');
+                const yearSuffix = ['Jan', 'Feb', 'Mar'].includes(m) ? fyParts[1] : fyParts[0].slice(-2);
+                return (
+                  <option key={m} value={m}>
+                    {m} '{yearSuffix}
+                  </option>
+                );
+              })}
+            </select>
+          </div>
+        </div>
+      )}
+
+      {/* Summary Cards */}
+      <div className={!isStandalone ? "gst-summary-grid-v20 v22" : "revenue-summary-grid-v5"}>
+        {summaryCards.map((card, idx) => {
+          if (!isStandalone) {
+            if (idx === 0) {
+              return (
+                <div key={idx} className="rev-hero-card-v22">
+                  <span className="rev-hero-rupee-v22">₹</span>
+                  <p className="rev-hero-label-v22">{card.label}</p>
+                  <div className="rev-hero-value-v22">{card.value}</div>
+                  {card.growth && (
+                    <div className={`rev-hero-growth-badge-v22 ${card.trend}`}>
+                      {card.growth} {card.trend === 'up' ? '↑' : '↓'} <span>vs last month</span>
+                    </div>
+                  )}
+                </div>
+              );
+            }
+            return (
+              <div key={idx} className={`gst-summary-card-v20 ${idx === 1 ? 'highlight' : ''}`}>
+                <label>{card.label}</label>
+                <div className="card-main-v20">
+                  <span className="value-v20">{card.value}</span>
+                  <span className="sub-v20">{card.growth ? `${card.growth} vs last month` : card.subtext}</span>
+                </div>
+              </div>
+            );
+          }
+          return (
+            <div key={idx} className="revenue-card-v5">
+              <div className="card-icon-v5">{card.icon}</div>
+              <div className="card-info-v5">
+                <label>{card.label}</label>
+                <div className="card-value-row-v5">
+                  <span className="value-v5">{card.value}</span>
+                  {card.growth && (
+                    <span className={`growth-v5 ${card.trend}`}>
+                      {card.growth}
+                    </span>
+                  )}
+                </div>
+                {card.subtext && <p className="card-subtext-v5">{card.subtext}</p>}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Main Content Grid */}
+      <div className="revenue-main-grid-v5">
+        {/* Trend Chart */}
+        <div className="revenue-chart-section-v5">
+          <div className="section-header-v5">
+            <h3>Revenue Trend</h3>
+            <span className="period-label-v5">Last 12 Months</span>
+          </div>
+          <div className="chart-container-v5">
+            <div className="y-axis-v5">
+              <span>{Math.round(maxRevenue / 1000)}k</span>
+              <span>{Math.round(maxRevenue * 0.75 / 1000)}k</span>
+              <span>{Math.round(maxRevenue * 0.5 / 1000)}k</span>
+              <span>{Math.round(maxRevenue * 0.25 / 1000)}k</span>
+              <span>0</span>
+            </div>
+            <div className="bars-v5">
+              {monthlyTrend.map((data, i) => (
+                <div key={i} className="bar-group-v5">
+                  <div 
+                    className={`bar-v5 ${data.month === selectedMonth ? 'active' : ''}`}
+                    style={{ height: `${(data.revenue / maxRevenue) * 100}%`, background: data.month === selectedMonth ? '#6366f1' : '#f1f5f9' }}
+                    onClick={() => setSelectedMonth(data.month)}
+                  >
+                    <div className="bar-tooltip-v5">₹{data.revenue.toLocaleString()}</div>
+                  </div>
+                  <span className="bar-label-v5">{data.month}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Sidebar Mini-stats */}
+        <div className="revenue-sidebar-v5">
+          {/* Booking Performance */}
+          <div className="booking-performance-card-v24">
+            <div className="card-header-v24">
+              <h4>Booking Performance</h4>
+            </div>
+            <div className="perf-grid-v24">
+              <div className="perf-item-v24">
+                <label>Total Bookings</label>
+                <span className="total-v24">{bookingStats.total}</span>
+              </div>
+              <div className="perf-item-v24">
+                <label>Completed</label>
+                <span className="positive-v24">{bookingStats.completed}</span>
+              </div>
+              <div className="perf-item-v24">
+                <label>Cancelled</label>
+                <span className="negative-v24">{bookingStats.cancelled}</span>
+              </div>
+              <div className="perf-item-v24">
+                <label>Conversion Rate</label>
+                <span className="highlight-v24">{bookingStats.conversion}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Revenue Breakdown */}
+          <div className="revenue-breakdown-card-v24">
+            <h4>Revenue Breakdown</h4>
+            <div className="breakdown-chart-v24">
+              <div className="breakdown-legend-v24">
+                <div className="legend-item-v24">
+                  <div className="legend-left-v24">
+                    <span className="dot b2b"></span>
+                    <label>B2B Revenue</label>
+                  </div>
+                  <span className="legend-value-v24">{revenueSplit.b2bAmount} ({revenueSplit.b2b}%)</span>
+                </div>
+                <div className="legend-item-v24">
+                  <div className="legend-left-v24">
+                    <span className="dot b2c"></span>
+                    <label>B2C Revenue</label>
+                  </div>
+                  <span className="legend-value-v24">{revenueSplit.b2cAmount} ({revenueSplit.b2c}%)</span>
+                </div>
+              </div>
+              <div className="progress-bar-v24">
+                <div className="progress-fill-v24 b2b" style={{ width: `${revenueSplit.b2b}%` }}></div>
+                <div className="progress-fill-v24 b2c" style={{ width: `${revenueSplit.b2c}%` }}></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Payout Summary Section */}
+      <div className="payout-summary-section-v24">
+        <div className="inner-card-v24">
+          <div className="card-header-v24">
+            <h4>Payout Summary</h4>
+            <div className="payout-helper-v24">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+              Payouts are processed based on booking schedule
+            </div>
+          </div>
+          <div className="payout-grid-v24">
+            {payoutSummary.map((payout, idx) => (
+              <div key={idx} className={`payout-status-card-v24 ${payout.label.toLowerCase()}`}>
+                <label>{payout.label} Amount</label>
+                <div className="payout-value-v24">{payout.value}</div>
+                <span className="status-tag-v24">{payout.status}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* 6. Notes & Disclaimer */}
+      <div className="revenue-footer-advice-v24">
+        <div className="advice-meta-v24">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+          <div className="advice-texts-v24">
+            <p>Figures are based on completed bookings for the selected period.</p>
+            <p>Payouts may vary based on settlement schedule and customer collection.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default App;
