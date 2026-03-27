@@ -5736,22 +5736,22 @@ const Reports = () => {
     net: acc.net + curr.net,
   }), { earnings: 0, tds: 0, net: 0 });
 
-  const gstBookings = [
-    { id: 'BK-12401', date: '20 Mar 2026', state: 'Maharashtra', type: 'B2C', taxable: 42373, cgst: 3813, sgst: 3813, igst: 0, total: 7626 },
-    { id: 'BK-12395', date: '17 Mar 2026', state: 'Karnataka', type: 'B2C', taxable: 25424, cgst: 0, sgst: 0, igst: 4576, total: 4576 },
-    { id: 'BK-12388', date: '15 Mar 2026', state: 'Maharashtra', type: 'B2B', taxable: 84746, cgst: 7627, sgst: 7627, igst: 0, total: 15254 },
-    { id: 'BK-12380', date: '12 Mar 2026', state: 'Maharashtra', type: 'B2C', taxable: 16949, cgst: 1525, sgst: 1525, igst: 0, total: 3050 },
-    { id: 'BK-12372', date: '10 Mar 2026', state: 'Delhi', type: 'B2C', taxable: 33898, cgst: 0, sgst: 0, igst: 6102, total: 6102 },
-    { id: 'BK-12365', date: '08 Mar 2026', state: 'Maharashtra', type: 'B2C', taxable: 21186, cgst: 1907, sgst: 1907, igst: 0, total: 3814 },
-    { id: 'BK-12354', date: '05 Mar 2026', state: 'Gujarat', type: 'B2B', taxable: 110169, cgst: 0, sgst: 0, igst: 19831, total: 19831 },
-    { id: 'BK-12344', date: '02 Mar 2026', state: 'Maharashtra', type: 'B2C', taxable: 46610, cgst: 4195, sgst: 4195, igst: 0, total: 8390 },
-    { id: 'BK-12330', date: '01 Mar 2026', state: 'Maharashtra', type: 'B2C', taxable: 74576, cgst: 6712, sgst: 6712, igst: 0, total: 13424 },
-    { id: 'BK-12315', date: '28 Feb 2026', state: 'Karnataka', type: 'B2C', taxable: 29661, cgst: 0, sgst: 0, igst: 5339, total: 5339 },
-    { id: 'BK-12300', date: '25 Feb 2026', state: 'Maharashtra', type: 'B2B', taxable: 55085, cgst: 4958, sgst: 4958, igst: 0, total: 9916 },
-    { id: 'BK-12285', date: '22 Feb 2026', state: 'Tamil Nadu', type: 'B2C', taxable: 38136, cgst: 0, sgst: 0, igst: 6864, total: 6864 },
-  ];
+  // const gstBookings = [
+  //   { id: 'BK-12401', date: '20 Mar 2026', state: 'Maharashtra', type: 'B2C', taxable: 42373, cgst: 3813, sgst: 3813, igst: 0, total: 7626 },
+  //   { id: 'BK-12395', date: '17 Mar 2026', state: 'Karnataka', type: 'B2C', taxable: 25424, cgst: 0, sgst: 0, igst: 4576, total: 4576 },
+  //   { id: 'BK-12388', date: '15 Mar 2026', state: 'Maharashtra', type: 'B2B', taxable: 84746, cgst: 7627, sgst: 7627, igst: 0, total: 15254 },
+  //   { id: 'BK-12380', date: '12 Mar 2026', state: 'Maharashtra', type: 'B2C', taxable: 16949, cgst: 1525, sgst: 1525, igst: 0, total: 3050 },
+  //   { id: 'BK-12372', date: '10 Mar 2026', state: 'Delhi', type: 'B2C', taxable: 33898, cgst: 0, sgst: 0, igst: 6102, total: 6102 },
+  //   { id: 'BK-12365', date: '08 Mar 2026', state: 'Maharashtra', type: 'B2C', taxable: 21186, cgst: 1907, sgst: 1907, igst: 0, total: 3814 },
+  //   { id: 'BK-12354', date: '05 Mar 2026', state: 'Gujarat', type: 'B2B', taxable: 110169, cgst: 0, sgst: 0, igst: 19831, total: 19831 },
+  //   { id: 'BK-12344', date: '02 Mar 2026', state: 'Maharashtra', type: 'B2C', taxable: 46610, cgst: 4195, sgst: 4195, igst: 0, total: 8390 },
+  //   { id: 'BK-12330', date: '01 Mar 2026', state: 'Maharashtra', type: 'B2C', taxable: 74576, cgst: 6712, sgst: 6712, igst: 0, total: 13424 },
+  //   { id: 'BK-12315', date: '28 Feb 2026', state: 'Karnataka', type: 'B2C', taxable: 29661, cgst: 0, sgst: 0, igst: 5339, total: 5339 },
+  //   { id: 'BK-12300', date: '25 Feb 2026', state: 'Maharashtra', type: 'B2B', taxable: 55085, cgst: 4958, sgst: 4958, igst: 0, total: 9916 },
+  //   { id: 'BK-12285', date: '22 Feb 2026', state: 'Tamil Nadu', type: 'B2C', taxable: 38136, cgst: 0, sgst: 0, igst: 6864, total: 6864 },
+  // ];
 
-  const [gstPage, setGstPage] = useState(1);
+  // const [gstPage] = useState(1);
   const [selectedFY, setSelectedFY] = useState('FY 2025-26');
   const [selectedMonthTab, setSelectedMonthTab] = useState('Mar');
 
@@ -5814,11 +5814,12 @@ const Reports = () => {
   const growthValue = ((currentMonthVal - lastMonthVal) / lastMonthVal * 100).toFixed(1);
   const isGrowthPositive = parseFloat(growthValue) >= 0;
 
-  const gstRowsPerPage = 8;
-  const indexOfLastGst = gstPage * gstRowsPerPage;
-  const indexOfFirstGst = indexOfLastGst - gstRowsPerPage;
-  const currentGstRows = gstBookings.slice(indexOfFirstGst, indexOfLastGst);
-  const totalGstPages = Math.ceil(gstBookings.length / gstRowsPerPage);
+  // const gstRowsPerPage = 8;
+  // const indexOfLastGst = gstPage * gstRowsPerPage;
+  // const indexOfFirstGst = indexOfLastGst - gstRowsPerPage;
+  // const currentGstRows = gstBookings.slice(indexOfFirstGst, indexOfLastGst);
+  // const totalGstPages = Math.ceil(gstBookings.length / gstRowsPerPage);
+
 
   const getNextMonthInfo = (month: string) => {
     const months = ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar'];
@@ -7211,14 +7212,14 @@ const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
       { type: 'GST Certificate', identifier: '29ABCDE1234F103Z5', date: '14 Feb 2026', status: 'Verified' },
       { type: 'PAN Card', identifier: 'ABCDE1234F', date: '14 Feb 2026', status: 'Verified' },
       { type: 'FSSAI License', identifier: '12345678901234', date: '14 Feb 2026', status: 'Verified' },
-      { type: 'Cancelled Cheque', identifier: 'A/C: ****9012', date: '14 Feb 2026', status: 'Verified' }
+      { type: 'Cancelled Cheque', identifier: 'XXXX XXXX 9012', date: '14 Feb 2026', status: 'Verified' }
     ],
     bankAccounts: [
       {
         id: 'bank-1',
         bankName: 'HDFC Bank',
         holderName: 'User 3',
-        accountNumber: 'XXXX  XXXX  9012',
+        accountNumber: 'XXXX XXXX 9012',
         ifsc: 'HDFC0001234',
         accountType: 'Savings Account',
         status: 'Verified',
@@ -7231,7 +7232,7 @@ const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
         id: 'bank-2',
         bankName: 'ICICI Bank',
         holderName: 'User 3',
-        accountNumber: 'XXXX  XXXX  5678',
+        accountNumber: 'XXXX XXXX 5678',
         ifsc: 'ICIC0005678',
         accountType: 'Savings Account',
         status: 'Verified',

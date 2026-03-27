@@ -6585,15 +6585,6 @@ input:checked+.service-slider:before {
   opacity: 0.9;
 }
 
-/* Bank Details Refinements */
-.bank-card-footer-v4 {
-  margin-top: 24px;
-  padding-top: 20px;
-  border-top: 1px solid #f1f5f9;
-  display: flex;
-  justify-content: center;
-  justify-content: flex-end;
-}
 
 .change-bank-btn-v4 {
   display: flex;
@@ -18775,22 +18766,6 @@ input:checked+.slider-v4:before {
   background: #fef2f2;
 }
 
-.edit-details-btn-v4 {
-  background: #f1f5f9;
-  border: 1px solid #e2e8f0;
-  color: #475569;
-  padding: 6px 16px;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.edit-details-btn-v4:hover {
-  background: #e2e8f0;
-  color: #1e293b;
-}
 
 /* Bank Modal Specifics */
 .bank-modal-overlay-v4 {
