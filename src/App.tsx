@@ -8264,8 +8264,6 @@ const RevenueAnalytics = ({
     { month: 'Jan', revenue: 130000 }, { month: 'Feb', revenue: 128000 }, { month: 'Mar', revenue: 135000 }
   ];
 
-  const maxRevenue = Math.max(...monthlyTrend.map(d => d.revenue));
-
   const bookingStats = {
     total: 148,
     completed: 132,
