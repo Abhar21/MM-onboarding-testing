@@ -13281,14 +13281,17 @@ input:checked+.slider-v4:before {
 
 /* TDS Reports V14 */
 .tds-report-v14 {
-  padding: 0.5rem 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 
 .tds-section-header-v14 {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 2rem;
+  margin-bottom: 0;
   gap: 1.5rem;
 }
 
@@ -16812,18 +16815,17 @@ input:checked+.slider-v4:before {
 .revenue-tab-inner-v22 {
   display: flex !important;
   flex-direction: column !important;
-  gap: 32px !important;
-  /* Balanced gap between rows */
-  padding: 32px !important;
-  /* STRICT: 32px equal padding all sides */
-  padding-bottom: 100px !important;
+  gap: 24px !important;
+  /* Match GST tab compact spacing */
+  padding: 0 !important;
+  padding-bottom: 80px !important;
 }
 
 .chart-header-v25 {
   display: flex !important;
   justify-content: space-between !important;
   align-items: flex-start !important;
-  margin-bottom: 32px !important; /* Balanced gap between header and chart content */
+  margin-bottom: 20px !important;
 }
 
 .header-left-v25 h3 {
