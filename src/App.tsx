@@ -1545,14 +1545,12 @@ const Coupons = () => {
 };
 
 const Settings = ({
-  setProfileData,
   profileForm,
   setShowAccountEditModal,
   setNewEditValue,
   setEditStep,
   setEditOtp
 }: {
-  setProfileData: any,
   profileForm: any,
   setShowAccountEditModal: (val: 'Mobile' | 'Email' | null) => void,
   setNewEditValue: (val: string) => void,
@@ -7359,7 +7357,6 @@ const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
           )}
           {activeTab === 'settings' && (
             <Settings
-              setProfileData={setProfileData}
               profileForm={profileForm}
               setShowAccountEditModal={setShowAccountEditModal}
               setNewEditValue={setNewFieldValue}
