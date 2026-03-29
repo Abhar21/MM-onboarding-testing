@@ -4479,43 +4479,43 @@ const VendorProfile = ({
                     </div>
                   </div>
 
-                    <div className="bank-card-footer-v4">
-                      <div className="bc-footer-left-v4">
-                        {account.isPrimary ? (
-                          <div className="payout-active-tag-v4">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                            Active for Payouts
-                          </div>
-                        ) : (
-                          account.status === 'Verified' && (
-                            <button
-                              className="set-primary-btn-v4"
-                              onClick={() => {
-                                setPendingPrimaryBank(account);
-                                setShowSetPrimaryModal(true);
-                              }}
-                            >
-                              Set as Primary
-                            </button>
-                          )
-                        )}
-                      </div>
-
-                      <div className="bc-footer-right-v4">
-                        {!account.isPrimary && (
+                  <div className="bank-card-footer-v4">
+                    <div className="bc-footer-left-v4">
+                      {account.isPrimary ? (
+                        <div className="payout-active-tag-v4">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                          Active for Payouts
+                        </div>
+                      ) : (
+                        account.status === 'Verified' && (
                           <button
-                            className="delete-bank-btn-v4"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setPendingDeleteBank(account);
-                              setShowDeleteBankModal(true);
+                            className="set-primary-btn-v4"
+                            onClick={() => {
+                              setPendingPrimaryBank(account);
+                              setShowSetPrimaryModal(true);
                             }}
                           >
-                            Delete
+                            Set as Primary
                           </button>
-                        )}
-                      </div>
+                        )
+                      )}
                     </div>
+
+                    <div className="bc-footer-right-v4">
+                      {!account.isPrimary && (
+                        <button
+                          className="delete-bank-btn-v4"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setPendingDeleteBank(account);
+                            setShowDeleteBankModal(true);
+                          }}
+                        >
+                          Delete
+                        </button>
+                      )}
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
@@ -5855,8 +5855,8 @@ const Reports = () => {
 
       <div className="report-content-v13">
         {activeReportTab === 'Revenue' && (
-          <RevenueAnalytics 
-            externalMonth={selectedRevenueMonth} 
+          <RevenueAnalytics
+            externalMonth={selectedRevenueMonth}
             onMonthChange={setSelectedRevenueMonth}
           />
         )}
@@ -8228,9 +8228,34 @@ const RevenueAnalytics = ({
 
   const summaryCards = [
     { label: 'Total Revenue', value: `₹${(currentMonthVal * 4500).toLocaleString('en-IN')}`, growth: growthString, icon: '💰', trend: currentTrend },
-    { label: 'Net Earnings', value: `₹${(currentMonthVal * 4400).toLocaleString('en-IN')}`, subtext: 'After deductions', icon: '🏦', trend: currentTrend },
+    { label: 'Net Earnings', value: `₹${(currentMonthVal * 4400).toLocaleString('en-IN')}`, growth: growthString, icon: '🏦', trend: currentTrend },
     { label: 'Total Bookings', value: Math.round(currentMonthVal / 3).toString(), growth: '+8%', icon: '📅', trend: 'up' },
   ];
+
+  const payoutSummary = [
+    { label: 'Paid', value: '₹3,25,000', status: 'Credited to your bank', color: '#16a34a' },
+    { label: 'Upcoming', value: '₹65,850', status: 'From 4 bookings', color: '#7c3aed', subtext: '' },
+    { label: 'Processing', value: '₹35,000', status: 'Processing (1–2 days)', color: '#f59e0b', subtext: '' }
+  ];
+
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [isBreakdownOpen, setIsBreakdownOpen] = useState(false);
+  const [selectedPayout, setSelectedPayout] = useState<any>(null);
+  const [historySearch, setHistorySearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('All');
+
+  const payoutHistoryData = [
+    { id: 'BK-9824', date: '25 Mar, 2024', customer: 'Rahul Sharma', eventDate: '24 Mar, 2024', amount: 45000, tds: 4500, net: 40500, status: 'Credited', refId: 'TXN-982411', platformFee: 2250 },
+    { id: 'BK-9825', date: '26 Mar, 2024', customer: 'Anjali Gupta', eventDate: '25 Mar, 2024', amount: 32000, tds: 3200, net: 28800, status: 'Processing', refId: '-', platformFee: 1600 },
+    { id: 'BK-9826', date: '27 Mar, 2024', customer: 'Vikram Singh', eventDate: '26 Mar, 2024', amount: 15000, tds: 1500, net: 13500, status: 'Upcoming', refId: '-', platformFee: 750 },
+    { id: 'BK-9827', date: '28 Mar, 2024', customer: 'Priya Verma', eventDate: '27 Mar, 2024', amount: 55000, tds: 5500, net: 49500, status: 'Processing', refId: 'TXN-982700', platformFee: 2750 },
+  ];
+
+  const filteredHistory = payoutHistoryData.filter(p => {
+    const matchesSearch = p.id.toLowerCase().includes(historySearch.toLowerCase());
+    const matchesStatus = statusFilter === 'All' || p.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
 
   const monthlyTrend = [
     { month: 'Apr', revenue: 85000 }, { month: 'May', revenue: 92000 }, { month: 'Jun', revenue: 88000 },
@@ -8254,12 +8279,6 @@ const RevenueAnalytics = ({
     b2bAmount: '₹7,45,000',
     b2cAmount: '₹5,00,000'
   };
-
-  const payoutSummary = [
-    { label: 'Paid', value: '₹3,25,000', status: 'Settled', color: '#16a34a' },
-    { label: 'Upcoming', value: '₹65,850', status: 'Expected by 28 Mar', color: '#7c3aed' },
-    { label: 'Processing', value: '₹35,000', status: 'Initiated', color: '#f59e0b' }
-  ];
 
   const [selectedFY, setSelectedFY] = useState('FY 2025-26');
 
@@ -8299,49 +8318,21 @@ const RevenueAnalytics = ({
         </div>
       )}
 
-      {/* Summary Cards */}
-      <div className={!isStandalone ? "gst-summary-grid-v20 v22" : "revenue-summary-grid-v5"}>
+      <div className="revenue-summary-row-v22">
         {summaryCards.map((card, idx) => {
-          if (!isStandalone) {
-            if (idx === 0) {
-              return (
-                <div key={idx} className="rev-hero-card-v22">
-                  <span className="rev-hero-rupee-v22">₹</span>
-                  <p className="rev-hero-label-v22">{card.label}</p>
-                  <div className="rev-hero-value-v22">{card.value}</div>
-                  {card.growth && (
-                    <div className={`rev-hero-growth-badge-v22 ${card.trend}`}>
-                      {card.growth} {card.trend === 'up' ? '↑' : '↓'} <span>vs last month</span>
-                    </div>
-                  )}
-                </div>
-              );
-            }
-            return (
-              <div key={idx} className={`gst-summary-card-v20 ${idx === 1 ? 'highlight' : ''}`}>
-                <label>{card.label}</label>
-                <div className="card-main-v20">
-                  <span className="value-v20">{card.value}</span>
-                  <span className="sub-v20">{card.growth ? `${card.growth} vs last month` : card.subtext}</span>
-                </div>
-              </div>
-            );
-          }
+          const isHero = idx === 0;
           return (
-            <div key={idx} className="revenue-card-v5">
-              <div className="card-icon-v5">{card.icon}</div>
-              <div className="card-info-v5">
-                <label>{card.label}</label>
-                <div className="card-value-row-v5">
-                  <span className="value-v5">{card.value}</span>
-                  {card.growth && (
-                    <span className={`growth-v5 ${card.trend}`}>
-                      {card.growth}
-                    </span>
-                  )}
-                </div>
-                {card.subtext && <p className="card-subtext-v5">{card.subtext}</p>}
+            <div key={idx} className={isHero ? "rev-hero-card-v22" : "rev-refined-card-v22"}>
+              <div className="card-top-row-v22">
+                {isHero ? <span className="rev-hero-rupee-v22">₹</span> : <span className="rev-refined-icon-v22">{card.icon}</span>}
+                <p className={isHero ? "rev-hero-label-v22" : "rev-refined-label-v22"}>{card.label}</p>
               </div>
+              <div className={isHero ? "rev-hero-value-v22" : "rev-refined-value-v22"}>{card.value}</div>
+              {card.growth && (
+                <div className={`rev-hero-growth-badge-v22 ${card.trend || 'up'}`}>
+                  {card.growth} {card.trend === 'up' ? '↑' : '↓'} <span>vs last month</span>
+                </div>
+              )}
             </div>
           );
         })}
@@ -8351,38 +8342,64 @@ const RevenueAnalytics = ({
       <div className="revenue-main-grid-v5">
         {/* Trend Chart */}
         <div className="revenue-chart-section-v5">
-          <div className="section-header-v5">
-            <h3>Revenue Trend</h3>
-            <span className="period-label-v5">Last 12 Months</span>
-          </div>
-          <div className="chart-container-v5">
-            <div className="y-axis-v5">
-              <span>{Math.round(maxRevenue / 1000)}k</span>
-              <span>{Math.round(maxRevenue * 0.75 / 1000)}k</span>
-              <span>{Math.round(maxRevenue * 0.5 / 1000)}k</span>
-              <span>{Math.round(maxRevenue * 0.25 / 1000)}k</span>
-              <span>0</span>
+          <div className="chart-header-v25">
+            <div className="header-left-v25">
+              <h3>Revenue Trend</h3>
+              <div className="stats-pill-v25">
+                <span>Last 12 Months</span>
+                <span className="pill-trend-v25">↑ +8% vs last month</span>
+              </div>
             </div>
-            <div className="bars-v5">
-              {monthlyTrend.map((data, i) => (
-                <div key={i} className="bar-group-v5">
-                  <div 
-                    className={`bar-v5 ${data.month === selectedMonth ? 'active' : ''}`}
-                    style={{ height: `${(data.revenue / maxRevenue) * 100}%`, background: data.month === selectedMonth ? '#6366f1' : '#f1f5f9' }}
-                    onClick={() => setSelectedMonth(data.month)}
-                  >
-                    <div className="bar-tooltip-v5">₹{data.revenue.toLocaleString()}</div>
+            <div className="best-month-card-v25">
+              <div className="card-label-v25">Best Month</div>
+              <div className="card-value-v25">Jan ₹1,35,000</div>
+            </div>
+          </div>
+
+            <div className="chart-wrapper-v25">
+              <div className="y-axis-v25">
+                <span>1.5L</span>
+                <span>1L</span>
+                <span>50K</span>
+                <span>0</span>
+              </div>
+              
+              <div className="bars-area-v25">
+                {/* Visual Grid Lines - Moved inside bars-flex for easier baseline alignment */}
+                <div className="bars-flex-v25">
+                  {monthlyTrend.map((d, i) => (
+                    <div key={i} className="bar-column-v25">
+                      <div 
+                        className={`bar-v25 ${i === monthlyTrend.length - 1 ? 'active' : ''}`}
+                        style={{ height: `${(d.revenue / 150000) * 100}%` }}
+                      >
+                        <div className="bar-tooltip-v25">
+                          <div className="tooltip-month-v24">{d.month} 2025</div>
+                          <div className="tooltip-val-v24">₹{d.revenue.toLocaleString('en-IN')}</div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  <div className="grid-lines-v25">
+                    <div className="grid-line-v25"></div>
+                    <div className="grid-line-v25"></div>
+                    <div className="grid-line-v25"></div>
+                    <div className="grid-line-v25"></div>
                   </div>
-                  <span className="bar-label-v5">{data.month}</span>
                 </div>
-              ))}
+
+                {/* Dedicated Labels Row Below the Line */}
+                <div className="months-flex-v25">
+                  {monthlyTrend.map((d, i) => (
+                    <span key={i} className="month-label-v25">{d.month}</span>
+                  ))}
+                </div>
+              </div>
             </div>
-          </div>
         </div>
 
         {/* Sidebar Mini-stats */}
         <div className="revenue-sidebar-v5">
-          {/* Booking Performance */}
           <div className="booking-performance-card-v24">
             <div className="card-header-v24">
               <h4>Booking Performance</h4>
@@ -8407,7 +8424,6 @@ const RevenueAnalytics = ({
             </div>
           </div>
 
-          {/* Revenue Breakdown */}
           <div className="revenue-breakdown-card-v24">
             <h4>Revenue Breakdown</h4>
             <div className="breakdown-chart-v24">
@@ -8436,35 +8452,62 @@ const RevenueAnalytics = ({
         </div>
       </div>
 
+      <PayoutHistoryModal
+        isOpen={isHistoryOpen}
+        onClose={() => setIsHistoryOpen(false)}
+        data={filteredHistory}
+        search={historySearch}
+        setSearch={setHistorySearch}
+        filter={statusFilter}
+        setFilter={setStatusFilter}
+        onViewBreakdown={(p: any) => {
+          setSelectedPayout(p);
+          setIsBreakdownOpen(true);
+        }}
+      />
+
+      <PayoutBreakdownModal
+        isOpen={isBreakdownOpen}
+        onClose={() => setIsBreakdownOpen(false)}
+        payout={selectedPayout}
+      />
+
       {/* Payout Summary Section */}
       <div className="payout-summary-section-v24">
         <div className="inner-card-v24">
           <div className="card-header-v24">
-            <h4>Payout Summary</h4>
-            <div className="payout-helper-v24">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-              Payouts are processed based on booking schedule
+            <div className="header-title-row-v24">
+              <h4>Payout Summary</h4>
+              <button className="view-history-btn-v24" onClick={() => setIsHistoryOpen(true)}>
+                View Payout History
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+              </button>
+            </div>
+            <div className="header-subtitles-v24">
+              <div className="payout-subtitle-v24">Payouts are processed 24–48 hours before the event date</div>
+              <div className="payout-deduction-v24">Payout amounts are after TDS deductions</div>
             </div>
           </div>
           <div className="payout-grid-v24">
             {payoutSummary.map((payout, idx) => (
               <div key={idx} className={`payout-status-card-v24 ${payout.label.toLowerCase()}`}>
-                <label>{payout.label} Amount</label>
+                <label>{payout.label} Payout</label>
                 <div className="payout-value-v24">{payout.value}</div>
-                <span className="status-tag-v24">{payout.status}</span>
+                <div className="payout-status-row-v24">
+                  {payout.status && <span className="status-tag-v24">{payout.status}</span>}
+                  {payout.subtext && <span className="payout-card-subtext-v24">{payout.subtext}</span>}
+                </div>
               </div>
             ))}
           </div>
         </div>
-      </div>
 
-      {/* 6. Notes & Disclaimer */}
-      <div className="revenue-footer-advice-v24">
-        <div className="advice-meta-v24">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-          <div className="advice-texts-v24">
-            <p>Figures are based on completed bookings for the selected period.</p>
-            <p>Payouts may vary based on settlement schedule and customer collection.</p>
+        <div className="revenue-footer-advice-v24">
+          <div className="advice-meta-v24">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            <div className="advice-texts-v24">
+              <p>Revenue is based on completed bookings. Payouts are processed based on event schedule and settlement timelines.</p>
+            </div>
           </div>
         </div>
       </div>
@@ -8472,4 +8515,148 @@ const RevenueAnalytics = ({
   );
 };
 
+
+
+/* --- PayOut History Modals --- */
+const PayoutHistoryModal = ({ isOpen, onClose, data, search, setSearch, filter, setFilter, onViewBreakdown }: any) => {
+  if (!isOpen) return null;
+  return (
+    <div className="modal-overlay-v24" onClick={onClose}>
+      <div className="modal-content-v24 history-modal-v24" onClick={e => e.stopPropagation()}>
+        <div className="modal-header-v24">
+          <div className="header-text-v24">
+            <h2>Payout History</h2>
+            <p>View and download your payout details</p>
+          </div>
+          <button className="close-btn-v24" onClick={onClose}>&times;</button>
+        </div>
+
+        <div className="modal-filters-v24">
+          <div className="search-box-v24">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input
+              type="text"
+              placeholder="Search by Booking ID..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+          <div className="filter-group-v24">
+            <select value={filter} onChange={(e) => setFilter(e.target.value)}>
+              <option value="All">All Status</option>
+              <option value="Credited">Credited</option>
+              <option value="Upcoming">Upcoming</option>
+              <option value="Processing">Processing</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="table-container-v24">
+          <table className="history-table-v24">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Booking ID</th>
+                <th>Event Date</th>
+                <th>Payout Amount</th>
+                <th>TDS Deducted</th>
+                <th>Net Credited</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.map((row: any) => (row && row.id && (
+                <tr key={row.id}>
+                  <td>{row.date}</td>
+                  <td className="booking-id-v24">{row.id}</td>
+                  <td>{row.eventDate}</td>
+                  <td>₹{row.amount?.toLocaleString()}</td>
+                  <td className="deduction-v24">-₹{row.tds?.toLocaleString()}</td>
+                  <td className="net-v24">₹{row.net?.toLocaleString()}</td>
+                  <td>
+                    <span className={`status-pill-v24 ${row.status?.toLowerCase().replace(' ', '-')}`}>
+                      {row.status}
+                    </span>
+                  </td>
+                  <td className="actions-v24">
+                    <button className="action-btn-v24 view" onClick={() => onViewBreakdown(row)}>View</button>
+                    <button
+                      className="action-btn-v24 download"
+                      disabled={row.status !== 'Credited'}
+                      title={row.status !== 'Credited' ? "Download only available for credited payouts" : ""}
+                    >
+                      Download
+                    </button>
+                  </td>
+                </tr>
+              )))}
+              {(!data || data.length === 0) && (
+                <tr>
+                  <td colSpan={8} className="empty-state-v24">No payout records found matching your filters.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const PayoutBreakdownModal = ({ isOpen, onClose, payout }: any) => {
+  if (!isOpen || !payout) return null;
+  return (
+    <div className="modal-overlay-v24 secondary-modal-v24" onClick={onClose}>
+      <div className="modal-content-v24 breakdown-modal-v24" onClick={e => e.stopPropagation()}>
+        <div className="modal-header-v24">
+          <h3>Payout Breakdown</h3>
+          <button className="close-btn-v24" onClick={onClose}>&times;</button>
+        </div>
+
+        <div className="breakdown-body-v24">
+          <div className="breakdown-info-v24">
+            <div className="info-item-v24">
+              <label>Booking ID</label>
+              <span className="info-val-v24">{payout.id}</span>
+            </div>
+            <div className="info-item-v24 right-align-v24">
+              <label>Status</label>
+              <span className={`status-pill-v24 ${payout.status?.toLowerCase().replace(' ', '-')}`}>{payout.status}</span>
+            </div>
+          </div>
+
+          <div className="breakdown-items-v24">
+            <div className="grid-row-v24">
+              <label>Booking Amount</label>
+              <span className="value-v24">₹{payout.amount?.toLocaleString()}</span>
+            </div>
+            <div className="grid-row-v24">
+              <label>TDS Deducted (10%)</label>
+              <span className="value-v24">₹{payout.tds?.toLocaleString()}</span>
+            </div>
+            
+            <div className="modal-divider-v24"></div>
+
+            <div className="grid-row-v24 total-row-v24">
+              <label>Net Credited</label>
+              <span className="value-v24 net-v24">₹{payout.net?.toLocaleString()}</span>
+            </div>
+          </div>
+
+          <div className="bank-details-v24">
+            <div className="grid-row-v24">
+              <label>Bank Reference ID</label>
+              <span className="bank-val-v24">{payout.refId}</span>
+            </div>
+            <div className="grid-row-v24">
+              <label>Date of Transfer</label>
+              <span className="bank-val-v24">{payout.status === 'Credited' ? payout.date : 'Awaiting Settlement'}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 export default App;
