@@ -1776,40 +1776,7 @@ const Settings = ({
                   </div>
                 </div>
 
-                <div className="form-group">
-                  <div className="notification-settings-v4">
-                    <h4 className="sub-title">Notification Preferences</h4>
-                    <div className="toggle-row-v4">
-                      <span>Order Updates (WhatsApp)</span>
-                      <label className="switch-v4">
-                        <input type="checkbox" defaultChecked />
-                        <span className="slider-v4 round"></span>
-                      </label>
-                    </div>
-                    <div className="toggle-row-v4">
-                      <span>Marketing Emails</span>
-                      <label className="switch-v4">
-                        <input type="checkbox" />
-                        <span className="slider-v4 round"></span>
-                      </label>
-                    </div>
-                  </div>
-                </div>
-                <button
-                  className="btn btn-primary-blue save-settings-btn-v4"
-                  onClick={() => {
-                    setProfileData((prev: any) => ({
-                      ...prev,
-                      owner: {
-                        ...prev.owner,
-                        mobile: profileForm.mobile,
-                        email: profileForm.email
-                      }
-                    }));
-                  }}
-                >
-                  Save Changes
-                </button>
+
               </div>
             </div>
           )}
