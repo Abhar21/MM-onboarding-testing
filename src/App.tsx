@@ -6861,8 +6861,86 @@ const Bookings = () => {
 };
 
 /* ─────────────────── HOME VIEW ─────────────────── */
+/* ─────────────────── OPERATIONAL UTILS ─────────────────── */
+const CountdownTimer = ({ targetISO }: { targetISO: string }) => {
+  const [timeLeft, setTimeLeft] = useState('');
+
+  useEffect(() => {
+    const calculateTime = () => {
+      const now = new Date().getTime();
+      const target = new Date(targetISO).getTime();
+      const diff = target - now;
+
+      if (diff <= 0) {
+        return 'Started';
+      }
+
+      const hh = Math.floor(diff / (1000 * 60 * 60)).toString().padStart(2, '0');
+      const mm = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
+      const ss = Math.floor((diff % (1000 * 60)) / 1000).toString().padStart(2, '0');
+      
+      return `${hh}:${mm}:${ss}`;
+    };
+
+    setTimeLeft(calculateTime());
+    const timer = setInterval(() => {
+      setTimeLeft(calculateTime());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [targetISO]);
+
+  return <span>Starts in {timeLeft}</span>;
+}
+
 const HomeView = ({ setActiveTab }: { setActiveTab: (tab: string) => void }) => {
   const todayDate = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [activeNotifTab, setActiveNotifTab] = useState('all');
+  const notifRef = useRef<HTMLDivElement>(null);
+
+  const [notifications, setNotifications] = useState([
+    { id: 1, type: 'booking', title: 'New Booking Received', subtitle: 'BK-12440 • Premium Buffet for 50 guests', time: '2 mins ago', unread: true, action: 'View Booking' },
+    { id: 2, type: 'payment', title: 'Payment Credited', subtitle: '₹45,800 credited for BK-12400', time: '1 hour ago', unread: true },
+    { id: 3, type: 'reminder', title: 'GST Filing Reminder', subtitle: 'Q1 GST filing due in 3 days', time: '5 hours ago', unread: false },
+    { id: 4, type: 'document', title: 'Form 16A Available', subtitle: 'Download your TDS certificate for Feb 2026', time: 'Yesterday', unread: false, action: 'Download' }
+  ]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (notifRef.current && !notifRef.current.contains(event.target as Node)) {
+        setShowNotifications(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const markAllAsRead = () => {
+    setNotifications(notifications.map(n => ({ ...n, unread: false })));
+  };
+
+  const filteredNotifs = activeNotifTab === 'unread' 
+    ? notifications.filter(n => n.unread) 
+    : notifications;
+
+  const unreadCount = notifications.filter(n => n.unread).length;
+
+  const getNotifIcon = (type: string) => {
+    switch (type) {
+      case 'booking': return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>;
+      case 'payment': return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>;
+      case 'reminder': return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>;
+      case 'document': return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>;
+      default: return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>;
+    }
+  };
+
+  // Today's Bookings Data with standardized themes (2h and 8h from now)
+  const todayBookings = [
+    { id: 'BK-12405', type: 'Lunch', menu: 'Standard Business Lunch', guests: 150, collect: '₹75,000', time: '10:00 AM', targetTime: new Date(Date.now() + 2 * 3600 * 1000).toISOString(), theme: 'warning' },
+    { id: 'BK-12410', type: 'Dinner', menu: 'Premium Buffet Menu 2', guests: 45, collect: '₹31,500', time: '04:00 PM', targetTime: new Date(Date.now() + 8 * 3600 * 1000).toISOString(), theme: 'info' }
+  ];
 
   return (
     <div className="home-view-v25">
@@ -6878,98 +6956,171 @@ const HomeView = ({ setActiveTab }: { setActiveTab: (tab: string) => void }) => 
             </div>
           </div>
         </div>
+        <div className="home-header-actions-v25" ref={notifRef}>
+          <button className="notification-btn-v25" onClick={() => setShowNotifications(!showNotifications)}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+            {unreadCount > 0 && <span className="notification-badge-v25"></span>}
+          </button>
+
+          {showNotifications && (
+            <div className="notif-dropdown-v25">
+              <div className="notif-header-v25">
+                <h3>Notifications</h3>
+                <button className="mark-read-btn-v25" onClick={markAllAsRead}>Mark all as read</button>
+              </div>
+
+              <div className="notif-tabs-v25">
+                <button 
+                  className={`notif-tab-v25 ${activeNotifTab === 'all' ? 'active' : ''}`}
+                  onClick={() => setActiveNotifTab('all')}
+                >
+                  All <span>{notifications.length}</span>
+                </button>
+                <button 
+                  className={`notif-tab-v25 ${activeNotifTab === 'unread' ? 'active' : ''}`}
+                  onClick={() => setActiveNotifTab('unread')}
+                >
+                  Unread <span>{unreadCount}</span>
+                </button>
+              </div>
+
+              <div className="notif-content-v25">
+                {filteredNotifs.length > 0 ? (
+                  filteredNotifs.map((n) => (
+                    <div key={n.id} className={`notif-item-v25 ${n.unread ? 'unread' : ''}`}>
+                      <div className={`notif-icon-v25 ${n.type}`}>
+                        {getNotifIcon(n.type)}
+                      </div>
+                      <div className="notif-info-v25">
+                        <div className="notif-title-row-v25">
+                          <p className="notif-title-v25">{n.title}</p>
+                          {n.unread && <span className="unread-dot-v25"></span>}
+                        </div>
+                        <p className="notif-subtitle-v25">{n.subtitle}</p>
+                        <p className="notif-time-v25">{n.time}</p>
+                        {n.action && (
+                          <div className="notif-actions-v25">
+                            <button className="notif-action-btn-v25" onClick={() => setShowNotifications(false)}>
+                              {n.action}
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="notif-empty-v25">
+                    <p>No notifications yet</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="home-main-grid-v25">
-        {/* 1. Today Overview Metrics Grid */}
+        {/* 1. Summary Cards (Moved to top) */}
         <div className="home-stats-grid-v25">
-          <div className="home-stat-card-v25 main">
+          <div className="home-stat-card-v25 priority">
+            <span className="stat-card-label-v25">Today's Bookings</span>
+            <span className="stat-card-value-v25">02</span>
+          </div>
+
+          <div className="home-stat-card-v25">
             <span className="stat-card-label-v25">Today's Revenue</span>
             <span className="stat-card-value-v25">₹45,800</span>
           </div>
 
           <div className="home-stat-card-v25">
-            <span className="stat-card-label-v25">Today's Bookings</span>
-            <span className="stat-card-value-v25">04</span>
-          </div>
-
-          <div className="home-stat-card-v25">
-            <span className="stat-card-label-v25">Upcoming (24h)</span>
-            <span className="stat-card-value-v25">03</span>
+            <span className="stat-card-label-v25">Next Booking</span>
+            <span className="stat-card-value-v25 small-text">Starts in 2h 15m</span>
           </div>
         </div>
 
-        <div className="home-layout-columns-v25">
-          {/* Left Column: Daily Bookings Performance Graph */}
-          <div className="home-col-left-v25">
-            <div className="home-card-v25 bookings-graph-card-v25">
-              <div className="card-header-v25">
-                <h3 className="card-title-v25">Daily Bookings Performance</h3>
-                <div className="month-label-v25">Last 7 Days</div>
+        {/* 2. Top Grid (Today's & Upcoming) */}
+        <div className="home-top-grid-v25">
+          {/* 1. Today's Bookings Section */}
+          <div className="home-card-v25 today-bookings-card-v25">
+            <div className="card-header-v25 compact">
+              <div className="header-left-v25">
+                <h3 className="card-title-v25">Today's Bookings</h3>
               </div>
-              <div className="graph-container-v25">
-                {[
-                  { day: 'Mon', value: 12 },
-                  { day: 'Tue', value: 18 },
-                  { day: 'Wed', value: 15 },
-                  { day: 'Thu', value: 24 },
-                  { day: 'Fri', value: 28 },
-                  { day: 'Sat', value: 32, active: true },
-                  { day: 'Sun', value: 25 },
-                ].map((d, i) => (
-                  <div key={i} className="graph-bar-wrapper-v25">
-                    <div
-                      className={`graph-bar-v25 ${d.active ? 'active' : ''}`}
-                      style={{ height: `${(d.value / 35) * 95}%` }}
-                      data-value={d.value}
-                    ></div>
-                    <span className="day-label-v25">{d.day}</span>
+              <button className="view-all-link-v25 compact" onClick={() => setActiveTab('bookings')}>View All &rarr;</button>
+            </div>
+
+            <div className="today-bookings-list-v25">
+              {todayBookings.length > 0 ? (
+                todayBookings.map((b, i) => (
+                  <div key={i} className="today-booking-item-v25 clickable" onClick={() => setActiveTab('bookings')}>
+                    <div className="today-booking-info-v25">
+                      <div className="today-booking-time-v25">{b.time}</div>
+                      <div className="today-booking-meta-v25">
+                        <span className="today-menu-pill-v25">{b.type}</span>
+                        <span className="today-menu-pill-v25">{b.menu}</span>
+                        <span className="today-menu-pill-v25">
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" style={{ marginRight: '4px' }}><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                          {b.guests} guests
+                        </span>
+                        <span className="today-menu-pill-v25">
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" style={{ marginRight: '4px' }}><rect x="2" y="5" width="20" height="14" rx="2" /><circle cx="12" cy="12" r="3" /></svg>
+                          {b.collect}
+                        </span>
+                      </div>
+                    </div>
+                    <div className={`today-booking-status-v25 ${b.theme}`}>
+                      <CountdownTimer targetISO={b.targetTime} />
+                    </div>
                   </div>
-                ))}
-              </div>
+                ))
+              ) : (
+                <div className="empty-state-v25">
+                  <p>No bookings scheduled for today</p>
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Right Column: Upcoming Bookings */}
-          <div className="home-col-right-v25">
-            <div className="home-card-v25 upcoming-list-card-v25">
-              <div className="card-header-v25">
+          {/* 2. Upcoming Bookings List */}
+          <div className="home-card-v25 upcoming-list-card-v25">
+            <div className="card-header-v25 compact">
+              <div className="header-left-v25">
                 <h3 className="card-title-v25">Upcoming Bookings</h3>
-                <button className="view-all-link-v25" onClick={() => setActiveTab('bookings')}>View All &rarr;</button>
               </div>
-              <div className="upcoming-mini-list-v25">
-                {[
-                  { id: 'BK-12405', title: 'Dinner - Stylish Dinner menu 1', date: 'Today', time: '10:00 AM', timer: 'Starts in 2h 15m', guests: 150, collect: '₹63,000' },
-                  { id: 'BK-12410', title: 'Lunch - Executive Meal Pack', date: 'Today', time: '04:00 PM', timer: 'Starts in 8h 15m', guests: 45, collect: '₹25,200' },
-                  { id: 'BK-12415', title: 'Dinner - Premium Buffet Menu 2', date: 'Tomorrow', time: '09:00 AM', timer: 'Starts in 25h', guests: 300, collect: '₹1,05,000' },
-                  { id: 'BK-12420', title: 'Lunch - Standard Business Lunch', date: 'Tomorrow', time: '12:30 PM', timer: 'Starts in 28h', guests: 80, collect: '₹39,200' },
-                  { id: 'BK-12425', title: 'Dinner - Gourmet Celebration', date: '26 Mar', time: '08:00 PM', timer: 'Starts in 52h', guests: 120, collect: '₹1,00,800' },
-                ].map((booking, idx) => (
-                  <div key={idx} className="mini-booking-item-v25">
-                    <div className="booking-time-v25">
-                      <strong>{booking.date}</strong>
-                      <span>{booking.time}</span>
-                    </div>
-                    <div className="booking-main-info-v25">
-                      <p>{booking.id} • {booking.title}</p>
-                      <div className="booking-meta-line-v25">
-                        <div className="booking-timer-v25">
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                          {booking.timer}
-                        </div>
-                        <div className="booking-guests-v25">
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                          {booking.guests} Guests
-                        </div>
-                        <div className="booking-collect-v25">
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="5" width="20" height="14" rx="2" /><line x1="12" y1="15" x2="12" y2="15" /><circle cx="12" cy="12" r="3" /></svg>
-                          Collect: {booking.collect}
-                        </div>
+              <button className="view-all-link-v25 compact" onClick={() => setActiveTab('bookings')}>View All &rarr;</button>
+            </div>
+            <div className="upcoming-mini-list-v25">
+              {[
+                { id: 'BK-12415', title: 'Dinner - Premium Buffet Menu 2', date: 'Tomorrow', time: '09:00 AM', timer: 'Starts in 25h', guests: 300, collect: '₹1,05,000' },
+                { id: 'BK-12420', title: 'Lunch - Standard Business Lunch', date: 'Tomorrow', time: '12:30 PM', timer: 'Starts in 28h', guests: 80, collect: '₹39,200' },
+                { id: 'BK-12425', title: 'Dinner - Gourmet Celebration', date: '26 Mar', time: '08:00 PM', timer: 'Starts in 52h', guests: 120, collect: '₹1,00,800' },
+                { id: 'BK-12430', title: 'Lunch - Office Farewell Party', date: '27 Mar', time: '01:00 PM', timer: 'Starts in 69h', guests: 50, collect: '₹22,500' },
+                { id: 'BK-12435', title: 'Dinner - Birthday Bash', date: '28 Mar', time: '07:30 PM', timer: 'Starts in 98h', guests: 100, collect: '₹85,000' },
+              ].map((booking, idx) => (
+                <div key={idx} className="mini-booking-item-v25 clickable" onClick={() => setActiveTab('bookings')}>
+                  <div className="booking-time-v25">
+                    <strong>{booking.date}</strong>
+                    <span>{booking.time}</span>
+                  </div>
+                  <div className="booking-main-info-v25">
+                    <p>{booking.id} • {booking.title}</p>
+                    <div className="booking-meta-line-v25">
+                      <div className="booking-chip-v25">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                        {booking.timer}
+                      </div>
+                      <div className="booking-chip-v25">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                        {booking.guests} guests
+                      </div>
+                      <div className="booking-chip-v25">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><rect x="2" y="5" width="20" height="14" rx="2" /><circle cx="12" cy="12" r="3" /></svg>
+                        {booking.collect}
                       </div>
                     </div>
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -8478,7 +8629,7 @@ const RevenueAnalytics = ({
               <h4>Payout Summary</h4>
               <button className="view-history-btn-v24" onClick={() => setIsHistoryOpen(true)}>
                 View Payout History
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-history"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>
               </button>
             </div>
             <div className="header-subtitles-v24">
