@@ -1,7 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Routes, Route, useNavigate, Navigate, Link } from 'react-router-dom';
+import MobileDashboard from './MobileDashboard';
+import './MobileDashboard.css';
 import './App.css';
 import './ratings.css';
+
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 767);
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 767);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  return isMobile;
+};
 
 interface FormData {
   ownerName: string;
@@ -7170,7 +7182,7 @@ const HomeView = ({ setActiveTab }: { setActiveTab: (tab: string) => void }) => 
 
 /* ─────────────────── DASHBOARD ─────────────────── */
 const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
-
+  const isMobile = useIsMobile();
   const [profileData, setProfileData] = useState<ProfileData>({
     header: {
       name: 'Catering Enterprise 3',
@@ -7369,6 +7381,18 @@ const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
       ]
     }
   ];
+
+  if (isMobile) {
+    return (
+      <MobileDashboard 
+        activeTab={activeTab} 
+        setActiveTab={setActiveTab} 
+        profileData={profileData} 
+        navigationGroups={navigationGroups}
+        onLogout={() => navigate('/login')}
+      />
+    );
+  }
 
   return (
     <div className="dashboard-layout">
