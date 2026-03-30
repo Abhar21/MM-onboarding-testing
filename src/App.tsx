@@ -2622,6 +2622,15 @@ const Settings = ({
 
 const ServiceSettings = () => {
   const [activeCategory, setActiveCategory] = useState('breakfast');
+  const [isEditingService, setIsEditingService] = useState(false);
+  const [tempSettings, setTempSettings] = useState<any>(null);
+
+  const handleCategoryChange = (catId: string) => {
+    setActiveCategory(catId);
+    setIsEditingService(false);
+    setTempSettings(null);
+  };
+
 
   const [activeSettingsTab, setActiveSettingsTab] = useState('services');
   const [weeklySchedule, setWeeklySchedule] = useState([
@@ -2856,19 +2865,36 @@ const ServiceSettings = () => {
     setMenuEditingId(null);
   };
 
-  const currentSettings = settings[activeCategory as keyof typeof settings];
+  const currentSettings = isEditingService ? tempSettings : settings[activeCategory as keyof typeof settings];
+
+  const handleEditClick = () => {
+    setIsEditingService(true);
+    setTempSettings({ ...settings[activeCategory as keyof typeof settings] });
+  };
+
+  const handleSaveClick = () => {
+    if (overlapError) return;
+    setSettings(prev => ({
+      ...prev,
+      [activeCategory]: tempSettings
+    }));
+    setIsEditingService(false);
+    setTempSettings(null);
+    setOverallStatus('Saving...');
+    setTimeout(() => {
+      setOverallStatus('All changes saved');
+    }, 1000);
+  };
+
+  const handleCancelClick = () => {
+    setIsEditingService(false);
+    setTempSettings(null);
+    setOverlapError(null);
+  };
+
 
   const totalItemsCount = sections.reduce((acc, sec) => acc + (sec.items?.length || 0), 0);
 
-  const handleToggle = () => {
-    setSettings(prev => ({
-      ...prev,
-      [activeCategory]: {
-        ...prev[activeCategory as keyof typeof prev],
-        acceptingOrders: !prev[activeCategory as keyof typeof prev].acceptingOrders
-      }
-    }));
-  };
 
   // Compute min/max time constraints based on other services' occupied ranges
   const getTimingConstraints = () => {
@@ -2910,47 +2936,46 @@ const ServiceSettings = () => {
     return { startMin, startMax, endMin, endMax };
   };
 
-  const triggerAutoSave = () => {
-    setOverallStatus('Saving...');
-    setTimeout(() => {
-      setOverallStatus('All changes saved');
-    }, 1000);
+
+  const handleToggle = () => {
+    const nextStatus = !settings[activeCategory as keyof typeof settings].acceptingOrders;
+    setSettings(prev => ({
+      ...prev,
+      [activeCategory]: {
+        ...prev[activeCategory as keyof typeof prev],
+        acceptingOrders: nextStatus
+      }
+    }));
+    if (isEditingService) {
+      setTempSettings((prev: any) => ({ ...prev, acceptingOrders: nextStatus }));
+    }
   };
 
+
   const updateSetting = (field: string, value: any) => {
-    setSettings(prev => {
-      const updated = {
-        ...prev,
-        [activeCategory]: {
-          ...prev[activeCategory as keyof typeof prev],
-          [field]: value
-        }
-      };
+    if (isEditingService) {
+      setTempSettings((prev: any) => {
+        const updated = { ...prev, [field]: value };
 
-      // Validation check for timing fields
-      if (field === 'startTime' || field === 'endTime') {
-        const cat = updated[activeCategory as keyof typeof updated];
-        const doesOverlap = Object.entries(updated).some(([id, s]: [string, any]) => {
-          if (id === activeCategory || !s.startTime || !s.endTime) return false;
-          const sStart = s.startTime;
-          const sEnd = s.endTime;
-          const newStart = cat.startTime;
-          const newEnd = cat.endTime;
-          if (!newStart || !newEnd) return false;
-          return newStart < sEnd && newEnd > sStart;
-        });
-        if (doesOverlap) {
-          setOverlapError('This timing overlaps with another service. Please adjust timing.');
-        } else {
-          setOverlapError(null);
-          triggerAutoSave();
+        if (field === 'startTime' || field === 'endTime') {
+          const doesOverlap = Object.entries(settings).some(([id, s]: [string, any]) => {
+            if (id === activeCategory || !s.startTime || !s.endTime) return false;
+            const sStart = s.startTime;
+            const sEnd = s.endTime;
+            const newStart = updated.startTime;
+            const newEnd = updated.endTime;
+            if (!newStart || !newEnd) return false;
+            return newStart < sEnd && newEnd > sStart;
+          });
+          if (doesOverlap) {
+            setOverlapError('This timing overlaps with another service. Please adjust timing.');
+          } else {
+            setOverlapError(null);
+          }
         }
-      } else if (field !== 'sitDownExtraPrice') {
-        triggerAutoSave();
-      }
-
-      return updated;
-    });
+        return updated;
+      });
+    }
   };
 
   return (
@@ -2990,7 +3015,7 @@ const ServiceSettings = () => {
                   <button
                     key={cat.id}
                     className={`category-card-btn ${activeCategory === cat.id ? 'active' : ''}`}
-                    onClick={() => setActiveCategory(cat.id)}
+                    onClick={() => handleCategoryChange(cat.id)}
                   >
                     <div className="cat-card-main">
                       <div className="cat-info">
@@ -3007,19 +3032,21 @@ const ServiceSettings = () => {
           <div className="settings-content">
             <div className="content-category-header">
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <h3 className="category-title">{activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1)}</h3>
-                {overallStatus && (
+                <h3 className="category-title">{activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1)} Settings</h3>
+                {overallStatus && !isEditingService && (
                   <span className={`status-text ${overallStatus === 'Saving...' ? 'saving' : 'saved'}`} style={{ fontSize: '12px', fontWeight: 600 }}>
                     {overallStatus === 'Saving...' ? '⏳ Saving...' : '✓ Saved'}
                   </span>
                 )}
               </div>
-              <div className="service-toggle-wrapper">
-                <span className="service-toggle-label">{currentSettings.acceptingOrders ? 'Accepting Orders' : 'Paused Orders'}</span>
-                <label className="service-switch">
-                  <input type="checkbox" checked={currentSettings.acceptingOrders} onChange={handleToggle} />
-                  <span className="service-slider round"></span>
-                </label>
+              <div className="category-header-actions">
+                <div className="header-status-toggle">
+                  <span className="status-label-v4">{settings[activeCategory as keyof typeof settings].acceptingOrders ? 'Accepting Orders' : 'Paused Orders'}</span>
+                  <label className="service-switch">
+                    <input type="checkbox" checked={settings[activeCategory as keyof typeof settings].acceptingOrders} onChange={handleToggle} />
+                    <span className="service-slider round"></span>
+                  </label>
+                </div>
               </div>
             </div>
 
@@ -3030,8 +3057,27 @@ const ServiceSettings = () => {
                   <span>{overlapError}</span>
                 </div>
               )}
-              <div className={`settings-main-split-v4 ${!currentSettings.acceptingOrders ? 'disabled-menu' : ''}`}>
+              <div className={`settings-main-split-v4 ${!currentSettings.acceptingOrders ? 'disabled-menu' : ''} ${isEditingService ? 'edit-mode-active' : ''}`}>
                 <div className="settings-card">
+                  <div className="card-inner-header">
+                    <div className="inner-header-left">
+                      <h4 className="inner-card-title">Menu Settings</h4>
+                    </div>
+                    <div className="inner-header-right">
+                      {isEditingService ? (
+                        <div className="edit-actions-btns" style={{ display: 'flex', gap: '8px' }}>
+                          <button className="btn btn-secondary-gray btn-sm" onClick={handleCancelClick}>Cancel</button>
+                          <button className="btn btn-primary-blue btn-sm" style={{ minWidth: '100px' }} onClick={handleSaveClick}>Save</button>
+                        </div>
+                      ) : (
+                        <button className="btn btn-outline btn-sm edit-section-btn" onClick={handleEditClick}>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2-2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                          Edit
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
                   <div className="settings-grid-rows">
                     <div className="settings-row">
                       {(() => {
@@ -3040,25 +3086,31 @@ const ServiceSettings = () => {
                           <>
                             <div className="form-group">
                               <label className="input-label">Start Time</label>
-                              <input
-                                type="time"
-                                className="input-field"
-                                value={currentSettings.startTime}
-                                min={startMin}
-                                onChange={(e) => updateSetting('startTime', e.target.value)}
-                              />
-                              {startMin && <p className="input-helper-v4" style={{ marginTop: 4, color: '#64748b', fontSize: 11 }}>Available from {startMin}</p>}
+                              <div className="input-with-icon-v4">
+                                <input
+                                  type="time"
+                                  className="input-field"
+                                  value={currentSettings.startTime}
+                                  min={startMin}
+                                  disabled={!isEditingService}
+                                  onChange={(e) => updateSetting('startTime', e.target.value)}
+                                />
+                                {isEditingService && startMin && <p className="input-helper-v4">Available from {startMin}</p>}
+                              </div>
                             </div>
                             <div className="form-group">
                               <label className="input-label">End Time</label>
-                              <input
-                                type="time"
-                                className="input-field"
-                                value={currentSettings.endTime}
-                                max={endMax}
-                                onChange={(e) => updateSetting('endTime', e.target.value)}
-                              />
-                              {endMax && <p className="input-helper-v4" style={{ marginTop: 4, color: '#64748b', fontSize: 11 }}>Must end by {endMax}</p>}
+                              <div className="input-with-icon-v4">
+                                <input
+                                  type="time"
+                                  className="input-field"
+                                  value={currentSettings.endTime}
+                                  max={endMax}
+                                  disabled={!isEditingService}
+                                  onChange={(e) => updateSetting('endTime', e.target.value)}
+                                />
+                                {isEditingService && endMax && <p className="input-helper-v4">Must end by {endMax}</p>}
+                              </div>
                             </div>
                           </>
                         );
@@ -3071,8 +3123,9 @@ const ServiceSettings = () => {
                         <input
                           type="number"
                           className="input-field"
-                          placeholder="Enter booking limit..."
+                          placeholder="No Limit"
                           value={currentSettings.bookingLimit}
+                          disabled={!isEditingService}
                           onChange={(e) => updateSetting('bookingLimit', e.target.value)}
                         />
                       </div>
@@ -3082,6 +3135,7 @@ const ServiceSettings = () => {
                           <select
                             className="input-field stop-value"
                             value={currentSettings.stopOrdersValue}
+                            disabled={!isEditingService}
                             onChange={(e) => updateSetting('stopOrdersValue', e.target.value)}
                           >
                             {Array.from(
@@ -3094,10 +3148,10 @@ const ServiceSettings = () => {
                           <select
                             className="input-field stop-unit"
                             value={currentSettings.stopOrdersUnit}
+                            disabled={!isEditingService}
                             onChange={(e) => {
                               const newUnit = e.target.value;
                               updateSetting('stopOrdersUnit', newUnit);
-                              // Cap value at 24 if switching to Hours
                               if (newUnit === 'Hours' && parseInt(currentSettings.stopOrdersValue) > 24) {
                                 updateSetting('stopOrdersValue', '24');
                               }
@@ -3113,12 +3167,13 @@ const ServiceSettings = () => {
 
                   <div className="service-style-section">
                     <label className="input-label">Service Style Supported</label>
-                    <div className="service-style-cards">
+                    <div className={`service-style-cards ${!isEditingService ? 'read-only-styles' : ''}`}>
                       <div
-                        className={`style-card ${currentSettings.style.includes('Buffet Service') ? 'active' : ''}`}
+                        className={`style-card ${currentSettings.style.includes('Buffet Service') ? 'active' : ''} ${!isEditingService ? 'no-hover' : ''}`}
                         onClick={() => {
+                          if (!isEditingService) return;
                           const newStyles = currentSettings.style.includes('Buffet Service')
-                            ? currentSettings.style.filter(s => s !== 'Buffet Service')
+                            ? currentSettings.style.filter((s: string) => s !== 'Buffet Service')
                             : [...currentSettings.style, 'Buffet Service'];
                           updateSetting('style', newStyles);
                         }}
@@ -3130,16 +3185,19 @@ const ServiceSettings = () => {
                           <span className="style-name">Buffet Service</span>
                           <span className="style-desc">Self-service meal style</span>
                         </div>
-                        <div className="style-checkbox">
-                          {currentSettings.style.includes('Buffet Service') && <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>}
-                        </div>
+                        {isEditingService && (
+                          <div className="style-checkbox">
+                            {currentSettings.style.includes('Buffet Service') && <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>}
+                          </div>
+                        )}
                       </div>
 
                       <div
-                        className={`style-card ${currentSettings.style.includes('Sit-down Service') ? 'active' : ''}`}
+                        className={`style-card ${currentSettings.style.includes('Sit-down Service') ? 'active' : ''} ${!isEditingService ? 'no-hover' : ''}`}
                         onClick={() => {
+                          if (!isEditingService) return;
                           const newStyles = currentSettings.style.includes('Sit-down Service')
-                            ? currentSettings.style.filter(s => s !== 'Sit-down Service')
+                            ? currentSettings.style.filter((s: string) => s !== 'Sit-down Service')
                             : [...currentSettings.style, 'Sit-down Service'];
                           updateSetting('style', newStyles);
                         }}
@@ -3151,30 +3209,44 @@ const ServiceSettings = () => {
                           <span className="style-name">Sit-down Service</span>
                           <span className="style-desc">Wait-staff table service</span>
                         </div>
-                        <div className="style-checkbox">
-                          {currentSettings.style.includes('Sit-down Service') && <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>}
-                        </div>
+                        {isEditingService && (
+                          <div className="style-checkbox">
+                            {currentSettings.style.includes('Sit-down Service') && <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>}
+                          </div>
+                        )}
                       </div>
                     </div>
 
-                    <div className={`sit-down-pricing-block-v4 ${!currentSettings.style.includes('Sit-down Service') ? 'disabled' : ''}`}>
-                      <label className="input-label">Add Extra Cost for Sit-down Service</label>
-                      <div className="pricing-input-wrapper-v4">
-                        <span className="currency-prefix">₹</span>
-                        <input
-                          type="number"
-                          className="input-field pricing-input-v4"
-                          placeholder="per person"
-                          disabled={!currentSettings.style.includes('Sit-down Service')}
-                          value={currentSettings.sitDownExtraPrice || ''}
-                          onChange={(e) => updateSetting('sitDownExtraPrice', parseFloat(e.target.value) || 0)}
-                          onBlur={() => triggerAutoSave()}
-                        />
-                        <span className="unit-suffix">per person</span>
-                      </div>
-                      <p className="input-helper-v4">
-                        Enter only the extra amount added to your current menu price, not the total sit-down price.
-                      </p>
+                    <div className={`sit-down-pricing-block-v4 ${!currentSettings.style.includes('Sit-down Service') ? 'disabled' : ''} ${!isEditingService ? 'read-only' : ''}`}>
+                      <label className="input-label">Extra Cost for Sit-down Service</label>
+                      {isEditingService ? (
+                        <div className="pricing-input-wrapper-v4">
+                          <span className="currency-prefix">₹</span>
+                          <input
+                            type="number"
+                            className="input-field pricing-input-v4"
+                            placeholder="per person"
+                            disabled={!currentSettings.style.includes('Sit-down Service')}
+                            value={currentSettings.sitDownExtraPrice || ''}
+                            onChange={(e) => updateSetting('sitDownExtraPrice', parseFloat(e.target.value) || 0)}
+                          />
+                          <span className="unit-suffix">per person</span>
+                        </div>
+                      ) : (
+                        <div className="read-only-display-v4">
+                          <span className="read-only-text">
+                            {currentSettings.style.includes('Sit-down Service')
+                              ? `₹${currentSettings.sitDownExtraPrice || 0} extra per person`
+                              : 'Not Applicable'
+                            }
+                          </span>
+                        </div>
+                      )}
+                      {isEditingService && (
+                        <p className="input-helper-v4">
+                          Enter only the extra amount added to your current menu price.
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -6843,7 +6915,7 @@ const CountdownTimer = ({ targetISO }: { targetISO: string }) => {
       const hh = Math.floor(diff / (1000 * 60 * 60)).toString().padStart(2, '0');
       const mm = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
       const ss = Math.floor((diff % (1000 * 60)) / 1000).toString().padStart(2, '0');
-      
+
       return `${hh}:${mm}:${ss}`;
     };
 
@@ -6885,8 +6957,8 @@ const HomeView = ({ setActiveTab }: { setActiveTab: (tab: string) => void }) => 
     setNotifications(notifications.map(n => ({ ...n, unread: false })));
   };
 
-  const filteredNotifs = activeNotifTab === 'unread' 
-    ? notifications.filter(n => n.unread) 
+  const filteredNotifs = activeNotifTab === 'unread'
+    ? notifications.filter(n => n.unread)
     : notifications;
 
   const unreadCount = notifications.filter(n => n.unread).length;
@@ -6935,13 +7007,13 @@ const HomeView = ({ setActiveTab }: { setActiveTab: (tab: string) => void }) => 
               </div>
 
               <div className="notif-tabs-v25">
-                <button 
+                <button
                   className={`notif-tab-v25 ${activeNotifTab === 'all' ? 'active' : ''}`}
                   onClick={() => setActiveNotifTab('all')}
                 >
                   All <span>{notifications.length}</span>
                 </button>
-                <button 
+                <button
                   className={`notif-tab-v25 ${activeNotifTab === 'unread' ? 'active' : ''}`}
                   onClick={() => setActiveNotifTab('unread')}
                 >
@@ -8469,46 +8541,46 @@ const RevenueAnalytics = ({
             </div>
           </div>
 
-            <div className="chart-wrapper-v25">
-              <div className="y-axis-v25">
-                <span>1.5L</span>
-                <span>1L</span>
-                <span>50K</span>
-                <span>0</span>
-              </div>
-              
-              <div className="bars-area-v25">
-                {/* Visual Grid Lines - Moved inside bars-flex for easier baseline alignment */}
-                <div className="bars-flex-v25">
-                  {monthlyTrend.map((d, i) => (
-                    <div key={i} className="bar-column-v25">
-                      <div 
-                        className={`bar-v25 ${i === monthlyTrend.length - 1 ? 'active' : ''}`}
-                        style={{ height: `${(d.revenue / 150000) * 100}%` }}
-                      >
-                        <div className="bar-tooltip-v25">
-                          <div className="tooltip-month-v24">{d.month} 2025</div>
-                          <div className="tooltip-val-v24">₹{d.revenue.toLocaleString('en-IN')}</div>
-                        </div>
+          <div className="chart-wrapper-v25">
+            <div className="y-axis-v25">
+              <span>1.5L</span>
+              <span>1L</span>
+              <span>50K</span>
+              <span>0</span>
+            </div>
+
+            <div className="bars-area-v25">
+              {/* Visual Grid Lines - Moved inside bars-flex for easier baseline alignment */}
+              <div className="bars-flex-v25">
+                {monthlyTrend.map((d, i) => (
+                  <div key={i} className="bar-column-v25">
+                    <div
+                      className={`bar-v25 ${i === monthlyTrend.length - 1 ? 'active' : ''}`}
+                      style={{ height: `${(d.revenue / 150000) * 100}%` }}
+                    >
+                      <div className="bar-tooltip-v25">
+                        <div className="tooltip-month-v24">{d.month} 2025</div>
+                        <div className="tooltip-val-v24">₹{d.revenue.toLocaleString('en-IN')}</div>
                       </div>
                     </div>
-                  ))}
-                  <div className="grid-lines-v25">
-                    <div className="grid-line-v25"></div>
-                    <div className="grid-line-v25"></div>
-                    <div className="grid-line-v25"></div>
-                    <div className="grid-line-v25"></div>
                   </div>
-                </div>
-
-                {/* Dedicated Labels Row Below the Line */}
-                <div className="months-flex-v25">
-                  {monthlyTrend.map((d, i) => (
-                    <span key={i} className="month-label-v25">{d.month}</span>
-                  ))}
+                ))}
+                <div className="grid-lines-v25">
+                  <div className="grid-line-v25"></div>
+                  <div className="grid-line-v25"></div>
+                  <div className="grid-line-v25"></div>
+                  <div className="grid-line-v25"></div>
                 </div>
               </div>
+
+              {/* Dedicated Labels Row Below the Line */}
+              <div className="months-flex-v25">
+                {monthlyTrend.map((d, i) => (
+                  <span key={i} className="month-label-v25">{d.month}</span>
+                ))}
+              </div>
             </div>
+          </div>
         </div>
 
         {/* Sidebar Mini-stats */}
@@ -8593,7 +8665,7 @@ const RevenueAnalytics = ({
               <h4>Payout Summary</h4>
               <button className="view-history-btn-v24" onClick={() => setIsHistoryOpen(true)}>
                 View Payout History
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-history"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-history"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /><path d="M12 7v5l4 2" /></svg>
               </button>
             </div>
             <div className="header-subtitles-v24">
@@ -8748,7 +8820,7 @@ const PayoutBreakdownModal = ({ isOpen, onClose, payout }: any) => {
               <label>TDS Deducted (10%)</label>
               <span className="value-v24">₹{payout.tds?.toLocaleString()}</span>
             </div>
-            
+
             <div className="modal-divider-v24"></div>
 
             <div className="grid-row-v24 total-row-v24">

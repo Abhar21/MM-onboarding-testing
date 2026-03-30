@@ -20997,3 +20997,206 @@ input:checked+.slider-v4:before {
   background: #4f46e5 !important;
   transform: translateY(-1px) !important;
 }
+/* Service Settings Controlled Edit Pattern */
+.content-category-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #f1f5f9;
+  margin-bottom: 1.5rem;
+}
+
+.category-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 !important;
+}
+
+.edit-mode-active {
+  /* Removed blue highlight as per feedback */
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.read-only-display-v4 {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1.5px solid #e2e8f0;
+  min-height: 48px;
+}
+
+.read-only-text {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #334155;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 99px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.status-pill.active {
+  background-color: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #10b98120;
+}
+
+.status-pill.paused {
+  background-color: #fff7ed;
+  color: #9a3412;
+  border: 1px solid #f9731620;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.status-pill.active .status-dot { background-color: #10b981; }
+.status-pill.paused .status-dot { background-color: #f97316; }
+
+.service-toggle-wrapper-inline {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem;
+  background: white;
+  border-radius: 14px;
+  border: 1.5px solid #e2e8f0;
+  margin-top: 0.5rem;
+}
+
+.toggle-info .toggle-label-v4 {
+  display: block;
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 0.9375rem;
+}
+
+.toggle-info .toggle-desc-v4 {
+  font-size: 0.8125rem;
+  color: #64748b;
+  margin: 0.25rem 0 0 0;
+}
+
+.read-only-styles .style-card.no-hover {
+  cursor: default;
+  transition: opacity 0.2s;
+}
+
+.read-only-styles .style-card.no-hover:hover {
+  transform: none !important;
+  box-shadow: none !important;
+  border-color: #e2e8f0 !important;
+}
+
+.read-only-styles .style-card.active.no-hover {
+  border-color: #3b82f6 !important;
+  background: rgba(59, 130, 246, 0.05);
+}
+
+.edit-section-btn {
+  display: flex;
+  align-items: center;
+  background: #0077ff !important;
+  border: 1px solid #0077ff !important;
+  color: white !important;
+  font-weight: 600 !important;
+  padding: 0.5rem 1.25rem !important;
+  border-radius: 8px !important;
+  transition: all 0.2s !important;
+  box-shadow: 0 2px 8px rgba(0, 119, 255, 0.2);
+}
+
+.edit-section-btn:hover {
+  background: #0066ee !important;
+  border-color: #0066ee !important;
+  color: white !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 119, 255, 0.3);
+}
+
+.edit-section-btn svg {
+  stroke: white !important;
+}
+
+.edit-actions-btns .btn {
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+/* Card Internal Header Styles */
+.card-inner-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1.5px solid #e2e8f0;
+}
+
+.inner-header-left .inner-card-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 0.25rem 0;
+}
+
+.inner-header-left .inner-card-subtitle {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin: 0;
+}
+
+/* Header Status Toggle */
+.header-status-toggle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: transparent;
+  padding: 0.5rem 0;
+  border-radius: 0;
+  border: none;
+}
+
+.status-label-v4 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+/* Unified UI - Disabled Input Styles for View Mode */
+.input-field:disabled {
+  background-color: #f8fafc !important;
+  color: #1e293b !important;
+  cursor: default !important;
+  border-color: #e2e8f0 !important;
+  opacity: 1 !important;
+  -webkit-text-fill-color: #1e293b !important; /* For Safari/iOS */
+}
+
+.input-helper-v4 {
+  margin-top: 0.5rem;
+  color: #64748b;
+  font-size: 0.75rem;
+  font-weight: 500;
+  display: block;
+}
+
+.input-with-icon-v4 {
+  position: relative;
+  width: 100%;
+}
