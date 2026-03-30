@@ -7384,10 +7384,10 @@ const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
 
   if (isMobile) {
     return (
-      <MobileDashboard 
-        activeTab={activeTab} 
-        setActiveTab={setActiveTab} 
-        profileData={profileData} 
+      <MobileDashboard
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        profileData={profileData}
         navigationGroups={navigationGroups}
         onLogout={() => navigate('/login')}
       />
