@@ -167,12 +167,20 @@ const MobileBookingsView = () => {
     { id: 'BK-12432', customer: 'KL Rahul', date: '2026-04-17', time: '08:00 PM', category: 'Dinner', menuName: 'Modern Classic', guests: 25, amount: 30000, paid: 10000, status: 'Upcoming' },
   ]);
 
-  const [filter] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
   const [rangeShortcut, setRangeShortcut] = useState('All');
   const [isNoteOpen, setIsNoteOpen] = useState(false);
   const [visibleCount, setVisibleCount] = useState(10);
   const [loadingMore, setLoadingMore] = useState(false);
+  
+  // Advanced Filters State
+  const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
+  const [appliedFilters, setAppliedFilters] = useState({
+    fromDate: '',
+    toDate: '',
+    status: 'All'
+  });
+  const [tempFilters, setTempFilters] = useState({ ...appliedFilters });
 
   const today = new Date().toISOString().split('T')[0];
   
@@ -184,10 +192,26 @@ const MobileBookingsView = () => {
   };
 
   const filteredBookings = bookings.filter(b => {
+    // 1. Search matching
     const matchesSearch = b.id.toLowerCase().includes(searchTerm.toLowerCase()) || b.customer.toLowerCase().includes(searchTerm.toLowerCase());
     if (!matchesSearch) return false;
-    if (filter !== 'All' && rangeShortcut === 'All' && b.status !== filter) return false;
-    if (rangeShortcut === 'Today' && b.date !== today) return false;
+
+    // 2. Handle Shortcuts (Today, Month, etc) - Overrides advanced date if active
+    if (rangeShortcut === 'Today') {
+      if (b.date !== today) return false;
+    } else if (rangeShortcut === 'This Month') {
+      const bDate = new Date(b.date);
+      const now = new Date();
+      if (bDate.getMonth() !== now.getMonth() || bDate.getFullYear() !== now.getFullYear()) return false;
+    } else if (appliedFilters.fromDate || appliedFilters.toDate) {
+      // 3. Advanced Date Range (only if no rapid shortcut is active or All is selected)
+      if (appliedFilters.fromDate && b.date < appliedFilters.fromDate) return false;
+      if (appliedFilters.toDate && b.date > appliedFilters.toDate) return false;
+    }
+
+    // 4. Status Filter
+    if (appliedFilters.status !== 'All' && b.status !== appliedFilters.status) return false;
+
     return true;
   });
 
@@ -201,6 +225,24 @@ const MobileBookingsView = () => {
     }, 800);
   };
 
+  const openFilters = () => {
+    setTempFilters({ ...appliedFilters });
+    setIsFilterSheetOpen(true);
+  };
+
+  const applyFilters = () => {
+    setAppliedFilters({ ...tempFilters });
+    setRangeShortcut('All'); // Clear rapid shortcut if advanced filters applied
+    setIsFilterSheetOpen(false);
+    setVisibleCount(10);
+  };
+
+  const resetFilters = () => {
+    setTempFilters({ fromDate: '', toDate: '', status: 'All' });
+  };
+
+  const hasActiveAdvancedFilters = appliedFilters.fromDate || appliedFilters.toDate || appliedFilters.status !== 'All';
+
   return (
     <div className="mobile-scroller-v50">
       <div className="mobile-home-header-v50" style={{ marginBottom: '20px' }}>
@@ -208,6 +250,7 @@ const MobileBookingsView = () => {
         <p style={{ fontSize: '0.85rem', color: '#64748b', margin: '4px 0 0' }}>Monitor and manage your operations</p>
       </div>
 
+      {/* Stats Grid */}
       <div className="mobile-stats-grid-v50">
         <div className="mobile-stat-card-v50">
           <span className="stat-label">Total</span>
@@ -231,6 +274,7 @@ const MobileBookingsView = () => {
         </div>
       </div>
 
+      {/* Search and Filters Strip */}
       <div className="mobile-search-filter-stack-v50">
         <div className="mobile-search-bar-v50">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
@@ -244,19 +288,30 @@ const MobileBookingsView = () => {
             }}
           />
         </div>
-        <div className="mobile-chips-scroll-v50">
-          {['All', 'Today', 'This Month', 'Last Month'].map(s => (
-            <button 
-              key={s} 
-              className={`filter-chip-v50 ${rangeShortcut === s ? 'active' : ''}`}
-              onClick={() => {
-                setRangeShortcut(s);
-                setVisibleCount(10);
-              }}
-            >
-              {s}
-            </button>
-          ))}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div className="mobile-chips-scroll-v50" style={{ flex: 1 }}>
+            {['All', 'Today', 'This Month'].map(s => (
+              <button 
+                key={s} 
+                className={`filter-chip-v50 ${rangeShortcut === s ? 'active' : ''}`}
+                onClick={() => {
+                  setRangeShortcut(s);
+                  setAppliedFilters({ fromDate: '', toDate: '', status: 'All' }); // Clear advanced if choosing rapid
+                  setVisibleCount(10);
+                }}
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+          <button 
+            className="mobile-action-btn-v50" 
+            style={{ padding: '8px', background: 'white', borderRadius: '10px', border: '1px solid #e2e8f0', minWidth: '42px', height: '42px' }}
+            onClick={openFilters}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={hasActiveAdvancedFilters ? '#0077ff' : '#64748b'} strokeWidth="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+            {hasActiveAdvancedFilters && <span className="filter-active-dot-v50"></span>}
+          </button>
         </div>
       </div>
 
@@ -284,7 +339,7 @@ const MobileBookingsView = () => {
                 </div>
                 <div className={`card-status-v50 ${b.status.toLowerCase()}`}>{b.status}</div>
               </div>
-                <div className="card-body-v50">
+              <div className="card-body-v50">
                 <h4 className="customer-name-v50">{b.customer}</h4>
                 <div className="event-details-v50">
                   <div className="detail-row-v50">
@@ -340,6 +395,66 @@ const MobileBookingsView = () => {
           </div>
         )}
       </div>
+
+      {/* Filter Bottom Sheet */}
+      {isFilterSheetOpen && (
+        <div className="mobile-sheet-overlay-v50" onClick={() => setIsFilterSheetOpen(false)}>
+          <div className="mobile-bottom-sheet-v50" onClick={e => e.stopPropagation()}>
+            <div className="sheet-header-v50">
+              <span className="sheet-title-v50">Filter Bookings</span>
+              <button className="sheet-close-v50" onClick={() => setIsFilterSheetOpen(false)}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
+            </div>
+            
+            <div className="sheet-body-v50">
+              <div className="sheet-section-v50">
+                <div className="sheet-section-title-v50">Date Range</div>
+                <div className="sheet-date-grid-v50">
+                  <div className="date-field-v50">
+                    <label>From</label>
+                    <input 
+                      type="date" 
+                      className="mobile-date-input-v50" 
+                      value={tempFilters.fromDate}
+                      onChange={e => setTempFilters({ ...tempFilters, fromDate: e.target.value })}
+                    />
+                  </div>
+                  <div className="date-field-v50">
+                    <label>To</label>
+                    <input 
+                      type="date" 
+                      className="mobile-date-input-v50"
+                      value={tempFilters.toDate}
+                      onChange={e => setTempFilters({ ...tempFilters, toDate: e.target.value })}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="sheet-section-v50">
+                <div className="sheet-section-title-v50">Booking Status</div>
+                <div className="sheet-chips-v50">
+                  {['All', 'Preparing', 'Upcoming', 'Completed', 'Cancelled'].map(s => (
+                    <button 
+                      key={s}
+                      className={`filter-chip-v50 ${tempFilters.status === s ? 'active' : ''}`}
+                      onClick={() => setTempFilters({ ...tempFilters, status: s })}
+                    >
+                      {s}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="sheet-footer-v50">
+              <button className="btn-sheet-reset-v50" onClick={resetFilters}>Reset</button>
+              <button className="btn-sheet-apply-v50" onClick={applyFilters}>Apply Filters</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

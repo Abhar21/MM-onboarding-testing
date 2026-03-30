@@ -714,3 +714,164 @@
 @keyframes rotateSpinner {
   to { transform: rotate(360deg); }
 }
+
+/* ─────────────────── MOBILE BOTTOM SHEET FILTER ─────────────────── */
+
+.mobile-sheet-overlay-v50 {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  z-index: 3000;
+  display: flex;
+  align-items: flex-end;
+  backdrop-filter: blur(4px);
+}
+
+.mobile-bottom-sheet-v50 {
+  width: 100%;
+  max-height: 85vh;
+  background: white;
+  border-radius: 24px 24px 0 0;
+  display: flex;
+  flex-direction: column;
+  animation: slideUpMobile 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 -10px 25px rgba(0,0,0,0.1);
+}
+
+@keyframes slideUpMobile {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.sheet-header-v50 {
+  padding: 20px;
+  border-bottom: 1px solid #f1f5f9;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sheet-title-v50 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.sheet-close-v50 {
+  background: #f1f5f9;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  cursor: pointer;
+}
+
+.sheet-body-v50 {
+  padding: 24px 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.sheet-section-title-v50 {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 12px;
+}
+
+.sheet-date-grid-v50 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.date-field-v50 {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.date-field-v50 label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+.mobile-date-input-v50 {
+  width: 100%;
+  padding: 12px;
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  color: #1e293b;
+  outline: none;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+
+.mobile-date-input-v50:focus {
+  border-color: #0077ff;
+  background: white;
+}
+
+.sheet-chips-v50 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.sheet-footer-v50 {
+  padding: 20px;
+  border-top: 1px solid #f1f5f9;
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 12px;
+  background: white;
+  padding-bottom: env(safe-area-inset-bottom, 10px);
+}
+
+.btn-sheet-reset-v50 {
+  padding: 14px;
+  border: 1.5px solid #e2e8f0;
+  background: white;
+  color: #64748b;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.btn-sheet-apply-v50 {
+  padding: 14px;
+  border: none;
+  background: #0077ff;
+  color: white;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  box-shadow: 0 4px 12px rgba(0, 119, 255, 0.25);
+  cursor: pointer;
+}
+
+.filter-active-dot-v50 {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 10px;
+  height: 10px;
+  background: #22c55e;
+  border: 2px solid white;
+  border-radius: 50%;
+}
