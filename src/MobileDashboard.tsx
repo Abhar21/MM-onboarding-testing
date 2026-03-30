@@ -139,32 +139,353 @@ const MobileHomeView = ({ setActiveTab }: { setActiveTab: (tab: string) => void 
   );
 };
 
+/* ─────────────────── MOBILE BOOKINGS DETAIL VIEW ─────────────────── */
+const MobileBookingDetailView = ({ 
+  booking, 
+  onBack 
+}: { 
+  booking: any; 
+  onBack: () => void;
+}) => {
+  const [isMarkingComplete, setIsMarkingComplete] = useState(false);
+  const [isMenuSheetOpen, setIsMenuSheetOpen] = useState(false);
+
+  const handleComplete = () => {
+    setIsMarkingComplete(true);
+    setTimeout(() => {
+      setIsMarkingComplete(false);
+      onBack();
+    }, 1000);
+  };
+
+  return (
+    <div className="mobile-detail-page-v50">
+      <div className="mobile-detail-header-v50">
+        <div className="header-left-v50">
+          <button className="back-btn-v50" onClick={onBack}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+          </button>
+          <span className="detail-id-v50">{booking.id}</span>
+        </div>
+        <div className="header-right-v50">
+          <div className="detail-type-badge-v50">{booking.taxType}</div>
+          <div className={`detail-status-badge-v50 ${booking.status.toLowerCase()}`}>
+            {booking.status}
+          </div>
+        </div>
+      </div>
+
+      <div className="mobile-detail-content-v50">
+        {/* Customer Info Section */}
+        <div className="detail-section-v50 card">
+          <h3 className="section-title-v50 small">Customer Information</h3>
+          <div className="customer-info-box-v50">
+            <div className="customer-name-big-v50">{booking.customer}</div>
+            <a href={`tel:${booking.phone || '9123456789'}`} className="customer-contact-row-v50">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0077ff" strokeWidth="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l2.28-2.28a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+              <span>+91 {booking.phone || '91234 56789'}</span>
+            </a>
+            <div className="customer-contact-row-v50">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+              <span>{booking.email || 'customer@example.com'}</span>
+            </div>
+            <div className="customer-contact-row-v50">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+              <span>{booking.address || '402, Skyline Residency, Sector 44, Bengaluru'}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Event Details Section */}
+        <div className="detail-section-v50 card">
+          <h3 className="section-title-v50 small">Event Details</h3>
+          <div className="event-details-grid-v50">
+            <div className="event-info-item-v50">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+              <div className="info-text-v50">
+                <label>Date & Time</label>
+                <span>{new Date(booking.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })} • {booking.time}</span>
+              </div>
+            </div>
+            <div className="event-info-item-v50">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2"><path d="M12 2v20M2 12h20M12 2l4 4-4 4 4 4-4 4-4-4 4-4-4-4 4-4z"></path></svg>
+              <div className="info-text-v50">
+                <label>Category</label>
+                <span>{booking.category}</span>
+              </div>
+            </div>
+            <div className="event-info-item-v50">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+              <div className="info-text-v50">
+                <label>Guests</label>
+                <span>{booking.guests} People</span>
+              </div>
+            </div>
+            <div className="event-info-item-v50">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+              <div className="info-text-v50">
+                <label>Menu Selection</label>
+                <span>{booking.menuName}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Menu Details Section */}
+        {booking.menuDetails && (
+          <div className="detail-section-v50 card">
+            <h3 className="section-title-v50 small">Menu Details</h3>
+            <div className="menu-summary-container-v50">
+              {/* Only show the first section/category in the preview */}
+              {booking.menuDetails.categories.slice(0, 1).map((cat: any, idx: number) => (
+                <div key={idx} className="menu-category-group-v50">
+                  <div className="cat-header-v50">
+                    <span className="cat-name-v50">{cat.name}</span>
+                    <span className={`cat-status-pill-v50 ${cat.status === 'All Items Included' ? 'all' : 'custom'}`}>
+                      {cat.status}
+                    </span>
+                  </div>
+                  <div className="cat-items-flex-v50">
+                    {cat.items.slice(0, 4).map((item: string, i: number) => (
+                      <div key={i} className="menu-item-pill-v50">{item}</div>
+                    ))}
+                    {cat.items.length > 4 && (
+                      <div className="menu-item-pill-v50 more">+{cat.items.length - 4} more</div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <button className="view-full-menu-btn-v50" onClick={() => setIsMenuSheetOpen(true)}>
+              View Full Menu
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
+          </div>
+        )}
+
+        {/* Payment Summary Section */}
+        <div className="detail-section-v50 card">
+          <h3 className="section-title-v50 small">Payment Summary</h3>
+          <div className="payment-summary-box-v50">
+            <div className="payment-main-row-v50">
+              <span className="label">Total Booking Value</span>
+              <span className="value primary">₹{booking.amount.toLocaleString()}</span>
+            </div>
+            <div className="payment-divider-v50"></div>
+            <div className="payment-sub-grid-v50">
+              <div className="payment-sub-item-v50">
+                <label>Advance Paid</label>
+                <div className="amount-status-v50">
+                  <span className="amount received">₹{booking.paid.toLocaleString()}</span>
+                  <span className="tag success">Received</span>
+                </div>
+              </div>
+              <div className="payment-sub-item-v50">
+                <label>Pending Balance</label>
+                <div className="amount-status-v50">
+                  <span className="amount pending">₹{(booking.amount - booking.paid).toLocaleString()}</span>
+                  <span className="tag warning">Pending</span>
+                </div>
+              </div>
+            </div>
+            <div className="payout-info-grid-v50">
+              <div className="payout-detail-row-v50">
+                <label>Payout:</label>
+                <span className="value accent">₹{booking.paid.toLocaleString()}</span>
+              </div>
+              <div className="payout-detail-row-v50">
+                <label>Payout Processed At:</label>
+                <span className="value">{
+                  (() => {
+                    const d = new Date(booking.date);
+                    d.setDate(d.getDate() - 1);
+                    return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+                  })()
+                }</span>
+              </div>
+              <div className="payout-detail-row-v50">
+                <label>GST Month:</label>
+                <span className="value">{
+                  (() => {
+                    const d = new Date(booking.date);
+                    d.setMonth(d.getMonth() + 1);
+                    return d.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+                  })()
+                }</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Warning Note */}
+        <div className="mobile-warning-alert-v50">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#b45309" strokeWidth="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+          <span>Collect remaining amount on event day from customer.</span>
+        </div>
+
+        {/* Documents Section */}
+        <div className="detail-section-v50">
+          <h3 className="section-title-v50 small">Documents</h3>
+          <div className="mobile-doc-list-v50">
+            <div className="doc-row-v50">
+              <div className="doc-left-v50">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                <div className="doc-info-v50">
+                  <span className="doc-name-v50">Advance Booking Receipt</span>
+                  <span className="doc-meta-v50">PDF • 1.2 MB</span>
+                </div>
+              </div>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" strokeWidth="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </div>
+            <div className="doc-row-v50">
+              <div className="doc-left-v50">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                <div className="doc-info-v50">
+                  <span className="doc-name-v50">Tax Invoice (Final)</span>
+                  <span className="doc-meta-v50">Unavailable</span>
+                </div>
+              </div>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" strokeWidth="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </div>
+          </div>
+        </div>
+        
+        <div style={{ height: '80px' }}></div> {/* Spacer for sticky button */}
+      </div>
+
+      {/* Sticky Bottom CTA */}
+      <div className="mobile-detail-footer-v50">
+        <button 
+          className="btn-mark-completed-v50" 
+          onClick={handleComplete}
+          disabled={isMarkingComplete}
+        >
+          {isMarkingComplete ? 'Updating...' : 'Mark as Completed'}
+        </button>
+      </div>
+
+      {/* Full Menu Bottom Sheet */}
+      {isMenuSheetOpen && (
+        <div className="mobile-sheet-overlay-v50" onClick={() => setIsMenuSheetOpen(false)}>
+          <div className="mobile-bottom-sheet-v50" onClick={e => e.stopPropagation()}>
+            <div className="sheet-header-v50">
+              <span className="sheet-title-v50">Full Menu Selection</span>
+              <button className="sheet-close-v50" onClick={() => setIsMenuSheetOpen(false)}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
+            </div>
+            <div className="sheet-body-v50 scrollable">
+              {booking.menuDetails.categories.map((cat: any, idx: number) => (
+                <div key={idx} className="sheet-menu-cat-block-v50">
+                  <div className="sheet-cat-header-v50">
+                    <span className="name">{cat.name}</span>
+                    <span className="status">{cat.status}</span>
+                  </div>
+                  <div className="sheet-cat-items-v50">
+                    {cat.items.map((item: string, i: number) => (
+                      <div key={i} className="sheet-menu-item-v50">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <span>{item}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 /* ─────────────────── MOBILE BOOKINGS VIEW ─────────────────── */
 const MobileBookingsView = () => {
   const [bookings] = useState([
-    { id: 'BK-12401', customer: 'Amit Khurana', date: new Date().toISOString().split('T')[0], time: '12:30 PM', category: 'Lunch', menuName: 'Premium Sadhya Menu', guests: 200, amount: 145000, paid: 43500, status: 'Preparing' },
-    { id: 'BK-12402', customer: 'Bhavya Singh', date: new Date().toISOString().split('T')[0], time: '01:00 PM', category: 'Lunch', menuName: 'Traditional South Indian', guests: 120, amount: 95000, paid: 30000, status: 'Preparing' },
-    { id: 'BK-12405', customer: 'Siddharth Malhotra', date: '2026-03-22', time: '07:30 PM', category: 'Dinner', menuName: 'Executive Buffet', guests: 150, amount: 85000, paid: 25500, status: 'Upcoming' },
-    { id: 'BK-12398', customer: 'Ananya Pandey', date: '2026-03-20', time: '04:30 PM', category: 'Snacks', menuName: 'High Tea Special', guests: 80, amount: 45000, paid: 13500, status: 'Completed' },
-    { id: 'BK-12410', customer: 'Varun Dhawan', date: '2026-03-24', time: '08:00 PM', category: 'Dinner', menuName: 'Romantic Four-Course', guests: 12, amount: 15000, paid: 4500, status: 'Upcoming' },
-    { id: 'BK-12412', customer: 'Kareena Kapoor', date: '2026-03-25', time: '01:00 PM', category: 'Lunch', menuName: 'Healthy Salads & Juice', guests: 40, amount: 35000, paid: 10500, status: 'Upcoming' },
-    { id: 'BK-12415', customer: 'Rajeev Mehta', date: '2026-03-26', time: '08:30 PM', category: 'Dinner', menuName: 'Royal North Indian', guests: 50, amount: 40000, paid: 12000, status: 'Upcoming' },
-    { id: 'BK-12416', customer: 'Divya Reddy', date: '2026-03-27', time: '12:00 PM', category: 'Lunch', menuName: 'Continental Feast', guests: 80, amount: 55000, paid: 15000, status: 'Upcoming' },
-    { id: 'BK-12417', customer: 'Sita Ram', date: '2026-03-28', time: '07:00 PM', category: 'Dinner', menuName: 'Family Thali Special', guests: 30, amount: 20000, paid: 6000, status: 'Upcoming' },
-    { id: 'BK-12418', customer: 'Arun Kumar', date: '2026-03-29', time: '01:30 PM', category: 'Lunch', menuName: 'Business Buffet', guests: 60, amount: 30000, paid: 9000, status: 'Upcoming' },
-    { id: 'BK-12420', customer: 'Nisha Gupta', date: '2026-04-01', time: '08:00 PM', category: 'Dinner', menuName: 'Grand Wedding Feast', guests: 300, amount: 250000, paid: 75000, status: 'Upcoming' },
-    { id: 'BK-12421', customer: 'Rahul Bose', date: '2026-04-02', time: '12:30 PM', category: 'Lunch', menuName: 'Office Gathering Menu', guests: 45, amount: 35000, paid: 10000, status: 'Upcoming' },
-    { id: 'BK-12422', customer: 'Vikram Seth', date: '2026-04-03', time: '07:30 PM', category: 'Dinner', menuName: 'Corporate Banquet', guests: 100, amount: 120000, paid: 40000, status: 'Upcoming' },
-    { id: 'BK-12423', customer: 'Meera Iyer', date: '2026-04-04', time: '01:00 PM', category: 'Lunch', menuName: 'Celebration Meal', guests: 20, amount: 15000, paid: 5000, status: 'Upcoming' },
-    { id: 'BK-12424', customer: 'Deepak Jain', date: '2026-04-05', time: '08:30 PM', category: 'Dinner', menuName: 'Party Platter Special', guests: 75, amount: 65000, paid: 20000, status: 'Upcoming' },
-    { id: 'BK-12425', customer: 'Sunil Gavaskar', date: '2026-04-10', time: '07:30 PM', category: 'Breakfast', menuName: 'Sunrise Buffet', guests: 50, amount: 50000, paid: 15000, status: 'Upcoming' },
-    { id: 'BK-12426', customer: 'Kapil Dev', date: '2026-04-11', time: '08:00 PM', category: 'Dinner', menuName: 'Legendary Feast', guests: 100, amount: 90000, paid: 30000, status: 'Upcoming' },
-    { id: 'BK-12427', customer: 'Sachin Tendulkar', date: '2026-04-12', time: '01:00 PM', category: 'Lunch', menuName: 'Masterclass Menu', guests: 80, amount: 75000, paid: 25000, status: 'Upcoming' },
-    { id: 'BK-12428', customer: 'MS Dhoni', date: '2026-04-13', time: '07:00 PM', category: 'Dinner', menuName: 'Captain’s Choice', guests: 150, amount: 150000, paid: 50000, status: 'Upcoming' },
-    { id: 'BK-12429', customer: 'Virat Kohli', date: '2026-04-14', time: '08:30 PM', category: 'Dinner', menuName: 'Fitness Focused Buffet', guests: 60, amount: 60000, paid: 20000, status: 'Upcoming' },
-    { id: 'BK-12430', customer: 'Rohit Sharma', date: '2026-04-15', time: '01:30 PM', category: 'Lunch', menuName: 'Hitman Special', guests: 90, amount: 85000, paid: 25000, status: 'Upcoming' },
-    { id: 'BK-12431', customer: 'Hardik Pandya', date: '2026-04-16', time: '07:30 PM', category: 'Dinner', menuName: 'Vibrant Fusion', guests: 40, amount: 45000, paid: 15000, status: 'Upcoming' },
-    { id: 'BK-12432', customer: 'KL Rahul', date: '2026-04-17', time: '08:00 PM', category: 'Dinner', menuName: 'Modern Classic', guests: 25, amount: 30000, paid: 10000, status: 'Upcoming' },
+    { 
+      id: 'BK-12401', 
+      customer: 'Amit Khurana', 
+      date: new Date().toISOString().split('T')[0], 
+      time: '12:30 PM', 
+      category: 'Lunch', 
+      menuName: 'Premium Sadhya Menu', 
+      guests: 200, 
+      amount: 145000, 
+      paid: 43500, 
+      status: 'Preparing', 
+      address: '402, Skyline Residency, Sector 44, Bengaluru', 
+      taxType: 'B2B',
+      menuDetails: {
+        categories: [
+          { name: 'Starters', items: ['Hara Bhara Kabab', 'Paneer Tikka', 'Chilli Gobi', 'Veg Spring Roll'], status: 'All Items Included' },
+          { name: 'Main Course', items: ['Dal Makhani', 'Paneer Butter Masala', 'Mixed Veg Curry', 'Assorted Naan', 'Jeera Rice'], status: 'Customer Selected' },
+          { name: 'Desserts', items: ['Gulab Jamun', 'Vanilla Ice Cream with Chocolate Sauce', 'Fresh Fruit Salad'], status: 'All Items Included' }
+        ]
+      }
+    },
+    { 
+      id: 'BK-12402', 
+      customer: 'Bhavya Singh', 
+      date: new Date().toISOString().split('T')[0], 
+      time: '01:00 PM', 
+      category: 'Lunch', 
+      menuName: 'Traditional South Indian', 
+      guests: 120, 
+      amount: 95000, 
+      paid: 30000, 
+      status: 'Preparing', 
+      address: 'Plot 12, HSR Layout, 7th Sector, Bengaluru', 
+      taxType: 'B2C',
+      menuDetails: {
+        categories: [
+          { name: 'Starters', items: ['Medhu Vada', 'Mini Idli', 'Onion Pakoda'], status: 'All Items Included' },
+          { name: 'Main Course', items: ['Sambar Rice', 'Curd Rice', 'Avial', 'Poriyal', 'Appalam'], status: 'Customer Selected' },
+          { name: 'Desserts', items: ['Payasam', 'Banana Halwa'], status: 'All Items Included' }
+        ]
+      }
+    },
+    { 
+      id: 'BK-12405', 
+      customer: 'Siddharth Malhotra', 
+      date: '2026-03-22', 
+      time: '07:30 PM', 
+      category: 'Dinner', 
+      menuName: 'Executive Buffet', 
+      guests: 150, 
+      amount: 85000, 
+      paid: 25500, 
+      status: 'Upcoming', 
+      address: 'Apartment 701, Prestige Ferns Residency, Bellandur', 
+      taxType: 'B2B',
+      menuDetails: {
+        categories: [
+          { name: 'Starters', items: ['Chicken Tikka', 'Fish Finger', 'Veg Seekh Kabab'], status: 'Customer Selected' },
+          { name: 'Main Course', items: ['Butter Chicken', 'Mutton Rogan Josh', 'Dal Tadka', 'Garlic Naan'], status: 'Customer Selected' },
+          { name: 'Desserts', items: ['Shahi Tukda', 'Moong Dal Halwa'], status: 'All Items Included' }
+        ]
+      }
+    },
+    // Defaulting other bookings with a standard menu for now
+    { id: 'BK-12398', customer: 'Ananya Pandey', date: '2026-03-20', time: '04:30 PM', category: 'Snacks', menuName: 'High Tea Special', guests: 80, amount: 45000, paid: 13500, status: 'Completed', address: 'No. 34, 1st Cross, Indiranagar 2nd Stage', taxType: 'B2C', menuDetails: { categories: [{ name: 'Starters', items: ['Samosa', 'Chai', 'Cookies'], status: 'All Included' }] } },
+    { id: 'BK-12410', customer: 'Varun Dhawan', date: '2026-03-24', time: '08:00 PM', category: 'Dinner', menuName: 'Romantic Four-Course', guests: 12, amount: 15000, paid: 4500, status: 'Upcoming', address: 'Flat 4A, Green Meadows Appts, Koramangala', taxType: 'B2B', menuDetails: { categories: [{ name: 'Starters', items: ['Soup'], status: 'All Included' }] } },
+    { id: 'BK-12412', customer: 'Kareena Kapoor', date: '2026-03-25', time: '01:00 PM', category: 'Lunch', menuName: 'Healthy Salads & Juice', guests: 40, amount: 35000, paid: 10500, status: 'Upcoming', address: 'Villa 5, Sterling Villa Grande, Kadugodi', taxType: 'B2C', menuDetails: { categories: [{ name: 'Starters', items: ['Salad'], status: 'All Included' }] } },
+    { id: 'BK-12415', customer: 'Rajeev Mehta', date: '2026-03-26', time: '08:30 PM', category: 'Dinner', menuName: 'Royal North Indian', guests: 50, amount: 40000, paid: 12000, status: 'Upcoming', address: 'Villa 88, Palm Meadows, Whitefield', taxType: 'B2B', menuDetails: { categories: [{ name: 'Starters', items: ['Tikka'], status: 'All Included' }] } },
+    { id: 'BK-12416', customer: 'Divya Reddy', date: '2026-03-27', time: '12:00 PM', category: 'Lunch', menuName: 'Continental Feast', guests: 80, amount: 55000, paid: 15000, status: 'Upcoming', address: 'House 56, 12th Main, Jayanagar 4th Block', taxType: 'B2C', menuDetails: { categories: [{ name: 'Starters', items: ['Pasta'], status: 'All Included' }] } },
+    { id: 'BK-12417', customer: 'Sita Ram', date: '2026-03-28', time: '07:00 PM', category: 'Dinner', menuName: 'Family Thali Special', guests: 30, amount: 20000, paid: 6000, status: 'Upcoming', address: 'No. 15, Malleshwaram 18th Cross', taxType: 'B2C', menuDetails: { categories: [{ name: 'Starters', items: ['Thali Items'], status: 'All Included' }] } },
+    { id: 'BK-12418', customer: 'Arun Kumar', date: '2026-03-29', time: '01:30 PM', category: 'Lunch', menuName: 'Business Buffet', guests: 60, amount: 30000, paid: 9000, status: 'Upcoming', address: 'Apartment 204, Embassy Lake Terraces, Hebbal', taxType: 'B2B', menuDetails: { categories: [{ name: 'Starters', items: ['Paneer'], status: 'All Included' }] } },
+    { id: 'BK-12420', customer: 'Nisha Gupta', date: '2026-04-01', time: '08:00 PM', category: 'Dinner', menuName: 'Grand Wedding Feast', guests: 300, amount: 250000, paid: 75000, status: 'Upcoming', address: 'Leela Palace Grand Ballroom, Old Airport Road', taxType: 'B2B', menuDetails: { categories: [{ name: 'Starters', items: ['Many Items'], status: 'All Included' }] } },
+    { id: 'BK-12421', customer: 'Rahul Bose', date: '2026-04-02', time: '12:30 PM', category: 'Lunch', menuName: 'Office Gathering Menu', guests: 45, amount: 35000, paid: 10000, status: 'Upcoming', address: 'EcoWorld Block 8-B, Marathahalli-Sarjapur Outer Ring Road', taxType: 'B2C', menuDetails: { categories: [{ name: 'Starters', items: ['Office Snacks'], status: 'All Included' }] } },
+    { id: 'BK-12422', customer: 'Vikram Seth', date: '2026-04-03', time: '07:30 PM', category: 'Dinner', menuName: 'Corporate Banquet', guests: 100, amount: 120000, paid: 40000, status: 'Upcoming', address: 'Sheraton Grand, Whitefield Main Road', taxType: 'B2B', menuDetails: { categories: [{ name: 'Starters', items: ['Corporate Items'], status: 'All Included' }] } },
+    { id: 'BK-12423', customer: 'Meera Iyer', date: '2026-04-04', time: '01:00 PM', category: 'Lunch', menuName: 'Celebration Meal', guests: 20, amount: 15000, paid: 5000, status: 'Upcoming', address: 'Door No. 12, Benson Cross Road, Benson Town', taxType: 'B2C', menuDetails: { categories: [{ name: 'Starters', items: ['Celebration Snacks'], status: 'All Included' }] } },
+    { id: 'BK-12424', customer: 'Deepak Jain', date: '2026-04-05', time: '08:30 PM', category: 'Dinner', menuName: 'Party Platter Special', guests: 75, amount: 65000, paid: 20000, status: 'Upcoming', address: 'Mantri Elegance, Bannerghatta Road', taxType: 'B2C', menuDetails: { categories: [{ name: 'Starters', items: ['Party items'], status: 'All Included' }] } },
+    { id: 'BK-12425', customer: 'Sunil Gavaskar', date: '2026-04-10', time: '07:30 PM', category: 'Breakfast', menuName: 'Sunrise Buffet', guests: 50, amount: 50000, paid: 15000, status: 'Upcoming', address: 'G-05, Sobha Quartz, Sarjapur Main Road', taxType: 'B2B', menuDetails: { categories: [{ name: 'Starters', items: ['Breakfast items'], status: 'All Included' }] } },
+    { id: 'BK-12426', customer: 'Kapil Dev', date: '2026-04-11', time: '08:00 PM', category: 'Dinner', menuName: 'Legendary Feast', guests: 100, amount: 90000, paid: 30000, status: 'Upcoming', address: 'Lakeside Pavilion, Ulsoor Lake Area', taxType: 'B2B', menuDetails: { categories: [{ name: 'Starters', items: ['Feast items'], status: 'All Included' }] } },
+    { id: 'BK-12427', customer: 'Sachin Tendulkar', date: '2026-04-12', time: '01:00 PM', category: 'Lunch', menuName: 'Masterclass Menu', guests: 80, amount: 75000, paid: 25000, status: 'Upcoming', address: 'Godrej Woodsman Estate, Tower B, Bellary Road', taxType: 'B2C', menuDetails: { categories: [{ name: 'Starters', items: ['Master items'], status: 'All Included' }] } },
+    { id: 'BK-12428', customer: 'MS Dhoni', date: '2026-04-13', time: '07:00 PM', category: 'Dinner', menuName: 'Captain’s Choice', guests: 150, amount: 150000, paid: 50000, status: 'Upcoming', address: 'Flat 505, Salarpuria Sattva Magnificia, Old Madras Road', taxType: 'B2B', menuDetails: { categories: [{ name: 'Starters', items: ['Captain items'], status: 'All Included' }] } },
+    { id: 'BK-12429', customer: 'Virat Kohli', date: '2026-04-14', time: '08:30 PM', category: 'Dinner', menuName: 'Fitness Focused Buffet', guests: 60, amount: 60000, paid: 20000, status: 'Upcoming', address: 'Penthouse A, Brigade Exotica, Old Madras Road', taxType: 'B2B', menuDetails: { categories: [{ name: 'Starters', items: ['Fitness items'], status: 'All Included' }] } },
+    { id: 'BK-12430', customer: 'Rohit Sharma', date: '2026-04-15', time: '01:30 PM', category: 'Lunch', menuName: 'Hitman Special', guests: 90, amount: 85000, paid: 25000, status: 'Upcoming', address: 'Tower 2, Floor 15, Karle Town Centre, Nagavara', taxType: 'B2B', menuDetails: { categories: [{ name: 'Starters', items: ['Hitman items'], status: 'All Included' }] } },
+    { id: 'BK-12431', customer: 'Hardik Pandya', date: '2026-04-16', time: '07:30 PM', category: 'Dinner', menuName: 'Vibrant Fusion', guests: 40, amount: 45000, paid: 15000, status: 'Upcoming', address: 'House No. 9, Windmill on the Hills, Whitefield', taxType: 'B2B', menuDetails: { categories: [{ name: 'Starters', items: ['Fusion items'], status: 'All Included' }] } },
+    { id: 'BK-12432', customer: 'KL Rahul', date: '2026-04-17', time: '08:00 PM', category: 'Dinner', menuName: 'Modern Classic', guests: 25, amount: 30000, paid: 10000, status: 'Upcoming', address: 'Flat 302, Total Environment Learning to Fly, Jayanagar', taxType: 'B2C', menuDetails: { categories: [{ name: 'Starters', items: ['Classic items'], status: 'All Included' }] } },
   ]);
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -181,6 +502,7 @@ const MobileBookingsView = () => {
     status: 'All'
   });
   const [tempFilters, setTempFilters] = useState({ ...appliedFilters });
+  const [selectedDetail, setSelectedDetail] = useState<any>(null);
 
   const today = new Date().toISOString().split('T')[0];
   
@@ -242,6 +564,10 @@ const MobileBookingsView = () => {
   };
 
   const hasActiveAdvancedFilters = appliedFilters.fromDate || appliedFilters.toDate || appliedFilters.status !== 'All';
+
+  if (selectedDetail) {
+    return <MobileBookingDetailView booking={selectedDetail} onBack={() => setSelectedDetail(null)} />;
+  }
 
   return (
     <div className="mobile-scroller-v50">
@@ -331,7 +657,7 @@ const MobileBookingsView = () => {
       <div className="mobile-section-v50" style={{ marginTop: '0' }}>
         <div className="mobile-card-list-v50">
           {displayedBookings.map((b) => (
-            <div key={b.id} className="mobile-booking-card-v50">
+            <div key={b.id} className="mobile-booking-card-v50" onClick={() => setSelectedDetail(b)}>
               <div className="card-header-v50">
                 <div className="card-id-v50">
                   {b.id}

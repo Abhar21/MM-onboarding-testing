@@ -5503,20 +5503,24 @@ const BookingDetailModal = ({
                   }
 
                   return (
-                    <>
+                    <div className="payout-details-v11">
                       {isCancelled && (
-                        <div className="payout-row-small-v11 cancelled-by-row" style={{ color: '#ef4444' }}>
+                        <div className="payout-row-small-v11 cancelled-by-row" style={{ color: '#ef4444', marginBottom: '8px' }}>
                           <label>Cancelled By:</label>
                           <span style={{ fontWeight: 600 }}>{(booking as any).cancelledBy || 'Customer'}</span>
                         </div>
                       )}
                       <div className="payout-row-small-v11">
+                        <label>Payout:</label>
+                        <span className="value accent" style={{ color: '#4f46e5', fontWeight: 700 }}>₹{booking.paid.toLocaleString()}</span>
+                      </div>
+                      <div className="payout-row-small-v11">
                         <label>{label}</label>
-                        <span className={value.includes('under review') ? 'status-pill-v7 review' : ''} style={value.includes('under review') || value.includes('refund') ? { color: '#f59e0b', fontWeight: 600 } : {}}>{value}</span>
+                        <span className={value.includes('under review') ? 'status-pill-v7 review' : ''} style={value.includes('under review') || value.includes('refund') ? { color: '#f59e0b', fontWeight: 600 } : { fontWeight: 700 }}>{value}</span>
                       </div>
                       <div className="payout-row-small-v11">
                         <label>GST Month:</label>
-                        <span style={{ fontWeight: 600 }}>{
+                        <span style={{ fontWeight: 700 }}>{
                           (() => {
                             let d = new Date(booking.date);
                             if (isUpcoming && diffDays > 2) {
@@ -5531,7 +5535,7 @@ const BookingDetailModal = ({
                           })()
                         }</span>
                       </div>
-                    </>
+                    </div>
                   );
                 })()}
               </div>
