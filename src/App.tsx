@@ -2650,16 +2650,18 @@ const ServiceSettings = () => {
   };
 
   const applyToAllOpenDays = (sourceIndex: number) => {
-    const source = weeklySchedule[sourceIndex];
-    if (!source.isOpen) return;
-    setWeeklySchedule(weeklySchedule.map((day, idx) => {
-      if (idx === sourceIndex) return day;
-      return {
-        ...day,
-        openTime: source.openTime,
-        closeTime: source.closeTime
-      };
-    }));
+    setWeeklySchedule(prev => {
+      const source = prev[sourceIndex];
+      return prev.map((day, idx) => {
+        if (idx === sourceIndex) return day;
+        return {
+          ...day,
+          isOpen: source.isOpen,
+          openTime: source.openTime,
+          closeTime: source.closeTime
+        };
+      });
+    });
   };
 
   const [pauseBookings, setPauseBookings] = useState({
@@ -3947,59 +3949,59 @@ const ServiceSettings = () => {
 
                   <div className="availability-list" style={{ marginTop: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                     {weeklySchedule.map((day, index) => (
-                      <div key={day.day} className="availability-row-v4" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', padding: '1.25rem 0', borderBottom: '1px solid #f1f5f9' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-                          <div className="day-label-v4" style={{ fontWeight: '600', fontSize: '1rem', color: '#1e293b' }}>{day.day}</div>
+                      <div key={day.day} className="availability-row-v4" style={{ display: 'flex', alignItems: 'center', gap: '2rem', padding: '1.25rem 0', borderBottom: '1px solid #f1f5f9' }}>
+                        <div className="day-label-v4" style={{ fontWeight: '600', fontSize: '1rem', color: '#1e293b', minWidth: '110px' }}>{day.day}</div>
 
-                          <div className="status-toggle-wrapper-v4" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                            <label className="service-switch" style={{ margin: 0 }}>
-                              <input type="checkbox" checked={day.isOpen} onChange={(e) => handleScheduleChange(index, 'isOpen', e.target.checked)} />
-                              <span className="service-slider round" style={{ backgroundColor: day.isOpen ? '#22c55e' : '#e2e8f0' }}></span>
-                            </label>
-                            <span className="status-text-v4" style={{ color: day.isOpen ? '#22c55e' : '#94a3b8', fontWeight: '600', fontSize: '0.875rem' }}>
-                              {day.isOpen ? 'Open' : 'Closed'}
-                            </span>
-                          </div>
+                        <div className="status-toggle-wrapper-v4" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', minWidth: '90px' }}>
+                          <label className="service-switch" style={{ margin: 0 }}>
+                            <input type="checkbox" checked={day.isOpen} onChange={(e) => handleScheduleChange(index, 'isOpen', e.target.checked)} />
+                            <span className="service-slider round" style={{ backgroundColor: day.isOpen ? '#22c55e' : '#e2e8f0' }}></span>
+                          </label>
+                          <span className="status-text-v4" style={{ color: day.isOpen ? '#22c55e' : '#94a3b8', fontWeight: '600', fontSize: '0.875rem' }}>
+                            {day.isOpen ? 'Open' : 'Closed'}
+                          </span>
                         </div>
 
-                        <div className="time-inputs-container-v4" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', width: '100%', opacity: day.isOpen ? 1 : 0.5 }}>
-                          <div className={`time-input-group-v4 ${!day.isOpen ? 'disabled' : ''}`} style={{ flex: 1, minWidth: 0 }}>
-                            <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '1px solid #e2e8f0', borderRadius: '8px', backgroundColor: 'white', padding: '0.625rem 0.75rem', width: '100%' }}>
-                              <span style={{ fontSize: '0.9rem', color: '#1e293b', fontWeight: '500' }}>
+                        <div className="time-inputs-container-v4" style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flex: 1, opacity: day.isOpen ? 1 : 0.5 }}>
+                          <div className={`time-input-group-v4 ${!day.isOpen ? 'disabled' : ''}`} style={{ flex: 1 }}>
+                            <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '1px solid #e2e8f0', borderRadius: '8px', backgroundColor: 'white', padding: '0.75rem 1rem', width: '100%' }}>
+                              <span style={{ fontSize: '1rem', color: '#1e293b', fontWeight: '500' }}>
                                 {day.openTime ? (() => {
                                   const [h, m] = day.openTime.split(':');
                                   const hours = parseInt(h, 10);
                                   return `${(hours % 12 || 12).toString().padStart(2, '0')}:${m} ${hours >= 12 ? 'PM' : 'AM'}`;
                                 })() : '--:-- --'}
                               </span>
-                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2.5" style={{ flexShrink: 0, pointerEvents: 'none' }}><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2.5" style={{ flexShrink: 0, pointerEvents: 'none' }}><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
                               <input
                                 type="time"
                                 value={day.openTime}
                                 disabled={!day.isOpen}
                                 onChange={(e) => handleScheduleChange(index, 'openTime', e.target.value)}
+                                onClick={(e) => day.isOpen && typeof (e.target as any).showPicker === 'function' && (e.target as any).showPicker()}
                                 style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer' }}
                               />
                             </div>
                           </div>
 
-                          <span className="time-separator-v4" style={{ color: '#94a3b8', fontSize: '0.9rem', fontWeight: '600', minWidth: '15px', textAlign: 'center' }}>to</span>
+                          <span className="time-separator-v4" style={{ color: '#94a3b8', fontSize: '1rem', fontWeight: '600', minWidth: '20px', textAlign: 'center' }}>to</span>
 
-                          <div className={`time-input-group-v4 ${!day.isOpen ? 'disabled' : ''}`} style={{ flex: 1, minWidth: 0 }}>
-                            <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '1px solid #e2e8f0', borderRadius: '8px', backgroundColor: 'white', padding: '0.625rem 0.75rem', width: '100%' }}>
-                              <span style={{ fontSize: '0.95rem', color: '#1e293b', fontWeight: '500' }}>
+                          <div className={`time-input-group-v4 ${!day.isOpen ? 'disabled' : ''}`} style={{ flex: 1 }}>
+                            <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '1px solid #e2e8f0', borderRadius: '8px', backgroundColor: 'white', padding: '0.75rem 1rem', width: '100%' }}>
+                              <span style={{ fontSize: '1rem', color: '#1e293b', fontWeight: '500' }}>
                                 {day.closeTime ? (() => {
                                   const [h, m] = day.closeTime.split(':');
                                   const hours = parseInt(h, 10);
                                   return `${(hours % 12 || 12).toString().padStart(2, '0')}:${m} ${hours >= 12 ? 'PM' : 'AM'}`;
                                 })() : '--:-- --'}
                               </span>
-                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2.5" style={{ flexShrink: 0, pointerEvents: 'none' }}><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2.5" style={{ flexShrink: 0, pointerEvents: 'none' }}><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
                               <input
                                 type="time"
                                 value={day.closeTime}
                                 disabled={!day.isOpen}
                                 onChange={(e) => handleScheduleChange(index, 'closeTime', e.target.value)}
+                                onClick={(e) => day.isOpen && typeof (e.target as any).showPicker === 'function' && (e.target as any).showPicker()}
                                 style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer' }}
                               />
                             </div>
