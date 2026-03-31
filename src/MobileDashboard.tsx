@@ -785,6 +785,430 @@ const MobileBookingsView = () => {
   );
 };
 
+/* ─────────────────── MOBILE REPORTS VIEW ─────────────────── */
+
+const MobileRevenueView = () => {
+  const [selectedFY, setSelectedFY] = useState('FY 2025-26');
+  const [selectedMonth, setSelectedMonth] = useState('Mar');
+  const [selectedBar, setSelectedBar] = useState<number | null>(5); // Default highlight Mar
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+
+  const monthsList = ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar'];
+
+  const trendData = [
+    { month: 'Oct', revenue: 85000 },
+    { month: 'Nov', revenue: 92000 },
+    { month: 'Dec', revenue: 108000 },
+    { month: 'Jan', revenue: 125000 },
+    { month: 'Feb', revenue: 118000 },
+    { month: 'Mar', revenue: 135000 },
+  ];
+
+  const maxVal = Math.max(...trendData.map(d => d.revenue));
+
+  return (
+    <div className="mobile-revenue-container-v50">
+      {/* Single Row Filters */}
+      <div className="mobile-revenue-filters-v50">
+        <div className="filter-row-single-v50">
+          <select value={selectedFY} onChange={e => setSelectedFY(e.target.value)} className="rev-select-v50">
+            <option>FY '25-26</option>
+            <option>FY '24-25</option>
+          </select>
+          <select value={selectedMonth} onChange={e => setSelectedMonth(e.target.value)} className="rev-select-v50">
+            {monthsList.map(m => <option key={m} value={m}>{m}</option>)}
+          </select>
+        </div>
+      </div>
+
+      {/* KPI Hierarchy */}
+      <div className="mobile-rev-kpi-stack-v50">
+        <div className="rev-kpi-hero-card-v50">
+          <div className="hero-head-v50">
+            <div className="hero-title-group-v50">
+              <span className="label-v50">Total Revenue</span>
+            </div>
+          </div>
+          <div className="hero-value-v50">₹4,25,840</div>
+        </div>
+        
+        <div className="rev-kpi-secondary-row-v50">
+          <div className="rev-kpi-card-v51">
+            <label>Net Earnings</label>
+            <div className="val-v51">₹3,82,410</div>
+          </div>
+          <div className="rev-kpi-card-v51">
+            <label>Total Bookings</label>
+            <div className="val-v51">148</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Revenue Trend - Focused on Revenue Only */}
+      <div className="mobile-rev-trend-section-v51">
+        <div className="chart-header-v51">
+          <div className="header-left-v51">
+            <h3 className="chart-title-v51">Revenue Trend</h3>
+          </div>
+          <div className="best-month-mini-v51">
+            <label>Best Month</label>
+            <span className="val-v51">Jan ₹1,35,000</span>
+          </div>
+        </div>
+        
+        <div className="mobile-scrollable-chart-v50">
+          <div className="chart-viewport-v50">
+            {trendData.map((d, i) => {
+              const val = d.revenue;
+              const height = (val / (maxVal * 1.1)) * 100;
+              const isActive = selectedBar === i;
+              return (
+                <div 
+                  key={i} 
+                  className="chart-col-v51" 
+                  onClick={() => setSelectedBar(i === selectedBar ? null : i)}
+                >
+                  <div className="bar-track-v51">
+                    <div 
+                      className={`bar-fill-v51 ${isActive ? 'active' : ''}`} 
+                      style={{ height: `${height}%` }}
+                    >
+                      {isActive && (
+                        <div className="bar-tooltip-v51">
+                          ₹{d.revenue.toLocaleString()}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <span className={`bar-axis-label-v51 ${isActive ? 'active' : ''}`}>{d.month}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* Additional Refined Sections */}
+      <div className="mobile-rev-stats-grid-v51">
+        <div className="rev-card-v51">
+          <div className="card-head-v51">
+            <h4>Booking Performance</h4>
+          </div>
+          <div className="perf-summary-v51">
+            <div className="perf-metric-v51">
+              <label>Completed</label>
+              <span className="success">132</span>
+            </div>
+            <div className="perf-metric-v51">
+              <label>Cancelled</label>
+              <span className="danger">16</span>
+            </div>
+            <div className="perf-divider-v51"></div>
+            <div className="perf-metric-v51 conversion">
+              <label>Conversion Rate</label>
+              <span className="highlight">89.2%</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="rev-card-v51">
+          <div className="card-head-v51">
+            <h4>Revenue Breakdown</h4>
+          </div>
+          <div className="breakdown-v51">
+            <div className="breakdown-stat-v51">
+              <div className="label-bar-v51">
+                <span className="dot b2b"></span>
+                <label>B2B Revenue</label>
+              </div>
+              <span className="val-v51">₹3,25,000 (60%)</span>
+            </div>
+            <div className="breakdown-stat-v51">
+              <div className="label-bar-v51">
+                <span className="dot b2c"></span>
+                <label>B2C Revenue</label>
+              </div>
+              <span className="val-v51">₹2,16,666 (40%)</span>
+            </div>
+            <div className="rev-progress-v51">
+              <div className="fill-v51 b2b" style={{ width: '60%' }}></div>
+              <div className="fill-v51 b2c" style={{ width: '40%' }}></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Payout Summary */}
+      <div className="mobile-rev-action-card-v51">
+        <div className="card-head-v51">
+          <h4>Payout Summary</h4>
+          <button className="text-link-v51" onClick={() => setIsHistoryOpen(true)}>
+            History <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </button>
+        </div>
+        <div className="payout-stack-v50">
+          <div className="payout-card-v50 paid">
+            <label className="payout-label-v50">PAID PAYOUT</label>
+            <div className="payout-val-v50">₹3,25,000</div>
+            <div className="payout-badge-v50">CREDITED TO YOUR BANK</div>
+          </div>
+          <div className="payout-card-v50 upcoming">
+            <label className="payout-label-v50">UPCOMING PAYOUT</label>
+            <div className="payout-val-v50">₹65,850</div>
+            <div className="payout-badge-v50">FROM 4 BOOKINGS</div>
+          </div>
+          <div className="payout-card-v50 processing">
+            <label className="payout-label-v50">PROCESSING PAYOUT</label>
+            <div className="payout-val-v50">₹35,000</div>
+            <div className="payout-badge-v50">PROCESSING (1-2 DAYS)</div>
+          </div>
+        </div>
+      </div>
+
+      
+      <div className="rev-footnote-v51">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+        <span>Revenue is based on completed event checkouts.</span>
+      </div>
+
+      {/* Payout History Sheet */}
+      {isHistoryOpen && (
+        <MobilePayoutHistorySheet 
+          onClose={() => setIsHistoryOpen(false)} 
+          defaultMonth={selectedMonth}
+        />
+      )}
+    </div>
+  );
+};
+
+/* ─────────────────── MOBILE PAYOUT HISTORY SHEET ─────────────────── */
+const MobilePayoutHistorySheet = ({ onClose, defaultMonth }: { onClose: () => void, defaultMonth: string }) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('All');
+  const [visibleCount, setVisibleCount] = useState(5);
+  const [viewMode, setViewMode] = useState<'list' | 'detail'>('list');
+  const [activePayout, setActivePayout] = useState<any>(null);
+
+  const mockPayouts = [
+    { id: 'BK-9824', payoutDate: '25 Mar 2024', eventDate: '21 Mar 2024', amount: 45000, tds: 4500, net: 40500, status: 'Credited', bankRefId: 'TXN-982411' },
+    { id: 'BK-9825', payoutDate: '26 Mar 2024', eventDate: '20 Mar 2024', amount: 32000, tds: 3200, net: 28800, status: 'Processing', bankRefId: 'TXN-982512' },
+    { id: 'BK-9826', payoutDate: '27 Mar 2024', eventDate: '18 Mar 2024', amount: 15000, tds: 1500, net: 13500, status: 'Upcoming', bankRefId: 'TXN-982613' },
+    { id: 'BK-9827', payoutDate: '28 Mar 2024', eventDate: '15 Mar 2024', amount: 55000, tds: 5500, net: 49500, status: 'Processing', bankRefId: 'TXN-982714' },
+  ];
+
+  const filtered = mockPayouts.filter(p => {
+    const matchesSearch = p.id.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === 'All' || p.status === statusFilter;
+    const matchesMonth = defaultMonth === 'All' || p.payoutDate.includes(defaultMonth);
+    return matchesSearch && matchesStatus && matchesMonth;
+  });
+
+  const displayed = filtered.slice(0, visibleCount);
+
+  const handleViewDetails = (p: any) => {
+    setActivePayout(p);
+    setViewMode('detail');
+  };
+
+  const handleBackToList = () => {
+    setViewMode('list');
+    setActivePayout(null);
+  };
+
+  return (
+    <div className="mobile-sheet-overlay-v50" onClick={onClose}>
+      <div className="mobile-payout-history-sheet-v50" onClick={e => e.stopPropagation()}>
+        {/* Conditional Header */}
+        <div className="sheet-header-v50">
+          {viewMode === 'list' ? (
+            <div className="header-info-v50">
+              <span className="sheet-title-v50">Payout History</span>
+              <p className="sheet-subtext-v50">View and download payout details</p>
+            </div>
+          ) : (
+            <div className="sheet-header-title-row-v51">
+              <button className="sheet-back-btn-v51" onClick={handleBackToList}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+              </button>
+              <span className="sheet-title-v50">Payout Breakdown</span>
+            </div>
+          )}
+          <button className="sheet-close-v50" onClick={onClose}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </div>
+
+        {viewMode === 'list' ? (
+          <>
+            <div className="sheet-controls-v50">
+              <div className="search-box-v50">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input 
+                  type="text" 
+                  placeholder="Search Booking ID..." 
+                  value={searchTerm}
+                  onChange={e => setSearchTerm(e.target.value)}
+                />
+              </div>
+              <div className="filter-row-v50" style={{ justifyContent: 'space-between' }}>
+                <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} style={{ width: '100%' }}>
+                  <option value="All">All Status</option>
+                  <option value="Credited">Credited</option>
+                  <option value="Processing">Processing</option>
+                  <option value="Upcoming">Upcoming</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="payout-card-list-v50">
+              {displayed.map(p => (
+                <div key={p.id} className="payout-history-card-v50">
+                  <div className="card-top-v50">
+                    <span className="booking-id-v50">{p.id}</span>
+                    <span className={`status-badge-v50 ${p.status.toLowerCase()}`}>{p.status}</span>
+                  </div>
+                  
+                  <div className="card-stats-grid-v50">
+                    <div className="stat-item-v50">
+                      <label>Payout Date</label>
+                      <span>{p.payoutDate}</span>
+                    </div>
+                    <div className="stat-item-v50">
+                      <label>Event Date</label>
+                      <span>{p.eventDate}</span>
+                    </div>
+                    <div className="stat-item-v50">
+                      <label>Amount</label>
+                      <span>₹{p.amount.toLocaleString()}</span>
+                    </div>
+                    <div className="stat-item-v50">
+                      <label>TDS (1%)</label>
+                      <span>₹{p.tds.toLocaleString()}</span>
+                    </div>
+                  </div>
+
+                  <div className="card-highlight-v50">
+                    <label>Net Credited Amount</label>
+                    <div className="net-amount-v50">₹{p.net.toLocaleString()}</div>
+                  </div>
+
+                  <div className="card-actions-v50">
+                    <button className="action-btn-v50 view" onClick={() => handleViewDetails(p)}>View</button>
+                    <button 
+                      className={`action-btn-v50 download ${p.status !== 'Credited' ? 'disabled' : ''}`}
+                      disabled={p.status !== 'Credited'}
+                    >
+                      Download
+                    </button>
+                  </div>
+                </div>
+              ))}
+
+              {filtered.length > visibleCount && (
+                <button className="load-more-history-v50" onClick={() => setVisibleCount(visibleCount + 10)}>
+                  Load More Payouts
+                </button>
+              )}
+
+              {filtered.length === 0 && (
+                <div className="empty-history-v50">
+                  <p>No payout matching your search/filters.</p>
+                </div>
+              )}
+            </div>
+          </>
+        ) : (
+          /* Payout Breakdown Detail View */
+          <div className="payout-detail-container-v50">
+            <div className="payout-breakdown-top-v51">
+              <div className="grid-item-v51">
+                <label>BOOKING ID</label>
+                <span className="booking-id-large-v51">{activePayout.id}</span>
+              </div>
+              <div className="grid-item-v51 align-right">
+                <label>STATUS</label>
+                <span className={`status-badge-v50 large ${activePayout.status.toLowerCase()}`}>{activePayout.status}</span>
+              </div>
+            </div>
+
+            <div className="payout-breakdown-main-v51">
+              <div className="breakdown-row-v51">
+                <label>Booking Amount</label>
+                <span>₹{activePayout.amount.toLocaleString()}</span>
+              </div>
+              <div className="breakdown-row-v51">
+                <label>TDS Deducted (10%)</label>
+                <span>₹{activePayout.tds.toLocaleString()}</span>
+              </div>
+              <div className="breakdown-divider-v51"></div>
+              <div className="breakdown-row-v51 highlight">
+                <label>Net Credited</label>
+                <span className="net-credited-value-v51">₹{activePayout.net.toLocaleString()}</span>
+              </div>
+            </div>
+
+            <div className="payout-breakdown-bottom-v51">
+              <div className="breakdown-row-v51">
+                <label>Bank Reference ID</label>
+                <span className="bold-v51">{activePayout.bankRefId}</span>
+              </div>
+              <div className="breakdown-row-v51">
+                <label>Date of Transfer</label>
+                <span className="bold-v51">{activePayout.payoutDate}</span>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const MobileReportsView = () => {
+  const [activeTab, setActiveTab] = useState('revenue');
+
+  return (
+    <div className="mobile-reports-page-v50">
+      <div className="reports-primary-header-v51">
+        <h1>Reports</h1>
+      </div>
+      <div className="reports-tab-nav-v50">
+        <button 
+          className={`report-nav-item-v50 ${activeTab === 'revenue' ? 'active' : ''}`}
+          onClick={() => setActiveTab('revenue')}
+        >
+          Revenue
+        </button>
+        <button 
+          className={`report-nav-item-v50 ${activeTab === 'gst' ? 'active' : ''}`}
+          onClick={() => setActiveTab('gst')}
+        >
+          GST
+        </button>
+        <button 
+          className={`report-nav-item-v50 ${activeTab === 'tds' ? 'active' : ''}`}
+          onClick={() => setActiveTab('tds')}
+        >
+          TDS
+        </button>
+      </div>
+
+      <div className="report-view-content-v50">
+        {activeTab === 'revenue' ? (
+          <MobileRevenueView />
+        ) : (
+          <div className="report-coming-soon-v51">
+            <div className="icon-v51">📊</div>
+            <h4>{activeTab.toUpperCase()} Reports</h4>
+            <p>We're polishing this view for you.</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
 /* ─────────────────── MOBILE DASHBOARD WRAPPER ─────────────────── */
 interface MobileDashboardProps {
   activeTab: string;
@@ -835,6 +1259,8 @@ const MobileDashboard: React.FC<MobileDashboardProps> = ({
         <MobileHomeView setActiveTab={setActiveTab} />
       ) : activeTab === 'bookings' ? (
         <MobileBookingsView />
+      ) : activeTab === 'reports' ? (
+        <MobileReportsView />
       ) : (
         <div className="mobile-scroller-v50" style={{ textAlign: 'center', color: '#64748b', paddingTop: '100px' }}>
           <p>Mobile view for <strong>{activeTab}</strong> component coming soon...</p>

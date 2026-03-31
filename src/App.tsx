@@ -8543,11 +8543,6 @@ const RevenueAnalytics = ({
                 <p className={isHero ? "rev-hero-label-v22" : "rev-refined-label-v22"}>{card.label}</p>
               </div>
               <div className={isHero ? "rev-hero-value-v22" : "rev-refined-value-v22"}>{card.value}</div>
-              {card.growth && (
-                <div className={`rev-hero-growth-badge-v22 ${card.trend || 'up'}`}>
-                  {card.growth} {card.trend === 'up' ? '↑' : '↓'} <span>vs last month</span>
-                </div>
-              )}
             </div>
           );
         })}
@@ -8560,10 +8555,6 @@ const RevenueAnalytics = ({
           <div className="chart-header-v25">
             <div className="header-left-v25">
               <h3>Revenue Trend</h3>
-              <div className="stats-pill-v25">
-                <span>Last 12 Months</span>
-                <span className="pill-trend-v25">↑ +8% vs last month</span>
-              </div>
             </div>
             <div className="best-month-card-v25">
               <div className="card-label-v25">Best Month</div>
