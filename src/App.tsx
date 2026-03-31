@@ -2632,10 +2632,37 @@ const Settings = ({
 };
 
 
-const ServiceSettings = () => {
+const ServiceSettings = ({
+  menus,
+  setMenus,
+  isAddingMenu,
+  setIsAddingMenu,
+  menuIdentity,
+  setMenuIdentity,
+  sections,
+  setSections,
+  currentSection,
+  setCurrentSection,
+  isAddingSection,
+  setIsAddingSection,
+  menuStep,
+  setMenuStep,
+  sectionEditingIndex,
+  setSectionEditingIndex,
+  menuActionId,
+  setMenuActionId,
+  selectedMenuAction,
+  setSelectedMenuAction,
+  menuEditingId,
+  setMenuEditingId,
+  handleImageUpload,
+  handleSaveSection,
+  resetAddMenu
+}: any) => {
   const [activeCategory, setActiveCategory] = useState('breakfast');
   const [isEditingService, setIsEditingService] = useState(false);
   const [tempSettings, setTempSettings] = useState<any>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleCategoryChange = (catId: string) => {
     setActiveCategory(catId);
@@ -2788,96 +2815,6 @@ const ServiceSettings = () => {
   const [overlapError, setOverlapError] = useState<string | null>(null);
   const [dietFilter, setDietFilter] = useState('All');
 
-  const [menus, setMenus] = useState([
-    {
-      id: 1, name: 'Standard Breakfast', price: 250, status: 'Active', category: 'breakfast',
-      minMembers: '20', maxMembers: '100', dietType: 'Veg', image: null as string | null,
-      sections: [
-        { name: 'Starters', type: 'All Included', limit: 0, items: [{ name: 'Idli', description: 'Steamed rice cakes', image: null as string | null }] }
-      ]
-    },
-    {
-      id: 2, name: 'Premium Lunch Buffet', price: 650, status: 'Active', category: 'lunch',
-      minMembers: '50', maxMembers: '200', dietType: 'Veg', image: null as string | null,
-      sections: []
-    },
-    {
-      id: 3, name: 'Evening Hi-Tea', price: 180, status: 'Disabled', category: 'snacks',
-      minMembers: '15', maxMembers: '50', dietType: 'Veg', image: null as string | null,
-      sections: []
-    },
-  ]);
-
-  const [isAddingMenu, setIsAddingMenu] = useState(false);
-  const [menuIdentity, setMenuIdentity] = useState({
-    name: '',
-    image: null as string | null,
-    dietType: 'Veg',
-    price: '',
-    minMembers: '',
-    maxMembers: ''
-  });
-  const [sections, setSections] = useState<any[]>([]);
-  const [currentSection, setCurrentSection] = useState({
-    name: '',
-    type: 'All Included',
-    items: [] as any[], // Changed to array of objects
-    limit: 0
-  });
-  const [isAddingSection, setIsAddingSection] = useState(false);
-  const [menuStep, setMenuStep] = useState(1);
-  const [sectionEditingIndex, setSectionEditingIndex] = useState<number | null>(null);
-  const [menuActionId, setMenuActionId] = useState<number | null>(null);
-  const [selectedMenuAction, setSelectedMenuAction] = useState<'hide' | 'delete' | null>(null);
-  const [menuEditingId, setMenuEditingId] = useState<number | null>(null);
-
-  // States for item-level creation
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setMenuIdentity(prev => ({ ...prev, image: reader.result as string }));
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-
-  const handleSaveSection = () => {
-    if (sectionEditingIndex !== null) {
-      setSections(prev => {
-        const newSections = [...prev];
-        newSections[sectionEditingIndex] = currentSection;
-        return newSections;
-      });
-    } else {
-      setSections(prev => [...prev, currentSection]);
-    }
-    setCurrentSection({ name: '', type: 'All Included', items: [], limit: 0 });
-    setIsAddingSection(false);
-    setSectionEditingIndex(null);
-  };
-
-  const resetAddMenu = () => {
-    setIsAddingMenu(false);
-    setMenuStep(1);
-    setMenuIdentity({
-      name: '',
-      image: null,
-      dietType: 'Veg',
-      price: '',
-      minMembers: '',
-      maxMembers: ''
-    });
-    setSections([]);
-    setCurrentSection({ name: '', type: 'All Included', items: [], limit: 0 });
-    setIsAddingSection(false);
-    setSectionEditingIndex(null);
-    setMenuEditingId(null);
-  };
 
   const currentSettings = isEditingService ? tempSettings : settings[activeCategory as keyof typeof settings];
 
@@ -2907,7 +2844,7 @@ const ServiceSettings = () => {
   };
 
 
-  const totalItemsCount = sections.reduce((acc, sec) => acc + (sec.items?.length || 0), 0);
+  const totalItemsCount = sections.reduce((acc: number, sec: any) => acc + (sec.items?.length || 0), 0);
 
 
   // Compute min/max time constraints based on other services' occupied ranges
@@ -3290,7 +3227,7 @@ const ServiceSettings = () => {
                   </div>
 
                   <div className="menu-list">
-                    {menus.filter(m => m.category === activeCategory && (dietFilter === 'All' || m.dietType === dietFilter)).map(menu => (
+                    {menus.filter((m: any) => m.category === activeCategory && (dietFilter === 'All' || m.dietType === dietFilter)).map((menu: any) => (
                       <div key={menu.id} className="menu-card">
                         <div className="menu-card-header">
                           <div className="menu-header-left">
@@ -3375,7 +3312,7 @@ const ServiceSettings = () => {
                           <div className="modal-content" style={{ padding: '0 1.5rem 1.5rem' }}>
                             <div className="action-options-modal">
                               {(() => {
-                                const menu = menus.find(m => m.id === menuActionId);
+                                const menu = menus.find((m: any) => m.id === menuActionId);
                                 if (!menu) return null;
                                 return (
                                   <>
@@ -3421,22 +3358,22 @@ const ServiceSettings = () => {
                                 style={{ minWidth: '120px' }}
                                 onClick={() => {
                                   if (selectedMenuAction === 'hide') {
-                                    setMenus(menus.map(m => m.id === menuActionId ? { ...m, status: m.status === 'Disabled' ? 'Active' : 'Disabled' } : m));
+                                    setMenus(menus.map((m: any) => m.id === menuActionId ? { ...m, status: m.status === 'Disabled' ? 'Active' : 'Disabled' } : m));
                                   } else if (selectedMenuAction === 'delete') {
-                                    setMenus(menus.filter(m => m.id !== menuActionId));
+                                    setMenus(menus.filter((m: any) => m.id !== menuActionId));
                                   }
                                   setMenuActionId(null);
                                   setSelectedMenuAction(null);
                                 }}
                               >
-                                {!selectedMenuAction ? 'Okay' : (selectedMenuAction === 'delete' ? 'Delete Menu' : (menus.find(m => m.id === menuActionId)?.status === 'Disabled' ? 'Show Menu' : 'Hide Menu'))}
+                                {!selectedMenuAction ? 'Okay' : (selectedMenuAction === 'delete' ? 'Delete Menu' : (menus.find((m: any) => m.id === menuActionId)?.status === 'Disabled' ? 'Show Menu' : 'Hide Menu'))}
                               </button>
                             </div>
                           </div>
                         </div>
                       </div>
                     )}
-                    {menus.filter(m => m.category === activeCategory).length === 0 && (
+                    {menus.filter((m: any) => m.category === activeCategory).length === 0 && (
                       <div className="empty-menu-state">
                         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z"></path><path d="M3 9V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4"></path><path d="M13 13h4"></path><path d="M13 17h4"></path><path d="M7 13h2v4H7z"></path></svg>
                         <p>No menus added for this category yet.</p>
@@ -3485,7 +3422,7 @@ const ServiceSettings = () => {
                               className="input-field"
                               placeholder="e.g. Standard Breakfast"
                               value={menuIdentity.name}
-                              onChange={(e) => setMenuIdentity(prev => ({ ...prev, name: e.target.value }))}
+                              onChange={(e) => setMenuIdentity((prev: any) => ({ ...prev, name: e.target.value }))}
                             />
                           </div>
                         </div>
@@ -3498,7 +3435,7 @@ const ServiceSettings = () => {
                                 <button
                                   key={type}
                                   className={`pill-btn ${type === 'Veg' ? 'pill-veg' : 'pill-non-veg'} ${menuIdentity.dietType === type ? 'active' : ''}`}
-                                  onClick={() => setMenuIdentity(prev => ({ ...prev, dietType: type }))}
+                                  onClick={() => setMenuIdentity((prev: any) => ({ ...prev, dietType: type }))}
                                 >
                                   <span className="pill-icon">
                                     <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="0.5" y="0.5" width="11" height="11" rx="1.5" stroke="currentColor" /><circle cx="6" cy="6" r="3" fill="currentColor" /></svg>
@@ -3518,7 +3455,7 @@ const ServiceSettings = () => {
                                 className="input-field pill-input"
                                 placeholder="0"
                                 value={menuIdentity.price}
-                                onChange={(e) => setMenuIdentity(prev => ({ ...prev, price: e.target.value }))}
+                                onChange={(e) => setMenuIdentity((prev: any) => ({ ...prev, price: e.target.value }))}
                               />
                             </div>
                           </div>
@@ -3531,7 +3468,7 @@ const ServiceSettings = () => {
                                 className="input-field"
                                 placeholder="Min pax"
                                 value={menuIdentity.minMembers}
-                                onChange={(e) => setMenuIdentity(prev => ({ ...prev, minMembers: e.target.value }))}
+                                onChange={(e) => setMenuIdentity((prev: any) => ({ ...prev, minMembers: e.target.value }))}
                               />
                               <span className="helper-text-label">Applicable booking size for this menu</span>
                             </div>
@@ -3542,7 +3479,7 @@ const ServiceSettings = () => {
                                 className="input-field"
                                 placeholder="Max pax"
                                 value={menuIdentity.maxMembers}
-                                onChange={(e) => setMenuIdentity(prev => ({ ...prev, maxMembers: e.target.value }))}
+                                onChange={(e) => setMenuIdentity((prev: any) => ({ ...prev, maxMembers: e.target.value }))}
                               />
                               <span className="helper-text-label">Applicable booking size for this menu</span>
                             </div>
@@ -3620,7 +3557,7 @@ const ServiceSettings = () => {
                       )}
 
                       <div className="saved-sections-list">
-                        {sections.map((sec, idx) => {
+                        {sections.map((sec: any, idx: number) => {
                           if (idx === sectionEditingIndex) return null;
                           return (
                             <div key={idx} className="section-summary-card">
@@ -3639,7 +3576,7 @@ const ServiceSettings = () => {
                                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                                 </button>
                                 <button className="icon-btn delete-btn" onClick={() => {
-                                  setSections(sections.filter((_, i) => i !== idx));
+                                  setSections(sections.filter((_: any, i: number) => i !== idx));
                                 }}>
                                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                                 </button>
@@ -3673,7 +3610,7 @@ const ServiceSettings = () => {
                                 className="input-field"
                                 placeholder="e.g. Starters"
                                 value={currentSection.name}
-                                onChange={(e) => setCurrentSection(prev => ({ ...prev, name: e.target.value }))}
+                                onChange={(e) => setCurrentSection((prev: any) => ({ ...prev, name: e.target.value }))}
                               />
                             </div>
 
@@ -3683,7 +3620,7 @@ const ServiceSettings = () => {
                                 <select
                                   className="input-field"
                                   value={currentSection.type}
-                                  onChange={(e) => setCurrentSection(prev => ({ ...prev, type: e.target.value }))}
+                                  onChange={(e) => setCurrentSection((prev: any) => ({ ...prev, type: e.target.value }))}
                                 >
                                   <option>All Included</option>
                                   <option>Limited Selection</option>
@@ -3697,7 +3634,7 @@ const ServiceSettings = () => {
                                   placeholder="0"
                                   disabled={currentSection.type === 'All Included'}
                                   value={currentSection.limit || ''}
-                                  onChange={(e) => setCurrentSection(prev => ({ ...prev, limit: parseInt(e.target.value) || 0 }))}
+                                  onChange={(e) => setCurrentSection((prev: any) => ({ ...prev, limit: parseInt(e.target.value) || 0 }))}
                                 />
                               </div>
                             </div>
@@ -3706,7 +3643,7 @@ const ServiceSettings = () => {
                           <div className="items-area-inline">
                             <label className="input-label">Items in this Section</label>
                             <div className="item-cards-list">
-                              {currentSection.items.map((item, i) => (
+                              {currentSection.items.map((item: any, i: number) => (
                                 <div key={i} className="section-item-row-v5">
                                   {/* ... contents ... */}
                                   <div className="item-photo-column-v5">
@@ -3721,7 +3658,7 @@ const ServiceSettings = () => {
                                           reader.onloadend = () => {
                                             const newItems = [...currentSection.items];
                                             newItems[i].image = reader.result as string;
-                                            setCurrentSection(prev => ({ ...prev, items: newItems }));
+                                            setCurrentSection((prev: any) => ({ ...prev, items: newItems }));
                                           };
                                           reader.readAsDataURL(file);
                                         }
@@ -3749,7 +3686,7 @@ const ServiceSettings = () => {
                                         onChange={(e) => {
                                           const newItems = [...currentSection.items];
                                           newItems[i].name = e.target.value;
-                                          setCurrentSection(prev => ({ ...prev, items: newItems }));
+                                          setCurrentSection((prev: any) => ({ ...prev, items: newItems }));
                                         }}
                                       />
                                     </div>
@@ -3762,7 +3699,7 @@ const ServiceSettings = () => {
                                         onChange={(e) => {
                                           const newItems = [...currentSection.items];
                                           newItems[i].description = e.target.value;
-                                          setCurrentSection(prev => ({ ...prev, items: newItems }));
+                                          setCurrentSection((prev: any) => ({ ...prev, items: newItems }));
                                         }}
                                       />
                                     </div>
@@ -3770,7 +3707,7 @@ const ServiceSettings = () => {
 
                                   {currentSection.items.length > 1 && (
                                     <button className="item-remove-btn-v5" onClick={() => {
-                                      setCurrentSection(prev => ({ ...prev, items: prev.items.filter((_, idx) => idx !== i) }));
+                                      setCurrentSection((prev: any) => ({ ...prev, items: prev.items.filter((_: any, idx: number) => idx !== i) }));
                                     }}>
                                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                                     </button>
@@ -3782,7 +3719,7 @@ const ServiceSettings = () => {
                             <button
                               className="add-item-btn-inline"
                               onClick={() => {
-                                setCurrentSection(prev => ({
+                                setCurrentSection((prev: any) => ({
                                   ...prev,
                                   items: [...prev.items, { name: '', description: '', image: null }]
                                 }));
@@ -3834,7 +3771,7 @@ const ServiceSettings = () => {
                         </div>
 
                         <div className="preview-sections-v5">
-                          {sections.map((sec, idx) => (
+                          {sections.map((sec: any, idx: number) => (
                             <div key={idx} className="preview-section-block-v5">
                               <div className="p-sec-header-v5">
                                 <h5 className="p-sec-title-v5">{sec.name}</h5>
@@ -3863,13 +3800,13 @@ const ServiceSettings = () => {
                   </div>
                   <div className="footer-right">
                     {menuStep > 1 && (
-                      <button className="btn btn-outline" onClick={() => setMenuStep(prev => prev - 1)}>Back</button>
+                      <button className="btn btn-outline" onClick={() => setMenuStep((prev: number) => prev - 1)}>Back</button>
                     )}
 
                     {menuStep < 3 ? (
                       <button
                         className="btn btn-primary-blue"
-                        onClick={() => setMenuStep(prev => prev + 1)}
+                        onClick={() => setMenuStep((prev: number) => prev + 1)}
                         disabled={menuStep === 1 && !menuIdentity.name}
                       >
                         Next
@@ -3879,7 +3816,7 @@ const ServiceSettings = () => {
                         className="btn btn-primary-blue"
                         onClick={() => {
                           if (menuEditingId) {
-                            setMenus(prev => prev.map(m => m.id === menuEditingId ? {
+                            setMenus((prev: any[]) => prev.map((m: any) => m.id === menuEditingId ? {
                               ...m,
                               name: menuIdentity.name,
                               price: parseInt(menuIdentity.price) || 0,
@@ -3902,7 +3839,7 @@ const ServiceSettings = () => {
                               image: menuIdentity.image,
                               sections: [...sections]
                             };
-                            setMenus(prev => [...prev, newMenuObj]);
+                            setMenus((prev: any[]) => [...prev, newMenuObj]);
                           }
                           resetAddMenu();
                         }}
@@ -7187,6 +7124,96 @@ const HomeView = ({ setActiveTab }: { setActiveTab: (tab: string) => void }) => 
 /* ─────────────────── DASHBOARD ─────────────────── */
 const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
   const isMobile = useIsMobile();
+
+  // Menu Creation Shared State (Internal to Dashboard)
+  const [menus, setMenus] = useState<any[]>([
+    {
+      id: 1, name: 'Standard Breakfast', price: 250, status: 'Active', category: 'breakfast',
+      minMembers: '20', maxMembers: '100', dietType: 'Veg', image: null as string | null,
+      sections: [
+        { name: 'Starters', type: 'All Included', limit: 0, items: [{ name: 'Idli', description: 'Steamed rice cakes', image: null as string | null }] }
+      ]
+    },
+    {
+      id: 2, name: 'Premium Lunch Buffet', price: 650, status: 'Active', category: 'lunch',
+      minMembers: '50', maxMembers: '200', dietType: 'Veg', image: null as string | null,
+      sections: []
+    },
+    {
+      id: 3, name: 'Evening Hi-Tea', price: 180, status: 'Disabled', category: 'snacks',
+      minMembers: '15', maxMembers: '50', dietType: 'Veg', image: null as string | null,
+      sections: []
+    },
+  ]);
+
+  const [isAddingMenu, setIsAddingMenu] = useState(false);
+  const [menuIdentity, setMenuIdentity] = useState({
+    name: '',
+    image: null as string | null,
+    dietType: 'Veg',
+    price: '',
+    minMembers: '',
+    maxMembers: ''
+  });
+  const [sections, setSections] = useState<any[]>([]);
+  const [currentSection, setCurrentSection] = useState({
+    name: '',
+    type: 'All Included',
+    items: [] as any[],
+    limit: 0
+  });
+  const [isAddingSection, setIsAddingSection] = useState(false);
+  const [menuStep, setMenuStep] = useState(1);
+  const [sectionEditingIndex, setSectionEditingIndex] = useState<number | null>(null);
+  const [menuActionId, setMenuActionId] = useState<number | null>(null);
+  const [selectedMenuAction, setSelectedMenuAction] = useState<'hide' | 'delete' | null>(null);
+  const [menuEditingId, setMenuEditingId] = useState<number | null>(null);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setMenuIdentity(prev => ({ ...prev, image: reader.result as string }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSaveSection = () => {
+    if (sectionEditingIndex !== null) {
+      setSections((prev: any[]) => {
+        const newSections = [...prev];
+        newSections[sectionEditingIndex] = currentSection;
+        return newSections;
+      });
+    } else {
+      setSections((prev: any[]) => [...prev, currentSection]);
+    }
+    setCurrentSection({ name: '', type: 'All Included', items: [], limit: 0 });
+    setIsAddingSection(false);
+    setSectionEditingIndex(null);
+  };
+
+  const resetAddMenu = () => {
+    setIsAddingMenu(false);
+    setMenuStep(1);
+    setMenuIdentity({
+      name: '',
+      image: null,
+      dietType: 'Veg',
+      price: '',
+      minMembers: '',
+      maxMembers: ''
+    });
+    setSections([]);
+    setCurrentSection({ name: '', type: 'All Included', items: [], limit: 0 });
+    setIsAddingSection(false);
+    setSectionEditingIndex(null);
+    setMenuEditingId(null);
+  };
   const [profileData, setProfileData] = useState<ProfileData>({
     header: {
       name: 'Catering Enterprise 3',
@@ -7394,6 +7421,28 @@ const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
         profileData={profileData}
         navigationGroups={navigationGroups}
         onLogout={() => navigate('/login')}
+        // Menu Creation Props
+        isAddingMenu={isAddingMenu}
+        setIsAddingMenu={setIsAddingMenu}
+        menuStep={menuStep}
+        setMenuStep={setMenuStep}
+        menuIdentity={menuIdentity}
+        setMenuIdentity={setMenuIdentity}
+        sections={sections}
+        setSections={setSections}
+        isAddingSection={isAddingSection}
+        setIsAddingSection={setIsAddingSection}
+        currentSection={currentSection}
+        setCurrentSection={setCurrentSection}
+        sectionEditingIndex={sectionEditingIndex}
+        setSectionEditingIndex={setSectionEditingIndex}
+        resetAddMenu={resetAddMenu}
+        handleImageUpload={handleImageUpload}
+        handleSaveSection={handleSaveSection}
+        menuEditingId={menuEditingId}
+        setMenuEditingId={setMenuEditingId}
+        menus={menus}
+        setMenus={setMenus}
       />
     );
   }
@@ -7443,7 +7492,35 @@ const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
         <div className="dashboard-content no-header">
           {activeTab === 'dashboard' && <HomeView setActiveTab={setActiveTab} />}
           {activeTab === 'tickets' && <Tickets />}
-          {activeTab === 'service-settings' && <ServiceSettings />}
+          {activeTab === 'service-settings' && (
+            <ServiceSettings 
+              menus={menus}
+              setMenus={setMenus}
+              isAddingMenu={isAddingMenu}
+              setIsAddingMenu={setIsAddingMenu}
+              menuIdentity={menuIdentity}
+              setMenuIdentity={setMenuIdentity}
+              sections={sections}
+              setSections={setSections}
+              currentSection={currentSection}
+              setCurrentSection={setCurrentSection}
+              isAddingSection={isAddingSection}
+              setIsAddingSection={setIsAddingSection}
+              menuStep={menuStep}
+              setMenuStep={setMenuStep}
+              sectionEditingIndex={sectionEditingIndex}
+              setSectionEditingIndex={setSectionEditingIndex}
+              menuActionId={menuActionId}
+              setMenuActionId={setMenuActionId}
+              selectedMenuAction={selectedMenuAction}
+              setSelectedMenuAction={setSelectedMenuAction}
+              menuEditingId={menuEditingId}
+              setMenuEditingId={setMenuEditingId}
+              handleImageUpload={handleImageUpload}
+              handleSaveSection={handleSaveSection}
+              resetAddMenu={resetAddMenu}
+            />
+          )}
           {activeTab === 'ratings' && <Ratings />}
           {activeTab === 'profile' && (
             <VendorProfile

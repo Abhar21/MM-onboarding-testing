@@ -1,5 +1,5 @@
 /* MobileDashboard.tsx - Isolated components for Mobile Devices */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './MobileDashboard.css';
 
 /* ─────────────────── MOBILE UTILS ─────────────────── */
@@ -1504,16 +1504,780 @@ interface MobileDashboardProps {
   profileData: any;
   navigationGroups: any[];
   onLogout: () => void;
+  // Menu Creation Props
+  isAddingMenu: boolean;
+  setIsAddingMenu: (val: boolean) => void;
+  menuStep: number;
+  setMenuStep: (step: number | ((prev: number) => number)) => void;
+  menuIdentity: any;
+  setMenuIdentity: (val: any | ((prev: any) => any)) => void;
+  sections: any[];
+  setSections: (val: any[] | ((prev: any[]) => any[])) => void;
+  isAddingSection: boolean;
+  setIsAddingSection: (val: boolean) => void;
+  currentSection: any;
+  setCurrentSection: (val: any | ((prev: any) => any)) => void;
+  sectionEditingIndex: number | null;
+  setSectionEditingIndex: (val: number | null) => void;
+  resetAddMenu: () => void;
+  handleImageUpload: (e: any) => void;
+  handleSaveSection: () => void;
+  menuEditingId: number | null;
+  setMenuEditingId: (val: number | null) => void;
+  menus: any[];
+  setMenus: (val: any[] | ((prev: any[]) => any[])) => void;
 }
+
+/* ─────────────────── MOBILE CREATE MENU VIEW (-v55) ─────────────────── */
+
+const MobileSectionEditor = ({
+  currentSection,
+  setCurrentSection,
+  setIsAddingSection,
+  handleSaveSection
+}: any) => {
+  const addItem = () => {
+    setCurrentSection((prev: any) => ({
+      ...prev,
+      items: [...prev.items, { name: '', description: '', image: null }]
+    }));
+  };
+
+  const removeItem = (index: number) => {
+    setCurrentSection((prev: any) => ({
+      ...prev,
+      items: prev.items.filter((_: any, i: number) => i !== index)
+    }));
+  };
+
+  const updateItem = (index: number, field: string, value: any) => {
+    setCurrentSection((prev: any) => {
+      const newItems = [...prev.items];
+      newItems[index] = { ...newItems[index], [field]: value };
+      return { ...prev, items: newItems };
+    });
+  };
+
+  const handleItemImage = (index: number) => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = (e: any) => {
+      const file = e.target.files?.[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          updateItem(index, 'image', reader.result as string);
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+    input.click();
+  };
+
+  return (
+    <div className="mobile-section-editor-v55">
+      <div className="mobile-create-header-v55">
+        <button className="mobile-action-btn-v50" onClick={() => setIsAddingSection(false)}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+        <div className="header-center-v55">
+          <h2>Add Section</h2>
+        </div>
+        <div style={{ width: 44 }}></div>
+      </div>
+
+      <div className="mobile-create-content-v55">
+        <div className="mobile-form-section-v55">
+          <div className="mobile-form-group-v55">
+            <label className="mobile-label-v55">Section Name</label>
+            <input 
+              type="text" 
+              className="mobile-input-v55" 
+              placeholder="e.g. Starters"
+              value={currentSection.name}
+              onChange={(e) => setCurrentSection((prev: any) => ({ ...prev, name: e.target.value }))}
+            />
+          </div>
+
+          <div className="mobile-form-group-v55">
+            <label className="mobile-label-v55">Selection Type</label>
+            <div className="mobile-radio-group-v55">
+              <button 
+                className={`mobile-radio-btn-v55 ${currentSection.type === 'All Included' ? 'active' : ''}`}
+                onClick={() => setCurrentSection((prev: any) => ({ ...prev, type: 'All Included' }))}
+              >
+                All Included
+              </button>
+              <button 
+                className={`mobile-radio-btn-v55 ${currentSection.type === 'Limited Selection' ? 'active' : ''}`}
+                onClick={() => setCurrentSection((prev: any) => ({ ...prev, type: 'Limited Selection' }))}
+              >
+                Limited
+              </button>
+            </div>
+          </div>
+
+          {currentSection.type === 'Limited Selection' && (
+            <div className="mobile-form-group-v55">
+              <label className="mobile-label-v55">Max Items Customer Can Choose</label>
+              <input 
+                type="number" 
+                className="mobile-input-v55" 
+                placeholder="0"
+                value={currentSection.limit || ''}
+                onChange={(e) => setCurrentSection((prev: any) => ({ ...prev, limit: parseInt(e.target.value) || 0 }))}
+              />
+            </div>
+          )}
+        </div>
+
+        <div className="mobile-section-v50">
+          <h3 className="mobile-h3-v50" style={{ marginBottom: '16px' }}>Items in this Section</h3>
+          <div className="mobile-items-list-v55">
+            {currentSection.items.map((item: any, i: number) => (
+              <div key={i} className="mobile-item-row-v55">
+                <div className="item-img-upload-v55" onClick={() => handleItemImage(i)}>
+                  {item.image ? (
+                    <img src={item.image} alt="item" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : (
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                  )}
+                </div>
+                <div className="item-fields-v55">
+                  <input 
+                    type="text" 
+                    className="mobile-input-v55" 
+                    placeholder="Item Name" 
+                    style={{ height: '40px', fontSize: '0.9rem' }}
+                    value={item.name}
+                    onChange={(e) => updateItem(i, 'name', e.target.value)}
+                  />
+                  <input 
+                    type="text" 
+                    className="mobile-input-v55" 
+                    placeholder="Description (Optional)" 
+                    style={{ height: '40px', fontSize: '0.85rem' }}
+                    value={item.description}
+                    onChange={(e) => updateItem(i, 'description', e.target.value)}
+                  />
+                </div>
+                {currentSection.items.length > 1 && (
+                  <button className="btn-remove-item-v55" onClick={() => removeItem(i)}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+
+          <button className="mobile-btn-v55 mobile-btn-outline-v55" style={{ marginTop: '20px', height: '44px' }} onClick={addItem}>
+            + Add Another Item
+          </button>
+        </div>
+      </div>
+
+      <div className="mobile-sticky-footer-v55">
+        <button className="mobile-btn-v55 mobile-btn-primary-v55" disabled={!currentSection.name} onClick={handleSaveSection}>
+          Save Section
+        </button>
+      </div>
+    </div>
+  );
+};
+
+const MobileCreateMenuView = ({
+  menuStep,
+  setMenuStep,
+  menuIdentity,
+  setMenuIdentity,
+  sections,
+  setSections,
+  isAddingSection,
+  setIsAddingSection,
+  currentSection,
+  setCurrentSection,
+  sectionEditingIndex,
+  setSectionEditingIndex,
+  resetAddMenu,
+  handleImageUpload,
+  handleSaveSection,
+  menuEditingId,
+  menus,
+  setMenus
+}: any) => {
+  const totalItems = sections.reduce((acc: number, sec: any) => acc + (sec.items?.length || 0), 0);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleNext = () => {
+    if (menuStep < 3) setMenuStep((s: number) => s + 1);
+  };
+
+  const handleBack = () => {
+    if (menuStep > 1) setMenuStep((s: number) => s - 1);
+    else resetAddMenu();
+  };
+
+  const finalizeSave = () => {
+    if (menuEditingId) {
+      setMenus((prev: any[]) => prev.map((m: any) => m.id === menuEditingId ? {
+        ...m,
+        name: menuIdentity.name,
+        price: parseInt(menuIdentity.price) || 0,
+        minMembers: menuIdentity.minMembers,
+        maxMembers: menuIdentity.maxMembers,
+        dietType: menuIdentity.dietType,
+        image: menuIdentity.image,
+        sections: [...sections]
+      } : m));
+    } else {
+      const newMenuObj = {
+        id: Date.now(),
+        name: menuIdentity.name,
+        price: parseInt(menuIdentity.price) || 0,
+        status: 'Active',
+        category: 'breakfast', // Default for now
+        minMembers: menuIdentity.minMembers,
+        maxMembers: menuIdentity.maxMembers,
+        dietType: menuIdentity.dietType,
+        image: menuIdentity.image,
+        sections: [...sections]
+      };
+      setMenus((prev: any[]) => [...prev, newMenuObj]);
+    }
+    resetAddMenu();
+  };
+
+  return (
+    <div className="mobile-create-menu-view-v55">
+      <div className="mobile-create-header-v55">
+        <button className="mobile-action-btn-v50" onClick={handleBack}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        </button>
+        <div className="header-center-v55">
+          <span className="header-step-v55">Step {menuStep} of 3</span>
+          <h2>{menuEditingId ? 'Edit Menu' : 'Create New Menu'}</h2>
+        </div>
+        <button className="mobile-action-btn-v50" onClick={resetAddMenu}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <div className="mobile-create-content-v55">
+        <div className="step-indicator-v55">
+          <div className="step-progress-bar-v55">
+            <div className="step-progress-fill-v55" style={{ width: `${(menuStep / 3) * 100}%` }}></div>
+          </div>
+        </div>
+
+        {menuStep === 1 && (
+          <div className="mobile-form-section-v55">
+            <div className="mobile-form-group-v55">
+              <label className="mobile-label-v55">Menu Name</label>
+              <input 
+                type="text" 
+                className="mobile-input-v55" 
+                placeholder="e.g. Premium Buffet"
+                value={menuIdentity.name}
+                onChange={(e) => setMenuIdentity((prev: any) => ({ ...prev, name: e.target.value }))}
+              />
+            </div>
+
+            <div className="mobile-form-group-v55">
+              <label className="mobile-label-v55">Diet Preference</label>
+              <div className="mobile-radio-group-v55">
+                {['Veg', 'Non-Veg'].map(type => (
+                  <button 
+                    key={type}
+                    className={`mobile-radio-btn-v55 ${type === 'Veg' ? 'veg' : 'nonveg'} ${menuIdentity.dietType === type ? 'active' : ''}`}
+                    onClick={() => setMenuIdentity((prev: any) => ({ ...prev, dietType: type }))}
+                  >
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="0.5" y="0.5" width="11" height="11" rx="1.5" stroke="currentColor" /><circle cx="6" cy="6" r="3" fill="currentColor" /></svg>
+                    {type}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="mobile-form-group-v55">
+              <label className="mobile-label-v55">Price Per Person</label>
+              <div className="mobile-input-prefix-v55">
+                <span className="mobile-prefix-v55">₹</span>
+                <input 
+                  type="number" 
+                  className="mobile-input-v55" 
+                  placeholder="0"
+                  value={menuIdentity.price}
+                  onChange={(e) => setMenuIdentity((prev: any) => ({ ...prev, price: e.target.value }))}
+                />
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '16px' }}>
+              <div className="mobile-form-group-v55" style={{ flex: 1 }}>
+                <label className="mobile-label-v55">Min Pax</label>
+                <input 
+                  type="number" 
+                  className="mobile-input-v55" 
+                  placeholder="10"
+                  value={menuIdentity.minMembers}
+                  onChange={(e) => setMenuIdentity((prev: any) => ({ ...prev, minMembers: e.target.value }))}
+                />
+              </div>
+              <div className="mobile-form-group-v55" style={{ flex: 1 }}>
+                <label className="mobile-label-v55">Max Pax</label>
+                <input 
+                  type="number" 
+                  className="mobile-input-v55" 
+                  placeholder="500"
+                  value={menuIdentity.maxMembers}
+                  onChange={(e) => setMenuIdentity((prev: any) => ({ ...prev, maxMembers: e.target.value }))}
+                />
+              </div>
+            </div>
+
+            <div className="mobile-form-group-v55">
+              <label className="mobile-label-v55">Menu Cover Image</label>
+              <input type="file" ref={fileInputRef} style={{ display: 'none' }} onChange={handleImageUpload} accept="image/*" />
+              <div className={`mobile-image-upload-v55 ${menuIdentity.image ? 'has-image' : ''}`} onClick={() => fileInputRef.current?.click()}>
+                {menuIdentity.image ? (
+                  <>
+                    <img src={menuIdentity.image} alt="Preview" className="mobile-upload-preview-v55" />
+                    <div className="mobile-upload-overlay-v55">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M23 4v6h-6"></path><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                      Change
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                    <span style={{ fontSize: '0.9rem', color: '#64748b', fontWeight: '500' }}>Upload Menu Image</span>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {menuStep === 2 && (
+          <div className="mobile-step-container-v55">
+            <h3 className="mobile-h3-v50" style={{ marginBottom: '16px' }}>Menu Sections</h3>
+            
+            {sections.length === 0 && !isAddingSection && (
+              <div style={{ textAlign: 'center', padding: '40px 20px', background: 'white', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
+                <div style={{ width: '48px', height: '48px', background: '#f1f5f9', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2"><path d="M12 5v14M5 12h14"></path></svg>
+                </div>
+                <h4 style={{ margin: '0 0 8px 0', fontSize: '1rem', color: '#1e293b' }}>No sections added</h4>
+                <p style={{ margin: 0, fontSize: '0.85rem', color: '#64748b' }}>Start by adding a section like Starters or Main Course.</p>
+              </div>
+            )}
+
+            <div className="mobile-sections-list-v55">
+              {sections.map((sec: any, idx: number) => (
+                <div key={idx} className="mobile-section-card-v55">
+                  <div className="sec-info-v55">
+                    <h4>{sec.name}</h4>
+                    <p>{sec.items.length} Items • {sec.type === 'All Included' ? 'All Chosen' : `Choose ${sec.limit}`}</p>
+                  </div>
+                  <div className="sec-actions-v55">
+                    <button className="mobile-action-btn-v50" onClick={() => {
+                      setCurrentSection({ ...sec });
+                      setSectionEditingIndex(idx);
+                      setIsAddingSection(true);
+                    }}>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0077ff" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                    </button>
+                    <button className="mobile-action-btn-v50" onClick={() => setSections((prev: any[]) => prev.filter((_: any, i: number) => i !== idx))}>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {!isAddingSection && (
+              <button 
+                className="mobile-btn-v55 mobile-btn-outline-v55" 
+                style={{ marginTop: '16px', background: 'white' }}
+                onClick={() => {
+                  setCurrentSection({ name: '', type: 'All Included', limit: 0, items: [{ name: '', description: '', image: null }] });
+                  setIsAddingSection(true);
+                  setSectionEditingIndex(null);
+                }}
+              >
+                + Add Section
+              </button>
+            )}
+
+            {isAddingSection && (
+              <MobileSectionEditor 
+                currentSection={currentSection}
+                setCurrentSection={setCurrentSection}
+                setIsAddingSection={setIsAddingSection}
+                handleSaveSection={handleSaveSection}
+              />
+            )}
+          </div>
+        )}
+
+        {menuStep === 3 && (
+          <div className="mobile-step-container-v55">
+            <h3 className="mobile-h3-v50" style={{ marginBottom: '16px' }}>Review Menu</h3>
+            
+            <div className="mobile-form-section-v55" style={{ padding: '0', overflow: 'hidden' }}>
+              <div style={{ width: '100%', height: '140px', background: '#f1f5f9' }}>
+                {menuIdentity.image ? (
+                  <img src={menuIdentity.image} alt="Menu" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (
+                  <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8' }}>No Image</div>
+                )}
+              </div>
+              <div style={{ padding: '20px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                  <h4 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '800', color: '#1e293b' }}>{menuIdentity.name || 'Untitled Menu'}</h4>
+                  <span className={`card-status-pill-v50 ${menuIdentity.dietType === 'Veg' ? 'info' : 'warning'}`} style={{ fontSize: '0.7rem' }}>{menuIdentity.dietType}</span>
+                </div>
+                <div style={{ fontSize: '0.9rem', color: '#64748b', fontWeight: '600', marginBottom: '12px' }}>
+                  {sections.length} Sections • {totalItems} Items
+                </div>
+                <div style={{ fontSize: '1.5rem', fontWeight: '800', color: '#0077ff' }}>₹{menuIdentity.price || '0'}<span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: '500' }}> /person</span></div>
+              </div>
+            </div>
+
+            <h4 style={{ fontSize: '0.95rem', fontWeight: '700', color: '#1e293b', marginBottom: '12px' }}>Contents</h4>
+            <div className="mobile-sections-list-v55">
+              {sections.map((sec: any, i: number) => (
+                <div key={i} className="mobile-section-card-v55" style={{ display: 'block' }}>
+                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                      <span style={{ fontWeight: '700', fontSize: '0.9rem' }}>{sec.name}</span>
+                      <span style={{ fontSize: '0.75rem', background: '#f1f5f9', padding: '2px 8px', borderRadius: '4px', color: '#475569' }}>{sec.type}</span>
+                   </div>
+                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                      {sec.items.map((it: any, j: number) => (
+                        <span key={j} style={{ fontSize: '0.8rem', color: '#64748b' }}>{it.name}{j < sec.items.length - 1 ? ' • ' : ''}</span>
+                      ))}
+                   </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="mobile-sticky-footer-v55">
+        <button className="mobile-btn-v55 mobile-btn-outline-v55" style={{ flex: '0 0 100px' }} onClick={handleBack}>
+          {menuStep === 1 ? 'Cancel' : 'Back'}
+        </button>
+        <button 
+          className="mobile-btn-v55 mobile-btn-primary-v55" 
+          disabled={menuStep === 1 && !menuIdentity.name}
+          onClick={menuStep === 3 ? finalizeSave : handleNext}
+        >
+          {menuStep === 3 ? (menuEditingId ? 'Update Menu' : 'Save & Publish') : 'Continue'}
+        </button>
+      </div>
+    </div>
+  );
+};
+
+const MobileServiceSettingsView = ({ 
+  setIsAddingMenu, 
+  menus, 
+  setMenus,
+  setMenuIdentity,
+  setSections,
+  setMenuEditingId,
+  setMenuStep
+}: { 
+  setIsAddingMenu: (val: boolean) => void,
+  menus: any[],
+  setMenus: (val: any[] | ((prev: any[]) => any[])) => void,
+  setMenuIdentity: (val: any | ((prev: any) => any)) => void,
+  setSections: (val: any[] | ((prev: any[]) => any[])) => void,
+  setMenuEditingId: (val: number | null) => void,
+  setMenuStep: (val: number | ((prev: number) => number)) => void
+}) => {
+  const [activeService, setActiveService] = useState('Breakfast');
+  const [isAcceptingOrders, setIsAcceptingOrders] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
+  const [selectedStyles, setSelectedStyles] = useState(['Buffet']);
+  const [menuFilter, setMenuFilter] = useState('All');
+  const [stopAcceptValue, setStopAcceptValue] = useState(2);
+  const [stopAcceptUnit, setStopAcceptUnit] = useState('Hours');
+  const [manageBookingsCount, setManageBookingsCount] = useState(1);
+
+  const toggleStyle = (style: string) => {
+    if (!isEditing) return;
+    setSelectedStyles(prev => {
+      if (prev.includes(style)) {
+        if (prev.length > 1) return prev.filter(s => s !== style);
+        return prev;
+      }
+      return [...prev, style];
+    });
+  };
+
+  const services = ['Breakfast', 'Lunch', 'Snacks', 'Dinner'];
+  const filteredMenus = menus.filter((m: any) => 
+    (menuFilter === 'All' || m.dietType === menuFilter) && 
+    (m.category?.toLowerCase() === activeService.toLowerCase() || !m.category)
+  );
+
+  return (
+    <div className="mobile-service-settings-v54">
+      {/* Primary Header with Tabs (Reports-style) */}
+      <div className="service-header-v54">
+        <h1 className="service-title-v54">Service Settings</h1>
+        <div className="service-tabs-nav-v54">
+          {services.map(s => (
+            <button
+              key={s}
+              className={`service-tab-item-v54 ${activeService === s ? 'active' : ''}`}
+              onClick={() => setActiveService(s)}
+            >
+              {s}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="settings-scroller-v54">
+        {/* Accepting Orders Row */}
+        <div className="order-toggle-row-v54">
+          <span>Accepting Orders</span>
+          <div 
+            className={`toggle-switch-v54 ${isAcceptingOrders ? 'on' : ''}`}
+            onClick={() => setIsAcceptingOrders(!isAcceptingOrders)}
+          >
+            <div className="toggle-knob-v54"></div>
+          </div>
+        </div>
+
+        {/* Merged Settings & Style Card */}
+        <div className="settings-card-v54">
+          <div className="card-header-v54">
+            <h3>Service Configuration</h3>
+            <button className="edit-action-btn-v54" onClick={() => setIsEditing(!isEditing)}>
+              {isEditing ? 'Cancel' : 'Edit'}
+            </button>
+          </div>
+
+          <div className="card-subsection-v54">
+            <h4 className="card-subtitle-v54">Timing & Bookings</h4>
+            <div className="form-grid-v54">
+              <div className="form-group-v54">
+                <label>Start Time</label>
+                <input type="time" defaultValue="08:00" disabled={!isEditing} />
+              </div>
+              <div className="form-group-v54">
+                <label>End Time</label>
+                <input type="time" defaultValue="11:00" disabled={!isEditing} />
+              </div>
+              <div className="form-group-v54 full">
+                <label>Manage Bookings</label>
+                <input 
+                  type="number" 
+                  min="1" 
+                  value={manageBookingsCount} 
+                  onChange={(e) => setManageBookingsCount(Number(e.target.value))}
+                  disabled={!isEditing} 
+                />
+              </div>
+              <div className="form-group-v54 full inline">
+                <label>Stop accepting orders</label>
+                <div className="input-group-row-v54">
+                  <select 
+                    value={stopAcceptValue} 
+                    onChange={(e) => setStopAcceptValue(Number(e.target.value))}
+                    disabled={!isEditing}
+                  >
+                    {Array.from({ length: stopAcceptUnit === 'Hours' ? 24 : 30 }, (_, i) => i + 1).map(v => (
+                      <option key={v} value={v}>{v}</option>
+                    ))}
+                  </select>
+                  <select 
+                    value={stopAcceptUnit} 
+                    onChange={(e) => {
+                      setStopAcceptUnit(e.target.value);
+                      if (e.target.value === 'Hours' && stopAcceptValue > 24) setStopAcceptValue(24);
+                    }}
+                    disabled={!isEditing}
+                  >
+                    <option value="Hours">Hours</option>
+                    <option value="Days">Days</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="card-divider-v54"></div>
+
+          <div className="card-subsection-v54">
+            <h4 className="card-subtitle-v54">Service Style Supported</h4>
+            <div className="style-grid-v54">
+              <div 
+                className={`style-option-v54 ${selectedStyles.includes('Buffet') ? 'selected' : ''} ${!isEditing ? 'disabled' : ''}`}
+                onClick={() => toggleStyle('Buffet')}
+              >
+                <div className="style-icon-v54">🍽️</div>
+                <div className="style-info-v54">
+                  <h5>Buffet Service</h5>
+                  <p>Self-serve experience</p>
+                </div>
+                <div className="selection-indicator-v54"></div>
+              </div>
+              <div 
+                className={`style-option-v54 ${selectedStyles.includes('Sit-down') ? 'selected' : ''} ${!isEditing ? 'disabled' : ''}`}
+                onClick={() => toggleStyle('Sit-down')}
+              >
+                <div className="style-icon-v54">🤵</div>
+                <div className="style-info-v54">
+                  <h5>Sit-down Service</h5>
+                  <p>Table service with staff</p>
+                </div>
+                <div className="selection-indicator-v54"></div>
+              </div>
+            </div>
+
+            <div className={`conditional-input-v54 ${!selectedStyles.includes('Sit-down') ? 'disabled' : ''}`}>
+              <label style={{ fontWeight: '800', color: '#1e293b' }}>Extra Cost per person</label>
+              <div className="price-input-v54">
+                <span>₹</span>
+                <input 
+                  type="number" 
+                  placeholder="0" 
+                  defaultValue="50" 
+                  disabled={!isEditing || !selectedStyles.includes('Sit-down')} 
+                />
+              </div>
+              <p className="extra-cost-helper-v54">Enter only the extra amount added to your current menu price</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Menu Builder */}
+        <div className="menu-builder-section-v54">
+          <div className="section-header-v54">
+            <h3>Menu Builder</h3>
+            <button className="add-menu-btn-v54" onClick={() => setIsAddingMenu(true)}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              <span>Add Menu</span>
+            </button>
+          </div>
+
+          <div className="filter-chips-v54">
+            {['All', 'Veg', 'Non-Veg'].map(f => (
+              <button 
+                key={f}
+                className={`filter-chip-v54 ${menuFilter === f ? 'active' : ''}`}
+                onClick={() => setMenuFilter(f)}
+              >
+                {f}
+              </button>
+            ))}
+          </div>
+
+          <div className="menu-item-stack-v54">
+            {filteredMenus.map((item: any) => (
+              <div key={item.id} className="menu-item-card-v54">
+                <div className="item-image-box-v54">
+                  {item.image ? (
+                    <img src={item.image} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }} />
+                  ) : (
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                  )}
+                </div>
+                <div className="item-info-v54">
+                  <h4 className="item-title-v54">{item.name}</h4>
+                  <div className="item-tag-row-v54">
+                    <span className={`type-tag-v54 ${item.dietType?.toLowerCase() === 'veg' ? 'veg' : 'nonveg'}`}>
+                      <span className="type-icon-v54">▣</span>
+                      {item.dietType}
+                    </span>
+                    <span className="active-tag-v54">{item.status || 'Active'}</span>
+                  </div>
+                  <div className="item-price-v54">₹{item.price}</div>
+                </div>
+                <div className="item-actions-v54">
+                  <button className="item-action-icon-v54 btn-edit" onClick={() => {
+                    setMenuIdentity({
+                      name: item.name,
+                      price: item.price.toString(),
+                      minMembers: item.minMembers || '',
+                      maxMembers: item.maxMembers || '',
+                      dietType: item.dietType,
+                      image: item.image
+                    });
+                    setSections(item.sections || []);
+                    setMenuEditingId(item.id);
+                    setMenuStep(1);
+                    setIsAddingMenu(true);
+                  }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                  </button>
+                  <button className="item-action-icon-v54 btn-settings" onClick={() => {
+                    if (confirm('Are you sure you want to delete this menu?')) {
+                      setMenus((prev: any[]) => prev.filter((m: any) => m.id !== item.id));
+                    }
+                  }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Sticky Save Bar */}
+      {isEditing && (
+        <div className="sticky-save-bar-v54">
+          <button className="mobile-save-btn-v54" onClick={() => setIsEditing(false)}>
+            Save Changes
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
 
 const MobileDashboard: React.FC<MobileDashboardProps> = ({
   activeTab,
   setActiveTab,
   profileData,
   navigationGroups,
-  onLogout
+  onLogout,
+  isAddingMenu,
+  setIsAddingMenu,
+  menuStep,
+  setMenuStep,
+  menuIdentity,
+  setMenuIdentity,
+  sections,
+  setSections,
+  isAddingSection,
+  setIsAddingSection,
+  currentSection,
+  setCurrentSection,
+  sectionEditingIndex,
+  setSectionEditingIndex,
+  resetAddMenu,
+  handleImageUpload,
+  handleSaveSection,
+  menuEditingId,
+  setMenuEditingId,
+  menus,
+  setMenus
 }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+  // We need menus locally or from context to update them
+  // In Dashboard (App.tsx), we lifted menus state. 
+  // But we need to pass it down to MobileDashboard as well.
+  // Wait, I didn't add 'menus' and 'setMenus' to MobileDashboardProps yet.
+  // I should do that.
 
   // Close drawer on tab change
   useEffect(() => {
@@ -1549,6 +2313,16 @@ const MobileDashboard: React.FC<MobileDashboardProps> = ({
         <MobileBookingsView />
       ) : activeTab === 'reports' ? (
         <MobileReportsView />
+      ) : activeTab === 'service-settings' ? (
+        <MobileServiceSettingsView 
+          setIsAddingMenu={setIsAddingMenu} 
+          menus={menus} 
+          setMenus={setMenus} 
+          setMenuIdentity={setMenuIdentity}
+          setSections={setSections}
+          setMenuEditingId={setMenuEditingId}
+          setMenuStep={setMenuStep}
+        />
       ) : (
         <div className="mobile-scroller-v50" style={{ textAlign: 'center', color: '#64748b', paddingTop: '100px' }}>
           <p>Mobile view for <strong>{activeTab}</strong> component coming soon...</p>
@@ -1559,6 +2333,30 @@ const MobileDashboard: React.FC<MobileDashboardProps> = ({
             ← Back to Dashboard Overview
           </button>
         </div>
+      )}
+
+      {/* Full Screen Menu Creation Overlay */}
+      {isAddingMenu && (
+        <MobileCreateMenuView 
+          menuStep={menuStep}
+          setMenuStep={setMenuStep}
+          menuIdentity={menuIdentity}
+          setMenuIdentity={setMenuIdentity}
+          sections={sections}
+          setSections={setSections}
+          isAddingSection={isAddingSection}
+          setIsAddingSection={setIsAddingSection}
+          currentSection={currentSection}
+          setCurrentSection={setCurrentSection}
+          sectionEditingIndex={sectionEditingIndex}
+          setSectionEditingIndex={setSectionEditingIndex}
+          resetAddMenu={resetAddMenu}
+          handleImageUpload={handleImageUpload}
+          handleSaveSection={handleSaveSection}
+          menuEditingId={menuEditingId}
+          menus={menus}
+          setMenus={setMenus}
+        />
       )}
 
       {/* Drawer Menu */}
