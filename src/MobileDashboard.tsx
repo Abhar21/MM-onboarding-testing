@@ -32,7 +32,7 @@ const MobileCountdown = ({ targetISO }: { targetISO: string }) => {
 /* ─────────────────── MOBILE HOME VIEW ─────────────────── */
 const MobileHomeView = ({ setActiveTab }: { setActiveTab: (tab: string) => void }) => {
   const todayDate = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-  
+
   const todayBookings = [
     { id: 'BK-12405', type: 'Lunch', menu: 'Standard Business Lunch', guests: 150, collect: '₹75,000', time: '10:00 AM', targetTime: new Date(Date.now() + 2 * 3600 * 1000).toISOString(), theme: 'warning' },
     { id: 'BK-12410', type: 'Dinner', menu: 'Premium Buffet Menu 2', guests: 45, collect: '₹31,500', time: '04:00 PM', targetTime: new Date(Date.now() + 8 * 3600 * 1000).toISOString(), theme: 'info' }
@@ -126,8 +126,8 @@ const MobileHomeView = ({ setActiveTab }: { setActiveTab: (tab: string) => void 
               </div>
             </div>
           ))}
-          <button 
-            className="mobile-view-all-v50" 
+          <button
+            className="mobile-view-all-v50"
             onClick={() => setActiveTab('bookings')}
             style={{ width: '100%', padding: '14px', borderRadius: '12px', background: 'white', border: '1.5px solid #e2e8f0', color: '#0077ff', fontWeight: '700', marginTop: '8px' }}
           >
@@ -140,11 +140,11 @@ const MobileHomeView = ({ setActiveTab }: { setActiveTab: (tab: string) => void 
 };
 
 /* ─────────────────── MOBILE BOOKINGS DETAIL VIEW ─────────────────── */
-const MobileBookingDetailView = ({ 
-  booking, 
-  onBack 
-}: { 
-  booking: any; 
+const MobileBookingDetailView = ({
+  booking,
+  onBack
+}: {
+  booking: any;
   onBack: () => void;
 }) => {
   const [isMarkingComplete, setIsMarkingComplete] = useState(false);
@@ -349,14 +349,14 @@ const MobileBookingDetailView = ({
             </div>
           </div>
         </div>
-        
+
         <div style={{ height: '80px' }}></div> {/* Spacer for sticky button */}
       </div>
 
       {/* Sticky Bottom CTA */}
       <div className="mobile-detail-footer-v50">
-        <button 
-          className="btn-mark-completed-v50" 
+        <button
+          className="btn-mark-completed-v50"
           onClick={handleComplete}
           disabled={isMarkingComplete}
         >
@@ -402,18 +402,18 @@ const MobileBookingDetailView = ({
 /* ─────────────────── MOBILE BOOKINGS VIEW ─────────────────── */
 const MobileBookingsView = () => {
   const [bookings] = useState([
-    { 
-      id: 'BK-12401', 
-      customer: 'Amit Khurana', 
-      date: new Date().toISOString().split('T')[0], 
-      time: '12:30 PM', 
-      category: 'Lunch', 
-      menuName: 'Premium Sadhya Menu', 
-      guests: 200, 
-      amount: 145000, 
-      paid: 43500, 
-      status: 'Preparing', 
-      address: '402, Skyline Residency, Sector 44, Bengaluru', 
+    {
+      id: 'BK-12401',
+      customer: 'Amit Khurana',
+      date: new Date().toISOString().split('T')[0],
+      time: '12:30 PM',
+      category: 'Lunch',
+      menuName: 'Premium Sadhya Menu',
+      guests: 200,
+      amount: 145000,
+      paid: 43500,
+      status: 'Preparing',
+      address: '402, Skyline Residency, Sector 44, Bengaluru',
       taxType: 'B2B',
       menuDetails: {
         categories: [
@@ -423,18 +423,18 @@ const MobileBookingsView = () => {
         ]
       }
     },
-    { 
-      id: 'BK-12402', 
-      customer: 'Bhavya Singh', 
-      date: new Date().toISOString().split('T')[0], 
-      time: '01:00 PM', 
-      category: 'Lunch', 
-      menuName: 'Traditional South Indian', 
-      guests: 120, 
-      amount: 95000, 
-      paid: 30000, 
-      status: 'Preparing', 
-      address: 'Plot 12, HSR Layout, 7th Sector, Bengaluru', 
+    {
+      id: 'BK-12402',
+      customer: 'Bhavya Singh',
+      date: new Date().toISOString().split('T')[0],
+      time: '01:00 PM',
+      category: 'Lunch',
+      menuName: 'Traditional South Indian',
+      guests: 120,
+      amount: 95000,
+      paid: 30000,
+      status: 'Preparing',
+      address: 'Plot 12, HSR Layout, 7th Sector, Bengaluru',
       taxType: 'B2C',
       menuDetails: {
         categories: [
@@ -444,18 +444,18 @@ const MobileBookingsView = () => {
         ]
       }
     },
-    { 
-      id: 'BK-12405', 
-      customer: 'Siddharth Malhotra', 
-      date: '2026-03-22', 
-      time: '07:30 PM', 
-      category: 'Dinner', 
-      menuName: 'Executive Buffet', 
-      guests: 150, 
-      amount: 85000, 
-      paid: 25500, 
-      status: 'Upcoming', 
-      address: 'Apartment 701, Prestige Ferns Residency, Bellandur', 
+    {
+      id: 'BK-12405',
+      customer: 'Siddharth Malhotra',
+      date: '2026-03-22',
+      time: '07:30 PM',
+      category: 'Dinner',
+      menuName: 'Executive Buffet',
+      guests: 150,
+      amount: 85000,
+      paid: 25500,
+      status: 'Upcoming',
+      address: 'Apartment 701, Prestige Ferns Residency, Bellandur',
       taxType: 'B2B',
       menuDetails: {
         categories: [
@@ -493,7 +493,7 @@ const MobileBookingsView = () => {
   const [isNoteOpen, setIsNoteOpen] = useState(false);
   const [visibleCount, setVisibleCount] = useState(10);
   const [loadingMore, setLoadingMore] = useState(false);
-  
+
   // Advanced Filters State
   const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
   const [appliedFilters, setAppliedFilters] = useState({
@@ -505,7 +505,7 @@ const MobileBookingsView = () => {
   const [selectedDetail, setSelectedDetail] = useState<any>(null);
 
   const today = new Date().toISOString().split('T')[0];
-  
+
   const stats = {
     total: bookings.length,
     today: bookings.filter(b => b.date === today).length,
@@ -604,9 +604,9 @@ const MobileBookingsView = () => {
       <div className="mobile-search-filter-stack-v50">
         <div className="mobile-search-bar-v50">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-          <input 
-            type="text" 
-            placeholder="Search ID or Customer..." 
+          <input
+            type="text"
+            placeholder="Search ID or Customer..."
             value={searchTerm}
             onChange={(e) => {
               setSearchTerm(e.target.value);
@@ -617,8 +617,8 @@ const MobileBookingsView = () => {
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <div className="mobile-chips-scroll-v50" style={{ flex: 1 }}>
             {['All', 'Today', 'This Month'].map(s => (
-              <button 
-                key={s} 
+              <button
+                key={s}
                 className={`filter-chip-v50 ${rangeShortcut === s ? 'active' : ''}`}
                 onClick={() => {
                   setRangeShortcut(s);
@@ -630,8 +630,8 @@ const MobileBookingsView = () => {
               </button>
             ))}
           </div>
-          <button 
-            className="mobile-action-btn-v50" 
+          <button
+            className="mobile-action-btn-v50"
             style={{ padding: '8px', background: 'white', borderRadius: '10px', border: '1px solid #e2e8f0', minWidth: '42px', height: '42px' }}
             onClick={openFilters}
           >
@@ -703,8 +703,8 @@ const MobileBookingsView = () => {
               Showing {displayedBookings.length} of {filteredBookings.length} bookings
             </span>
             {visibleCount < filteredBookings.length && (
-              <button 
-                className="load-more-btn-v50" 
+              <button
+                className="load-more-btn-v50"
                 onClick={handleLoadMore}
                 disabled={loadingMore}
               >
@@ -732,24 +732,24 @@ const MobileBookingsView = () => {
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
               </button>
             </div>
-            
+
             <div className="sheet-body-v50">
               <div className="sheet-section-v50">
                 <div className="sheet-section-title-v50">Date Range</div>
                 <div className="sheet-date-grid-v50">
                   <div className="date-field-v50">
                     <label>From</label>
-                    <input 
-                      type="date" 
-                      className="mobile-date-input-v50" 
+                    <input
+                      type="date"
+                      className="mobile-date-input-v50"
                       value={tempFilters.fromDate}
                       onChange={e => setTempFilters({ ...tempFilters, fromDate: e.target.value })}
                     />
                   </div>
                   <div className="date-field-v50">
                     <label>To</label>
-                    <input 
-                      type="date" 
+                    <input
+                      type="date"
                       className="mobile-date-input-v50"
                       value={tempFilters.toDate}
                       onChange={e => setTempFilters({ ...tempFilters, toDate: e.target.value })}
@@ -762,7 +762,7 @@ const MobileBookingsView = () => {
                 <div className="sheet-section-title-v50">Booking Status</div>
                 <div className="sheet-chips-v50">
                   {['All', 'Preparing', 'Upcoming', 'Completed', 'Cancelled'].map(s => (
-                    <button 
+                    <button
                       key={s}
                       className={`filter-chip-v50 ${tempFilters.status === s ? 'active' : ''}`}
                       onClick={() => setTempFilters({ ...tempFilters, status: s })}
@@ -790,12 +790,18 @@ const MobileBookingsView = () => {
 const MobileRevenueView = () => {
   const [selectedFY, setSelectedFY] = useState('FY 2025-26');
   const [selectedMonth, setSelectedMonth] = useState('Mar');
-  const [selectedBar, setSelectedBar] = useState<number | null>(5); // Default highlight Mar
+  const [selectedBar, setSelectedBar] = useState<number | null>(11); // Default highlight Mar
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 
   const monthsList = ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar'];
 
   const trendData = [
+    { month: 'Apr', revenue: 65000 },
+    { month: 'May', revenue: 72000 },
+    { month: 'Jun', revenue: 85000 },
+    { month: 'Jul', revenue: 78000 },
+    { month: 'Aug', revenue: 92000 },
+    { month: 'Sep', revenue: 88000 },
     { month: 'Oct', revenue: 85000 },
     { month: 'Nov', revenue: 92000 },
     { month: 'Dec', revenue: 108000 },
@@ -831,7 +837,7 @@ const MobileRevenueView = () => {
           </div>
           <div className="hero-value-v50">₹4,25,840</div>
         </div>
-        
+
         <div className="rev-kpi-secondary-row-v50">
           <div className="rev-kpi-card-v51">
             <label>Net Earnings</label>
@@ -855,7 +861,7 @@ const MobileRevenueView = () => {
             <span className="val-v51">Jan ₹1,35,000</span>
           </div>
         </div>
-        
+
         <div className="mobile-scrollable-chart-v50">
           <div className="chart-viewport-v50">
             {trendData.map((d, i) => {
@@ -863,14 +869,14 @@ const MobileRevenueView = () => {
               const height = (val / (maxVal * 1.1)) * 100;
               const isActive = selectedBar === i;
               return (
-                <div 
-                  key={i} 
-                  className="chart-col-v51" 
+                <div
+                  key={i}
+                  className="chart-col-v51"
                   onClick={() => setSelectedBar(i === selectedBar ? null : i)}
                 >
                   <div className="bar-track-v51">
-                    <div 
-                      className={`bar-fill-v51 ${isActive ? 'active' : ''}`} 
+                    <div
+                      className={`bar-fill-v51 ${isActive ? 'active' : ''}`}
                       style={{ height: `${height}%` }}
                     >
                       {isActive && (
@@ -896,17 +902,21 @@ const MobileRevenueView = () => {
           </div>
           <div className="perf-summary-v51">
             <div className="perf-metric-v51">
-              <label>Completed</label>
+              <label>Total Bookings</label>
+              <span>148</span>
+            </div>
+            <div className="perf-metric-v51">
+              <label>Completed Bookings</label>
               <span className="success">132</span>
             </div>
             <div className="perf-metric-v51">
-              <label>Cancelled</label>
+              <label>Cancelled Bookings</label>
               <span className="danger">16</span>
             </div>
             <div className="perf-divider-v51"></div>
-            <div className="perf-metric-v51 conversion">
+            <div className="perf-metric-v51 highlight">
               <label>Conversion Rate</label>
-              <span className="highlight">89.2%</span>
+              <span className="rate-val-v51">89.2%</span>
             </div>
           </div>
         </div>
@@ -965,16 +975,16 @@ const MobileRevenueView = () => {
         </div>
       </div>
 
-      
+
       <div className="rev-footnote-v51">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-        <span>Revenue is based on completed event checkouts.</span>
+        <span>Revenue is based on completed bookings. Payouts are processed based on event schedule and settlement timelines</span>
       </div>
 
       {/* Payout History Sheet */}
       {isHistoryOpen && (
-        <MobilePayoutHistorySheet 
-          onClose={() => setIsHistoryOpen(false)} 
+        <MobilePayoutHistorySheet
+          onClose={() => setIsHistoryOpen(false)}
           defaultMonth={selectedMonth}
         />
       )}
@@ -1044,9 +1054,9 @@ const MobilePayoutHistorySheet = ({ onClose, defaultMonth }: { onClose: () => vo
             <div className="sheet-controls-v50">
               <div className="search-box-v50">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                <input 
-                  type="text" 
-                  placeholder="Search Booking ID..." 
+                <input
+                  type="text"
+                  placeholder="Search Booking ID..."
                   value={searchTerm}
                   onChange={e => setSearchTerm(e.target.value)}
                 />
@@ -1068,7 +1078,7 @@ const MobilePayoutHistorySheet = ({ onClose, defaultMonth }: { onClose: () => vo
                     <span className="booking-id-v50">{p.id}</span>
                     <span className={`status-badge-v50 ${p.status.toLowerCase()}`}>{p.status}</span>
                   </div>
-                  
+
                   <div className="card-stats-grid-v50">
                     <div className="stat-item-v50">
                       <label>Payout Date</label>
@@ -1095,7 +1105,7 @@ const MobilePayoutHistorySheet = ({ onClose, defaultMonth }: { onClose: () => vo
 
                   <div className="card-actions-v50">
                     <button className="action-btn-v50 view" onClick={() => handleViewDetails(p)}>View</button>
-                    <button 
+                    <button
                       className={`action-btn-v50 download ${p.status !== 'Credited' ? 'disabled' : ''}`}
                       disabled={p.status !== 'Credited'}
                     >
@@ -1165,6 +1175,280 @@ const MobilePayoutHistorySheet = ({ onClose, defaultMonth }: { onClose: () => vo
   );
 };
 
+const MobileGSTView = () => {
+  const [selectedFY, setSelectedFY] = useState('FY 2025-26');
+  const [selectedMonth, setSelectedMonth] = useState('Mar');
+
+  const monthsList = ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar'];
+
+  return (
+    <div className="mobile-gst-container-v52">
+      {/* Filters Section */}
+      <div className="gst-filters-v52">
+        <select value={selectedFY} onChange={e => setSelectedFY(e.target.value)} className="gst-select-v52">
+          <option>FY 2025–26</option>
+          <option>FY 2024–25</option>
+        </select>
+        <select value={selectedMonth} onChange={e => setSelectedMonth(e.target.value)} className="gst-select-v52">
+          {monthsList.map(m => (
+            <option key={m} value={m}>{m} '26</option>
+          ))}
+        </select>
+      </div>
+
+      {/* KPI Cards (Stacked Layout) */}
+      <div className="gst-kpi-stack-v52">
+        <div className="gst-kpi-card-v52 primary">
+          <div className="card-label-v52">GST Payable</div>
+          <div className="card-value-v52">₹73,051</div>
+          <div className="card-subtitle-v52">After ITC adjustments</div>
+        </div>
+        <div className="gst-kpi-card-v52">
+          <div className="card-label-v52">Taxable Amount</div>
+          <div className="card-value-v52">₹4,25,840</div>
+          <div className="card-subtitle-v52">Total taxable value for March FY 2025-26</div>
+        </div>
+        <div className="gst-kpi-card-v52">
+          <div className="card-label-v52">Total GST This Month</div>
+          <div className="card-value-v52">₹76,651</div>
+          <div className="card-subtitle-v52">Calculated for Mar</div>
+        </div>
+        <div className="gst-kpi-card-v52">
+          <div className="card-label-v52">ITC Available</div>
+          <div className="card-value-v52">₹3,600</div>
+          <div className="card-subtitle-v52">Available for credit</div>
+        </div>
+      </div>
+
+      {/* Upcoming Filing Deadlines */}
+      <div className="gst-section-v52">
+        <h3 className="section-title-v52">Upcoming Filing Deadlines</h3>
+        <div className="merged-deadline-card-v52">
+          <div className="deadline-item-v52">
+            <div className="deadline-info-v52">
+              <span className="deadline-title-v52">GSTR-1</span>
+              <span className="deadline-date-v52">Due Date: 11 Apr 2026</span>
+            </div>
+            <div className="deadline-badge-v52">Due in 11 days</div>
+          </div>
+          <div className="deadline-divider-v52"></div>
+          <div className="deadline-item-v52">
+            <div className="deadline-info-v52">
+              <span className="deadline-title-v52">GSTR-3B</span>
+              <span className="deadline-date-v52">Due Date: 20 Apr 2026</span>
+            </div>
+            <div className="deadline-badge-v52">Due in 20 days</div>
+          </div>
+        </div>
+      </div>
+
+      {/* GST Split Section */}
+      <div className="gst-section-v52">
+        <h3 className="section-title-v52">GST Split (Mar)</h3>
+        <div className="split-card-v52">
+          <div className="split-row-v52">
+            <label>CGST</label>
+            <span>₹17,246</span>
+          </div>
+          <div className="split-row-v52">
+            <label>SGST</label>
+            <span>₹17,246</span>
+          </div>
+          <div className="split-row-v52">
+            <label>IGST</label>
+            <span>₹42,158</span>
+          </div>
+          <div className="split-divider-v52"></div>
+          <div className="split-row-v52">
+            <label>GST Collected</label>
+            <span>₹76,651</span>
+          </div>
+          <div className="split-row-v52 success">
+            <label>ITC Available</label>
+            <span>-₹3,600</span>
+          </div>
+          <div className="split-divider-v52"></div>
+          <div className="split-row-v52 highlight">
+            <label>GST Payable</label>
+            <span className="payable-value-v52">₹73,051</span>
+          </div>
+        </div>
+      </div>
+
+      {/* GST Documents */}
+      <div className="gst-section-v52">
+        <h3 className="section-title-v52">GST Documents</h3>
+        <div className="document-stack-v52">
+          <button className="doc-btn-v52">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            <span>Download GSTR-1 Data</span>
+          </button>
+          <button className="doc-btn-v52">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            <span>Download GSTR-3B Summary</span>
+          </button>
+          <button className="doc-btn-v52">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            <span>Download B2B Invoices</span>
+          </button>
+          <button className="doc-btn-v52">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            <span>Download GST Summary</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Bottom Info Section */}
+      <div className="gst-footer-info-v52">
+        <div className="footer-notice-v52 c-accountant">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+          <p>Share this report with your <strong>Chartered Accountant (CA)</strong> for final GST filing.</p>
+        </div>
+        <div className="footer-notice-v52 disclaimer">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+          <p>System-generated report based on your bookings. Please <strong>verify all details</strong> before filing.</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
+const MobileTDSView = () => {
+  const [selectedFY, setSelectedFY] = useState('FY 2025-26');
+  const [selectedQuarter, setSelectedQuarter] = useState('Q2 Jul–Sep');
+
+  const monthlyData = [
+    { month: 'Jul', earnings: 95000, tds: 950, net: 94050 },
+    { month: 'Aug', earnings: 102000, tds: 1020, net: 100980 },
+    { month: 'Sep', earnings: 90100, tds: 930, net: 89170 }
+  ];
+
+  const totalEarnings = monthlyData.reduce((acc, curr) => acc + curr.earnings, 0);
+  const totalTDS = monthlyData.reduce((acc, curr) => acc + curr.tds, 0);
+  const totalNet = monthlyData.reduce((acc, curr) => acc + curr.net, 0);
+
+  return (
+    <div className="mobile-tds-container-v53">
+      {/* Filters Section (Sticky Candidate) */}
+      <div className="tds-filters-v53">
+        <select value={selectedFY} onChange={e => setSelectedFY(e.target.value)} className="tds-select-v53">
+          <option>FY 2025–26</option>
+          <option>FY 2024–25</option>
+        </select>
+        <select value={selectedQuarter} onChange={e => setSelectedQuarter(e.target.value)} className="tds-select-v53">
+          <option>Q1 Apr–Jun</option>
+          <option>Q2 Jul–Sep</option>
+          <option>Q3 Oct–Dec</option>
+          <option>Q4 Jan–Mar</option>
+        </select>
+      </div>
+
+      {/* Summary Cards (Stacked) */}
+      <div className="tds-summary-stack-v53">
+        <div className="tds-summary-card-v53 primary">
+          <div className="summary-label-v53">Total Net Payout</div>
+          <div className="summary-value-v53">₹2,87,100</div>
+          <div className="summary-subtext-v53">after TDS deduction</div>
+        </div>
+        <div className="tds-summary-card-v53">
+          <div className="summary-label-v53">Total TDS Deducted</div>
+          <div className="summary-value-v53">₹2,900</div>
+          <div className="summary-subtext-v53">Deposited with Income Tax Department</div>
+        </div>
+      </div>
+
+      {/* Monthly TDS Breakdown */}
+      <div className="tds-section-v53">
+        <div className="section-header-v53">
+          <div className="title-group-v53">
+            <h3 className="section-title-v53">Monthly TDS Breakdown</h3>
+            <span className="section-subtitle-v53">Q2 (Jul–Sep 2025)</span>
+          </div>
+          <button className="export-btn-v53">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            <span>Excel</span>
+          </button>
+        </div>
+
+        <div className="tds-month-stack-v53">
+          {monthlyData.map(d => (
+            <div key={d.month} className="tds-month-card-v53">
+              <div className="month-name-v53">{d.month} 2025</div>
+              <div className="month-grid-v53">
+                <div className="grid-item-v53">
+                  <label>Earnings</label>
+                  <span>₹{d.earnings.toLocaleString()}</span>
+                </div>
+                <div className="grid-item-v53">
+                  <label>TDS</label>
+                  <span>₹{d.tds.toLocaleString()}</span>
+                </div>
+                <div className="grid-item-v53 highlight">
+                  <label>Net Received</label>
+                  <span className="net-val-v53">₹{d.net.toLocaleString()}</span>
+                </div>
+              </div>
+            </div>
+          ))}
+
+          {/* Total Row */}
+          <div className="tds-total-card-v53">
+            <div className="total-label-v53">Quarter Total</div>
+            <div className="month-grid-v53">
+              <div className="grid-item-v53">
+                <label>Total Earnings</label>
+                <span>₹{totalEarnings.toLocaleString()}</span>
+              </div>
+              <div className="grid-item-v53">
+                <label>Total TDS</label>
+                <span>₹{totalTDS.toLocaleString()}</span>
+              </div>
+              <div className="grid-item-v53 highlight">
+                <label>Net Received</label>
+                <span className="net-val-v53">₹{totalNet.toLocaleString()}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p className="tds-footnote-v53">
+          This data matches your Form 16A and will also reflect in Form 26AS.
+        </p>
+      </div>
+
+      {/* TDS Certificate Section */}
+      <div className="tds-section-v53 certificate-bg">
+        <div className="cert-header-v53">
+          <div className="title-group-v53">
+            <h3 className="section-title-v53">Your TDS Certificate (Form 16A)</h3>
+            <span className="cert-status-badge-v53">Available</span>
+          </div>
+        </div>
+        <div className="cert-details-v53">
+          <div className="cert-detail-row-v53">
+            <label>Quarter</label>
+            <span>Q2 (Jul–Sep 2025)</span>
+          </div>
+          <div className="cert-detail-row-v53">
+            <label>Issued on</label>
+            <span>15 Nov 2025</span>
+          </div>
+        </div>
+        <p className="cert-info-v53">
+          Your TDS certificate for the selected period is ready for download.
+        </p>
+        <button className="primary-doc-btn-v53">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          Download Certificate (Form 16A)
+        </button>
+        <p className="cert-helper-v53">
+          This certificate will also reflect in Form 26AS.
+        </p>
+      </div>
+    </div>
+  );
+};
+
 const MobileReportsView = () => {
   const [activeTab, setActiveTab] = useState('revenue');
 
@@ -1174,19 +1458,19 @@ const MobileReportsView = () => {
         <h1>Reports</h1>
       </div>
       <div className="reports-tab-nav-v50">
-        <button 
+        <button
           className={`report-nav-item-v50 ${activeTab === 'revenue' ? 'active' : ''}`}
           onClick={() => setActiveTab('revenue')}
         >
           Revenue
         </button>
-        <button 
+        <button
           className={`report-nav-item-v50 ${activeTab === 'gst' ? 'active' : ''}`}
           onClick={() => setActiveTab('gst')}
         >
           GST
         </button>
-        <button 
+        <button
           className={`report-nav-item-v50 ${activeTab === 'tds' ? 'active' : ''}`}
           onClick={() => setActiveTab('tds')}
         >
@@ -1197,6 +1481,10 @@ const MobileReportsView = () => {
       <div className="report-view-content-v50">
         {activeTab === 'revenue' ? (
           <MobileRevenueView />
+        ) : activeTab === 'gst' ? (
+          <MobileGSTView />
+        ) : activeTab === 'tds' ? (
+          <MobileTDSView />
         ) : (
           <div className="report-coming-soon-v51">
             <div className="icon-v51">📊</div>
@@ -1218,12 +1506,12 @@ interface MobileDashboardProps {
   onLogout: () => void;
 }
 
-const MobileDashboard: React.FC<MobileDashboardProps> = ({ 
-  activeTab, 
-  setActiveTab, 
-  profileData, 
+const MobileDashboard: React.FC<MobileDashboardProps> = ({
+  activeTab,
+  setActiveTab,
+  profileData,
   navigationGroups,
-  onLogout 
+  onLogout
 }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
@@ -1264,7 +1552,7 @@ const MobileDashboard: React.FC<MobileDashboardProps> = ({
       ) : (
         <div className="mobile-scroller-v50" style={{ textAlign: 'center', color: '#64748b', paddingTop: '100px' }}>
           <p>Mobile view for <strong>{activeTab}</strong> component coming soon...</p>
-          <button 
+          <button
             onClick={() => setActiveTab('dashboard')}
             style={{ marginTop: '20px', color: '#0077ff', fontWeight: '700', border: 'none', background: 'none' }}
           >
@@ -1286,7 +1574,7 @@ const MobileDashboard: React.FC<MobileDashboardProps> = ({
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
               </button>
             </div>
-            
+
             <div className="drawer-body-v50">
               {navigationGroups.map(group => (
                 <div key={group.title} className="drawer-nav-group-v50">
