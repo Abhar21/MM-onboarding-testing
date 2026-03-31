@@ -1697,13 +1697,11 @@ const MobileCreateMenuView = ({
   setIsAddingSection,
   currentSection,
   setCurrentSection,
-  sectionEditingIndex,
   setSectionEditingIndex,
   resetAddMenu,
   handleImageUpload,
   handleSaveSection,
   menuEditingId,
-  menus,
   setMenus
 }: any) => {
   const totalItems = sections.reduce((acc: number, sec: any) => acc + (sec.items?.length || 0), 0);

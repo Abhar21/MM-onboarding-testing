@@ -7169,7 +7169,6 @@ const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
   const [selectedMenuAction, setSelectedMenuAction] = useState<'hide' | 'delete' | null>(null);
   const [menuEditingId, setMenuEditingId] = useState<number | null>(null);
 
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
