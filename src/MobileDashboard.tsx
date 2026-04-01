@@ -31,7 +31,7 @@ interface MenuItem {
 interface Section {
   name: string;
   items: (MenuItem | string)[];
-  type?: string;
+  type: string;
   status?: string;
   limit?: number;
 }
@@ -98,7 +98,7 @@ interface MenuIdentity {
   price: string;
   minMembers: string;
   maxMembers: string;
-  image?: string | null;
+  image: string | null;
 }
 
 /* ─────────────────── MOBILE UTILS ─────────────────── */
@@ -1624,13 +1624,13 @@ interface MobileDashboardProps {
   menuStep: number;
   setMenuStep: (step: number | ((prev: number) => number)) => void;
   menuIdentity: MenuIdentity;
-  setMenuIdentity: React.Dispatch<React.SetStateAction<MenuIdentity>>;
+  setMenuIdentity: React.Dispatch<React.SetStateAction<any>>;
   sections: Section[];
   setSections: React.Dispatch<React.SetStateAction<Section[]>>;
   isAddingSection: boolean;
   setIsAddingSection: (val: boolean) => void;
   currentSection: Section;
-  setCurrentSection: React.Dispatch<React.SetStateAction<Section>>;
+  setCurrentSection: React.Dispatch<React.SetStateAction<any>>;
   sectionEditingIndex: number | null;
   setSectionEditingIndex: (val: number | null) => void;
   resetAddMenu: () => void;
