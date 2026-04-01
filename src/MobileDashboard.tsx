@@ -1528,15 +1528,23 @@ interface MobileDashboardProps {
   setMenus: (val: any[] | ((prev: any[]) => any[])) => void;
 }
 
-/* ─────────────────── MOBILE CREATE COUPON VIEW (v59) ─────────────────── */
+/* ─────────────────── MOBILE COUPON FORM VIEW (v59) ─────────────────── */
 
-const MobileCreateCouponView = ({ onClose, onSave }: { onClose: () => void, onSave: (coupon: any) => void }) => {
+const MobileCouponFormView = ({ 
+  onClose, 
+  onSave, 
+  initialData = null 
+}: { 
+  onClose: () => void, 
+  onSave: (coupon: any) => void,
+  initialData?: any
+}) => {
   const [form, setForm] = useState({
     code: '',
-    discountType: 'percentage',
+    discountType: 'percentage' as 'percentage' | 'flat',
     discountValue: '',
     maxCap: '',
-    scope: 'all',
+    scope: 'all' as 'all' | 'specific',
     selectedTargets: [] as string[],
     minAmount: '',
     totalLimit: '',
@@ -1545,6 +1553,25 @@ const MobileCreateCouponView = ({ onClose, onSave }: { onClose: () => void, onSa
     validFrom: new Date().toISOString().split('T')[0],
     validTo: '',
   });
+
+  useEffect(() => {
+    if (initialData) {
+      setForm({
+        code: initialData.code || '',
+        discountType: initialData.type === 'Percentage' ? 'percentage' : 'flat',
+        discountValue: initialData.value ? initialData.value.replace(/[^\d.]/g, '') : '',
+        maxCap: initialData.maxCap || '',
+        scope: initialData.scope || (initialData.applicability === 'orders' ? 'all' : 'specific'), // Rough mapping
+        selectedTargets: initialData.selectedTargets || [],
+        minAmount: initialData.minAmount || '',
+        totalLimit: initialData.usage ? initialData.usage.split('/')[1] : '',
+        isUnlimited: initialData.usage?.includes('∞') || false,
+        perUserLimit: initialData.perUserLimit || '1',
+        validFrom: initialData.validFrom || new Date().toISOString().split('T')[0],
+        validTo: initialData.validTo || '',
+      });
+    }
+  }, [initialData]);
 
   const categories = ['Breakfast', 'Lunch', 'Snacks', 'Dinner'];
 
@@ -1567,13 +1594,15 @@ const MobileCreateCouponView = ({ onClose, onSave }: { onClose: () => void, onSa
   const isFormValid = form.code && form.discountValue && (form.scope === 'all' || form.selectedTargets.length > 0);
 
   const handleSubmit = () => {
+    // Sanitize values
+    const cleanValue = form.discountValue.replace(/[^\d.]/g, '');
     onSave({
       ...form,
-      id: Math.random().toString(36).substr(2, 9),
+      id: initialData?.id || Math.random().toString(36).substr(2, 9),
       type: form.discountType === 'percentage' ? 'Percentage' : 'Flat Amount',
-      value: form.discountType === 'percentage' ? `${form.discountValue}%` : `₹${form.discountValue}`,
-      status: 'Active',
-      usage: `0/${form.isUnlimited ? '∞' : (form.totalLimit || '∞')}`,
+      value: form.discountType === 'percentage' ? `${cleanValue}%` : `₹${cleanValue}`,
+      status: initialData?.status || 'Active',
+      usage: initialData?.usage || `0/${form.isUnlimited ? '∞' : (form.totalLimit || '∞')}`,
       source: 'vendor',
       applicability: 'orders'
     });
@@ -1586,23 +1615,70 @@ const MobileCreateCouponView = ({ onClose, onSave }: { onClose: () => void, onSa
         <button className="mobile-action-btn-v50" onClick={onClose}>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
-        <h2 style={{ fontSize: '1rem', fontWeight: 800, color: '#1e293b' }}>Create New Coupon</h2>
+        <h2 style={{ fontSize: '1rem', fontWeight: 800, color: '#1e293b' }}>
+          {initialData ? 'Edit Coupon' : 'Create New Coupon'}
+        </h2>
       </header>
 
       <div className="create-coupon-body-v59">
         <div className="create-coupon-preview-sticky-v59">
-          <div className="preview-card-mini-v59">
-            <div className="mini-preview-top-v59">
-              <span className="mini-preview-code-v59">{form.code || 'CODE'}</span>
-              <span className="mini-preview-value-v59">
-                {form.discountType === 'percentage' ? `${form.discountValue || '0'}%` : `₹${form.discountValue || '0'}`}
+          <div className="preview-card-v60">
+            <div className="preview-header-v60">
+              <span className="preview-status-badge-v60">
+                <div className="status-dot-v60"></div>
+                Active
               </span>
+              <div className="preview-discount-row-v60">
+                <div className="preview-discount-value-v60">
+                  {form.discountType === 'percentage' ? '%' : '₹'}{form.discountValue || '0'}
+                  <span className="preview-discount-off-v60">OFF</span>
+                </div>
+                <div className="preview-code-box-v60">
+                  <span className="preview-code-label-v60">CODE:</span>
+                  <span className="preview-code-text-v60">{form.code || 'AUTUMN25'}</span>
+                </div>
+              </div>
             </div>
-            <div className="mini-preview-meta-v59">
-              <span>Min: ₹{form.minAmount || '0'}</span>
-              <span>Limit: {form.isUnlimited ? '∞' : (form.totalLimit || '∞')}</span>
-              <span>Scope: {form.scope === 'all' ? 'All Items' : form.selectedTargets.join(', ')}</span>
-              <span>Expires: {form.validTo || 'No Expiry'}</span>
+
+            <div className="preview-divider-v60"></div>
+
+            <div className="preview-details-grid-v60">
+              <div className="preview-detail-item-v60">
+                <span className="preview-detail-label-v60">Min. Booking Amount</span>
+                <span className="preview-detail-value-v60">₹ {form.minAmount || '0'}</span>
+              </div>
+              <div className="preview-detail-item-v60">
+                <span className="preview-detail-label-v60">Maximum Discount Cap</span>
+                <span className="preview-detail-value-v60">₹ {form.discountType === 'flat' ? 'Not Applicable' : (form.maxCap || '0')}</span>
+              </div>
+              <div className="preview-detail-item-v60">
+                <span className="preview-detail-label-v60">Total Usage Limit</span>
+                <span className="preview-detail-value-v60">{form.isUnlimited ? 'Unlimited' : (form.totalLimit || 'Unlimited')}</span>
+              </div>
+              <div className="preview-detail-item-v60">
+                <span className="preview-detail-label-v60">Per User Limit</span>
+                <span className="preview-detail-value-v60">{form.perUserLimit || '1'}</span>
+              </div>
+              <div className="preview-detail-item-v60">
+                <span className="preview-detail-label-v60">Validity Period</span>
+                <span className="preview-detail-value-v60">
+                  {(() => {
+                    try {
+                      const from = form.validFrom ? new Date(form.validFrom) : new Date();
+                      const to = form.validTo ? new Date(form.validTo) : null;
+                      const fromStr = isNaN(from.getTime()) ? 'Today' : from.toLocaleDateString('en-GB');
+                      const toStr = (to && !isNaN(to.getTime())) ? to.toLocaleDateString('en-GB') : 'No Expiry';
+                      return `${fromStr} — ${toStr}`;
+                    } catch (e) {
+                      return 'Today — No Expiry';
+                    }
+                  })()}
+                </span>
+              </div>
+              <div className="preview-detail-item-v60">
+                <span className="preview-detail-label-v60">Applicability</span>
+                <span className="preview-detail-value-v60">{form.scope === 'all' ? 'All Categories' : 'Specific Categories'}</span>
+              </div>
             </div>
           </div>
         </div>
@@ -1653,7 +1729,7 @@ const MobileCreateCouponView = ({ onClose, onSave }: { onClose: () => void, onSa
                 style={{ paddingLeft: '36px' }}
                 placeholder="0.00" 
                 value={form.discountValue}
-                onChange={(e) => setForm({ ...form, discountValue: e.target.value })}
+                onChange={(e) => setForm({ ...form, discountValue: e.target.value.replace(/[^\d.]/g, '') })}
               />
             </div>
           </div>
@@ -1668,7 +1744,7 @@ const MobileCreateCouponView = ({ onClose, onSave }: { onClose: () => void, onSa
               className="coupon-input-v59" 
               placeholder="₹ 0" 
               value={form.minAmount}
-              onChange={(e) => setForm({ ...form, minAmount: e.target.value })}
+              onChange={(e) => setForm({ ...form, minAmount: e.target.value.replace(/[^\d.]/g, '') })}
             />
           </div>
           
@@ -1794,12 +1870,14 @@ const MobileCouponsView = ({
   isAddingCoupon, 
   setIsAddingCoupon, 
   coupons, 
-  setCoupons 
+  setCoupons,
+  setEditingCoupon 
 }: { 
   isAddingCoupon: boolean, 
   setIsAddingCoupon: (val: boolean) => void, 
   coupons: any[], 
-  setCoupons: (val: any | ((prev: any) => any)) => void 
+  setCoupons: (val: any | ((prev: any) => any)) => void,
+  setEditingCoupon: (val: any) => void
 }) => {
   const [activeSubTab, setActiveSubTab] = useState<'vendor' | 'platform'>('vendor');
 
@@ -1821,9 +1899,12 @@ const MobileCouponsView = ({
   };
 
   const getUsagePercentage = (usage: string) => {
+    if (!usage) return 0;
     const [current, total] = usage.split('/');
-    if (total === '∞') return 100;
-    return Math.min(100, (parseInt(current) / parseInt(total)) * 100);
+    if (total === '∞' || !total) return 100;
+    const currNum = parseInt(current) || 0;
+    const totNum = parseInt(total) || 1;
+    return Math.min(100, (currNum / totNum) * 100);
   };
 
   const toggleStatus = (id: string) => {
@@ -1909,7 +1990,13 @@ const MobileCouponsView = ({
                       <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> Resume</>
                     )}
                   </button>
-                  <button className="coupon-action-btn-v58 primary">
+                  <button 
+                    className="coupon-action-btn-v58 primary"
+                    onClick={() => {
+                      setEditingCoupon(coupon);
+                      setIsAddingCoupon(true);
+                    }}
+                  >
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                     Edit
                   </button>
@@ -2967,6 +3054,7 @@ const MobileDashboard: React.FC<MobileDashboardProps> = ({
   setMenus
 }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [editingCoupon, setEditingCoupon] = useState<any>(null);
   const [isAddingCoupon, setIsAddingCoupon] = useState(false);
   const [coupons, setCoupons] = useState([
     { id: '1', code: 'WELCOME10', type: 'Percentage', value: '10%', status: 'Active', usage: '45/100', validFrom: '2026-03-01', validTo: '2026-03-31', maxCap: '500', minAmount: '1000', source: 'vendor', applicability: 'orders' },
@@ -3023,6 +3111,7 @@ const MobileDashboard: React.FC<MobileDashboardProps> = ({
           setIsAddingCoupon={setIsAddingCoupon} 
           coupons={coupons} 
           setCoupons={setCoupons} 
+          setEditingCoupon={setEditingCoupon}
         />
       ) : activeTab === 'tickets' ? (
         <MobileSupportView />
@@ -3048,13 +3137,23 @@ const MobileDashboard: React.FC<MobileDashboardProps> = ({
         </div>
       )}
 
-      {/* Full Screen Coupon Creation Overlay */}
+      {/* Full Screen Coupon Form Overlay */}
       {isAddingCoupon && (
-        <MobileCreateCouponView 
-          onClose={() => setIsAddingCoupon(false)}
-          onSave={(newCoupon) => {
-            setCoupons(prev => [newCoupon, ...prev]);
+        <MobileCouponFormView 
+          initialData={editingCoupon}
+          onClose={() => {
             setIsAddingCoupon(false);
+            setEditingCoupon(null);
+          }}
+          onSave={(newCoupon) => {
+            const exists = coupons.find(c => c.id === newCoupon.id);
+            if (exists) {
+              setCoupons(prev => prev.map(c => c.id === newCoupon.id ? newCoupon : c));
+            } else {
+              setCoupons(prev => [newCoupon, ...prev]);
+            }
+            setIsAddingCoupon(false);
+            setEditingCoupon(null);
           }}
         />
       )}

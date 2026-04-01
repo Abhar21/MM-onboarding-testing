@@ -5221,3 +5221,126 @@
   box-shadow: none;
 }
 
+
+/* ─────────────────── REDESIGNED PREVIEW CARD (v60) ─────────────────── */
+
+.preview-card-v60 {
+  background: #2563eb;
+  border-radius: 20px;
+  padding: 24px;
+  color: white;
+  box-shadow: 0 10px 30px rgba(37, 99, 235, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.preview-card-v60::before, .preview-card-v60::after {
+  content: '';
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  background: #f8fafc;
+  border-radius: 50%;
+  top: 100px; /* Aligned with divider */
+  transform: translateY(-50%);
+}
+
+.preview-card-v60::before { left: -12px; }
+.preview-card-v60::after { right: -12px; }
+
+.preview-header-v60 {
+  margin-bottom: 24px;
+}
+
+.preview-status-badge-v60 {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  background: #dcfce7;
+  color: #166534;
+  border-radius: 100px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.status-dot-v60 {
+  width: 6px;
+  height: 6px;
+  background: #15803d;
+  border-radius: 50%;
+}
+
+.preview-discount-row-v60 {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.preview-discount-value-v60 {
+  font-size: 2.8rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.preview-discount-off-v60 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-left: 4px;
+  opacity: 0.8;
+}
+
+.preview-code-box-v60 {
+  background: rgba(255, 255, 255, 0.15);
+  padding: 8px 16px;
+  border-radius: 10px;
+  text-align: right;
+}
+
+.preview-code-label-v60 {
+  display: block;
+  font-size: 0.6rem;
+  font-weight: 800;
+  opacity: 0.7;
+  letter-spacing: 0.05em;
+  margin-bottom: 2px;
+}
+
+.preview-code-text-v60 {
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: 900;
+  font-size: 1.1rem;
+  letter-spacing: 1px;
+}
+
+.preview-divider-v60 {
+  border-top: 1.5px dashed rgba(255, 255, 255, 0.3);
+  margin: 0 -24px 24px;
+}
+
+.preview-details-grid-v60 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.preview-detail-item-v60 {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.preview-detail-label-v60 {
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  opacity: 0.7;
+}
+
+.preview-detail-value-v60 {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
