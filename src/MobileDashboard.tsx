@@ -2,27 +2,134 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './MobileDashboard.css';
 
+/* ─────────────────── MOBILE INTERFACES ─────────────────── */
+
+interface Coupon {
+  id: string;
+  code: string;
+  type: string;
+  value: string;
+  status: string;
+  usage: string;
+  validFrom: string;
+  validTo: string;
+  maxCap?: string;
+  minAmount?: string;
+  source: 'vendor' | 'platform';
+  applicability: string;
+  selectedTargets?: string[];
+  scope?: 'all' | 'specific';
+  perUserLimit?: string;
+}
+
+interface MenuItem {
+  name: string;
+  description: string;
+  image: string | null;
+}
+
+interface Section {
+  name: string;
+  items: (MenuItem | string)[];
+  type?: string;
+  status?: string;
+  limit?: number;
+}
+
+interface Menu {
+  id: number;
+  name: string;
+  sections: Section[];
+  status: string;
+  category?: string;
+  price?: string | number;
+  image?: string | null;
+  minMembers?: string;
+  maxMembers?: string;
+  dietType?: string;
+}
+
+interface NavigationItem {
+  id: string;
+  label: string;
+  icon: React.ReactNode;
+}
+
+interface NavigationGroup {
+  title: string;
+  items: NavigationItem[];
+}
+
+interface Booking {
+  id: string;
+  type: string;
+  menu: string;
+  guests: number;
+  collect: string;
+  time: string;
+  targetTime: string;
+  theme: string;
+  status: string;
+  taxType: string;
+  customer?: string;
+  phone?: string;
+  email?: string;
+  address?: string;
+  date?: string;
+  category?: string;
+  menuName?: string;
+  amount?: string | number;
+  paid?: string | number;
+  menuDetails?: {
+    categories: Section[];
+  };
+}
+
+interface ProfileData {
+  owner?: {
+    name?: string;
+  };
+  activeTab?: string;
+}
+
+interface MenuIdentity {
+  name: string;
+  dietType: string;
+  price: string;
+  minMembers: string;
+  maxMembers: string;
+  image?: string | null;
+}
+
 /* ─────────────────── MOBILE UTILS ─────────────────── */
 const MobileCountdown = ({ targetISO }: { targetISO: string }) => {
-  const [timeLeft, setTimeLeft] = useState('');
+  const calculateInitialTime = () => {
+    const now = new Date().getTime();
+    const target = new Date(targetISO).getTime();
+    const diff = target - now;
+    if (diff <= 0) return 'Started';
+    const hh = Math.floor(diff / (1000 * 60 * 60)).toString().padStart(2, '0');
+    const mm = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
+    const ss = Math.floor((diff % (1000 * 60)) / 1000).toString().padStart(2, '0');
+    return `${hh}:${mm}:${ss}`;
+  };
+
+  const [timeLeft, setTimeLeft] = useState(calculateInitialTime());
 
   useEffect(() => {
-    const calculateTime = () => {
+    const timer = setInterval(() => {
       const now = new Date().getTime();
       const target = new Date(targetISO).getTime();
       const diff = target - now;
-
-      if (diff <= 0) return 'Started';
-
-      const hh = Math.floor(diff / (1000 * 60 * 60)).toString().padStart(2, '0');
-      const mm = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
-      const ss = Math.floor((diff % (1000 * 60)) / 1000).toString().padStart(2, '0');
-
-      return `${hh}:${mm}:${ss}`;
-    };
-
-    setTimeLeft(calculateTime());
-    const timer = setInterval(() => setTimeLeft(calculateTime()), 1000);
+      if (diff <= 0) {
+        setTimeLeft('Started');
+      } else {
+        const hh = Math.floor(diff / (1000 * 60 * 60)).toString().padStart(2, '0');
+        const mm = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
+        const ss = Math.floor((diff % (1000 * 60)) / 1000).toString().padStart(2, '0');
+        setTimeLeft(`${hh}:${mm}:${ss}`);
+      }
+    }, 1000);
     return () => clearInterval(timer);
   }, [targetISO]);
 
@@ -33,9 +140,10 @@ const MobileCountdown = ({ targetISO }: { targetISO: string }) => {
 const MobileHomeView = ({ setActiveTab }: { setActiveTab: (tab: string) => void }) => {
   const todayDate = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 
+  // Purity Fix: Compute static dates outside or inside useEffect to avoid render-time impurity
   const todayBookings = [
-    { id: 'BK-12405', type: 'Lunch', menu: 'Standard Business Lunch', guests: 150, collect: '₹75,000', time: '10:00 AM', targetTime: new Date(Date.now() + 2 * 3600 * 1000).toISOString(), theme: 'warning' },
-    { id: 'BK-12410', type: 'Dinner', menu: 'Premium Buffet Menu 2', guests: 45, collect: '₹31,500', time: '04:00 PM', targetTime: new Date(Date.now() + 8 * 3600 * 1000).toISOString(), theme: 'info' }
+    { id: 'BK-12405', type: 'Lunch', menu: 'Standard Business Lunch', guests: 150, collect: '₹75,000', time: '10:00 AM', targetTime: new Date(new Date().getTime() + 2 * 3600 * 1000).toISOString(), theme: 'warning' },
+    { id: 'BK-12410', type: 'Dinner', menu: 'Premium Buffet Menu 2', guests: 45, collect: '₹31,500', time: '04:00 PM', targetTime: new Date(new Date().getTime() + 8 * 3600 * 1000).toISOString(), theme: 'info' }
   ];
 
   return (
@@ -144,7 +252,7 @@ const MobileBookingDetailView = ({
   booking,
   onBack
 }: {
-  booking: any;
+  booking: Booking;
   onBack: () => void;
 }) => {
   const [isMarkingComplete, setIsMarkingComplete] = useState(false);
@@ -204,7 +312,9 @@ const MobileBookingDetailView = ({
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
               <div className="info-text-v50">
                 <label>Date & Time</label>
-                <span>{new Date(booking.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })} • {booking.time}</span>
+                <span>
+                  {booking.date ? new Date(booking.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : 'TBD'} • {booking.time}
+                </span>
               </div>
             </div>
             <div className="event-info-item-v50">
@@ -237,7 +347,7 @@ const MobileBookingDetailView = ({
             <h3 className="section-title-v50 small">Menu Details</h3>
             <div className="menu-summary-container-v50">
               {/* Only show the first section/category in the preview */}
-              {booking.menuDetails.categories.slice(0, 1).map((cat: any, idx: number) => (
+              {booking.menuDetails?.categories.slice(0, 1).map((cat: Section, idx: number) => (
                 <div key={idx} className="menu-category-group-v50">
                   <div className="cat-header-v50">
                     <span className="cat-name-v50">{cat.name}</span>
@@ -246,8 +356,10 @@ const MobileBookingDetailView = ({
                     </span>
                   </div>
                   <div className="cat-items-flex-v50">
-                    {cat.items.slice(0, 4).map((item: string, i: number) => (
-                      <div key={i} className="menu-item-pill-v50">{item}</div>
+                    {cat.items.slice(0, 4).map((item: any, i: number) => (
+                      <div key={i} className="menu-item-pill-v50">
+                        {typeof item === 'string' ? item : item.name}
+                      </div>
                     ))}
                     {cat.items.length > 4 && (
                       <div className="menu-item-pill-v50 more">+{cat.items.length - 4} more</div>
@@ -269,21 +381,21 @@ const MobileBookingDetailView = ({
           <div className="payment-summary-box-v50">
             <div className="payment-main-row-v50">
               <span className="label">Total Booking Value</span>
-              <span className="value primary">₹{booking.amount.toLocaleString()}</span>
+              <span className="value primary">₹{Number(booking.amount || 0).toLocaleString()}</span>
             </div>
             <div className="payment-divider-v50"></div>
             <div className="payment-sub-grid-v50">
               <div className="payment-sub-item-v50">
                 <label>Advance Paid</label>
                 <div className="amount-status-v50">
-                  <span className="amount received">₹{booking.paid.toLocaleString()}</span>
+                  <span className="amount received">₹{Number(booking.paid || 0).toLocaleString()}</span>
                   <span className="tag success">Received</span>
                 </div>
               </div>
               <div className="payment-sub-item-v50">
                 <label>Pending Balance</label>
                 <div className="amount-status-v50">
-                  <span className="amount pending">₹{(booking.amount - booking.paid).toLocaleString()}</span>
+                  <span className="amount pending">₹{(Number(booking.amount || 0) - Number(booking.paid || 0)).toLocaleString()}</span>
                   <span className="tag warning">Pending</span>
                 </div>
               </div>
@@ -291,12 +403,13 @@ const MobileBookingDetailView = ({
             <div className="payout-info-grid-v50">
               <div className="payout-detail-row-v50">
                 <label>Payout:</label>
-                <span className="value accent">₹{booking.paid.toLocaleString()}</span>
+                <span className="value accent">₹{Number(booking.paid || 0).toLocaleString()}</span>
               </div>
               <div className="payout-detail-row-v50">
                 <label>Payout Processed At:</label>
                 <span className="value">{
                   (() => {
+                    if (!booking.date) return 'N/A';
                     const d = new Date(booking.date);
                     d.setDate(d.getDate() - 1);
                     return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
@@ -307,6 +420,7 @@ const MobileBookingDetailView = ({
                 <label>GST Month:</label>
                 <span className="value">{
                   (() => {
+                    if (!booking.date) return 'N/A';
                     const d = new Date(booking.date);
                     d.setMonth(d.getMonth() + 1);
                     return d.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
@@ -375,17 +489,17 @@ const MobileBookingDetailView = ({
               </button>
             </div>
             <div className="sheet-body-v50 scrollable">
-              {booking.menuDetails.categories.map((cat: any, idx: number) => (
+              {booking.menuDetails?.categories.map((cat: Section, idx: number) => (
                 <div key={idx} className="sheet-menu-cat-block-v50">
                   <div className="sheet-cat-header-v50">
                     <span className="name">{cat.name}</span>
                     <span className="status">{cat.status}</span>
                   </div>
                   <div className="sheet-cat-items-v50">
-                    {cat.items.map((item: string, i: number) => (
+                    {cat.items.map((item: any, i: number) => (
                       <div key={i} className="sheet-menu-item-v50">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                        <span>{item}</span>
+                        <span>{typeof item === 'string' ? item : item.name}</span>
                       </div>
                     ))}
                   </div>
@@ -1501,31 +1615,32 @@ const MobileReportsView = () => {
 interface MobileDashboardProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
-  profileData: any;
-  navigationGroups: any[];
+  profileData: ProfileData;
+  navigationGroups: NavigationGroup[];
   onLogout: () => void;
   // Menu Creation Props
   isAddingMenu: boolean;
   setIsAddingMenu: (val: boolean) => void;
   menuStep: number;
   setMenuStep: (step: number | ((prev: number) => number)) => void;
-  menuIdentity: any;
-  setMenuIdentity: (val: any | ((prev: any) => any)) => void;
-  sections: any[];
-  setSections: (val: any[] | ((prev: any[]) => any[])) => void;
+  menuIdentity: MenuIdentity;
+  setMenuIdentity: React.Dispatch<React.SetStateAction<MenuIdentity>>;
+  sections: Section[];
+  setSections: React.Dispatch<React.SetStateAction<Section[]>>;
   isAddingSection: boolean;
   setIsAddingSection: (val: boolean) => void;
-  currentSection: any;
-  setCurrentSection: (val: any | ((prev: any) => any)) => void;
+  currentSection: Section;
+  setCurrentSection: React.Dispatch<React.SetStateAction<Section>>;
   sectionEditingIndex: number | null;
   setSectionEditingIndex: (val: number | null) => void;
   resetAddMenu: () => void;
-  handleImageUpload: (e: any) => void;
+  handleImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSaveSection: () => void;
   menuEditingId: number | null;
   setMenuEditingId: (val: number | null) => void;
-  menus: any[];
-  setMenus: (val: any[] | ((prev: any[]) => any[])) => void;
+  // Global Menus
+  menus: Menu[];
+  setMenus: React.Dispatch<React.SetStateAction<Menu[]>>;
 }
 
 /* ─────────────────── MOBILE COUPON FORM VIEW (v59) ─────────────────── */
@@ -1536,8 +1651,8 @@ const MobileCouponFormView = ({
   initialData = null 
 }: { 
   onClose: () => void, 
-  onSave: (coupon: any) => void,
-  initialData?: any
+  onSave: (coupon: Coupon) => void,
+  initialData?: Coupon | null
 }) => {
   const [form, setForm] = useState({
     code: '',
@@ -1677,7 +1792,7 @@ const MobileCouponFormView = ({
               </div>
               <div className="preview-detail-item-v60">
                 <span className="preview-detail-label-v60">Applicability</span>
-                <span className="preview-detail-value-v60">{form.scope === 'all' ? 'All Categories' : 'Specific Categories'}</span>
+                <span className="preview-detail-value-v60">{form.scope === ('all' as 'all' | 'specific') ? 'All Categories' : 'Specific Categories'}</span>
               </div>
             </div>
           </div>
@@ -1867,17 +1982,15 @@ const MobileCouponFormView = ({
 };
 
 const MobileCouponsView = ({ 
-  isAddingCoupon, 
-  setIsAddingCoupon, 
   coupons, 
-  setCoupons,
-  setEditingCoupon 
+  setCoupons, 
+  setEditingCoupon,
+  setIsAddingCoupon
 }: { 
-  isAddingCoupon: boolean, 
-  setIsAddingCoupon: (val: boolean) => void, 
-  coupons: any[], 
-  setCoupons: (val: any | ((prev: any) => any)) => void,
-  setEditingCoupon: (val: any) => void
+  coupons: Coupon[], 
+  setCoupons: React.Dispatch<React.SetStateAction<Coupon[]>>, 
+  setEditingCoupon: (val: Coupon) => void,
+  setIsAddingCoupon: (val: boolean) => void
 }) => {
   const [activeSubTab, setActiveSubTab] = useState<'vendor' | 'platform'>('vendor');
 
@@ -1908,8 +2021,8 @@ const MobileCouponsView = ({
   };
 
   const toggleStatus = (id: string) => {
-    setCoupons(prev => prev.map(c => 
-      c.id === id ? { ...c, status: c.status === 'Active' ? 'Paused' : 'Active' } : c
+    setCoupons((prev: Coupon[]) => prev.map((c: Coupon) => 
+      c.id === id ? { ...c, status: c.status === 'Active' ? 'Inactive' : 'Active' } : c
     ));
   };
 
@@ -2290,28 +2403,33 @@ const MobileRatingsView = () => {
 /* ─────────────────── MOBILE GST FILING VIEW (v52) ─────────────────── */
 
 const MobileSectionEditor = ({
+  onClose,
   currentSection,
   setCurrentSection,
-  setIsAddingSection,
   handleSaveSection
-}: any) => {
+}: {
+  onClose: () => void;
+  currentSection: Section;
+  setCurrentSection: React.Dispatch<React.SetStateAction<Section>>;
+  handleSaveSection: () => void;
+}) => {
   const addItem = () => {
-    setCurrentSection((prev: any) => ({
+    setCurrentSection((prev: Section) => ({
       ...prev,
       items: [...prev.items, { name: '', description: '', image: null }]
     }));
   };
 
   const removeItem = (index: number) => {
-    setCurrentSection((prev: any) => ({
+    setCurrentSection((prev: Section) => ({
       ...prev,
-      items: prev.items.filter((_: any, i: number) => i !== index)
+      items: (prev.items as any[]).filter((_: any, i: number) => i !== index)
     }));
   };
 
   const updateItem = (index: number, field: string, value: any) => {
-    setCurrentSection((prev: any) => {
-      const newItems = [...prev.items];
+    setCurrentSection((prev: Section) => {
+      const newItems = [...(prev.items as any[])];
       newItems[index] = { ...newItems[index], [field]: value };
       return { ...prev, items: newItems };
     });
@@ -2335,7 +2453,7 @@ const MobileSectionEditor = ({
   };
 
   return (
-    <div className="mobile-bottom-sheet-overlay-v55" onClick={() => setIsAddingSection(false)}>
+    <div className="mobile-bottom-sheet-overlay-v55" onClick={onClose}>
       <div className="mobile-bottom-sheet-v55" onClick={(e) => e.stopPropagation()}>
         <div className="bottom-sheet-content-v55">
           <div className="mobile-form-group-v55">
@@ -2346,7 +2464,7 @@ const MobileSectionEditor = ({
               placeholder="e.g. Starters"
               style={{ background: 'white', border: '1.5px solid #eef2f6' }}
               value={currentSection.name}
-              onChange={(e) => setCurrentSection((prev: any) => ({ ...prev, name: e.target.value }))}
+              onChange={(e) => setCurrentSection((prev: Section) => ({ ...prev, name: e.target.value }))}
             />
           </div>
 
@@ -2356,7 +2474,7 @@ const MobileSectionEditor = ({
               <select 
                 className="mobile-select-v55"
                 value={currentSection.type}
-                onChange={(e) => setCurrentSection((prev: any) => ({ ...prev, type: e.target.value }))}
+                onChange={(e) => setCurrentSection((prev: Section) => ({ ...prev, type: e.target.value }))}
               >
                 <option value="All Included">All Included</option>
                 <option value="Limited Selection">Limited Selection</option>
@@ -2371,7 +2489,7 @@ const MobileSectionEditor = ({
                 style={{ background: 'white', border: '1.5px solid #eef2f6', textAlign: 'center' }}
                 value={currentSection.limit || ''}
                 disabled={currentSection.type === 'All Included'}
-                onChange={(e) => setCurrentSection((prev: any) => ({ ...prev, limit: parseInt(e.target.value) || 0 }))}
+                onChange={(e) => setCurrentSection((prev: Section) => ({ ...prev, limit: parseInt(e.target.value) || 0 }))}
               />
             </div>
           </div>
@@ -2381,7 +2499,7 @@ const MobileSectionEditor = ({
           <h3 className="mobile-form-label-big-v55">Items in this Section</h3>
           
           <div className="mobile-items-list-v55">
-            {currentSection.items.map((item: any, i: number) => (
+            {(currentSection.items as any[]).map((item: any, i: number) => (
               <div key={i} className="item-editor-card-v55" style={{ position: 'relative' }}>
                 <div className="photo-upload-placeholder-v55" onClick={() => handleItemImage(i)}>
                   {item.image ? (
@@ -2434,11 +2552,11 @@ const MobileSectionEditor = ({
           </button>
 
           <div style={{ display: 'flex', gap: '12px', marginTop: '32px', paddingBottom: '24px' }}>
-            <button className="btn-cancel-v55" style={{ flex: 1 }} onClick={() => setIsAddingSection(false)}>Cancel</button>
+            <button className="btn-cancel-v55" style={{ flex: 1 }} onClick={onClose}>Cancel</button>
             <button 
               className="btn-save-v55" 
               style={{ flex: 2 }}
-              disabled={!currentSection.name || currentSection.items.some((it: any) => !it.name)}
+              disabled={!currentSection.name || (currentSection.items as any[]).some((it: any) => !it.name)}
               onClick={handleSaveSection}
             >
               Save Section
@@ -2461,14 +2579,35 @@ const MobileCreateMenuView = ({
   setIsAddingSection,
   currentSection,
   setCurrentSection,
+  sectionEditingIndex: _sectionEditingIndex,
   setSectionEditingIndex,
   resetAddMenu,
   handleImageUpload,
   handleSaveSection,
   menuEditingId,
+  menus: _menus,
   setMenus
-}: any) => {
-  const totalItems = sections.reduce((acc: number, sec: any) => acc + (sec.items?.length || 0), 0);
+}: {
+  menuStep: number;
+  setMenuStep: React.Dispatch<React.SetStateAction<number>>;
+  menuIdentity: MenuIdentity;
+  setMenuIdentity: React.Dispatch<React.SetStateAction<MenuIdentity>>;
+  sections: Section[];
+  setSections: React.Dispatch<React.SetStateAction<Section[]>>;
+  isAddingSection: boolean;
+  setIsAddingSection: (val: boolean) => void;
+  currentSection: Section;
+  setCurrentSection: React.Dispatch<React.SetStateAction<Section>>;
+  sectionEditingIndex: number | null;
+  setSectionEditingIndex: (val: number | null) => void;
+  resetAddMenu: () => void;
+  handleImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleSaveSection: () => void;
+  menuEditingId: number | null;
+  menus: Menu[];
+  setMenus: React.Dispatch<React.SetStateAction<Menu[]>>;
+}) => {
+  const totalItems = sections.reduce((acc: number, sec: Section) => acc + (sec.items?.length || 0), 0);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleNext = () => {
@@ -2482,10 +2621,10 @@ const MobileCreateMenuView = ({
 
   const finalizeSave = () => {
     if (menuEditingId) {
-      setMenus((prev: any[]) => prev.map((m: any) => m.id === menuEditingId ? {
+      setMenus((prev: Menu[]) => prev.map((m: Menu) => m.id === menuEditingId ? {
         ...m,
         name: menuIdentity.name,
-        price: parseInt(menuIdentity.price) || 0,
+        price: menuIdentity.price,
         minMembers: menuIdentity.minMembers,
         maxMembers: menuIdentity.maxMembers,
         dietType: menuIdentity.dietType,
@@ -2493,19 +2632,19 @@ const MobileCreateMenuView = ({
         sections: [...sections]
       } : m));
     } else {
-      const newMenuObj = {
+      const newMenuObj: Menu = {
         id: Date.now(),
         name: menuIdentity.name,
-        price: parseInt(menuIdentity.price) || 0,
+        price: menuIdentity.price,
         status: 'Active',
-        category: 'breakfast', // Default for now
+        category: 'breakfast',
         minMembers: menuIdentity.minMembers,
         maxMembers: menuIdentity.maxMembers,
         dietType: menuIdentity.dietType,
         image: menuIdentity.image,
         sections: [...sections]
       };
-      setMenus((prev: any[]) => [...prev, newMenuObj]);
+      setMenus((prev: Menu[]) => [...prev, newMenuObj]);
     }
     resetAddMenu();
   };
@@ -2538,7 +2677,7 @@ const MobileCreateMenuView = ({
                 className="mobile-input-v55" 
                 placeholder="e.g. Premium Buffet"
                 value={menuIdentity.name}
-                onChange={(e) => setMenuIdentity((prev: any) => ({ ...prev, name: e.target.value }))}
+                onChange={(e) => setMenuIdentity((prev: MenuIdentity) => ({ ...prev, name: e.target.value }))}
               />
             </div>
 
@@ -2549,7 +2688,7 @@ const MobileCreateMenuView = ({
                   <button 
                     key={type}
                     className={`mobile-radio-btn-v55 ${type === 'Veg' ? 'veg' : 'nonveg'} ${menuIdentity.dietType === type ? 'active' : ''}`}
-                    onClick={() => setMenuIdentity((prev: any) => ({ ...prev, dietType: type }))}
+                    onClick={() => setMenuIdentity((prev: MenuIdentity) => ({ ...prev, dietType: type }))}
                   >
                     <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="0.5" y="0.5" width="11" height="11" rx="1.5" stroke="currentColor" /><circle cx="6" cy="6" r="3" fill="currentColor" /></svg>
                     {type}
@@ -2567,7 +2706,7 @@ const MobileCreateMenuView = ({
                   className="mobile-input-v55" 
                   placeholder="0"
                   value={menuIdentity.price}
-                  onChange={(e) => setMenuIdentity((prev: any) => ({ ...prev, price: e.target.value }))}
+                  onChange={(e) => setMenuIdentity((prev: MenuIdentity) => ({ ...prev, price: e.target.value }))}
                 />
               </div>
             </div>
@@ -2580,7 +2719,7 @@ const MobileCreateMenuView = ({
                   className="mobile-input-v55" 
                   placeholder="10"
                   value={menuIdentity.minMembers}
-                  onChange={(e) => setMenuIdentity((prev: any) => ({ ...prev, minMembers: e.target.value }))}
+                  onChange={(e) => setMenuIdentity((prev: MenuIdentity) => ({ ...prev, minMembers: e.target.value }))}
                 />
               </div>
               <div className="mobile-form-group-v55" style={{ flex: 1 }}>
@@ -2590,7 +2729,7 @@ const MobileCreateMenuView = ({
                   className="mobile-input-v55" 
                   placeholder="500"
                   value={menuIdentity.maxMembers}
-                  onChange={(e) => setMenuIdentity((prev: any) => ({ ...prev, maxMembers: e.target.value }))}
+                  onChange={(e) => setMenuIdentity((prev: MenuIdentity) => ({ ...prev, maxMembers: e.target.value }))}
                 />
               </div>
             </div>
@@ -2652,7 +2791,7 @@ const MobileCreateMenuView = ({
             )}
 
             <div className="mobile-sections-list-v55">
-              {sections.map((sec: any, idx: number) => (
+              {sections.map((sec: Section, idx: number) => (
                 <div key={idx} className="mobile-section-card-v55">
                   <div className="sec-info-v55">
                     <h4>{sec.name}</h4>
@@ -2666,7 +2805,7 @@ const MobileCreateMenuView = ({
                     }}>
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0077ff" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                     </button>
-                    <button className="mobile-action-btn-v50" onClick={() => setSections((prev: any[]) => prev.filter((_: any, i: number) => i !== idx))}>
+                    <button className="mobile-action-btn-v50" onClick={() => setSections((prev: Section[]) => prev.filter((_: Section, i: number) => i !== idx))}>
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                     </button>
                   </div>
@@ -2690,9 +2829,9 @@ const MobileCreateMenuView = ({
 
             {isAddingSection && (
               <MobileSectionEditor 
+                onClose={() => setIsAddingSection(false)}
                 currentSection={currentSection}
                 setCurrentSection={setCurrentSection}
-                setIsAddingSection={setIsAddingSection}
                 handleSaveSection={handleSaveSection}
               />
             )}
@@ -2725,17 +2864,17 @@ const MobileCreateMenuView = ({
 
             <h4 style={{ fontSize: '0.95rem', fontWeight: '700', color: '#1e293b', marginBottom: '12px' }}>Contents</h4>
             <div className="mobile-sections-list-v55">
-              {sections.map((sec: any, i: number) => (
+              {sections.map((sec: Section, i: number) => (
                 <div key={i} className="mobile-section-card-v55" style={{ display: 'block' }}>
                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                       <span style={{ fontWeight: '700', fontSize: '0.9rem' }}>{sec.name}</span>
                       <span style={{ fontSize: '0.75rem', background: '#f1f5f9', padding: '2px 8px', borderRadius: '4px', color: '#475569' }}>{sec.type}</span>
                    </div>
-                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                      {sec.items.map((it: any, j: number) => (
-                        <span key={j} style={{ fontSize: '0.8rem', color: '#64748b' }}>{it.name}{j < sec.items.length - 1 ? ' • ' : ''}</span>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                      {(sec.items as any[]).map((it: any, j: number) => (
+                        <span key={j} style={{ fontSize: '0.8rem', color: '#64748b' }}>{typeof it === 'string' ? it : it.name}{j < sec.items.length - 1 ? ' • ' : ''}</span>
                       ))}
-                   </div>
+                    </div>
                 </div>
               ))}
             </div>
@@ -3025,49 +3164,45 @@ const MobileServiceSettingsView = ({
   );
 };
 
-const MobileDashboard: React.FC<MobileDashboardProps> = ({
-  activeTab,
-  setActiveTab,
-  profileData,
-  navigationGroups,
-  onLogout,
-  isAddingMenu,
-  setIsAddingMenu,
-  menuStep,
-  setMenuStep,
-  menuIdentity,
-  setMenuIdentity,
-  sections,
-  setSections,
-  isAddingSection,
-  setIsAddingSection,
-  currentSection,
-  setCurrentSection,
-  sectionEditingIndex,
-  setSectionEditingIndex,
-  resetAddMenu,
-  handleImageUpload,
-  handleSaveSection,
-  menuEditingId,
-  setMenuEditingId,
-  menus,
-  setMenus
-}) => {
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [editingCoupon, setEditingCoupon] = useState<any>(null);
-  const [isAddingCoupon, setIsAddingCoupon] = useState(false);
-  const [coupons, setCoupons] = useState([
-    { id: '1', code: 'WELCOME10', type: 'Percentage', value: '10%', status: 'Active', usage: '45/100', validFrom: '2026-03-01', validTo: '2026-03-31', maxCap: '500', minAmount: '1000', source: 'vendor', applicability: 'orders' },
-    { id: '2', code: 'FLAT500', type: 'Flat Amount', value: '₹500', status: 'Paused', usage: '12/50', validFrom: '2026-03-20', validTo: '2026-04-15', minAmount: '2000', source: 'vendor', applicability: 'orders' },
-    { id: '3', code: 'PLATFORM25', type: 'Percentage', value: '25%', status: 'Active', usage: '1050/5000', validFrom: '2026-01-01', validTo: '2026-12-31', maxCap: '1000', minAmount: '2000', source: 'platform', applicability: 'subscription' },
-    { id: '4', code: 'HOLIDAY15', type: 'Percentage', value: '15%', status: 'Active', usage: '800/2000', validFrom: '2026-03-15', validTo: '2026-04-30', maxCap: '750', minAmount: '1500', source: 'platform', applicability: 'orders' },
-  ]);
+const MobileDashboard = (props: MobileDashboardProps) => {
+  const { 
+    activeTab, 
+    setActiveTab, 
+    profileData, 
+    navigationGroups, 
+    onLogout,
+    isAddingMenu,
+    setIsAddingMenu,
+    menuStep,
+    setMenuStep,
+    menuIdentity,
+    setMenuIdentity,
+    sections,
+    setSections,
+    isAddingSection,
+    setIsAddingSection,
+    currentSection,
+    setCurrentSection,
+    sectionEditingIndex,
+    setSectionEditingIndex,
+    resetAddMenu,
+    handleImageUpload,
+    handleSaveSection,
+    menuEditingId,
+    setMenuEditingId,
+    menus,
+    setMenus
+  } = props;
 
-  // We need menus locally or from context to update them
-  // In Dashboard (App.tsx), we lifted menus state. 
-  // But we need to pass it down to MobileDashboard as well.
-  // Wait, I didn't add 'menus' and 'setMenus' to MobileDashboardProps yet.
-  // I should do that.
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [editingCoupon, setEditingCoupon] = useState<Coupon | null>(null);
+  const [isAddingCoupon, setIsAddingCoupon] = useState(false);
+  const [coupons, setCoupons] = useState<Coupon[]>([
+    { id: '1', code: 'WELCOME10', type: 'Percentage', value: '10%', status: 'Active', usage: '45/100', validFrom: '2026-03-01', validTo: '2026-03-31', maxCap: '500', minAmount: '1000', source: 'vendor', applicability: 'orders', scope: 'all', perUserLimit: '1' },
+    { id: '2', code: 'FLAT500', type: 'Flat Amount', value: '₹500', status: 'Paused', usage: '12/50', validFrom: '2026-03-20', validTo: '2026-04-15', minAmount: '2000', source: 'vendor', applicability: 'orders', maxCap: '0', scope: 'all', perUserLimit: '1' },
+    { id: '3', code: 'PLATFORM25', type: 'Percentage', value: '25%', status: 'Active', usage: '1050/5000', validFrom: '2026-01-01', validTo: '2026-12-31', maxCap: '1000', minAmount: '2000', source: 'platform', applicability: 'subscription', scope: 'all', perUserLimit: '1' },
+    { id: '4', code: 'HOLIDAY15', type: 'Percentage', value: '15%', status: 'Active', usage: '800/2000', validFrom: '2026-03-15', validTo: '2026-04-30', maxCap: '750', minAmount: '1500', source: 'platform', applicability: 'orders', scope: 'all', perUserLimit: '1' },
+  ]);
 
   // Close drawer on tab change
   useEffect(() => {
@@ -3107,11 +3242,13 @@ const MobileDashboard: React.FC<MobileDashboardProps> = ({
         <MobileRatingsView />
       ) : activeTab === 'coupons' ? (
         <MobileCouponsView 
-          isAddingCoupon={isAddingCoupon} 
-          setIsAddingCoupon={setIsAddingCoupon} 
           coupons={coupons} 
           setCoupons={setCoupons} 
-          setEditingCoupon={setEditingCoupon}
+          setEditingCoupon={(coupon: Coupon) => {
+            setEditingCoupon(coupon);
+            setIsAddingCoupon(true);
+          }}
+          setIsAddingCoupon={setIsAddingCoupon}
         />
       ) : activeTab === 'tickets' ? (
         <MobileSupportView />
@@ -3145,12 +3282,12 @@ const MobileDashboard: React.FC<MobileDashboardProps> = ({
             setIsAddingCoupon(false);
             setEditingCoupon(null);
           }}
-          onSave={(newCoupon) => {
+          onSave={(newCoupon: Coupon) => {
             const exists = coupons.find(c => c.id === newCoupon.id);
             if (exists) {
-              setCoupons(prev => prev.map(c => c.id === newCoupon.id ? newCoupon : c));
+              setCoupons((prev: Coupon[]) => prev.map((c: Coupon) => c.id === newCoupon.id ? newCoupon : c));
             } else {
-              setCoupons(prev => [newCoupon, ...prev]);
+              setCoupons((prev: Coupon[]) => [newCoupon, ...prev]);
             }
             setIsAddingCoupon(false);
             setEditingCoupon(null);
@@ -3201,7 +3338,7 @@ const MobileDashboard: React.FC<MobileDashboardProps> = ({
                 <div key={group.title} className="drawer-nav-group-v50">
                   <h3 className="drawer-nav-label-v50">{group.title}</h3>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    {group.items.map((item: any) => (
+                    {group.items.map((item: NavigationItem) => (
                       <button
                         key={item.id}
                         className={`drawer-item-v50 ${activeTab === item.id ? 'active' : ''}`}
