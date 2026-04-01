@@ -1576,94 +1576,92 @@ const MobileSectionEditor = ({
   };
 
   return (
-    <div className="mobile-section-editor-v55">
-      <div className="mobile-create-header-v55">
-        <button className="mobile-action-btn-v50" onClick={() => setIsAddingSection(false)}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-        </button>
-        <div className="header-center-v55">
-          <h2>Add Section</h2>
-        </div>
-        <div style={{ width: 44 }}></div>
-      </div>
-
-      <div className="mobile-create-content-v55">
-        <div className="mobile-form-section-v55">
+    <div className="mobile-bottom-sheet-overlay-v55" onClick={() => setIsAddingSection(false)}>
+      <div className="mobile-bottom-sheet-v55" onClick={(e) => e.stopPropagation()}>
+        <div className="bottom-sheet-content-v55">
           <div className="mobile-form-group-v55">
-            <label className="mobile-label-v55">Section Name</label>
+            <label className="mobile-form-label-big-v55">Section Name</label>
             <input 
               type="text" 
               className="mobile-input-v55" 
               placeholder="e.g. Starters"
+              style={{ background: 'white', border: '1.5px solid #eef2f6' }}
               value={currentSection.name}
               onChange={(e) => setCurrentSection((prev: any) => ({ ...prev, name: e.target.value }))}
             />
           </div>
 
-          <div className="mobile-form-group-v55">
-            <label className="mobile-label-v55">Selection Type</label>
-            <div className="mobile-radio-group-v55">
-              <button 
-                className={`mobile-radio-btn-v55 ${currentSection.type === 'All Included' ? 'active' : ''}`}
-                onClick={() => setCurrentSection((prev: any) => ({ ...prev, type: 'All Included' }))}
+          <div className="selection-row-v55">
+            <div className="selection-type-col-v55">
+              <label className="mobile-form-label-big-v55">Selection Type</label>
+              <select 
+                className="mobile-select-v55"
+                value={currentSection.type}
+                onChange={(e) => setCurrentSection((prev: any) => ({ ...prev, type: e.target.value }))}
               >
-                All Included
-              </button>
-              <button 
-                className={`mobile-radio-btn-v55 ${currentSection.type === 'Limited Selection' ? 'active' : ''}`}
-                onClick={() => setCurrentSection((prev: any) => ({ ...prev, type: 'Limited Selection' }))}
-              >
-                Limited
-              </button>
+                <option value="All Included">All Included</option>
+                <option value="Limited Selection">Limited Selection</option>
+              </select>
             </div>
-          </div>
-
-          {currentSection.type === 'Limited Selection' && (
-            <div className="mobile-form-group-v55">
-              <label className="mobile-label-v55">Max Items Customer Can Choose</label>
+            <div className="selection-limit-col-v55">
+              <label className="mobile-form-label-big-v55">Choose Any</label>
               <input 
                 type="number" 
                 className="mobile-input-v55" 
                 placeholder="0"
+                style={{ background: 'white', border: '1.5px solid #eef2f6', textAlign: 'center' }}
                 value={currentSection.limit || ''}
+                disabled={currentSection.type === 'All Included'}
                 onChange={(e) => setCurrentSection((prev: any) => ({ ...prev, limit: parseInt(e.target.value) || 0 }))}
               />
             </div>
-          )}
-        </div>
+          </div>
 
-        <div className="mobile-section-v50">
-          <h3 className="mobile-h3-v50" style={{ marginBottom: '16px' }}>Items in this Section</h3>
+          <div style={{ borderTop: '1px solid #f1f5f9', margin: '24px 0' }}></div>
+
+          <h3 className="mobile-form-label-big-v55">Items in this Section</h3>
+          
           <div className="mobile-items-list-v55">
             {currentSection.items.map((item: any, i: number) => (
-              <div key={i} className="mobile-item-row-v55">
-                <div className="item-img-upload-v55" onClick={() => handleItemImage(i)}>
+              <div key={i} className="item-editor-card-v55" style={{ position: 'relative' }}>
+                <div className="photo-upload-placeholder-v55" onClick={() => handleItemImage(i)}>
                   {item.image ? (
-                    <img src={item.image} alt="item" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <img src={item.image} alt="Item" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '12px' }} />
                   ) : (
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                    <>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                      <span>Photo</span>
+                    </>
+                  )}
+                  {item.image && (
+                    <button 
+                      style={{ position: 'absolute', top: '-8px', right: '-8px', background: '#ef4444', color: 'white', border: 'none', borderRadius: '50%', width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2 }}
+                      onClick={(e) => { e.stopPropagation(); updateItem(i, 'image', null); }}
+                    >
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
                   )}
                 </div>
-                <div className="item-fields-v55">
+                <div className="item-editor-fields-v55">
                   <input 
                     type="text" 
-                    className="mobile-input-v55" 
-                    placeholder="Item Name" 
-                    style={{ height: '40px', fontSize: '0.9rem' }}
+                    className="item-name-input-v55" 
+                    placeholder="Item Name"
                     value={item.name}
                     onChange={(e) => updateItem(i, 'name', e.target.value)}
                   />
-                  <input 
-                    type="text" 
-                    className="mobile-input-v55" 
-                    placeholder="Description (Optional)" 
-                    style={{ height: '40px', fontSize: '0.85rem' }}
+                  <textarea 
+                    className="item-desc-textarea-v55"
+                    placeholder="Short Description (max 1000 chars)"
                     value={item.description}
                     onChange={(e) => updateItem(i, 'description', e.target.value)}
                   />
                 </div>
                 {currentSection.items.length > 1 && (
-                  <button className="btn-remove-item-v55" onClick={() => removeItem(i)}>
+                  <button 
+                    style={{ position: 'absolute', right: '-8px', top: '-8px', background: '#fee2e2', border: 'none', color: '#ef4444', padding: '6px', borderRadius: '50%', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', zIndex: 3 }}
+                    onClick={() => removeItem(i)}
+                  >
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                   </button>
                 )}
@@ -1671,16 +1669,23 @@ const MobileSectionEditor = ({
             ))}
           </div>
 
-          <button className="mobile-btn-v55 mobile-btn-outline-v55" style={{ marginTop: '20px', height: '44px' }} onClick={addItem}>
-            + Add Another Item
+          <button className="btn-add-item-dashed-v55" onClick={addItem}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            Add Another Item
           </button>
-        </div>
-      </div>
 
-      <div className="mobile-sticky-footer-v55">
-        <button className="mobile-btn-v55 mobile-btn-primary-v55" disabled={!currentSection.name} onClick={handleSaveSection}>
-          Save Section
-        </button>
+          <div style={{ display: 'flex', gap: '12px', marginTop: '32px', paddingBottom: '24px' }}>
+            <button className="btn-cancel-v55" style={{ flex: 1 }} onClick={() => setIsAddingSection(false)}>Cancel</button>
+            <button 
+              className="btn-save-v55" 
+              style={{ flex: 2 }}
+              disabled={!currentSection.name || currentSection.items.some((it: any) => !it.name)}
+              onClick={handleSaveSection}
+            >
+              Save Section
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -1748,21 +1753,18 @@ const MobileCreateMenuView = ({
 
   return (
     <div className="mobile-create-menu-view-v55">
-      <div className="mobile-create-header-v55">
-        <button className="mobile-action-btn-v50" onClick={handleBack}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
-        </button>
-        <div className="header-center-v55">
-          <span className="header-step-v55">Step {menuStep} of 3</span>
-          <h2>{menuEditingId ? 'Edit Menu' : 'Create New Menu'}</h2>
+      <div className="mobile-create-header-v55" style={{ padding: '24px 20px 0 20px', height: 'auto', borderBottom: 'none', position: 'relative' }}>
+        <div className="header-center-v55" style={{ textAlign: 'left', margin: 0 }}>
+          <h2 style={{ fontSize: '1.15rem', fontWeight: '800', marginBottom: '4px' }}>{menuEditingId ? 'Edit Menu' : 'Create New Menu'}</h2>
+          <p style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: '500', marginBottom: '12px' }}>Create menu basics before adding food sections</p>
         </div>
-        <button className="mobile-action-btn-v50" onClick={resetAddMenu}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        <button className="close-btn-header-v55" onClick={resetAddMenu}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
       </div>
 
-      <div className="mobile-create-content-v55">
-        <div className="step-indicator-v55">
+      <div className="mobile-create-content-v55" style={{ padding: '0 20px 20px' }}>
+        <div className="step-indicator-v55" style={{ marginBottom: '24px' }}>
           <div className="step-progress-bar-v55">
             <div className="step-progress-fill-v55" style={{ width: `${(menuStep / 3) * 100}%` }}></div>
           </div>
@@ -1859,15 +1861,34 @@ const MobileCreateMenuView = ({
 
         {menuStep === 2 && (
           <div className="mobile-step-container-v55">
-            <h3 className="mobile-h3-v50" style={{ marginBottom: '16px' }}>Menu Sections</h3>
+            <span className="menu-section-label-muted-v55">EXAMPLE</span>
+            <div className="example-placeholder-v55"></div>
+
+            <h3 className="menu-title-big-v55">Sections</h3>
+            <span className="menu-subtitle-v55">Build food groups inside this menu</span>
+
+            <div className="menu-created-alert-v55">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+              Menu was created you can customise or edit from dashboard
+            </div>
             
             {sections.length === 0 && !isAddingSection && (
-              <div style={{ textAlign: 'center', padding: '40px 20px', background: 'white', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
-                <div style={{ width: '48px', height: '48px', background: '#f1f5f9', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2"><path d="M12 5v14M5 12h14"></path></svg>
+              <div className="no-sections-empty-state-v55">
+                <div className="icon-circle-v55">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2"><path d="M12 20v-6M9 20v-10M6 20v-4M15 20v-12M18 20v-16"></path></svg>
                 </div>
-                <h4 style={{ margin: '0 0 8px 0', fontSize: '1rem', color: '#1e293b' }}>No sections added</h4>
-                <p style={{ margin: 0, fontSize: '0.85rem', color: '#64748b' }}>Start by adding a section like Starters or Main Course.</p>
+                <h4>No sections added yet</h4>
+                <p>Start by creating your first food group like Starters or Main Course</p>
+                <button 
+                  className="mobile-btn-v55 btn-add-first-sec-v55"
+                  onClick={() => {
+                    setCurrentSection({ name: '', type: 'All Included', limit: 0, items: [{ name: '', description: '', image: null }] });
+                    setIsAddingSection(true);
+                    setSectionEditingIndex(null);
+                  }}
+                >
+                  + Add First Section
+                </button>
               </div>
             )}
 
@@ -1894,10 +1915,10 @@ const MobileCreateMenuView = ({
               ))}
             </div>
 
-            {!isAddingSection && (
+            {!isAddingSection && sections.length > 0 && (
               <button 
-                className="mobile-btn-v55 mobile-btn-outline-v55" 
-                style={{ marginTop: '16px', background: 'white' }}
+                className="btn-add-item-dashed-v55" 
+                style={{ marginTop: '16px', border: '1.5px solid #eef2f6', color: '#475569', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}
                 onClick={() => {
                   setCurrentSection({ name: '', type: 'All Included', limit: 0, items: [{ name: '', description: '', image: null }] });
                   setIsAddingSection(true);
@@ -1933,13 +1954,13 @@ const MobileCreateMenuView = ({
               </div>
               <div style={{ padding: '20px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
-                  <h4 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '800', color: '#1e293b' }}>{menuIdentity.name || 'Untitled Menu'}</h4>
+                  <h4 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '800', color: '#1e293b' }}>{menuIdentity.name || 'Untitled Menu'}</h4>
                   <span className={`card-status-pill-v50 ${menuIdentity.dietType === 'Veg' ? 'info' : 'warning'}`} style={{ fontSize: '0.7rem' }}>{menuIdentity.dietType}</span>
                 </div>
                 <div style={{ fontSize: '0.9rem', color: '#64748b', fontWeight: '600', marginBottom: '12px' }}>
                   {sections.length} Sections • {totalItems} Items
                 </div>
-                <div style={{ fontSize: '1.5rem', fontWeight: '800', color: '#0077ff' }}>₹{menuIdentity.price || '0'}<span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: '500' }}> /person</span></div>
+                <div style={{ fontSize: '1.25rem', fontWeight: '800', color: '#0077ff' }}>₹{menuIdentity.price || '0'}<span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: '500' }}> /person</span></div>
               </div>
             </div>
 
@@ -1963,17 +1984,21 @@ const MobileCreateMenuView = ({
         )}
       </div>
 
-      <div className="mobile-sticky-footer-v55">
-        <button className="mobile-btn-v55 mobile-btn-outline-v55" style={{ flex: '0 0 100px' }} onClick={handleBack}>
-          {menuStep === 1 ? 'Cancel' : 'Back'}
-        </button>
-        <button 
-          className="mobile-btn-v55 mobile-btn-primary-v55" 
-          disabled={menuStep === 1 && !menuIdentity.name}
-          onClick={menuStep === 3 ? finalizeSave : handleNext}
-        >
-          {menuStep === 3 ? (menuEditingId ? 'Update Menu' : 'Save & Publish') : 'Continue'}
-        </button>
+      <div className="mobile-sticky-footer-v55" style={{ padding: '8px 20px 12px 20px' }}>
+        <div className="step-pill-v55">STEP {menuStep}/3</div>
+        <div style={{ marginLeft: 'auto', display: 'flex', gap: '12px' }}>
+          <button className="mobile-btn-v55 mobile-btn-outline-v55" style={{ border: '1.5px solid #e2e8f0', color: '#1e293b', fontWeight: '700', padding: '8px 16px', fontSize: '0.75rem' }} onClick={handleBack}>
+            {menuStep === 1 ? 'Cancel' : 'Back'}
+          </button>
+          <button 
+            className="mobile-btn-v55 mobile-btn-primary-v55" 
+            style={{ padding: '8px 24px', borderRadius: '10px', fontSize: '0.75rem' }}
+            disabled={menuStep === 1 && !menuIdentity.name}
+            onClick={menuStep === 3 ? finalizeSave : handleNext}
+          >
+            {menuStep === 3 ? (menuEditingId ? 'Update' : 'Next') : 'Next'}
+          </button>
+        </div>
       </div>
     </div>
   );
