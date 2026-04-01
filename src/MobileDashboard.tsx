@@ -1528,7 +1528,280 @@ interface MobileDashboardProps {
   setMenus: (val: any[] | ((prev: any[]) => any[])) => void;
 }
 
-/* ─────────────────── MOBILE CREATE MENU VIEW (-v55) ─────────────────── */
+/* ─────────────────── MOBILE SUPPORT VIEW (v57) ─────────────────── */
+
+const MobileSupportView = () => {
+  const [category, setCategory] = useState('');
+  const [bookingId, setBookingId] = useState('');
+  const [description, setDescription] = useState('');
+
+  const categories = [
+    'Technical Issue',
+    'Payment / Payout Issue',
+    'Booking Issue',
+    'Account Access',
+    'Other'
+  ];
+
+  const recentBookings = [
+    { id: 'BK-10821', customer: 'Ananya Sharma' },
+    { id: 'BK-10744', customer: 'Ravi Krishnan' },
+  ];
+
+  const tickets = [
+    { id: 'TKT-8842', category: 'Payment / Payout Issue', date: 'Oct 24, 2023', status: 'In Review' },
+    { id: 'TKT-8711', category: 'Technical Issue', date: 'Oct 20, 2023', status: 'Resolved' },
+    { id: 'TKT-8605', category: 'Booking Issue', date: 'Oct 15, 2023', status: 'Resolved' },
+  ];
+
+  return (
+    <div className="mobile-support-container-v57 mobile-scroller-v50">
+      <div className="mobile-home-header-v50" style={{ marginBottom: '20px' }}>
+        <h1 className="mobile-title-v50">Support Tickets</h1>
+        <p style={{ fontSize: '0.75rem', color: '#64748b', margin: '4px 0 0' }}>Raise a new issue or track your recent support requests.</p>
+      </div>
+
+      <div className="support-form-card-v57">
+        <span className="support-section-title-v57">Create New Ticket</span>
+        
+        <div className="support-form-group-v57">
+          <label className="support-label-v57">Issue Category</label>
+          <select 
+            className="support-select-v57"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+          >
+            <option value="">Select Category</option>
+            {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+          </select>
+        </div>
+
+        <div className="support-form-group-v57">
+          <label className="support-label-v57">Booking ID</label>
+          <select 
+            className="support-select-v57"
+            value={bookingId}
+            onChange={(e) => setBookingId(e.target.value)}
+            disabled={!category}
+          >
+            <option value="">{category ? 'Select Recent Booking' : 'Select category first'}</option>
+            {recentBookings.map(b => (
+              <option key={b.id} value={b.id}>{b.id} — {b.customer}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="support-form-group-v57">
+          <label className="support-label-v57">Describe Your Issue</label>
+          <textarea 
+            className="support-textarea-v57"
+            placeholder="Tell us more about the problem you're facing..."
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          ></textarea>
+        </div>
+
+        <div className="support-form-group-v57">
+          <label className="support-label-v57">Proof Upload</label>
+          <div className="support-upload-zone-v57">
+            <svg className="support-upload-icon-v57" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+            <span className="support-upload-text-v57">Click to upload or drag & drop</span>
+            <p className="support-upload-sub-v57">Images, PDF, or DOC (Max 5 files, 10MB each)</p>
+          </div>
+        </div>
+
+        <button className="support-submit-btn-v57">Submit Ticket</button>
+      </div>
+
+      <div className="recent-tickets-header-v57">
+        <span className="support-section-title-v57" style={{ marginBottom: '8px' }}>Recent Tickets</span>
+      </div>
+
+      <div className="mobile-ticket-stack-v57">
+        {tickets.map(tkt => (
+          <div key={tkt.id} className="mobile-ticket-card-v57">
+            <div className="tkt-card-head-v57">
+              <span className="tkt-id-v57">{tkt.id}</span>
+              <span className={`tkt-status-v57 ${tkt.status.toLowerCase().replace(/ /g, '-')}`}>
+                {tkt.status}
+              </span>
+            </div>
+            <div className="tkt-category-v57">{tkt.category}</div>
+            <div className="tkt-date-v57">Created on {tkt.date}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const MobileRatingsView = () => {
+  const [filter, setFilter] = useState('All');
+  const [showStatus, setShowStatus] = useState(false);
+
+  const reviews = [
+    { id: 1, customer: 'Ananya Sharma', bookingId: 'BK-10821', eventDate: '12 Mar 2026', rating: 5, review: 'Absolutely amazing food and service! The team was incredibly professional and the presentation was stunning. Guests kept complimenting the food throughout. Highly recommend!' },
+    { id: 2, customer: 'Ravi Krishnan', bookingId: 'BK-10744', eventDate: '5 Mar 2026', rating: 4, review: 'Good overall experience. Food was tasty but setup took a little longer than expected. Would consider booking again.' },
+    { id: 3, customer: 'Meera Patel', bookingId: 'BK-10632', eventDate: '28 Feb 2026', rating: 5, review: 'Outstanding experience from start to finish. The menu customisation was excellent and the staff were very attentive.' },
+    { id: 4, customer: 'Siddharth R.', bookingId: 'BK-10589', eventDate: '20 Feb 2026', rating: 3, review: 'Food was decent but portions were a bit small for the group size. Communication could improve.' },
+    { id: 5, customer: 'Lakshmi N.', bookingId: 'BK-10502', eventDate: '14 Feb 2026', rating: 5, review: "Loved every bit of it! The Valentine's Day special menu was a hit. Thank you for making it memorable." },
+    { id: 6, customer: 'Vikram Singh', bookingId: 'BK-10499', eventDate: '12 Feb 2026', rating: 5, review: 'Exceptional service and the food quality was top-notch. Highly recommended for any large gathering!' },
+  ];
+
+  const breakdown = [
+    { stars: 5, count: 8 },
+    { stars: 4, count: 4 },
+    { stars: 3, count: 3 },
+    { stars: 2, count: 0 },
+    { stars: 1, count: 0 },
+  ];
+
+  const filteredReviews = filter === 'All' 
+    ? reviews 
+    : reviews.filter(r => r.rating === parseInt(filter));
+
+  const totalReviews = 15;
+
+  const renderStars = (rating: number) => {
+    return (
+      <div className="review-rating-stars-v56">
+        {[1, 2, 3, 4, 5].map(star => (
+          <svg key={star} width="12" height="12" viewBox="0 0 24 24" fill={star <= rating ? '#f59e0b' : 'none'} stroke={star <= rating ? '#f59e0b' : '#cbd5e1'} strokeWidth="2">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+          </svg>
+        ))}
+      </div>
+    );
+  };
+
+  return (
+    <div className="mobile-ratings-container-v56 mobile-scroller-v50">
+      <div className="mobile-home-header-v50" style={{ marginBottom: '20px' }}>
+        <h1 className="mobile-title-v50">Ratings & Reviews</h1>
+        <p style={{ fontSize: '0.75rem', color: '#64748b', margin: '4px 0 0' }}>What your customers are saying</p>
+      </div>
+
+      <div className="ratings-hero-card-v56">
+        <span className="hero-star-v56">⭐</span>
+        <div className="hero-rating-value-v56">4.3</div>
+        <div className="hero-rating-label-v56">Overall Rating</div>
+        
+        <button className="hero-badge-v56" onClick={() => setShowStatus(true)} style={{ cursor: 'pointer', border: '1px solid #dcfce7' }}>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
+          Excellent
+        </button>
+        
+        <div className="hero-reviews-total-v56">{totalReviews} customer reviews</div>
+      </div>
+
+      <div className="ratings-breakdown-box-v56">
+        <h3 className="breakdown-title-v56">Rating Breakdown</h3>
+        {breakdown.map((item) => (
+          <div key={item.stars} className="breakdown-row-v56">
+            <span className="breakdown-star-label-v56">{item.stars}★</span>
+            <div className="breakdown-bar-track-v56">
+              <div 
+                className="breakdown-bar-fill-v56" 
+                style={{ 
+                  width: `${(item.count / totalReviews) * 100}%`,
+                  background: item.stars >= 4 ? '#22c55e' : item.stars === 3 ? '#f59e0b' : '#ef4444'
+                }}
+              ></div>
+            </div>
+            <span className="breakdown-count-v56">{item.count}</span>
+          </div>
+        ))}
+
+        <div className="ratings-insight-v56">
+          <span className="insight-icon-v56">💡</span>
+          <div className="insight-text-v56">
+            Customers appreciate <strong>food quality</strong> and <strong>presentation</strong> most.
+          </div>
+        </div>
+      </div>
+
+      {/* Filter Horizontal Scroll */}
+      <div className="mobile-ratings-filters-v56">
+        {['All', '5', '4', '3', '2', '1'].map(f => (
+          <button 
+            key={f} 
+            className={`rating-filter-chip-v56 ${filter === f ? 'active' : ''}`}
+            onClick={() => setFilter(f)}
+          >
+            {f === 'All' ? 'All' : `${f}★`}
+          </button>
+        ))}
+      </div>
+
+      {/* Review List */}
+      <div className="mobile-reviews-list-v56">
+        {filteredReviews.length > 0 ? (
+          filteredReviews.map(review => (
+            <div key={review.id} className="mobile-review-card-v56">
+              <div className="review-card-head-v56">
+                <div className="review-user-info-v56">
+                  <div className="review-avatar-v56">{review.customer.charAt(0)}</div>
+                  <div className="review-name-stack-v56">
+                    <span className="review-user-name-v56">{review.customer}</span>
+                    <div className="review-meta-row-v56">
+                      <span>{review.bookingId}</span>
+                      <span>•</span>
+                      <span>{review.eventDate}</span>
+                    </div>
+                  </div>
+                </div>
+                {renderStars(review.rating)}
+              </div>
+              <p className="review-text-v56">{review.review}</p>
+            </div>
+          ))
+        ) : (
+          <div style={{ textAlign: 'center', padding: '40px 0', color: '#94a3b8', fontSize: '0.85rem' }}>
+            No reviews found for this filter.
+          </div>
+        )}
+      </div>
+
+      {/* Performance Status Popup */}
+      {showStatus && (
+        <div className="performance-status-overlay-v56" onClick={() => setShowStatus(false)}>
+          <div className="performance-status-content-v56" onClick={e => e.stopPropagation()}>
+            <button className="perf-popup-close-v56" onClick={() => setShowStatus(false)}>×</button>
+            <span className="perf-status-label-v56">PERFORMANCE STATUS</span>
+            <h3 className="perf-status-headline-v56">Boosted visibility applied</h3>
+            
+            <div className="perf-status-divider-v56"></div>
+            
+            <div className="perf-scale-grid-v56">
+              <div className="perf-scale-item-v56 active">
+                <span className="perf-scale-range-v56">4.0 - 5.0</span>
+                <span className="perf-scale-label-v56">Excellent</span>
+              </div>
+              <div className="perf-scale-item-v56">
+                <span className="perf-scale-range-v56">3.5 - 3.9</span>
+                <span className="perf-scale-label-v56">Good</span>
+              </div>
+              <div className="perf-scale-item-v56">
+                <span className="perf-scale-range-v56">3.0 - 3.4</span>
+                <span className="perf-scale-label-v56">Average</span>
+              </div>
+              <div className="perf-scale-item-v56">
+                <span className="perf-scale-range-v56">2.5 - 2.9</span>
+                <span className="perf-scale-label-v56">Needs Attention</span>
+              </div>
+              <div className="perf-scale-item-v56">
+                <span className="perf-scale-range-v56">Below 2.5</span>
+                <span className="perf-scale-label-v56">Under Review</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+/* ─────────────────── MOBILE GST FILING VIEW (v52) ─────────────────── */
 
 const MobileSectionEditor = ({
   currentSection,
@@ -2336,6 +2609,10 @@ const MobileDashboard: React.FC<MobileDashboardProps> = ({
         <MobileBookingsView />
       ) : activeTab === 'reports' ? (
         <MobileReportsView />
+      ) : activeTab === 'ratings' ? (
+        <MobileRatingsView />
+      ) : activeTab === 'tickets' ? (
+        <MobileSupportView />
       ) : activeTab === 'service-settings' ? (
         <MobileServiceSettingsView 
           setIsAddingMenu={setIsAddingMenu} 
