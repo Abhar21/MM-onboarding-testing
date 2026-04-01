@@ -1528,21 +1528,288 @@ interface MobileDashboardProps {
   setMenus: (val: any[] | ((prev: any[]) => any[])) => void;
 }
 
-/* ─────────────────── MOBILE COUPONS VIEW (v58) ─────────────────── */
+/* ─────────────────── MOBILE CREATE COUPON VIEW (v59) ─────────────────── */
 
-const MobileCouponsView = () => {
+const MobileCreateCouponView = ({ onClose, onSave }: { onClose: () => void, onSave: (coupon: any) => void }) => {
+  const [form, setForm] = useState({
+    code: '',
+    discountType: 'percentage',
+    discountValue: '',
+    maxCap: '',
+    scope: 'all',
+    selectedTargets: [] as string[],
+    minAmount: '',
+    totalLimit: '',
+    isUnlimited: false,
+    perUserLimit: '1',
+    validFrom: new Date().toISOString().split('T')[0],
+    validTo: '',
+  });
+
+  const categories = ['Breakfast', 'Lunch', 'Snacks', 'Dinner'];
+
+  const generateCode = () => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let code = '';
+    for (let i = 0; i < 8; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+    setForm({ ...form, code });
+  };
+
+  const toggleTarget = (target: string) => {
+    setForm(prev => ({
+      ...prev,
+      selectedTargets: prev.selectedTargets.includes(target)
+        ? prev.selectedTargets.filter(t => t !== target)
+        : [...prev.selectedTargets, target]
+    }));
+  };
+
+  const isFormValid = form.code && form.discountValue && (form.scope === 'all' || form.selectedTargets.length > 0);
+
+  const handleSubmit = () => {
+    onSave({
+      ...form,
+      id: Math.random().toString(36).substr(2, 9),
+      type: form.discountType === 'percentage' ? 'Percentage' : 'Flat Amount',
+      value: form.discountType === 'percentage' ? `${form.discountValue}%` : `₹${form.discountValue}`,
+      status: 'Active',
+      usage: `0/${form.isUnlimited ? '∞' : (form.totalLimit || '∞')}`,
+      source: 'vendor',
+      applicability: 'orders'
+    });
+    onClose();
+  };
+
+  return (
+    <div className="mobile-create-coupon-overlay-v59">
+      <header className="create-coupon-header-v59">
+        <button className="mobile-action-btn-v50" onClick={onClose}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+        <h2 style={{ fontSize: '1rem', fontWeight: 800, color: '#1e293b' }}>Create New Coupon</h2>
+      </header>
+
+      <div className="create-coupon-body-v59">
+        <div className="create-coupon-preview-sticky-v59">
+          <div className="preview-card-mini-v59">
+            <div className="mini-preview-top-v59">
+              <span className="mini-preview-code-v59">{form.code || 'CODE'}</span>
+              <span className="mini-preview-value-v59">
+                {form.discountType === 'percentage' ? `${form.discountValue || '0'}%` : `₹${form.discountValue || '0'}`}
+              </span>
+            </div>
+            <div className="mini-preview-meta-v59">
+              <span>Min: ₹{form.minAmount || '0'}</span>
+              <span>Limit: {form.isUnlimited ? '∞' : (form.totalLimit || '∞')}</span>
+              <span>Scope: {form.scope === 'all' ? 'All Items' : form.selectedTargets.join(', ')}</span>
+              <span>Expires: {form.validTo || 'No Expiry'}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Section 1: Coupon Details */}
+        <div className="create-coupon-section-v59">
+          <span className="create-coupon-label-v59">Coupon Code</span>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <input 
+              className="coupon-input-v59" 
+              style={{ flex: 1 }}
+              placeholder="e.g. SAVE500" 
+              value={form.code}
+              onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })}
+            />
+            <button 
+              className="coupon-action-btn-v58 primary" 
+              style={{ flex: 'none', padding: '0 16px', borderRadius: '12px' }}
+              onClick={generateCode}
+            >
+              Generate
+            </button>
+          </div>
+
+          <div style={{ marginTop: '16px' }}>
+            <span className="create-coupon-label-v59">Discount Type & Value</span>
+            <div className="coupon-toggle-group-v59" style={{ marginBottom: '12px' }}>
+              <button 
+                className={`coupon-toggle-btn-v59 ${form.discountType === 'percentage' ? 'active' : ''}`}
+                onClick={() => setForm({ ...form, discountType: 'percentage' })}
+              >
+                % Percentage
+              </button>
+              <button 
+                className={`coupon-toggle-btn-v59 ${form.discountType === 'flat' ? 'active' : ''}`}
+                onClick={() => setForm({ ...form, discountType: 'flat' })}
+              >
+                ₹ Flat Amount
+              </button>
+            </div>
+            <div style={{ position: 'relative' }}>
+              <span style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', fontWeight: 800, color: '#94a3b8' }}>
+                {form.discountType === 'percentage' ? '%' : '₹'}
+              </span>
+              <input 
+                type="number"
+                className="coupon-input-v59" 
+                style={{ paddingLeft: '36px' }}
+                placeholder="0.00" 
+                value={form.discountValue}
+                onChange={(e) => setForm({ ...form, discountValue: e.target.value })}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Section 2: Limits */}
+        <div className="create-coupon-section-v59">
+          <div style={{ marginBottom: '16px' }}>
+            <span className="create-coupon-label-v59">Minimum Booking Amount</span>
+            <input 
+              type="number"
+              className="coupon-input-v59" 
+              placeholder="₹ 0" 
+              value={form.minAmount}
+              onChange={(e) => setForm({ ...form, minAmount: e.target.value })}
+            />
+          </div>
+          
+          <div style={{ marginBottom: '16px' }}>
+            <span className="create-coupon-label-v59">Maximum Discount Cap</span>
+            <input 
+              type="number"
+              className="coupon-input-v59" 
+              placeholder={form.discountType === 'flat' ? 'Not Applicable' : 'No Limit'}
+              disabled={form.discountType === 'flat'}
+              value={form.discountType === 'flat' ? '' : form.maxCap}
+              onChange={(e) => setForm({ ...form, maxCap: e.target.value })}
+            />
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <div>
+              <span className="create-coupon-label-v59">Total Uses</span>
+              <input 
+                type="number"
+                className="coupon-input-v59" 
+                placeholder="Unlimited"
+                disabled={form.isUnlimited}
+                value={form.totalLimit}
+                onChange={(e) => setForm({ ...form, totalLimit: e.target.value })}
+              />
+            </div>
+            <div>
+              <span className="create-coupon-label-v59">Per User Limit</span>
+              <input 
+                type="number"
+                className="coupon-input-v59" 
+                value={form.perUserLimit}
+                onChange={(e) => setForm({ ...form, perUserLimit: e.target.value })}
+              />
+            </div>
+          </div>
+          
+          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '12px' }}>
+            <input 
+              type="checkbox" 
+              checked={form.isUnlimited}
+              onChange={(e) => setForm({ ...form, isUnlimited: e.target.checked })}
+            />
+            <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#64748b' }}>UNLIMITED USES</span>
+          </label>
+        </div>
+
+        {/* Section 3: Applicability */}
+        <div className="create-coupon-section-v59">
+          <span className="create-coupon-label-v59">Target Categories</span>
+          <div className="applicability-grid-v59">
+            <button 
+              className={`applicability-card-v59 ${form.scope === 'all' ? 'active' : ''}`}
+              onClick={() => setForm({ ...form, scope: 'all', selectedTargets: [] })}
+            >
+              <svg className="applicability-icon-v59" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+              <span className="applicability-title-v59">All Items</span>
+            </button>
+            <button 
+              className={`applicability-card-v59 ${form.scope === 'specific' ? 'active' : ''}`}
+              onClick={() => setForm({ ...form, scope: 'specific' })}
+            >
+              <svg className="applicability-icon-v59" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+              <span className="applicability-title-v59">Specific</span>
+            </button>
+          </div>
+
+          {form.scope === 'specific' && (
+            <div className="target-chips-v59">
+              {categories.map(cat => (
+                <button 
+                  key={cat}
+                  className={`target-chip-v59 ${form.selectedTargets.includes(cat) ? 'active' : ''}`}
+                  onClick={() => toggleTarget(cat)}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Section 4: Validity */}
+        <div className="create-coupon-section-v59">
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <div>
+              <span className="create-coupon-label-v59">Valid From</span>
+              <input 
+                type="date"
+                className="coupon-input-v59" 
+                value={form.validFrom}
+                onChange={(e) => setForm({ ...form, validFrom: e.target.value })}
+              />
+            </div>
+            <div>
+              <span className="create-coupon-label-v59">Expires On</span>
+              <input 
+                type="date"
+                className="coupon-input-v59" 
+                value={form.validTo}
+                onChange={(e) => setForm({ ...form, validTo: e.target.value })}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="create-coupon-footer-v59">
+        <button 
+          className="submit-coupon-btn-v59"
+          disabled={!isFormValid}
+          onClick={handleSubmit}
+        >
+          Create Coupon
+        </button>
+      </div>
+    </div>
+  );
+};
+
+const MobileCouponsView = ({ 
+  isAddingCoupon, 
+  setIsAddingCoupon, 
+  coupons, 
+  setCoupons 
+}: { 
+  isAddingCoupon: boolean, 
+  setIsAddingCoupon: (val: boolean) => void, 
+  coupons: any[], 
+  setCoupons: (val: any | ((prev: any) => any)) => void 
+}) => {
   const [activeSubTab, setActiveSubTab] = useState<'vendor' | 'platform'>('vendor');
-  const [coupons, setCoupons] = useState([
-    { id: '1', code: 'WELCOME10', type: 'Percentage', value: '10%', status: 'Active', usage: '45/100', validFrom: '2026-03-01', validTo: '2026-03-31', maxCap: '500', minAmount: '1000', source: 'vendor', applicability: 'orders' },
-    { id: '2', code: 'FLAT500', type: 'Flat Amount', value: '₹500', status: 'Paused', usage: '12/50', validFrom: '2026-03-20', validTo: '2026-04-15', minAmount: '2000', source: 'vendor', applicability: 'orders' },
-    { id: '3', code: 'PLATFORM25', type: 'Percentage', value: '25%', status: 'Active', usage: '1050/5000', validFrom: '2026-01-01', validTo: '2026-12-31', maxCap: '1000', minAmount: '2000', source: 'platform', applicability: 'subscription' },
-    { id: '4', code: 'HOLIDAY15', type: 'Percentage', value: '15%', status: 'Active', usage: '800/2000', validFrom: '2026-03-15', validTo: '2026-04-30', maxCap: '750', minAmount: '1500', source: 'platform', applicability: 'orders' },
-  ]);
 
   const filteredCoupons = coupons.filter(c => c.source === activeSubTab);
 
   const renderValidityStatus = (validTo: string) => {
+    if (!validTo) return { text: 'No Expiry', class: 'validity-calm-v58' };
     const expiry = new Date(validTo);
+    if (isNaN(expiry.getTime())) return { text: 'No Expiry', class: 'validity-calm-v58' };
+
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const diffDays = Math.ceil((expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
@@ -1615,7 +1882,8 @@ const MobileCouponsView = () => {
 
               <div className="coupon-validity-v58">
                 <div className="validity-dates-v58">
-                  {new Date(coupon.validFrom).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })} → {new Date(coupon.validTo).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}
+                  {new Date(coupon.validFrom).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })} 
+                  {coupon.validTo ? ` → ${new Date(coupon.validTo).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}` : ' (No Expiry)'}
                 </div>
                 <div className={`validity-status-v58 ${validity.class}`}>
                   {validity.text}
@@ -1653,7 +1921,7 @@ const MobileCouponsView = () => {
       </div>
 
       {activeSubTab === 'vendor' && (
-        <button className="coupons-fab-v58">
+        <button className="coupons-fab-v58" onClick={() => setIsAddingCoupon(true)}>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
         </button>
       )}
@@ -2699,6 +2967,13 @@ const MobileDashboard: React.FC<MobileDashboardProps> = ({
   setMenus
 }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isAddingCoupon, setIsAddingCoupon] = useState(false);
+  const [coupons, setCoupons] = useState([
+    { id: '1', code: 'WELCOME10', type: 'Percentage', value: '10%', status: 'Active', usage: '45/100', validFrom: '2026-03-01', validTo: '2026-03-31', maxCap: '500', minAmount: '1000', source: 'vendor', applicability: 'orders' },
+    { id: '2', code: 'FLAT500', type: 'Flat Amount', value: '₹500', status: 'Paused', usage: '12/50', validFrom: '2026-03-20', validTo: '2026-04-15', minAmount: '2000', source: 'vendor', applicability: 'orders' },
+    { id: '3', code: 'PLATFORM25', type: 'Percentage', value: '25%', status: 'Active', usage: '1050/5000', validFrom: '2026-01-01', validTo: '2026-12-31', maxCap: '1000', minAmount: '2000', source: 'platform', applicability: 'subscription' },
+    { id: '4', code: 'HOLIDAY15', type: 'Percentage', value: '15%', status: 'Active', usage: '800/2000', validFrom: '2026-03-15', validTo: '2026-04-30', maxCap: '750', minAmount: '1500', source: 'platform', applicability: 'orders' },
+  ]);
 
   // We need menus locally or from context to update them
   // In Dashboard (App.tsx), we lifted menus state. 
@@ -2743,7 +3018,12 @@ const MobileDashboard: React.FC<MobileDashboardProps> = ({
       ) : activeTab === 'ratings' ? (
         <MobileRatingsView />
       ) : activeTab === 'coupons' ? (
-        <MobileCouponsView />
+        <MobileCouponsView 
+          isAddingCoupon={isAddingCoupon} 
+          setIsAddingCoupon={setIsAddingCoupon} 
+          coupons={coupons} 
+          setCoupons={setCoupons} 
+        />
       ) : activeTab === 'tickets' ? (
         <MobileSupportView />
       ) : activeTab === 'service-settings' ? (
@@ -2766,6 +3046,17 @@ const MobileDashboard: React.FC<MobileDashboardProps> = ({
             ← Back to Dashboard Overview
           </button>
         </div>
+      )}
+
+      {/* Full Screen Coupon Creation Overlay */}
+      {isAddingCoupon && (
+        <MobileCreateCouponView 
+          onClose={() => setIsAddingCoupon(false)}
+          onSave={(newCoupon) => {
+            setCoupons(prev => [newCoupon, ...prev]);
+            setIsAddingCoupon(false);
+          }}
+        />
       )}
 
       {/* Full Screen Menu Creation Overlay */}
