@@ -4780,3 +4780,212 @@
   font-weight: 500;
 }
 
+
+/* ─────────────────── MOBILE COUPONS SCREEN (v58) ─────────────────── */
+
+.mobile-coupons-container-v58 {
+  padding: 16px;
+  background: var(--mobile-bg);
+  min-height: 100vh;
+  position: relative;
+}
+
+.coupons-tab-bar-v58 {
+  display: flex;
+  background: white;
+  padding: 6px;
+  border-radius: 14px;
+  margin-bottom: 20px;
+  border: 1.5px solid #eef2f6;
+}
+
+.coupon-tab-btn-v58 {
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #64748b;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+
+.coupon-tab-btn-v58.active {
+  background: #0077ff;
+  color: white;
+  box-shadow: 0 4px 10px rgba(0,119,255,0.15);
+}
+
+.coupon-count-badge-v58 {
+  background: rgba(0,0,0,0.1);
+  padding: 2px 8px;
+  border-radius: 100px;
+  font-size: 0.7rem;
+}
+
+.coupon-tab-btn-v58.active .coupon-count-badge-v58 {
+  background: rgba(255,255,255,0.2);
+}
+
+/* Coupon Card */
+.mobile-coupon-card-v58 {
+  background: white;
+  border-radius: 20px;
+  padding: 18px;
+  border: 1.5px solid #eef2f6;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+  margin-bottom: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.coupon-card-head-v58 {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 14px;
+}
+
+.coupon-code-badge-v58 {
+  display: inline-block;
+  padding: 6px 12px;
+  background: #f1f5f9;
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px;
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: #1e293b;
+}
+
+.coupon-status-pill-v58 {
+  padding: 4px 10px;
+  border-radius: 100px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.status-active-v58 { background: #f0fdf4; color: #15803d; }
+.status-paused-v58 { background: #fffbeb; color: #b45309; }
+.status-expired-v58 { background: #f1f5f9; color: #64748b; }
+
+.coupon-meta-row-v58 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.coupon-type-v58 {
+  font-size: 0.75rem;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.coupon-value-v58 {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0077ff;
+}
+
+.coupon-validity-v58 {
+  font-size: 0.7rem;
+  margin-bottom: 16px;
+}
+
+.validity-dates-v58 {
+  color: #64748b;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.validity-status-v58 { font-weight: 700; font-size: 0.65rem; }
+.validity-urgent-v58 { color: #ef4444; }
+.validity-soon-v58 { color: #f59e0b; }
+.validity-calm-v58 { color: #64748b; }
+
+.coupon-usage-box-v58 {
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 16px;
+}
+
+.usage-stats-v58 {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.usage-label-v58 { color: #94a3b8; }
+.usage-value-v58 { color: #1e293b; }
+
+.usage-bar-track-v58 {
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 100px;
+  overflow: hidden;
+}
+
+.usage-bar-fill-v58 {
+  height: 100%;
+  background: #0077ff;
+  border-radius: 100px;
+}
+
+.coupon-footer-v58 {
+  display: flex;
+  gap: 8px;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 14px;
+}
+
+.coupon-action-btn-v58 {
+  flex: 1;
+  padding: 8px;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border: 1.5px solid #e2e8f0;
+  background: white;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.coupon-action-btn-v58.primary {
+  border-color: #0077ff;
+  color: #0077ff;
+}
+
+/* Floating Action Button */
+.coupons-fab-v58 {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 28px;
+  background: #0077ff;
+  color: white;
+  border: none;
+  box-shadow: 0 4px 20px rgba(0,119,255,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  transition: transform 0.2s;
+}
+
+.coupons-fab-v58:active { transform: scale(0.9); }
+

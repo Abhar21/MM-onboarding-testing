@@ -1528,7 +1528,138 @@ interface MobileDashboardProps {
   setMenus: (val: any[] | ((prev: any[]) => any[])) => void;
 }
 
-/* ─────────────────── MOBILE SUPPORT VIEW (v57) ─────────────────── */
+/* ─────────────────── MOBILE COUPONS VIEW (v58) ─────────────────── */
+
+const MobileCouponsView = () => {
+  const [activeSubTab, setActiveSubTab] = useState<'vendor' | 'platform'>('vendor');
+  const [coupons, setCoupons] = useState([
+    { id: '1', code: 'WELCOME10', type: 'Percentage', value: '10%', status: 'Active', usage: '45/100', validFrom: '2026-03-01', validTo: '2026-03-31', maxCap: '500', minAmount: '1000', source: 'vendor', applicability: 'orders' },
+    { id: '2', code: 'FLAT500', type: 'Flat Amount', value: '₹500', status: 'Paused', usage: '12/50', validFrom: '2026-03-20', validTo: '2026-04-15', minAmount: '2000', source: 'vendor', applicability: 'orders' },
+    { id: '3', code: 'PLATFORM25', type: 'Percentage', value: '25%', status: 'Active', usage: '1050/5000', validFrom: '2026-01-01', validTo: '2026-12-31', maxCap: '1000', minAmount: '2000', source: 'platform', applicability: 'subscription' },
+    { id: '4', code: 'HOLIDAY15', type: 'Percentage', value: '15%', status: 'Active', usage: '800/2000', validFrom: '2026-03-15', validTo: '2026-04-30', maxCap: '750', minAmount: '1500', source: 'platform', applicability: 'orders' },
+  ]);
+
+  const filteredCoupons = coupons.filter(c => c.source === activeSubTab);
+
+  const renderValidityStatus = (validTo: string) => {
+    const expiry = new Date(validTo);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const diffDays = Math.ceil((expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+
+    if (diffDays < 0) return { text: 'Expired', class: 'validity-urgent-v58' };
+    if (diffDays === 0) return { text: 'Expires today', class: 'validity-urgent-v58' };
+    if (diffDays <= 3) return { text: `${diffDays} days left`, class: 'validity-soon-v58' };
+    return { text: `${diffDays} days left`, class: 'validity-calm-v58' };
+  };
+
+  const getUsagePercentage = (usage: string) => {
+    const [current, total] = usage.split('/');
+    if (total === '∞') return 100;
+    return Math.min(100, (parseInt(current) / parseInt(total)) * 100);
+  };
+
+  const toggleStatus = (id: string) => {
+    setCoupons(prev => prev.map(c => 
+      c.id === id ? { ...c, status: c.status === 'Active' ? 'Paused' : 'Active' } : c
+    ));
+  };
+
+  return (
+    <div className="mobile-coupons-container-v58 mobile-scroller-v50">
+      <div className="mobile-home-header-v50" style={{ marginBottom: '16px' }}>
+        <h1 className="mobile-title-v50">Coupons Hub</h1>
+        <p style={{ fontSize: '0.75rem', color: '#64748b', margin: '4px 0 0' }}>Manage your promotional offers and monitor usage.</p>
+      </div>
+
+      <div className="coupons-tab-bar-v58">
+        <button 
+          className={`coupon-tab-btn-v58 ${activeSubTab === 'vendor' ? 'active' : ''}`}
+          onClick={() => setActiveSubTab('vendor')}
+        >
+          My Coupons
+          <span className="coupon-count-badge-v58">{coupons.filter(c => c.source === 'vendor').length}</span>
+        </button>
+        <button 
+          className={`coupon-tab-btn-v58 ${activeSubTab === 'platform' ? 'active' : ''}`}
+          onClick={() => setActiveSubTab('platform')}
+        >
+          Platform Coupons
+          <span className="coupon-count-badge-v58">{coupons.filter(c => c.source === 'platform').length}</span>
+        </button>
+      </div>
+
+      <div className="mobile-coupon-stack-v58">
+        {filteredCoupons.map(coupon => {
+          const validity = renderValidityStatus(coupon.validTo);
+          const usagePct = getUsagePercentage(coupon.usage);
+          
+          return (
+            <div key={coupon.id} className="mobile-coupon-card-v58">
+              <div className="coupon-card-head-v58">
+                <span className="coupon-code-badge-v58">{coupon.code}</span>
+                <span className={`coupon-status-pill-v58 status-${coupon.status.toLowerCase()}-v58`}>
+                  {coupon.status}
+                </span>
+              </div>
+
+              <div className="coupon-meta-row-v58">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                  <span className="coupon-type-v58">{coupon.type}</span>
+                  <span style={{ fontSize: '0.65rem', color: '#94a3b8', fontWeight: 700 }}>
+                    Applied for {coupon.applicability.toUpperCase()}
+                  </span>
+                </div>
+                <span className="coupon-value-v58">{coupon.value}</span>
+              </div>
+
+              <div className="coupon-validity-v58">
+                <div className="validity-dates-v58">
+                  {new Date(coupon.validFrom).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })} → {new Date(coupon.validTo).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}
+                </div>
+                <div className={`validity-status-v58 ${validity.class}`}>
+                  {validity.text}
+                </div>
+              </div>
+
+              <div className="coupon-usage-box-v58">
+                <div className="usage-stats-v58">
+                  <span className="usage-label-v58">Usage Limit</span>
+                  <span className="usage-value-v58">{coupon.usage}</span>
+                </div>
+                <div className="usage-bar-track-v58">
+                  <div className="usage-bar-fill-v58" style={{ width: `${usagePct}%` }}></div>
+                </div>
+              </div>
+
+              {coupon.source === 'vendor' && (
+                <div className="coupon-footer-v58">
+                  <button className="coupon-action-btn-v58" onClick={() => toggleStatus(coupon.id)}>
+                    {coupon.status === 'Active' ? (
+                      <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg> Pause</>
+                    ) : (
+                      <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> Resume</>
+                    )}
+                  </button>
+                  <button className="coupon-action-btn-v58 primary">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                    Edit
+                  </button>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {activeSubTab === 'vendor' && (
+        <button className="coupons-fab-v58">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        </button>
+      )}
+    </div>
+  );
+};
 
 const MobileSupportView = () => {
   const [category, setCategory] = useState('');
@@ -2611,6 +2742,8 @@ const MobileDashboard: React.FC<MobileDashboardProps> = ({
         <MobileReportsView />
       ) : activeTab === 'ratings' ? (
         <MobileRatingsView />
+      ) : activeTab === 'coupons' ? (
+        <MobileCouponsView />
       ) : activeTab === 'tickets' ? (
         <MobileSupportView />
       ) : activeTab === 'service-settings' ? (
