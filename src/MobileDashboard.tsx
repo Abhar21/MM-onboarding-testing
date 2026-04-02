@@ -85,10 +85,63 @@ interface Booking {
   };
 }
 
+interface Document {
+  type: string;
+  identifier: string;
+  date: string;
+  status: string;
+}
+
+interface BankAccount {
+  id: string;
+  bankName: string;
+  holderName: string;
+  accountNumber: string;
+  ifsc: string;
+  accountType: string;
+  status: string;
+  lastUpdated: string;
+  isPrimary: boolean;
+}
+
 interface ProfileData {
+  header?: {
+    name: string;
+    id: string;
+    status: string;
+    joined: string;
+    gstType: string;
+    service: string;
+  };
   owner?: {
     name?: string;
+    email?: string;
+    mobile?: string;
+    profilePic?: string | null;
   };
+  business?: {
+    category: string;
+    displayName: string;
+    address: string;
+    city: string;
+    state: string;
+    radius: string;
+    gstRegistered: boolean;
+    fssai: string;
+  };
+  identity?: {
+    pan: string;
+    gst: string;
+    fssai: string;
+  };
+  partnership?: {
+    joinedDate: string;
+    plan: string;
+    gstType: string;
+    agreement: string;
+  };
+  documents?: Document[];
+  bankAccounts?: BankAccount[];
   activeTab?: string;
 }
 
@@ -1645,12 +1698,12 @@ interface MobileDashboardProps {
 
 /* ─────────────────── MOBILE COUPON FORM VIEW (v59) ─────────────────── */
 
-const MobileCouponFormView = ({ 
-  onClose, 
-  onSave, 
-  initialData = null 
-}: { 
-  onClose: () => void, 
+const MobileCouponFormView = ({
+  onClose,
+  onSave,
+  initialData = null
+}: {
+  onClose: () => void,
   onSave: (coupon: Coupon) => void,
   initialData?: Coupon | null
 }) => {
@@ -1802,15 +1855,15 @@ const MobileCouponFormView = ({
         <div className="create-coupon-section-v59">
           <span className="create-coupon-label-v59">Coupon Code</span>
           <div style={{ display: 'flex', gap: '8px' }}>
-            <input 
-              className="coupon-input-v59" 
+            <input
+              className="coupon-input-v59"
               style={{ flex: 1 }}
-              placeholder="e.g. SAVE500" 
+              placeholder="e.g. SAVE500"
               value={form.code}
               onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })}
             />
-            <button 
-              className="coupon-action-btn-v58 primary" 
+            <button
+              className="coupon-action-btn-v58 primary"
               style={{ flex: 'none', padding: '0 16px', borderRadius: '12px' }}
               onClick={generateCode}
             >
@@ -1821,13 +1874,13 @@ const MobileCouponFormView = ({
           <div style={{ marginTop: '16px' }}>
             <span className="create-coupon-label-v59">Discount Type & Value</span>
             <div className="coupon-toggle-group-v59" style={{ marginBottom: '12px' }}>
-              <button 
+              <button
                 className={`coupon-toggle-btn-v59 ${form.discountType === 'percentage' ? 'active' : ''}`}
                 onClick={() => setForm({ ...form, discountType: 'percentage' })}
               >
                 % Percentage
               </button>
-              <button 
+              <button
                 className={`coupon-toggle-btn-v59 ${form.discountType === 'flat' ? 'active' : ''}`}
                 onClick={() => setForm({ ...form, discountType: 'flat' })}
               >
@@ -1838,11 +1891,11 @@ const MobileCouponFormView = ({
               <span style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', fontWeight: 800, color: '#94a3b8' }}>
                 {form.discountType === 'percentage' ? '%' : '₹'}
               </span>
-              <input 
+              <input
                 type="number"
-                className="coupon-input-v59" 
+                className="coupon-input-v59"
                 style={{ paddingLeft: '36px' }}
-                placeholder="0.00" 
+                placeholder="0.00"
                 value={form.discountValue}
                 onChange={(e) => setForm({ ...form, discountValue: e.target.value.replace(/[^\d.]/g, '') })}
               />
@@ -1854,20 +1907,20 @@ const MobileCouponFormView = ({
         <div className="create-coupon-section-v59">
           <div style={{ marginBottom: '16px' }}>
             <span className="create-coupon-label-v59">Minimum Booking Amount</span>
-            <input 
+            <input
               type="number"
-              className="coupon-input-v59" 
-              placeholder="₹ 0" 
+              className="coupon-input-v59"
+              placeholder="₹ 0"
               value={form.minAmount}
               onChange={(e) => setForm({ ...form, minAmount: e.target.value.replace(/[^\d.]/g, '') })}
             />
           </div>
-          
+
           <div style={{ marginBottom: '16px' }}>
             <span className="create-coupon-label-v59">Maximum Discount Cap</span>
-            <input 
+            <input
               type="number"
-              className="coupon-input-v59" 
+              className="coupon-input-v59"
               placeholder={form.discountType === 'flat' ? 'Not Applicable' : 'No Limit'}
               disabled={form.discountType === 'flat'}
               value={form.discountType === 'flat' ? '' : form.maxCap}
@@ -1878,9 +1931,9 @@ const MobileCouponFormView = ({
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
             <div>
               <span className="create-coupon-label-v59">Total Uses</span>
-              <input 
+              <input
                 type="number"
-                className="coupon-input-v59" 
+                className="coupon-input-v59"
                 placeholder="Unlimited"
                 disabled={form.isUnlimited}
                 value={form.totalLimit}
@@ -1889,18 +1942,18 @@ const MobileCouponFormView = ({
             </div>
             <div>
               <span className="create-coupon-label-v59">Per User Limit</span>
-              <input 
+              <input
                 type="number"
-                className="coupon-input-v59" 
+                className="coupon-input-v59"
                 value={form.perUserLimit}
                 onChange={(e) => setForm({ ...form, perUserLimit: e.target.value })}
               />
             </div>
           </div>
-          
+
           <label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '12px' }}>
-            <input 
-              type="checkbox" 
+            <input
+              type="checkbox"
               checked={form.isUnlimited}
               onChange={(e) => setForm({ ...form, isUnlimited: e.target.checked })}
             />
@@ -1912,14 +1965,14 @@ const MobileCouponFormView = ({
         <div className="create-coupon-section-v59">
           <span className="create-coupon-label-v59">Target Categories</span>
           <div className="applicability-grid-v59">
-            <button 
+            <button
               className={`applicability-card-v59 ${form.scope === 'all' ? 'active' : ''}`}
               onClick={() => setForm({ ...form, scope: 'all', selectedTargets: [] })}
             >
               <svg className="applicability-icon-v59" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
               <span className="applicability-title-v59">All Items</span>
             </button>
-            <button 
+            <button
               className={`applicability-card-v59 ${form.scope === 'specific' ? 'active' : ''}`}
               onClick={() => setForm({ ...form, scope: 'specific' })}
             >
@@ -1931,7 +1984,7 @@ const MobileCouponFormView = ({
           {form.scope === 'specific' && (
             <div className="target-chips-v59">
               {categories.map(cat => (
-                <button 
+                <button
                   key={cat}
                   className={`target-chip-v59 ${form.selectedTargets.includes(cat) ? 'active' : ''}`}
                   onClick={() => toggleTarget(cat)}
@@ -1948,18 +2001,18 @@ const MobileCouponFormView = ({
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
             <div>
               <span className="create-coupon-label-v59">Valid From</span>
-              <input 
+              <input
                 type="date"
-                className="coupon-input-v59" 
+                className="coupon-input-v59"
                 value={form.validFrom}
                 onChange={(e) => setForm({ ...form, validFrom: e.target.value })}
               />
             </div>
             <div>
               <span className="create-coupon-label-v59">Expires On</span>
-              <input 
+              <input
                 type="date"
-                className="coupon-input-v59" 
+                className="coupon-input-v59"
                 value={form.validTo}
                 onChange={(e) => setForm({ ...form, validTo: e.target.value })}
               />
@@ -1969,7 +2022,7 @@ const MobileCouponFormView = ({
       </div>
 
       <div className="create-coupon-footer-v59">
-        <button 
+        <button
           className="submit-coupon-btn-v59"
           disabled={!isFormValid}
           onClick={handleSubmit}
@@ -1981,14 +2034,14 @@ const MobileCouponFormView = ({
   );
 };
 
-const MobileCouponsView = ({ 
-  coupons, 
-  setCoupons, 
+const MobileCouponsView = ({
+  coupons,
+  setCoupons,
   setEditingCoupon,
   setIsAddingCoupon
-}: { 
-  coupons: Coupon[], 
-  setCoupons: React.Dispatch<React.SetStateAction<Coupon[]>>, 
+}: {
+  coupons: Coupon[],
+  setCoupons: React.Dispatch<React.SetStateAction<Coupon[]>>,
   setEditingCoupon: (val: Coupon) => void,
   setIsAddingCoupon: (val: boolean) => void
 }) => {
@@ -2021,7 +2074,7 @@ const MobileCouponsView = ({
   };
 
   const toggleStatus = (id: string) => {
-    setCoupons((prev: Coupon[]) => prev.map((c: Coupon) => 
+    setCoupons((prev: Coupon[]) => prev.map((c: Coupon) =>
       c.id === id ? { ...c, status: c.status === 'Active' ? 'Inactive' : 'Active' } : c
     ));
   };
@@ -2034,14 +2087,14 @@ const MobileCouponsView = ({
       </div>
 
       <div className="coupons-tab-bar-v58">
-        <button 
+        <button
           className={`coupon-tab-btn-v58 ${activeSubTab === 'vendor' ? 'active' : ''}`}
           onClick={() => setActiveSubTab('vendor')}
         >
           My Coupons
           <span className="coupon-count-badge-v58">{coupons.filter(c => c.source === 'vendor').length}</span>
         </button>
-        <button 
+        <button
           className={`coupon-tab-btn-v58 ${activeSubTab === 'platform' ? 'active' : ''}`}
           onClick={() => setActiveSubTab('platform')}
         >
@@ -2054,7 +2107,7 @@ const MobileCouponsView = ({
         {filteredCoupons.map(coupon => {
           const validity = renderValidityStatus(coupon.validTo);
           const usagePct = getUsagePercentage(coupon.usage);
-          
+
           return (
             <div key={coupon.id} className="mobile-coupon-card-v58">
               <div className="coupon-card-head-v58">
@@ -2076,7 +2129,7 @@ const MobileCouponsView = ({
 
               <div className="coupon-validity-v58">
                 <div className="validity-dates-v58">
-                  {new Date(coupon.validFrom).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })} 
+                  {new Date(coupon.validFrom).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}
                   {coupon.validTo ? ` → ${new Date(coupon.validTo).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}` : ' (No Expiry)'}
                 </div>
                 <div className={`validity-status-v58 ${validity.class}`}>
@@ -2103,7 +2156,7 @@ const MobileCouponsView = ({
                       <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> Resume</>
                     )}
                   </button>
-                  <button 
+                  <button
                     className="coupon-action-btn-v58 primary"
                     onClick={() => {
                       setEditingCoupon(coupon);
@@ -2162,10 +2215,10 @@ const MobileSupportView = () => {
 
       <div className="support-form-card-v57">
         <span className="support-section-title-v57">Create New Ticket</span>
-        
+
         <div className="support-form-group-v57">
           <label className="support-label-v57">Issue Category</label>
-          <select 
+          <select
             className="support-select-v57"
             value={category}
             onChange={(e) => setCategory(e.target.value)}
@@ -2177,7 +2230,7 @@ const MobileSupportView = () => {
 
         <div className="support-form-group-v57">
           <label className="support-label-v57">Booking ID</label>
-          <select 
+          <select
             className="support-select-v57"
             value={bookingId}
             onChange={(e) => setBookingId(e.target.value)}
@@ -2192,7 +2245,7 @@ const MobileSupportView = () => {
 
         <div className="support-form-group-v57">
           <label className="support-label-v57">Describe Your Issue</label>
-          <textarea 
+          <textarea
             className="support-textarea-v57"
             placeholder="Tell us more about the problem you're facing..."
             value={description}
@@ -2255,8 +2308,8 @@ const MobileRatingsView = () => {
     { stars: 1, count: 0 },
   ];
 
-  const filteredReviews = filter === 'All' 
-    ? reviews 
+  const filteredReviews = filter === 'All'
+    ? reviews
     : reviews.filter(r => r.rating === parseInt(filter));
 
   const totalReviews = 15;
@@ -2284,12 +2337,12 @@ const MobileRatingsView = () => {
         <span className="hero-star-v56">⭐</span>
         <div className="hero-rating-value-v56">4.3</div>
         <div className="hero-rating-label-v56">Overall Rating</div>
-        
+
         <button className="hero-badge-v56" onClick={() => setShowStatus(true)} style={{ cursor: 'pointer', border: '1px solid #dcfce7' }}>
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
           Excellent
         </button>
-        
+
         <div className="hero-reviews-total-v56">{totalReviews} customer reviews</div>
       </div>
 
@@ -2299,9 +2352,9 @@ const MobileRatingsView = () => {
           <div key={item.stars} className="breakdown-row-v56">
             <span className="breakdown-star-label-v56">{item.stars}★</span>
             <div className="breakdown-bar-track-v56">
-              <div 
-                className="breakdown-bar-fill-v56" 
-                style={{ 
+              <div
+                className="breakdown-bar-fill-v56"
+                style={{
                   width: `${(item.count / totalReviews) * 100}%`,
                   background: item.stars >= 4 ? '#22c55e' : item.stars === 3 ? '#f59e0b' : '#ef4444'
                 }}
@@ -2322,8 +2375,8 @@ const MobileRatingsView = () => {
       {/* Filter Horizontal Scroll */}
       <div className="mobile-ratings-filters-v56">
         {['All', '5', '4', '3', '2', '1'].map(f => (
-          <button 
-            key={f} 
+          <button
+            key={f}
             className={`rating-filter-chip-v56 ${filter === f ? 'active' : ''}`}
             onClick={() => setFilter(f)}
           >
@@ -2368,9 +2421,9 @@ const MobileRatingsView = () => {
             <button className="perf-popup-close-v56" onClick={() => setShowStatus(false)}>×</button>
             <span className="perf-status-label-v56">PERFORMANCE STATUS</span>
             <h3 className="perf-status-headline-v56">Boosted visibility applied</h3>
-            
+
             <div className="perf-status-divider-v56"></div>
-            
+
             <div className="perf-scale-grid-v56">
               <div className="perf-scale-item-v56 active">
                 <span className="perf-scale-range-v56">4.0 - 5.0</span>
@@ -2396,6 +2449,971 @@ const MobileRatingsView = () => {
           </div>
         </div>
       )}
+    </div>
+  );
+};
+
+/* ─────────────────── MOBILE PROFILE VIEW (v60) ─────────────────── */
+
+const MobileProfileView = ({
+  profileData,
+  onEdit,
+  onAddBank,
+  onDeleteBank,
+  onSetPrimary
+}: {
+  profileData: ProfileData,
+  onEdit: () => void,
+  onAddBank: () => void,
+  onDeleteBank: (id: string) => void,
+  onSetPrimary: (id: string) => void
+}) => {
+  const [activeSubTab, setActiveSubTab] = useState('Summary');
+  const subTabs = ['Summary', 'Documents', 'Bank Details'];
+
+  const renderSummary = () => (
+    <div className="profile-summary-v60">
+      <div className="profile-card-v60">
+        <div className="profile-card-header-v60">
+          <h3>Personal Details</h3>
+        </div>
+        <div className="profile-card-body-v60">
+          <div className="profile-field-v60">
+            <label>OWNER NAME</label>
+            <p>{profileData.owner?.name || 'Bhargav'}</p>
+            <span className="verified-badge-v60">verified from pan</span>
+          </div>
+          <div className="profile-field-v60">
+            <label>MOBILE NUMBER</label>
+            <p>{profileData.owner?.mobile || '+91 96000 00001'}</p>
+          </div>
+          <div className="profile-field-v60">
+            <label>MAIL ID</label>
+            <p>{profileData.owner?.email || 'contact@cateringent3.com'}</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="profile-card-v60">
+        <div className="profile-card-header-v60">
+          <h3>Business Details</h3>
+        </div>
+        <div className="profile-card-body-v60">
+          <div className="profile-field-v60">
+            <label>BUSINESS NAME</label>
+            <p>{profileData.header?.name || 'Catering Enterprise 3'}</p>
+            <span className="verified-badge-v60">verified from fssai</span>
+          </div>
+          <div className="profile-field-v60">
+            <label>SERVICE CATEGORY</label>
+            <p>{profileData.business?.category || 'Catering'}</p>
+          </div>
+          <div className="profile-field-v60">
+            <label>ADDRESS</label>
+            <p>{profileData.business?.address || 'Plot No. 42, Sector 5, HSR Layout, Bengaluru, Karnataka 560102'}</p>
+            <span className="verified-badge-v60">verified from fssai</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="profile-preview-card-v60">
+        <div className="preview-label-v60">BUSINESS PREVIEW</div>
+        <div className="customer-app-card-v60">
+          <div className="app-card-image-v60">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" strokeWidth="1"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+          </div>
+          <div className="app-card-info-v60">
+            <h4>{profileData.header?.name || 'Catering Enterprise 3'}</h4>
+            <div className="app-card-meta-v60">
+              <span className="cat-chip-v60">Catering</span>
+              <span className="rating-chip-v60">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                4.8 (120+)
+              </span>
+            </div>
+            <div className="app-card-loc-v60">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+              <span>Hyderabad, Telangana</span>
+            </div>
+          </div>
+        </div>
+        <p className="preview-note-v60">This is how your business appears to customers.</p>
+      </div>
+
+      <div className="profile-footer-note-v60">
+        Details verified by the GST, FSSAI, PAN can't be editable
+      </div>
+    </div>
+  );
+
+  const renderDocuments = () => (
+    <div className="profile-documents-v60">
+      {(profileData.documents || [
+        { type: 'GST Certificate', identifier: '36AAAAA0000A1Z5', date: '14 Feb 2026', status: 'Verified' },
+        { type: 'PAN Card', identifier: 'ABCDE1234F', date: '14 Feb 2026', status: 'Verified' },
+        { type: 'FSSAI License', identifier: '12345678901234', date: '14 Feb 2026', status: 'Verified' }
+      ]).map((doc, idx) => (
+        <div key={idx} className="doc-item-card-v60">
+          <div className="doc-icon-v60">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+          </div>
+          <div className="doc-info-v60">
+            <h4>{doc.type}</h4>
+            <p>{doc.identifier}</p>
+            <span>Verified on {doc.date}</span>
+          </div>
+          <div className="doc-status-v60">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
+  const renderBankDetails = () => (
+    <div className="profile-bank-v60">
+      <button className="add-bank-btn-v62" onClick={onAddBank}>
+        <div className="add-bank-icon-v62">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        </div>
+        <span>Add Bank Account</span>
+      </button>
+
+      {(profileData.bankAccounts || [
+        { id: '1', bankName: 'HDFC Bank', holderName: 'Bhargav', accountNumber: 'XXXX XXXX 9012', ifsc: 'HDFC0001234', accountType: 'Savings Account', status: 'Verified', lastUpdated: '14 Feb 2026', isPrimary: true },
+        { id: '2', bankName: 'ICICI Bank', holderName: 'Bhargav', accountNumber: 'XXXX XXXX 5678', ifsc: 'ICIC0005678', accountType: 'Savings Account', status: 'Verified', lastUpdated: '20 Mar 2026', isPrimary: false }
+      ]).map((acc, idx) => (
+        <div key={idx} className="bank-account-card-v60">
+          <div className="bank-card-header-v60">
+            <div className="bank-name-group-v60">
+              <div className="bank-logo-v60">{acc.bankName.charAt(0)}</div>
+              <div>
+                <h4>{acc.bankName}</h4>
+                <p>{acc.accountType}</p>
+              </div>
+            </div>
+            <div className="bank-header-actions-v62">
+              {acc.isPrimary ? (
+                <span className="primary-pill-v60">Primary</span>
+              ) : (
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  <button className="set-primary-btn-v63" onClick={() => onSetPrimary(acc.id)}>
+                    Set as Primary
+                  </button>
+                  <button className="delete-bank-btn-v62" onClick={() => onDeleteBank(acc.id)}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+          <div className="bank-card-body-v60">
+            <div className="bank-row-v60">
+              <label>Account Holder</label>
+              <span>{acc.holderName}</span>
+            </div>
+            <div className="bank-row-v60">
+              <label>Account Number</label>
+              <span>{acc.accountNumber}</span>
+            </div>
+            <div className="bank-row-v60">
+              <label>IFSC Code</label>
+              <span>{acc.ifsc}</span>
+            </div>
+          </div>
+          <div className="bank-card-footer-v60 bank-footer-v62">
+            <span className="verified-status-v60">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              Verified
+            </span>
+            <span className="last-updated-v62">Last Updated: {acc.lastUpdated}</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
+  return (
+    <div className="mobile-profile-view-v60 mobile-scroller-v50">
+      <div className="profile-header-container-v60">
+        <div className="profile-header-title-row-v60">
+          <h1 className="profile-business-name-v60">{profileData.header?.name || 'Catering Enterprise 3'}</h1>
+          <button className="edit-profile-btn-v60" onClick={onEdit}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+            Edit
+          </button>
+        </div>
+
+        <div className="profile-meta-chips-v60">
+          <span className="meta-chip-v60 id-chip-v60">{profileData.header?.id || 'MYMCATKAR0003'}</span>
+          <span className="meta-status-pill-v60 active-v60">Active</span>
+        </div>
+
+        <div className="profile-quick-stats-v60">
+          <div className="stat-item-v60">
+            <label>Joined</label>
+            <span>{profileData.header?.joined || '18 Nov 2024'}</span>
+          </div>
+          <div className="stat-item-v60">
+            <label>GST Type</label>
+            <span>{profileData.header?.gstType || 'Regular'}</span>
+          </div>
+          <div className="stat-item-v60">
+            <label>Service</label>
+            <span>{profileData.header?.service || 'Catering'}</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="profile-tabs-nav-v60">
+        {subTabs.map(tab => (
+          <button
+            key={tab}
+            className={`profile-tab-btn-v60 ${activeSubTab === tab ? 'active' : ''}`}
+            onClick={() => setActiveSubTab(tab)}
+          >
+            {tab}
+          </button>
+        ))}
+      </div>
+
+      <div className="profile-content-area-v60">
+        {activeSubTab === 'Summary' && renderSummary()}
+        {activeSubTab === 'Documents' && renderDocuments()}
+        {activeSubTab === 'Bank Details' && renderBankDetails()}
+      </div>
+    </div>
+  );
+};
+
+/* ─────────────────── MOBILE ADD BANK VIEW (v63) ─────────────────── */
+
+const MobileAddBankView = ({
+  onClose,
+  handleImageUpload
+}: {
+  onClose: () => void,
+  handleImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void
+}) => {
+  return (
+    <div className="mobile-full-overlay-v61">
+      <div className="add-bank-container-v63">
+        {/* Header */}
+        <div className="edit-profile-header-v61">
+          <div className="header-icon-box-v63">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+          </div>
+          <div className="header-content-v61">
+            <h2>Add Bank Details</h2>
+            <p>Submit new account details for verification.</p>
+          </div>
+          <button className="close-overlay-btn-v61" onClick={onClose}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="edit-profile-body-v61 add-bank-body-v63">
+          <div className="mobile-form-grid-v63">
+            <div className="form-field-v63">
+              <label>BANK NAME</label>
+              <input type="text" placeholder="e.g. HDFC Bank" />
+            </div>
+            <div className="form-field-v63">
+              <label>ACCOUNT TYPE</label>
+              <select className="form-select-v63">
+                <option>Savings Account</option>
+                <option>Current Account</option>
+              </select>
+            </div>
+            <div className="form-field-v63">
+              <label>ACCOUNT HOLDER NAME</label>
+              <input type="text" placeholder="Name as on passbook" />
+            </div>
+            <div className="form-field-v63">
+              <label>IFSC CODE</label>
+              <input type="text" placeholder="e.g. HDFC0001234" />
+            </div>
+            <div className="form-field-v63">
+              <label>ACCOUNT NUMBER</label>
+              <input type="text" placeholder="Enter account number" />
+            </div>
+            <div className="form-field-v63">
+              <label>CONFIRM ACCOUNT NUMBER</label>
+              <input type="text" placeholder="Re-enter account number" />
+            </div>
+          </div>
+
+          <div className="upload-section-v61" style={{ marginTop: '24px' }}>
+            <label>UPLOAD PASSBOOK / CANCELLED CHEQUE</label>
+            <div className="image-dropzone-v61" onClick={() => document.getElementById('bank-doc-upload')?.click()}>
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+              <span>CLICK TO UPLOAD PDF OR IMAGE</span>
+              <input
+                id="bank-doc-upload"
+                type="file"
+                hidden
+                onChange={handleImageUpload}
+                accept="image/*,application/pdf"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="edit-profile-footer-v61">
+          <button className="footer-cancel-btn-v61" onClick={onClose}>Cancel</button>
+          <button className="footer-save-btn-v61 inactive-v63" disabled>Submit for Verification</button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ─────────────────── MOBILE EDIT PROFILE VIEW (v61) ─────────────────── */
+
+const MobileEditProfileView = ({
+  onClose,
+  handleImageUpload
+}: {
+  onClose: () => void,
+  handleImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void
+}) => {
+  return (
+    <div className="mobile-full-overlay-v61">
+      <div className="edit-profile-container-v61">
+        {/* Header */}
+        <div className="edit-profile-header-v61">
+          <div className="header-icon-box-v61">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1e293b" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          </div>
+          <div className="header-content-v61">
+            <h2>Edit Profile</h2>
+            <p>Update your basic profile information.</p>
+          </div>
+          <button className="close-overlay-btn-v61" onClick={onClose}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="edit-profile-body-v61">
+          <div className="upload-section-v61">
+            <label>BUSINESS IMAGE</label>
+            <div className="image-dropzone-v61" onClick={() => document.getElementById('profile-img-upload')?.click()}>
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+              <span>CLICK TO CHANGE BUSINESS IMAGE</span>
+              <input
+                id="profile-img-upload"
+                type="file"
+                hidden
+                onChange={handleImageUpload}
+                accept="image/*"
+              />
+            </div>
+          </div>
+
+          <div className="account-notice-box-v61">
+            <p>
+              To change your Mobile Number or Email Address, please go to
+              <span className="notice-link-v61"> Settings &gt; Account</span>.
+            </p>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="edit-profile-footer-v61">
+          <button className="footer-cancel-btn-v61" onClick={onClose}>Cancel</button>
+          <button className="footer-save-btn-v61" onClick={onClose}>Save Changes</button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ─────────────────── MOBILE SECURITY CONFIRM MODAL (v69) ─────────────────── */
+
+const MobileSecurityConfirmModal = ({
+  type,
+  onClose,
+  onConfirm
+}: {
+  type: 'logout-all' | 'remove-device',
+  onClose: () => void,
+  onConfirm: () => void
+}) => {
+  const isLogoutAll = type === 'logout-all';
+
+  return (
+    <div className="confirm-overlay-v69">
+      <div className="confirm-modal-v69">
+        <div className="confirm-body-v69">
+          <div className="confirm-icon-bg-v69">
+            {isLogoutAll ? (
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+            ) : (
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="3"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            )}
+          </div>
+          <h2 className="confirm-title-v69">
+            {isLogoutAll ? 'Logout all devices?' : 'Remove Device?'}
+          </h2>
+          <p className="confirm-subtitle-v69">
+            {isLogoutAll
+              ? 'Are you sure you want to logout all devices?'
+              : 'Are you sure you want to remove the device? By removing, they will logout on their device.'}
+          </p>
+        </div>
+        <div className="confirm-footer-v69">
+          <button className="confirm-cancel-btn-v69" onClick={onClose}>Cancel</button>
+          <button className="confirm-action-btn-v69" onClick={() => { onConfirm(); onClose(); }}>
+            {isLogoutAll ? 'Logout All' : 'Remove'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ─────────────────── MOBILE CHANGE PASSWORD VIEW (v67) ─────────────────── */
+
+const MobileChangePasswordView = ({ onClose }: { onClose: () => void }) => {
+  const [step, setStep] = useState<'verify' | 'otp' | 'new-password'>('verify');
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [otp, setOtp] = useState(['', '', '', '', '', '']);
+
+  const handleOtpChange = (index: number, value: string) => {
+    if (value.length > 1) return;
+    const newOtp = [...otp];
+    newOtp[index] = value;
+    setOtp(newOtp);
+
+    // Auto-focus next input
+    if (value && index < 5) {
+      const nextInput = document.getElementById(`otp-${index + 1}`);
+      nextInput?.focus();
+    }
+  };
+
+  const renderVerifyStep = () => (
+    <div className="pw-modal-v67">
+      <div className="pw-header-v67">
+        <div className="pw-icon-box-v67 lock">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+        </div>
+        <div className="pw-title-main-v67">
+          <h2>Change Password</h2>
+          <p>Verify your current password to continue.</p>
+        </div>
+      </div>
+
+      <div className="pw-body-v67">
+        <p className="pw-instruction-v67">
+          For your security, please verify your identity by entering your current password.
+        </p>
+
+        <div className="pw-form-field-v67">
+          <label>CURRENT PASSWORD</label>
+          <div className="pw-input-wrapper-v67">
+            <input
+              type={showCurrentPassword ? 'text' : 'password'}
+              placeholder="Enter current password"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+            />
+            <button
+              className="pw-toggle-btn-v67"
+              onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <button className="forgot-pw-link-v67" onClick={() => setStep('otp')}>Forgot password?</button>
+      </div>
+
+      <div className="pw-footer-v67">
+        <button className="pw-cancel-btn-v67" onClick={onClose}>Cancel</button>
+        <button
+          className={`pw-continue-btn-v67 ${currentPassword.length > 0 ? 'active' : 'disabled'}`}
+          onClick={() => currentPassword.length > 0 && setStep('otp')}
+          disabled={currentPassword.length === 0}
+        >
+          Continue
+        </button>
+      </div>
+    </div>
+  );
+
+  const renderOtpStep = () => (
+    <div className="pw-modal-v67">
+      <div className="pw-header-v67">
+        <div className="pw-icon-box-v67 lock">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+        </div>
+        <div className="pw-title-main-v67">
+          <h2>Change Password</h2>
+          <p>Verify code sent to your email.</p>
+        </div>
+      </div>
+
+      <div className="pw-body-v67 text-center">
+        <div className="mail-icon-bubble-v67">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#0077ff" strokeWidth="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+        </div>
+        <p className="pw-instruction-v67">
+          Enter the 6-digit code sent to emails
+        </p>
+
+        <div className="otp-container-v67">
+          {otp.map((digit, i) => (
+            <input
+              key={i}
+              id={`otp-${i}`}
+              type="text"
+              inputMode="numeric"
+              maxLength={1}
+              value={digit}
+              onChange={(e) => handleOtpChange(i, e.target.value)}
+              className="otp-dot-input-v67"
+            />
+          ))}
+        </div>
+
+        <div className="otp-meta-v67">
+          <span>Valid for 05:00</span>
+          <button className="resend-code-btn-v67">Resend Code</button>
+        </div>
+      </div>
+
+      <div className="pw-footer-v67">
+        <button className="pw-cancel-btn-v67" onClick={onClose}>Cancel</button>
+        <button
+          className={`pw-continue-btn-v67 ${otp.every(d => d !== '') ? 'active' : 'disabled'}`}
+          onClick={() => otp.every(d => d !== '') && setStep('new-password')}
+          disabled={!otp.every(d => d !== '')}
+        >
+          Verify & Continue
+        </button>
+      </div>
+    </div>
+  );
+
+  const renderNewPasswordStep = () => {
+    const hasMinLength = newPassword.length >= 8;
+    const hasUpper = /[A-Z]/.test(newPassword);
+    const hasNumber = /[0-9]/.test(newPassword);
+    const hasSpecial = /[!@#$%^&*]/.test(newPassword);
+    const strength = [hasMinLength, hasUpper, hasNumber, hasSpecial].filter(Boolean).length;
+
+    return (
+      <div className="pw-modal-v67">
+        <div className="pw-header-v67">
+          <div className="pw-icon-box-v67 lock">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+          </div>
+          <div className="pw-title-main-v67">
+            <h2>Change Password</h2>
+            <p>Create a strong new password.</p>
+          </div>
+        </div>
+
+        <div className="pw-body-v67">
+          <div className="pw-form-field-v67">
+            <label>NEW PASSWORD</label>
+            <div className="pw-input-wrapper-v67">
+              <input
+                type={showNewPassword ? 'text' : 'password'}
+                placeholder="Min. 8 characters"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+              />
+              <button
+                className="pw-toggle-btn-v67"
+                onClick={() => setShowNewPassword(!showNewPassword)}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+              </button>
+            </div>
+          </div>
+
+          <div className="strength-meter-v68">
+            <div className="strength-labels-v68">
+              <span className={hasMinLength ? 'active' : ''}>8+ chars</span>
+              <span className={hasUpper ? 'active' : ''}>Upper</span>
+              <span className={hasNumber ? 'active' : ''}>Number</span>
+              <span className={hasSpecial ? 'active' : ''}>Special</span>
+            </div>
+            <div className="strength-bar-bg-v68">
+              <div
+                className="strength-progress-v68"
+                style={{
+                  width: `${(strength / 4) * 100}%`,
+                  backgroundColor: strength === 4 ? '#22c55e' : strength >= 2 ? '#f59e0b' : '#ef4444'
+                }}
+              />
+            </div>
+          </div>
+
+          <div className="pw-form-field-v67" style={{ marginTop: '20px' }}>
+            <label>CONFIRM NEW PASSWORD</label>
+            <div className="pw-input-wrapper-v67">
+              <input
+                type={showConfirmPassword ? 'text' : 'password'}
+                placeholder="Repeat new password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+              />
+              <button
+                className="pw-toggle-btn-v67"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="pw-footer-v67">
+          <button className="pw-cancel-btn-v67" onClick={onClose}>Cancel</button>
+          <button
+            className={`pw-continue-btn-v67 ${strength === 4 && confirmPassword === newPassword ? 'active' : 'disabled'}`}
+            onClick={onClose}
+            disabled={strength < 4 || confirmPassword !== newPassword}
+          >
+            Reset Password
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="pw-overlay-v67">
+      {step === 'verify' && renderVerifyStep()}
+      {step === 'otp' && renderOtpStep()}
+      {step === 'new-password' && renderNewPasswordStep()}
+    </div>
+  );
+};
+
+/* ─────────────────── MOBILE SETTINGS VIEW (v64) ─────────────────── */
+
+const MobileSettingsView = ({ profileData, setIsChangingPassword, setSecurityConfirmModal }: { profileData: any, setIsChangingPassword: (v: boolean) => void, setSecurityConfirmModal: (type: 'logout-all' | 'remove-device' | null) => void }) => {
+  const [activeSubTab, setActiveSubTab] = useState('Account');
+  const subTabs = ['Account', 'Documents', 'Subscription', 'Security', 'Danger'];
+
+  const renderAccountSettings = () => (
+    <div className="settings-account-tab-v64">
+      <div className="settings-section-v64">
+        <h3 className="settings-section-title-v64">Account Settings</h3>
+
+        <div className="settings-field-row-v64">
+          <div className="field-info-v64">
+            <label>Mobile Number</label>
+            <p>{profileData.owner?.mobile || '9600000001'}</p>
+          </div>
+          <button className="field-edit-btn-v64">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+          </button>
+        </div>
+
+        <div className="settings-field-row-v64">
+          <div className="field-info-v64">
+            <label>Email Address</label>
+            <p>{profileData.owner?.email || 'contact@cateringent3.com'}</p>
+          </div>
+          <button className="field-edit-btn-v64">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderDocumentsSettings = () => {
+    const policies = [
+      { id: 'tnc', title: 'Terms & Conditions', date: '22 Jan 2026', type: 'updated' },
+      { id: 'privacy', title: 'Privacy Policy', date: '15 Feb 2026', type: 'updated' },
+      { id: 'refund', title: 'Refund & Cancellation Policy', date: '10 Jan 2026', type: 'updated' },
+      { id: 'tds', title: 'TDS Policy', date: '01 Mar 2026', type: 'updated' },
+    ];
+
+    const agreements = [
+      { id: 'vendor', title: 'Vendor Agreement', date: '03 Mar 2026', type: 'accepted' },
+    ];
+
+    const DocRow = ({ title, date, type }: { title: string, date: string, type: string }) => (
+      <div className="doc-row-v65">
+        <div className="doc-main-v65">
+          <div className={`doc-icon-container-v65 ${type}`}>
+            {type === 'accepted' ? (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle><polyline points="16 11 18 13 22 9"></polyline></svg>
+            ) : (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0077ff" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            )}
+          </div>
+          <div className="doc-info-v65">
+            <h4>{title}</h4>
+            <p>{type === 'accepted' ? 'Accepted on' : 'Last Updated'}: {date}</p>
+          </div>
+        </div>
+        <div className="doc-actions-v65">
+          <button className="view-doc-btn-v65">View</button>
+          <button className="download-doc-btn-v65">Download</button>
+        </div>
+      </div>
+    );
+
+    return (
+      <div className="settings-documents-tab-v65">
+        <div className="settings-section-v64">
+          <h3 className="settings-section-title-v64">Platform Policies</h3>
+          <div className="docs-list-v65">
+            {policies.map(doc => <DocRow key={doc.id} {...doc} />)}
+          </div>
+        </div>
+
+        <div className="settings-section-v64" style={{ marginTop: '32px' }}>
+          <h3 className="settings-section-title-v64">Vendor Agreement</h3>
+          <div className="docs-list-v65">
+            {agreements.map(doc => <DocRow key={doc.id} {...doc} />)}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderSecuritySettings = (setIsChangingPassword: (v: boolean) => void, setSecurityConfirmModal: (type: 'logout-all' | 'remove-device' | null) => void) => {
+    const sessions = [
+      { id: 1, device: 'MacBook Pro 16"', browser: 'Chrome', status: 'Current Session', location: 'Mumbai, India', type: 'laptop' },
+      { id: 2, device: 'iPhone 13 Pro', browser: 'Safari', status: 'Yesterday at 10:45 AM', location: 'Mumbai, India', type: 'mobile' },
+      { id: 3, device: 'Windows PC', browser: 'Edge', status: 'Oct 24, 2023 at 4:30 PM', location: 'Delhi, India', type: 'laptop' }
+    ];
+
+    return (
+      <div className="settings-security-tab-v66">
+        {/* Change Password Section */}
+        <div className="settings-section-v64">
+          <h3 className="settings-section-title-v64">Login Credentials</h3>
+          <div className="security-card-v66">
+            <div className="security-info-v66">
+              <div className="security-text-v66">
+                <h4>Password</h4>
+                <p>Last changed 3 months ago</p>
+              </div>
+            </div>
+            <button className="security-action-btn-v66" onClick={() => setIsChangingPassword(true)}>Change Password</button>
+          </div>
+        </div>
+
+        {/* Login Activity Section */}
+        <div className="settings-section-v64" style={{ marginTop: '24px' }}>
+          <div className="security-section-title-row-v66">
+            <h3 className="settings-section-title-v64">Login Activity</h3>
+            <button className="logout-all-btn-v66" onClick={() => setSecurityConfirmModal('logout-all')}>Logout all devices</button>
+          </div>
+          <div className="sessions-list-v66">
+            {sessions.map(session => (
+              <div key={session.id} className="session-item-v66">
+                <div className="session-main-v66">
+                  <div className="device-icon-v66">
+                    {session.type === 'laptop' ? (
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0077ff" strokeWidth="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="2" y1="20" x2="22" y2="20"></line></svg>
+                    ) : (
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0077ff" strokeWidth="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+                    )}
+                  </div>
+                  <div className="session-info-v66">
+                    <div className="device-name-v66">
+                      {session.device} • {session.browser}
+                    </div>
+                    <div className="session-meta-v66">
+                      <span className={`status-v66 ${session.status === 'Current Session' ? 'active' : ''}`}>
+                        {session.status}
+                      </span>
+                      {session.location && (
+                        <>
+                          <span className="dot-v66">•</span>
+                          <span className="location-v66">{session.location}</span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                {session.status !== 'Current Session' && (
+                  <button className="revoke-btn-v66" onClick={() => setSecurityConfirmModal('remove-device')}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderSubscriptionSettings = () => {
+    const billingHistory = [
+      { id: 'INV-102', date: '15 Jan 2026', amount: '₹2,994', plan: '6 Months Plan', validity: '15 Jan 2026 – 14 Jul 2026', method: 'UPI ••••9823' },
+      { id: 'INV-091', date: '15 Jul 2025', amount: '₹2,994', plan: '6 Months Plan', validity: '15 Jul 2025 – 14 Jan 2026', method: 'UPI ••••9823' },
+      { id: 'INV-084', date: '15 Jan 2025', amount: '₹2,994', plan: '6 Months Plan', validity: '15 Jan 2025 – 14 Jul 2025', method: 'UPI ••••9823' },
+      { id: 'INV-077', date: '15 Jul 2024', amount: '₹2,994', plan: '6 Months Plan', validity: '15 Jul 2024 – 14 Jan 2025', method: 'UPI ••••9823' },
+      { id: 'INV-065', date: '15 Jan 2024', amount: '₹2,994', plan: '6 Months Plan', validity: '15 Jan 2024 – 14 Jul 2024', method: 'UPI ••••9823' }
+    ];
+
+    return (
+      <div className="subscription-tab-v70">
+        <div className="plan-section-v70">
+          <h3 className="settings-section-title-v64">Subscription Plan</h3>
+          <div className="plan-card-v70">
+            <div className="plan-sparkles-v70">
+              <svg className="sparkle-v70-1" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" opacity="0.4"><path d="M12 1L14.39 8.26L22 9.27L16.5 14.14L18.18 21.02L12 17.77L5.82 21.02L7.5 14.14L2 9.27L9.61 8.26L12 1Z"></path></svg>
+              <svg className="sparkle-v70-2" width="10" height="10" viewBox="0 0 24 24" fill="currentColor" opacity="0.3"><path d="M12 1L14.39 8.26L22 9.27L16.5 14.14L18.18 21.02L12 17.77L5.82 21.02L7.5 14.14L2 9.27L9.61 8.26L12 1Z"></path></svg>
+            </div>
+            <div className="plan-header-v70">
+              <span className="plan-label-v70">CURRENT ACTIVE PLAN</span>
+              <span className="plan-badge-v70">ACTIVE</span>
+            </div>
+            
+            <div className="plan-main-v70">
+              <div className="plan-title-wrapper-v70">
+                <h2 className="plan-name-v70">Growth Plan</h2>
+                <span className="save-tag-v70">Saved ₹1,200/year</span>
+              </div>
+              <div className="plan-pricing-v70">
+                <span className="price-v70">₹499 / month</span>
+                <span className="duration-v70">• 6 Months plan</span>
+              </div>
+            </div>
+
+            <div className="plan-footer-v70">
+              <div className="next-billing-v70">
+                <span className="billing-label-v70">Next billing date</span>
+                <span className="billing-date-v70">April 01, 2026</span>
+              </div>
+            </div>
+
+            <div className="upgrade-banner-v70">
+              <div className="upgrade-info-v70">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2.5"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"></path></svg>
+                <span>Upgrade to 12 Months • <strong>Save ₹1,800/year</strong></span>
+              </div>
+              <button className="explore-plans-btn-v70">
+                EXPLORE PLANS <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="billing-history-section-v70">
+          <h3 className="settings-section-title-v64">Billing History</h3>
+          <div className="billing-cards-list-v70">
+            {billingHistory.map((invoice) => (
+              <div key={invoice.id} className="billing-card-v70">
+                <div className="card-top-row-v70">
+                  <div className="card-id-group-v70">
+                    <span className="card-date-v70">{invoice.date}</span>
+                    <span className="card-id-v70">{invoice.id}</span>
+                  </div>
+                  <span className="card-amount-v70">{invoice.amount}</span>
+                </div>
+                
+                <div className="card-middle-row-v70">
+                  <div className="card-plan-info-v70">
+                    <span className="card-plan-name-v70">{invoice.plan}</span>
+                    <span className="card-validity-v70">{invoice.validity}</span>
+                  </div>
+                </div>
+
+                <div className="card-bottom-row-v70">
+                  <div className="card-payment-method-v70">
+                    <span className="payment-label-v70">{invoice.method.split(' ')[0]}</span>
+                    <span className="payment-digits-v70">{invoice.method.split(' ')[1]}</span>
+                  </div>
+                  <button className="download-invoice-btn-v70">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    Download
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="pagination-footer-v70">
+            <span className="results-count-v70">Showing 5 of 12 records</span>
+            <button className="load-more-btn-v70">Load More Records</button>
+          </div>
+        </div>
+
+        <div className="razorpay-footer-v70">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+          <span>Secure Payments by Razorpay</span>
+        </div>
+      </div>
+    );
+  };
+
+  const renderDangerZone = () => (
+    <div className="settings-danger-tab-v64">
+      <div className="settings-section-v64">
+        <h3 className="settings-section-title-v64" style={{ color: '#e11d48' }}>Danger Zone</h3>
+        <p style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '20px' }}>
+          Deleting your account is permanent and cannot be undone. Please proceed with caution.
+        </p>
+        <div className="settings-danger-zone-v64" style={{ marginTop: 0, paddingTop: 0, borderTop: 'none' }}>
+          <button className="danger-link-v64">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path></svg>
+            Deactivate Account
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="mobile-settings-view-v64 mobile-scroller-v50">
+      <div className="settings-header-v64">
+        <h2>Settings</h2>
+        <p>Manage your account preferences, subscription, and security.</p>
+      </div>
+
+      <div className="profile-tabs-nav-v60 settings-tabs-v64 border-bottom-v64">
+        {subTabs.map(tab => (
+          <button
+            key={tab}
+            className={`profile-tab-btn-v60 ${activeSubTab === tab ? 'active' : ''}`}
+            onClick={() => setActiveSubTab(tab)}
+          >
+            {tab}
+          </button>
+        ))}
+      </div>
+
+      <div className="settings-content-area-v64">
+        {activeSubTab === 'Account' && renderAccountSettings()}
+        {activeSubTab === 'Documents' && renderDocumentsSettings()}
+        {activeSubTab === 'Security' && renderSecuritySettings(setIsChangingPassword, setSecurityConfirmModal)}
+        {activeSubTab === 'Subscription' && renderSubscriptionSettings()}
+        {activeSubTab === 'Danger' && renderDangerZone()}
+        {activeSubTab !== 'Account' && activeSubTab !== 'Documents' && activeSubTab !== 'Security' && activeSubTab !== 'Subscription' && activeSubTab !== 'Danger' && (
+          <div className="settings-placeholder-v64">
+            <div className="placeholder-icon-v64">⚙️</div>
+            <h4>{activeSubTab} coming soon</h4>
+            <p>We're polishing this section for you.</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
@@ -2458,9 +3476,9 @@ const MobileSectionEditor = ({
         <div className="bottom-sheet-content-v55">
           <div className="mobile-form-group-v55">
             <label className="mobile-form-label-big-v55">Section Name</label>
-            <input 
-              type="text" 
-              className="mobile-input-v55" 
+            <input
+              type="text"
+              className="mobile-input-v55"
               placeholder="e.g. Starters"
               style={{ background: 'white', border: '1.5px solid #eef2f6' }}
               value={currentSection.name}
@@ -2471,7 +3489,7 @@ const MobileSectionEditor = ({
           <div className="selection-row-v55">
             <div className="selection-type-col-v55">
               <label className="mobile-form-label-big-v55">Selection Type</label>
-              <select 
+              <select
                 className="mobile-select-v55"
                 value={currentSection.type}
                 onChange={(e) => setCurrentSection((prev: Section) => ({ ...prev, type: e.target.value }))}
@@ -2482,9 +3500,9 @@ const MobileSectionEditor = ({
             </div>
             <div className="selection-limit-col-v55">
               <label className="mobile-form-label-big-v55">Choose Any</label>
-              <input 
-                type="number" 
-                className="mobile-input-v55" 
+              <input
+                type="number"
+                className="mobile-input-v55"
                 placeholder="0"
                 style={{ background: 'white', border: '1.5px solid #eef2f6', textAlign: 'center' }}
                 value={currentSection.limit || ''}
@@ -2497,7 +3515,7 @@ const MobileSectionEditor = ({
           <div style={{ borderTop: '1px solid #f1f5f9', margin: '24px 0' }}></div>
 
           <h3 className="mobile-form-label-big-v55">Items in this Section</h3>
-          
+
           <div className="mobile-items-list-v55">
             {(currentSection.items as any[]).map((item: any, i: number) => (
               <div key={i} className="item-editor-card-v55" style={{ position: 'relative' }}>
@@ -2511,7 +3529,7 @@ const MobileSectionEditor = ({
                     </>
                   )}
                   {item.image && (
-                    <button 
+                    <button
                       style={{ position: 'absolute', top: '-8px', right: '-8px', background: '#ef4444', color: 'white', border: 'none', borderRadius: '50%', width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2 }}
                       onClick={(e) => { e.stopPropagation(); updateItem(i, 'image', null); }}
                     >
@@ -2520,14 +3538,14 @@ const MobileSectionEditor = ({
                   )}
                 </div>
                 <div className="item-editor-fields-v55">
-                  <input 
-                    type="text" 
-                    className="item-name-input-v55" 
+                  <input
+                    type="text"
+                    className="item-name-input-v55"
                     placeholder="Item Name"
                     value={item.name}
                     onChange={(e) => updateItem(i, 'name', e.target.value)}
                   />
-                  <textarea 
+                  <textarea
                     className="item-desc-textarea-v55"
                     placeholder="Short Description (max 1000 chars)"
                     value={item.description}
@@ -2535,7 +3553,7 @@ const MobileSectionEditor = ({
                   />
                 </div>
                 {currentSection.items.length > 1 && (
-                  <button 
+                  <button
                     style={{ position: 'absolute', right: '-8px', top: '-8px', background: '#fee2e2', border: 'none', color: '#ef4444', padding: '6px', borderRadius: '50%', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', zIndex: 3 }}
                     onClick={() => removeItem(i)}
                   >
@@ -2553,8 +3571,8 @@ const MobileSectionEditor = ({
 
           <div style={{ display: 'flex', gap: '12px', marginTop: '32px', paddingBottom: '24px' }}>
             <button className="btn-cancel-v55" style={{ flex: 1 }} onClick={onClose}>Cancel</button>
-            <button 
-              className="btn-save-v55" 
+            <button
+              className="btn-save-v55"
               style={{ flex: 2 }}
               disabled={!currentSection.name || (currentSection.items as any[]).some((it: any) => !it.name)}
               onClick={handleSaveSection}
@@ -2672,9 +3690,9 @@ const MobileCreateMenuView = ({
           <div className="mobile-form-section-v55">
             <div className="mobile-form-group-v55">
               <label className="mobile-label-v55">Menu Name</label>
-              <input 
-                type="text" 
-                className="mobile-input-v55" 
+              <input
+                type="text"
+                className="mobile-input-v55"
                 placeholder="e.g. Premium Buffet"
                 value={menuIdentity.name}
                 onChange={(e) => setMenuIdentity((prev: MenuIdentity) => ({ ...prev, name: e.target.value }))}
@@ -2685,7 +3703,7 @@ const MobileCreateMenuView = ({
               <label className="mobile-label-v55">Diet Preference</label>
               <div className="mobile-radio-group-v55">
                 {['Veg', 'Non-Veg'].map(type => (
-                  <button 
+                  <button
                     key={type}
                     className={`mobile-radio-btn-v55 ${type === 'Veg' ? 'veg' : 'nonveg'} ${menuIdentity.dietType === type ? 'active' : ''}`}
                     onClick={() => setMenuIdentity((prev: MenuIdentity) => ({ ...prev, dietType: type }))}
@@ -2701,9 +3719,9 @@ const MobileCreateMenuView = ({
               <label className="mobile-label-v55">Price Per Person</label>
               <div className="mobile-input-prefix-v55">
                 <span className="mobile-prefix-v55">₹</span>
-                <input 
-                  type="number" 
-                  className="mobile-input-v55" 
+                <input
+                  type="number"
+                  className="mobile-input-v55"
                   placeholder="0"
                   value={menuIdentity.price}
                   onChange={(e) => setMenuIdentity((prev: MenuIdentity) => ({ ...prev, price: e.target.value }))}
@@ -2714,9 +3732,9 @@ const MobileCreateMenuView = ({
             <div style={{ display: 'flex', gap: '16px' }}>
               <div className="mobile-form-group-v55" style={{ flex: 1 }}>
                 <label className="mobile-label-v55">Min Pax</label>
-                <input 
-                  type="number" 
-                  className="mobile-input-v55" 
+                <input
+                  type="number"
+                  className="mobile-input-v55"
                   placeholder="10"
                   value={menuIdentity.minMembers}
                   onChange={(e) => setMenuIdentity((prev: MenuIdentity) => ({ ...prev, minMembers: e.target.value }))}
@@ -2724,9 +3742,9 @@ const MobileCreateMenuView = ({
               </div>
               <div className="mobile-form-group-v55" style={{ flex: 1 }}>
                 <label className="mobile-label-v55">Max Pax</label>
-                <input 
-                  type="number" 
-                  className="mobile-input-v55" 
+                <input
+                  type="number"
+                  className="mobile-input-v55"
                   placeholder="500"
                   value={menuIdentity.maxMembers}
                   onChange={(e) => setMenuIdentity((prev: MenuIdentity) => ({ ...prev, maxMembers: e.target.value }))}
@@ -2769,7 +3787,7 @@ const MobileCreateMenuView = ({
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
               Menu was created you can customise or edit from dashboard
             </div>
-            
+
             {sections.length === 0 && !isAddingSection && (
               <div className="no-sections-empty-state-v55">
                 <div className="icon-circle-v55">
@@ -2777,7 +3795,7 @@ const MobileCreateMenuView = ({
                 </div>
                 <h4>No sections added yet</h4>
                 <p>Start by creating your first food group like Starters or Main Course</p>
-                <button 
+                <button
                   className="mobile-btn-v55 btn-add-first-sec-v55"
                   onClick={() => {
                     setCurrentSection({ name: '', type: 'All Included', limit: 0, items: [{ name: '', description: '', image: null }] });
@@ -2814,8 +3832,8 @@ const MobileCreateMenuView = ({
             </div>
 
             {!isAddingSection && sections.length > 0 && (
-              <button 
-                className="btn-add-item-dashed-v55" 
+              <button
+                className="btn-add-item-dashed-v55"
                 style={{ marginTop: '16px', border: '1.5px solid #eef2f6', color: '#475569', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}
                 onClick={() => {
                   setCurrentSection({ name: '', type: 'All Included', limit: 0, items: [{ name: '', description: '', image: null }] });
@@ -2828,7 +3846,7 @@ const MobileCreateMenuView = ({
             )}
 
             {isAddingSection && (
-              <MobileSectionEditor 
+              <MobileSectionEditor
                 onClose={() => setIsAddingSection(false)}
                 currentSection={currentSection}
                 setCurrentSection={setCurrentSection}
@@ -2841,7 +3859,7 @@ const MobileCreateMenuView = ({
         {menuStep === 3 && (
           <div className="mobile-step-container-v55">
             <h3 className="mobile-h3-v50" style={{ marginBottom: '16px' }}>Review Menu</h3>
-            
+
             <div className="mobile-form-section-v55" style={{ padding: '0', overflow: 'hidden' }}>
               <div style={{ width: '100%', height: '140px', background: '#f1f5f9' }}>
                 {menuIdentity.image ? (
@@ -2866,15 +3884,15 @@ const MobileCreateMenuView = ({
             <div className="mobile-sections-list-v55">
               {sections.map((sec: Section, i: number) => (
                 <div key={i} className="mobile-section-card-v55" style={{ display: 'block' }}>
-                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                      <span style={{ fontWeight: '700', fontSize: '0.9rem' }}>{sec.name}</span>
-                      <span style={{ fontSize: '0.75rem', background: '#f1f5f9', padding: '2px 8px', borderRadius: '4px', color: '#475569' }}>{sec.type}</span>
-                   </div>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                      {(sec.items as any[]).map((it: any, j: number) => (
-                        <span key={j} style={{ fontSize: '0.8rem', color: '#64748b' }}>{typeof it === 'string' ? it : it.name}{j < sec.items.length - 1 ? ' • ' : ''}</span>
-                      ))}
-                    </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                    <span style={{ fontWeight: '700', fontSize: '0.9rem' }}>{sec.name}</span>
+                    <span style={{ fontSize: '0.75rem', background: '#f1f5f9', padding: '2px 8px', borderRadius: '4px', color: '#475569' }}>{sec.type}</span>
+                  </div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                    {(sec.items as any[]).map((it: any, j: number) => (
+                      <span key={j} style={{ fontSize: '0.8rem', color: '#64748b' }}>{typeof it === 'string' ? it : it.name}{j < sec.items.length - 1 ? ' • ' : ''}</span>
+                    ))}
+                  </div>
                 </div>
               ))}
             </div>
@@ -2888,8 +3906,8 @@ const MobileCreateMenuView = ({
           <button className="mobile-btn-v55 mobile-btn-outline-v55" style={{ border: '1.5px solid #e2e8f0', color: '#1e293b', fontWeight: '700', padding: '8px 16px', fontSize: '0.75rem' }} onClick={handleBack}>
             {menuStep === 1 ? 'Cancel' : 'Back'}
           </button>
-          <button 
-            className="mobile-btn-v55 mobile-btn-primary-v55" 
+          <button
+            className="mobile-btn-v55 mobile-btn-primary-v55"
             style={{ padding: '8px 24px', borderRadius: '10px', fontSize: '0.75rem' }}
             disabled={menuStep === 1 && !menuIdentity.name}
             onClick={menuStep === 3 ? finalizeSave : handleNext}
@@ -2902,15 +3920,15 @@ const MobileCreateMenuView = ({
   );
 };
 
-const MobileServiceSettingsView = ({ 
-  setIsAddingMenu, 
-  menus, 
+const MobileServiceSettingsView = ({
+  setIsAddingMenu,
+  menus,
   setMenus,
   setMenuIdentity,
   setSections,
   setMenuEditingId,
   setMenuStep
-}: { 
+}: {
   setIsAddingMenu: (val: boolean) => void,
   menus: any[],
   setMenus: (val: any[] | ((prev: any[]) => any[])) => void,
@@ -2940,8 +3958,8 @@ const MobileServiceSettingsView = ({
   };
 
   const services = ['Breakfast', 'Lunch', 'Snacks', 'Dinner'];
-  const filteredMenus = menus.filter((m: any) => 
-    (menuFilter === 'All' || m.dietType === menuFilter) && 
+  const filteredMenus = menus.filter((m: any) =>
+    (menuFilter === 'All' || m.dietType === menuFilter) &&
     (m.category?.toLowerCase() === activeService.toLowerCase() || !m.category)
   );
 
@@ -2967,7 +3985,7 @@ const MobileServiceSettingsView = ({
         {/* Accepting Orders Row */}
         <div className="order-toggle-row-v54">
           <span>Accepting Orders</span>
-          <div 
+          <div
             className={`toggle-switch-v54 ${isAcceptingOrders ? 'on' : ''}`}
             onClick={() => setIsAcceptingOrders(!isAcceptingOrders)}
           >
@@ -2997,19 +4015,19 @@ const MobileServiceSettingsView = ({
               </div>
               <div className="form-group-v54 full">
                 <label>Manage Bookings</label>
-                <input 
-                  type="number" 
-                  min="1" 
-                  value={manageBookingsCount} 
+                <input
+                  type="number"
+                  min="1"
+                  value={manageBookingsCount}
                   onChange={(e) => setManageBookingsCount(Number(e.target.value))}
-                  disabled={!isEditing} 
+                  disabled={!isEditing}
                 />
               </div>
               <div className="form-group-v54 full inline">
                 <label>Stop accepting orders</label>
                 <div className="input-group-row-v54">
-                  <select 
-                    value={stopAcceptValue} 
+                  <select
+                    value={stopAcceptValue}
                     onChange={(e) => setStopAcceptValue(Number(e.target.value))}
                     disabled={!isEditing}
                   >
@@ -3017,8 +4035,8 @@ const MobileServiceSettingsView = ({
                       <option key={v} value={v}>{v}</option>
                     ))}
                   </select>
-                  <select 
-                    value={stopAcceptUnit} 
+                  <select
+                    value={stopAcceptUnit}
                     onChange={(e) => {
                       setStopAcceptUnit(e.target.value);
                       if (e.target.value === 'Hours' && stopAcceptValue > 24) setStopAcceptValue(24);
@@ -3038,7 +4056,7 @@ const MobileServiceSettingsView = ({
           <div className="card-subsection-v54">
             <h4 className="card-subtitle-v54">Service Style Supported</h4>
             <div className="style-grid-v54">
-              <div 
+              <div
                 className={`style-option-v54 ${selectedStyles.includes('Buffet') ? 'selected' : ''} ${!isEditing ? 'disabled' : ''}`}
                 onClick={() => toggleStyle('Buffet')}
               >
@@ -3049,7 +4067,7 @@ const MobileServiceSettingsView = ({
                 </div>
                 <div className="selection-indicator-v54"></div>
               </div>
-              <div 
+              <div
                 className={`style-option-v54 ${selectedStyles.includes('Sit-down') ? 'selected' : ''} ${!isEditing ? 'disabled' : ''}`}
                 onClick={() => toggleStyle('Sit-down')}
               >
@@ -3066,11 +4084,11 @@ const MobileServiceSettingsView = ({
               <label style={{ fontWeight: '800', color: '#1e293b' }}>Extra Cost per person</label>
               <div className="price-input-v54">
                 <span>₹</span>
-                <input 
-                  type="number" 
-                  placeholder="0" 
-                  defaultValue="50" 
-                  disabled={!isEditing || !selectedStyles.includes('Sit-down')} 
+                <input
+                  type="number"
+                  placeholder="0"
+                  defaultValue="50"
+                  disabled={!isEditing || !selectedStyles.includes('Sit-down')}
                 />
               </div>
               <p className="extra-cost-helper-v54">Enter only the extra amount added to your current menu price</p>
@@ -3090,7 +4108,7 @@ const MobileServiceSettingsView = ({
 
           <div className="filter-chips-v54">
             {['All', 'Veg', 'Non-Veg'].map(f => (
-              <button 
+              <button
                 key={f}
                 className={`filter-chip-v54 ${menuFilter === f ? 'active' : ''}`}
                 onClick={() => setMenuFilter(f)}
@@ -3165,11 +4183,11 @@ const MobileServiceSettingsView = ({
 };
 
 const MobileDashboard = (props: MobileDashboardProps) => {
-  const { 
-    activeTab, 
-    setActiveTab, 
-    profileData, 
-    navigationGroups, 
+  const {
+    activeTab,
+    setActiveTab,
+    profileData,
+    navigationGroups,
     onLogout,
     isAddingMenu,
     setIsAddingMenu,
@@ -3197,6 +4215,10 @@ const MobileDashboard = (props: MobileDashboardProps) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [editingCoupon, setEditingCoupon] = useState<Coupon | null>(null);
   const [isAddingCoupon, setIsAddingCoupon] = useState(false);
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [isAddingBank, setIsAddingBank] = useState(false);
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [securityConfirmModal, setSecurityConfirmModal] = useState<'logout-all' | 'remove-device' | null>(null);
   const [coupons, setCoupons] = useState<Coupon[]>([
     { id: '1', code: 'WELCOME10', type: 'Percentage', value: '10%', status: 'Active', usage: '45/100', validFrom: '2026-03-01', validTo: '2026-03-31', maxCap: '500', minAmount: '1000', source: 'vendor', applicability: 'orders', scope: 'all', perUserLimit: '1' },
     { id: '2', code: 'FLAT500', type: 'Flat Amount', value: '₹500', status: 'Paused', usage: '12/50', validFrom: '2026-03-20', validTo: '2026-04-15', minAmount: '2000', source: 'vendor', applicability: 'orders', maxCap: '0', scope: 'all', perUserLimit: '1' },
@@ -3241,9 +4263,9 @@ const MobileDashboard = (props: MobileDashboardProps) => {
       ) : activeTab === 'ratings' ? (
         <MobileRatingsView />
       ) : activeTab === 'coupons' ? (
-        <MobileCouponsView 
-          coupons={coupons} 
-          setCoupons={setCoupons} 
+        <MobileCouponsView
+          coupons={coupons}
+          setCoupons={setCoupons}
           setEditingCoupon={(coupon: Coupon) => {
             setEditingCoupon(coupon);
             setIsAddingCoupon(true);
@@ -3253,14 +4275,31 @@ const MobileDashboard = (props: MobileDashboardProps) => {
       ) : activeTab === 'tickets' ? (
         <MobileSupportView />
       ) : activeTab === 'service-settings' ? (
-        <MobileServiceSettingsView 
-          setIsAddingMenu={setIsAddingMenu} 
-          menus={menus} 
-          setMenus={setMenus} 
+        <MobileServiceSettingsView
+          setIsAddingMenu={setIsAddingMenu}
+          menus={menus}
+          setMenus={setMenus}
           setMenuIdentity={setMenuIdentity}
           setSections={setSections}
           setMenuEditingId={setMenuEditingId}
           setMenuStep={setMenuStep}
+        />
+      ) : activeTab === 'settings' ? (
+        <MobileSettingsView profileData={profileData} setIsChangingPassword={setIsChangingPassword} setSecurityConfirmModal={setSecurityConfirmModal} />
+      ) : activeTab === 'profile' ? (
+        <MobileProfileView
+          profileData={profileData}
+          onEdit={() => setIsEditingProfile(true)}
+          onAddBank={() => setIsAddingBank(true)}
+          onDeleteBank={(id) => {
+            if (window.confirm('Are you sure you want to delete this bank account?')) {
+              console.log('Deleting bank:', id);
+            }
+          }}
+          onSetPrimary={(id) => {
+            console.log('Setting primary bank:', id);
+            alert('Primary bank account updated!');
+          }}
         />
       ) : (
         <div className="mobile-scroller-v50" style={{ textAlign: 'center', color: '#64748b', paddingTop: '100px' }}>
@@ -3276,7 +4315,7 @@ const MobileDashboard = (props: MobileDashboardProps) => {
 
       {/* Full Screen Coupon Form Overlay */}
       {isAddingCoupon && (
-        <MobileCouponFormView 
+        <MobileCouponFormView
           initialData={editingCoupon}
           onClose={() => {
             setIsAddingCoupon(false);
@@ -3297,7 +4336,7 @@ const MobileDashboard = (props: MobileDashboardProps) => {
 
       {/* Full Screen Menu Creation Overlay */}
       {isAddingMenu && (
-        <MobileCreateMenuView 
+        <MobileCreateMenuView
           menuStep={menuStep}
           setMenuStep={setMenuStep}
           menuIdentity={menuIdentity}
@@ -3361,6 +4400,35 @@ const MobileDashboard = (props: MobileDashboardProps) => {
             </div>
           </div>
         </div>
+      )}
+      {/* Full Screen Edit Profile Overlay */}
+      {isEditingProfile && (
+        <MobileEditProfileView
+          onClose={() => setIsEditingProfile(false)}
+          handleImageUpload={handleImageUpload}
+        />
+      )}
+
+      {/* Full Screen Add Bank Overlay */}
+      {isAddingBank && (
+        <MobileAddBankView
+          onClose={() => setIsAddingBank(false)}
+          handleImageUpload={handleImageUpload}
+        />
+      )}
+
+      {/* Change Password Overlay */}
+      {isChangingPassword && (
+        <MobileChangePasswordView onClose={() => setIsChangingPassword(false)} />
+      )}
+
+      {/* Security Confirmation Modals */}
+      {securityConfirmModal && (
+        <MobileSecurityConfirmModal
+          type={securityConfirmModal}
+          onClose={() => setSecurityConfirmModal(null)}
+          onConfirm={() => console.log('Confirmed:', securityConfirmModal)}
+        />
       )}
     </div>
   );
