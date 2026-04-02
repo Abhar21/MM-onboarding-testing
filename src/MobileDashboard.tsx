@@ -3110,6 +3110,7 @@ const MobileChangePasswordView = ({ onClose }: { onClose: () => void }) => {
 
 const MobileSettingsView = ({ profileData, setIsChangingPassword, setSecurityConfirmModal }: { profileData: any, setIsChangingPassword: (v: boolean) => void, setSecurityConfirmModal: (type: 'logout-all' | 'remove-device' | null) => void }) => {
   const [activeSubTab, setActiveSubTab] = useState('Account');
+  const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
   const subTabs = ['Account', 'Documents', 'Subscription', 'Security', 'Danger'];
 
   const renderAccountSettings = () => (
@@ -3309,7 +3310,7 @@ const MobileSettingsView = ({ profileData, setIsChangingPassword, setSecurityCon
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2.5"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"></path></svg>
                 <span>Upgrade to 12 Months • <strong>Save ₹1,800/year</strong></span>
               </div>
-              <button className="explore-plans-btn-v70">
+              <button className="explore-plans-btn-v70" onClick={() => setIsPlanModalOpen(true)}>
                 EXPLORE PLANS <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="9 18 15 12 9 6"></polyline></svg>
               </button>
             </div>
@@ -3381,8 +3382,113 @@ const MobileSettingsView = ({ profileData, setIsChangingPassword, setSecurityCon
     </div>
   );
 
+  const renderPlanModal = () => {
+    if (!isPlanModalOpen) return null;
+
+    const plans = [
+      {
+        id: 'starter',
+        name: 'Starter Plan',
+        duration: '3 Months • Total ₹1,797',
+        price: '₹599 /mo',
+        annualBase: '₹7,188/year',
+        type: 'blue',
+        benefits: ['TDS Filing Support', 'Free Listing & Onboarding', 'Monthly Reports Access'],
+        isCurrent: false
+      },
+      {
+        id: 'growth',
+        name: 'Growth Plan',
+        duration: '6 Months • Total ₹2,994',
+        price: '₹499 /mo',
+        annualBase: '₹7,188/year',
+        savings: 'Save ₹1,200/year',
+        type: 'purple',
+        badge: 'Most Popular',
+        benefits: ['TDS Filing Support', 'Faster Payout Tracking', 'Priority Vendor Support'],
+        isCurrent: true
+      },
+      {
+        id: 'saving',
+        name: 'Saving Plan',
+        duration: '12 Months • Total ₹5,388',
+        price: '₹449 /mo',
+        annualBase: '₹7,188/year',
+        savings: 'Save ₹1,800/year',
+        type: 'gold',
+        badge: 'Best Value',
+        benefits: ['Full TDS Tracking', 'Priority Payout Support', 'Long-Term Savings Benefits'],
+        isCurrent: false
+      }
+    ];
+
+    return (
+      <div className="plan-modal-overlay-v71">
+        <div className="plan-modal-container-v71 mobile-scroller-v50">
+          <div className="plan-modal-header-v71">
+            <h3>Choose Subscription Plan</h3>
+            <button className="plan-modal-close-v71" onClick={() => setIsPlanModalOpen(false)}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+          </div>
+
+          <div className="plan-modal-body-v71">
+            <div className="plan-grid-list-v71">
+              {plans.map((plan) => (
+                <div key={plan.id} className={`plan-grid-card-v71 theme-${plan.type}-v71`}>
+                  {plan.badge && <span className="plan-modal-badge-v71">{plan.badge}</span>}
+                  
+                  <div className="plan-grid-sparkles-v71">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" opacity="0.4"><path d="M12 1L14.39 8.26L22 9.27L16.5 14.14L18.18 21.02L12 17.77L5.82 21.02L7.5 14.14L2 9.27L9.61 8.26L12 1Z"></path></svg>
+                    <svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor" opacity="0.3"><path d="M12 1L14.39 8.26L22 9.27L16.5 14.14L18.18 21.02L12 17.77L5.82 21.02L7.5 14.14L2 9.27L9.61 8.26L12 1Z"></path></svg>
+                  </div>
+
+                  <div className="plan-grid-top-v71">
+                    <h4>{plan.name}</h4>
+                    <span className="plan-grid-duration-v71">{plan.duration}</span>
+                  </div>
+
+                  <div className="plan-grid-main-v71">
+                    <div className="plan-grid-price-row-v71">
+                      <span className="plan-grid-amount-v71">{plan.price.split(' ')[0]}</span>
+                      <span className="plan-grid-mo-v71">/mo</span>
+                    </div>
+                    <div className="plan-grid-savings-row-v71">
+                      <span className="plan-grid-base-v71">{plan.annualBase}</span>
+                      {plan.savings && <span className="plan-grid-save-tag-v71">{plan.savings}</span>}
+                    </div>
+                  </div>
+
+                  <button 
+                    className={`plan-switch-btn-v71 ${plan.isCurrent ? 'current-plan-v71' : ''}`}
+                    disabled={plan.isCurrent}
+                  >
+                    {plan.isCurrent ? 'Current Active Plan' : 'Switch Plan'}
+                  </button>
+
+                  <div className="plan-benefits-v71">
+                    <span className="benefits-label-v71">BENEFITS</span>
+                    <ul className="benefits-list-v71">
+                      {plan.benefits.map((benefit, idx) => (
+                        <li key={idx}>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                          {benefit}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="mobile-settings-view-v64 mobile-scroller-v50">
+      {renderPlanModal()}
       <div className="settings-header-v64">
         <h2>Settings</h2>
         <p>Manage your account preferences, subscription, and security.</p>
