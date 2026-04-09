@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Routes, Route, useNavigate, Navigate, Link } from 'react-router-dom';
 import MobileDashboard from './MobileDashboard';
+import GSTCompliance from './GSTCompliance';
 import './MobileDashboard.css';
 import './App.css';
 import './ratings.css';
@@ -2805,10 +2806,10 @@ const ServiceSettings = ({
   ];
 
   const [settings, setSettings] = useState({
-    breakfast: { startTime: '07:00', endTime: '11:00', acceptingOrders: true, stopOrdersValue: '2', stopOrdersUnit: 'Hours', style: ['Buffet Service'], sitDownExtraPrice: 0, bookingLimit: '' },
-    lunch: { startTime: '12:00', endTime: '15:30', acceptingOrders: true, stopOrdersValue: '4', stopOrdersUnit: 'Hours', style: ['Buffet Service', 'Sit-down Service'], sitDownExtraPrice: 10, bookingLimit: '' },
-    snacks: { startTime: '16:00', endTime: '18:30', acceptingOrders: false, stopOrdersValue: '2', stopOrdersUnit: 'Hours', style: ['Buffet Service'], sitDownExtraPrice: 0, bookingLimit: '' },
-    dinner: { startTime: '19:00', endTime: '23:00', acceptingOrders: true, stopOrdersValue: '1', stopOrdersUnit: 'Days', style: ['Buffet Service', 'Sit-down Service'], sitDownExtraPrice: 15, bookingLimit: '' },
+    breakfast: { startTime: '07:00', endTime: '11:00', acceptingOrders: true, stopOrdersValue: '4', stopOrdersUnit: 'Days', style: ['Buffet Service'], sitDownExtraPrice: 0, bookingLimit: '' },
+    lunch: { startTime: '12:00', endTime: '15:30', acceptingOrders: true, stopOrdersValue: '4', stopOrdersUnit: 'Days', style: ['Buffet Service', 'Sit-down Service'], sitDownExtraPrice: 10, bookingLimit: '' },
+    snacks: { startTime: '16:00', endTime: '18:30', acceptingOrders: false, stopOrdersValue: '4', stopOrdersUnit: 'Days', style: ['Buffet Service'], sitDownExtraPrice: 0, bookingLimit: '' },
+    dinner: { startTime: '19:00', endTime: '23:00', acceptingOrders: true, stopOrdersValue: '4', stopOrdersUnit: 'Days', style: ['Buffet Service', 'Sit-down Service'], sitDownExtraPrice: 15, bookingLimit: '' },
   });
 
   const [overallStatus, setOverallStatus] = useState('All changes saved');
@@ -2956,30 +2957,18 @@ const ServiceSettings = ({
 
       {activeSettingsTab === 'services' ? (
         <div className="service-settings-main">
-          <div className="category-sidebar-wrapper">
-            <div className="sidebar-header">
-              <h3 className="sidebar-section-title">Services</h3>
-            </div>
-            <div className="category-sidebar">
-              <div className="category-cards">
-                {categories.map(cat => (
-                  <button
-                    key={cat.id}
-                    className={`category-card-btn ${activeCategory === cat.id ? 'active' : ''}`}
-                    onClick={() => handleCategoryChange(cat.id)}
-                  >
-                    <div className="cat-card-main">
-                      <div className="cat-info">
-                        <span className="cat-label">{cat.label}</span>
-                        <span className="cat-count">{cat.count} items</span>
-                      </div>
-                      <span className="cat-status-badge">Active</span>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
+          <nav className="category-tab-nav">
+            {categories.map(cat => (
+              <button
+                key={cat.id}
+                className={`category-tab-item ${activeCategory === cat.id ? 'active' : ''}`}
+                onClick={() => handleCategoryChange(cat.id)}
+              >
+                <span className="cat-tab-label">{cat.label}</span>
+                <span className="cat-tab-badge">Active</span>
+              </button>
+            ))}
+          </nav>
           <div className="settings-content">
             <div className="content-category-header">
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -3018,11 +3007,10 @@ const ServiceSettings = ({
                       {isEditingService ? (
                         <div className="edit-actions-btns" style={{ display: 'flex', gap: '8px' }}>
                           <button className="btn btn-secondary-gray btn-sm" onClick={handleCancelClick}>Cancel</button>
-                          <button className="btn btn-primary-blue btn-sm" style={{ minWidth: '100px' }} onClick={handleSaveClick}>Save</button>
+                          <button className="btn btn-primary-green btn-sm" style={{ minWidth: '100px' }} onClick={handleSaveClick}>Save</button>
                         </div>
                       ) : (
-                        <button className="btn btn-outline btn-sm edit-section-btn" onClick={handleEditClick}>
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2-2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                        <button className="btn btn-outline btn-sm edit-section-btn" style={{ paddingLeft: '1.25rem', paddingRight: '1.25rem' }} onClick={handleEditClick}>
                           Edit
                         </button>
                       )}
@@ -3068,8 +3056,8 @@ const ServiceSettings = ({
                       })()}
                     </div>
 
-                    <div className="settings-row">
-                      <div className="form-group">
+                    <div className="settings-row-vertical">
+                      <div className="form-group" style={{ marginBottom: '1.5rem' }}>
                         <label className="input-label">Manage Bookings</label>
                         <input
                           type="number"
@@ -3081,36 +3069,23 @@ const ServiceSettings = ({
                         />
                       </div>
                       <div className="form-group">
-                        <label className="input-label">Stop Accepting Orders Before</label>
-                        <div className="stop-orders-wrapper">
-                          <select
-                            className="input-field stop-value"
-                            value={currentSettings.stopOrdersValue}
-                            disabled={!isEditingService}
-                            onChange={(e) => updateSetting('stopOrdersValue', e.target.value)}
-                          >
-                            {Array.from(
-                              { length: currentSettings.stopOrdersUnit === 'Hours' ? 24 : 30 },
-                              (_, i) => i + 1
-                            ).map(val => (
-                              <option key={val} value={val}>{val}</option>
-                            ))}
-                          </select>
-                          <select
-                            className="input-field stop-unit"
-                            value={currentSettings.stopOrdersUnit}
-                            disabled={!isEditingService}
-                            onChange={(e) => {
-                              const newUnit = e.target.value;
-                              updateSetting('stopOrdersUnit', newUnit);
-                              if (newUnit === 'Hours' && parseInt(currentSettings.stopOrdersValue) > 24) {
-                                updateSetting('stopOrdersValue', '24');
-                              }
-                            }}
-                          >
-                            <option value="Hours">Hours</option>
-                            <option value="Days">Days</option>
-                          </select>
+                        <label className="input-label">Booking Cut-off Time</label>
+                        <div className="booking-cutoff-wrapper">
+                          <div className="cutoff-input-group">
+                            <select
+                              className="input-field cutoff-input"
+                              value={currentSettings.stopOrdersValue}
+                              disabled={!isEditingService}
+                              onChange={(e) => updateSetting('stopOrdersValue', e.target.value)}
+                            >
+                              {Array.from({ length: 27 }, (_, i) => i + 4).map(val => (
+                                <option key={val} value={val}>{val}</option>
+                              ))}
+                            </select>
+                            <button className="cutoff-unit-btn" disabled>Days</button>
+                          </div>
+                          <p className="input-helper-v4">Bookings will close min 4 days before the event date due to refund policy</p>
+                          <p className="input-example-v4">Example: For an event on Jan 10, bookings close on Jan 6</p>
                         </div>
                       </div>
                     </div>
@@ -3134,7 +3109,7 @@ const ServiceSettings = ({
                         </div>
                         <div className="style-info">
                           <span className="style-name">Buffet Service</span>
-                          <span className="style-desc">Self-service meal style</span>
+                          <span className="style-desc">Self-service meal</span>
                         </div>
                         {isEditingService && (
                           <div className="style-checkbox">
@@ -3157,8 +3132,8 @@ const ServiceSettings = ({
                           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M7 21v-7a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v7"></path><path d="M4 11V4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v7"></path><path d="M12 2v10"></path></svg>
                         </div>
                         <div className="style-info">
-                          <span className="style-name">Sit-down Service</span>
-                          <span className="style-desc">Wait-staff table service</span>
+                          <span className="style-name">Sit down Service</span>
+                          <span className="style-desc">Table service</span>
                         </div>
                         {isEditingService && (
                           <div className="style-checkbox">
@@ -5273,7 +5248,7 @@ const BookingDetailModal = ({
   const [showMenuDetail, setShowMenuDetail] = useState(false);
 
   return (
-    <div className="modal-overlay-v4" onClick={onClose} style={{ zIndex: 10000 }}>
+    <div className="modal-overlay-v4 drawer-overlay-v7" onClick={onClose} style={{ zIndex: 10000 }}>
       <div className="booking-detail-modal-v7" onClick={e => e.stopPropagation()}>
         <div className="detail-modal-header-v7">
           <div className="header-left-v7">
@@ -5356,140 +5331,83 @@ const BookingDetailModal = ({
           </div>
 
           <div className="detail-section-v7">
-            <h4 className="section-title-v7">Payment Summary</h4>
-            <div className="payment-card-v11">
-              <div className="payment-row-v11 main">
-                <label>Total Booking Value</label>
-                <span>₹{booking.amount.toLocaleString()}</span>
-              </div>
-              <div className="payment-divider-v11"></div>
-              <div className="payment-row-v11">
-                <label>Advance Received</label>
-                <span className="received-v11">₹{booking.paid.toLocaleString()}</span>
-              </div>
-              <div className="payment-row-v11">
-                <label>Pending Collection</label>
-                <span className="pending-v11">₹{(booking.amount - booking.paid).toLocaleString()}</span>
-              </div>
-              <div className="payment-divider-v11"></div>
-              <div className="payout-details-v11">
-                <div className="payout-row-small-v11">
-                  <label>Payout:</label>
-                  <span>₹{booking.paid.toLocaleString()}</span>
+            <h4 className="section-title-v7">PAYMENT SUMMARY</h4>
+            <div className="payment-summary-v25">
+              <div className="payment-section-v25">
+                <div className="payment-row-v25 row-total-v25">
+                  <label>TOTAL BOOKING VALUE</label>
+                  <span>₹{(booking.originalAmount || booking.amount).toLocaleString()}</span>
                 </div>
-                {(() => {
-                  const today = new Date();
-                  today.setHours(0, 0, 0, 0);
-                  const eventDate = new Date(booking.date);
-                  eventDate.setHours(0, 0, 0, 0);
-                  const isUpcoming = booking.status === 'Upcoming';
-                  const isCancelled = booking.status === 'Cancelled';
+                {booking.discount > 0 && (
+                  <div className="payment-row-v25 row-discount-v25">
+                    <label>Discount Applied</label>
+                    <span>-₹{booking.discount.toLocaleString()}</span>
+                  </div>
+                )}
+                <div className="payment-row-v25 row-final-v25">
+                  <label>Final Booking Value</label>
+                  <span>₹{booking.amount.toLocaleString()}</span>
+                </div>
+              </div>
 
-                  let cancelledTime = new Date().getTime();
-                  if (isCancelled && booking.timeline) {
-                    const cancelledEntry = booking.timeline.find((t: any) => t.status === 'Cancelled');
-                    if (cancelledEntry) {
-                      const parts = cancelledEntry.time.split(', ');
-                      if (parts.length === 2) {
-                        const dateStr = parts[0] + ` ${new Date().getFullYear()} ` + parts[1];
-                        const parsed = new Date(dateStr).getTime();
-                        if (!isNaN(parsed)) cancelledTime = parsed;
-                      }
+              <div className="payment-divider-v25"></div>
+
+              <div className="payment-section-v25">
+                <div className="payment-row-v25">
+                  <div className="label-with-subtext-v25">
+                    <label>Advance Received</label>
+                    <span className="subtext-v25">(via platform)</span>
+                  </div>
+                  <span style={{ color: '#10b981' }}>₹{booking.paid.toLocaleString()}</span>
+                </div>
+                <div className="payment-row-v25">
+                  <div className="label-with-subtext-v25">
+                    <label>To be collected</label>
+                    <span className="subtext-v25">(from customer)</span>
+                  </div>
+                  <span style={{ color: '#f59e0b' }}>₹{(booking.amount - booking.paid).toLocaleString()}</span>
+                </div>
+              </div>
+
+              <div className="payout-section-v25">
+                <div className="payment-row-v25 row-payout-v25">
+                  <label>PAYOUT TO YOU</label>
+                  <span>₹{(booking.payout || booking.paid).toLocaleString()}</span>
+                </div>
+                <div className="payout-info-v25">
+                  <p className="payout-info-title-v25">Includes:</p>
+                  <ul className="payout-list-v25">
+                    <li>Platform charges applied</li>
+                    <li>GST included</li>
+                    <li>TDS deducted (if applicable)</li>
+                  </ul>
+                  <p className="payout-footer-v25">
+                    Processed on: {
+                      (() => {
+                        const d = new Date(booking.date);
+                        d.setDate(d.getDate() - 1);
+                        return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+                      })()
                     }
-                  }
-
-                  const diffDays = Math.ceil((eventDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-
-                  // Default
-                  let label = 'Expected on:';
-                  let value = '';
-
-                  const payoutDate = new Date(booking.date);
-                  payoutDate.setDate(payoutDate.getDate() - 1);
-                  const formattedPayoutDate = payoutDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-
-                  if (isCancelled) {
-                    const timeUntilEvent = eventDate.getTime() - cancelledTime;
-                    // Prevent negative days if cancelled after the event (edge case)
-                    const diffDaysToEvent = Math.max(0, Math.ceil(timeUntilEvent / (1000 * 60 * 60 * 24)));
-                    const isVendor = (booking as any).cancelledBy === 'Vendor';
-
-                    if (isVendor) {
-                      label = 'Refund Status:';
-                      value = '100% Advance need to refund';
-                    } else {
-                      label = 'Refund Status:';
-                      if (diffDaysToEvent > 7) {
-                        value = '100% under review';
-                      } else if (diffDaysToEvent >= 5) {
-                        value = '50% under review';
-                      } else if (diffDaysToEvent >= 2) {
-                        value = '25% under review';
-                      } else {
-                        value = '0% under review';
-                      }
-                    }
-                  } else if (isUpcoming && diffDays > 2) {
-                    label = 'Expected on:';
-                    const expDate = new Date(booking.date);
-                    expDate.setDate(expDate.getDate() + 2);
-                    value = expDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-                  } else {
-                    label = 'Payout Processed At:';
-                    value = formattedPayoutDate;
-                  }
-
-                  return (
-                    <div className="payout-details-v11">
-                      {isCancelled && (
-                        <div className="payout-row-small-v11 cancelled-by-row" style={{ color: '#ef4444', marginBottom: '8px' }}>
-                          <label>Cancelled By:</label>
-                          <span style={{ fontWeight: 600 }}>{(booking as any).cancelledBy || 'Customer'}</span>
-                        </div>
-                      )}
-                      <div className="payout-row-small-v11">
-                        <label>Payout:</label>
-                        <span className="value accent" style={{ color: '#4f46e5', fontWeight: 700 }}>₹{booking.paid.toLocaleString()}</span>
-                      </div>
-                      <div className="payout-row-small-v11">
-                        <label>{label}</label>
-                        <span className={value.includes('under review') ? 'status-pill-v7 review' : ''} style={value.includes('under review') || value.includes('refund') ? { color: '#f59e0b', fontWeight: 600 } : { fontWeight: 700 }}>{value}</span>
-                      </div>
-                      <div className="payout-row-small-v11">
-                        <label>GST Month:</label>
-                        <span style={{ fontWeight: 700 }}>{
-                          (() => {
-                            let d = new Date(booking.date);
-                            if (isUpcoming && diffDays > 2) {
-                              d.setDate(d.getDate() + 2);
-                            } else if (isCancelled && cancelledTime > 0) {
-                              d = new Date(cancelledTime);
-                            } else {
-                              d.setDate(d.getDate() - 1);
-                            }
-                            d.setMonth(d.getMonth() + 1);
-                            return d.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
-                          })()
-                        }</span>
-                      </div>
-                    </div>
-                  );
-                })()}
+                  </p>
+                </div>
               </div>
-              {booking.status !== 'Cancelled' && booking.status !== 'Completed' && (
-                <div className="collection-warning-v11">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                  <span>Collect remaining amount on event day</span>
-                </div>
-              )}
-              {booking.status === 'Completed' && (
-                <div className="collection-warning-v11 completed">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                  <span>You marked as booking completed which is remaining amount is collected</span>
-                </div>
-              )}
             </div>
+
+            {booking.status !== 'Cancelled' && booking.status !== 'Completed' && (
+              <div className="collection-warning-v11" style={{ marginTop: '1.5rem' }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                <span>Collect remaining amount on event day</span>
+              </div>
+            )}
+            {booking.status === 'Completed' && (
+              <div className="collection-warning-v11 completed" style={{ marginTop: '1.5rem' }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                <span>You marked as booking completed which is remaining amount is collected</span>
+              </div>
+            )}
           </div>
+
 
           <div className="detail-section-v7 docs-section-v12">
             <h4 className="section-title-v7">Documents</h4>
@@ -5854,202 +5772,7 @@ const Reports = () => {
         )}
 
         {activeReportTab === 'GST' && (
-          <div className="gst-dashboard-v20 v22">
-            {/* 1. Header with FY Selector */}
-            <div className="reports-section-header-v20">
-              <div className="section-title-group-v20">
-                <h3>GST Reporting & Compliance</h3>
-                <p>Tax insights and compliance support for {fullMonthNames[selectedMonthTab]} {selectedFY}</p>
-              </div>
-              <div className="section-filters-v20">
-                <select
-                  className="period-select-v20 fy-select-v22"
-                  value={selectedFY}
-                  onChange={(e) => setSelectedFY(e.target.value)}
-                >
-                  <option>FY 2025-26</option>
-                  <option>FY 2024-25</option>
-                </select>
-                <select
-                  className="period-select-v20 month-select-v22"
-                  value={selectedMonthTab}
-                  onChange={(e) => setSelectedMonthTab(e.target.value)}
-                >
-                  {monthsList.map((m) => {
-                    const fyParts = selectedFY.replace('FY ', '').split('-');
-                    const yearSuffix = ['Jan', 'Feb', 'Mar'].includes(m) ? fyParts[1] : fyParts[0].slice(-2);
-                    return (
-                      <option key={m} value={m}>
-                        {m} '{yearSuffix}
-                      </option>
-                    );
-                  })}
-                </select>
-              </div>
-            </div>
-
-
-            {/* 3. Summary Grid + FY Insight */}
-            <div className="gst-metrics-row-v22">
-              {/* FY Insight Card - Moved to First */}
-              <div className="fy-insight-card-v22">
-                <div className="fy-insight-content-v22">
-                  <div className="fy-label-v22">Taxable Amount</div>
-                  <div className="fy-total-v22">₹4,25,840</div>
-                  <div className="fy-desc-v22">Total taxable value for {fullMonthNames[selectedMonthTab]} {selectedFY}</div>
-                </div>
-              </div>
-
-              <div className="gst-summary-grid-v20 v22">
-                <div className="gst-summary-card-v20 highlight">
-                  <label>Total GST this Month</label>
-                  <div className="card-main-v20">
-                    <span className="value-v20">₹76,651</span>
-                    <span className="sub-v20">Calculated for {selectedMonthTab}</span>
-                  </div>
-                </div>
-                <div className="gst-summary-card-v20">
-                  <label>ITC available</label>
-                  <div className="card-main-v20">
-                    <span className="value-v20">₹3,600</span>
-                    <span className="sub-v20">Available for credit</span>
-                  </div>
-                </div>
-                <div className="gst-summary-card-v20">
-                  <label>GST Payable</label>
-                  <div className="card-main-v20">
-                    <span className="value-v20">₹73,051</span>
-                    <span className="sub-v20">After ITC adjustments</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* 4. Deadlines & Breakdown Row */}
-            <div className="gst-middle-grid-v20">
-              <div className="gst-deadlines-section-v20">
-                <div className="inner-card-v20">
-                  <h4>Upcoming Filing Deadlines</h4>
-                  <div className="deadline-items-v20">
-                    <div className="deadline-item-v20 highlight-status">
-                      <div className="deadline-info-v20">
-                        <label>GSTR-1 (Outward Supplies)</label>
-                        <span>Due by <strong>{selectedMonthTab === 'Mar' ? 'April 11, 2026' : 'Next Month 11th'}</strong></span>
-                      </div>
-                      <span className="status-indicator-v20 critical" style={{ display: (selectedFY === 'FY 2025-26' && selectedMonthTab === 'Mar') ? 'block' : 'none' }}>Due in 5 days</span>
-                    </div>
-                    <div className="deadline-item-v20">
-                      <div className="deadline-info-v20">
-                        <label>GSTR-3B (Summary Return)</label>
-                        <span>Due by <strong>{selectedMonthTab === 'Mar' ? 'April 20, 2026' : 'Next Month 20th'}</strong></span>
-                      </div>
-                      <span className="status-indicator-v20" style={{ display: (selectedFY === 'FY 2025-26' && selectedMonthTab === 'Mar') ? 'block' : 'none' }}>Due in 14 days</span>
-                    </div>
-                    <div className="missed-alert-v20">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="20 6 9 17 4 12"></polyline></svg>
-                      <span>No missed deadlines for {selectedMonthTab}</span>
-                    </div>
-
-                    <div className="deadline-divider-v24"></div>
-
-                    <div className="next-cycle-v24">
-                      <div className="next-cycle-header-v24">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
-                        <span>Next Filing Cycle: {nextMonthInfo.fullName}</span>
-                      </div>
-                      <div className="next-cycle-items-v24">
-                        <div className="next-cycle-item-v24">
-                          <label>GSTR-1</label>
-                          <span>Deadline {nextMonthInfo.deadlineMonthName} 11th</span>
-                        </div>
-                        <div className="next-cycle-item-v24">
-                          <label>GSTR-3B</label>
-                          <span>Deadline {nextMonthInfo.deadlineMonthName} 20th</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="gst-type-breakdown-v20">
-                <div className="inner-card-v20 secondary-bg">
-                  <h4>GST Split ({selectedMonthTab})</h4>
-                  <div className="gst-breakdown-list-v23">
-                    <div className="gst-breakdown-item-v23">
-                      <span className="label-v23">CGST (within state)</span>
-                      <span className="value-v23">₹17,246</span>
-                    </div>
-                    <div className="gst-breakdown-item-v23">
-                      <span className="label-v23">SGST (within state)</span>
-                      <span className="value-v23">₹17,246</span>
-                    </div>
-                    <div className="gst-breakdown-item-v23">
-                      <span className="label-v23">IGST (interstate)</span>
-                      <span className="value-v23">₹42,158</span>
-                    </div>
-                    <div className="gst-breakdown-divider-v23"></div>
-                    <div className="gst-breakdown-item-v23 collected">
-                      <span className="label-v23">GST Collected</span>
-                      <span className="value-v23">₹76,651</span>
-                    </div>
-                    <div className="gst-breakdown-item-v23 itc">
-                      <span className="label-v23">ITC Available</span>
-                      <span className="value-v23 positive">₹3,600</span>
-                    </div>
-                    <div className="gst-breakdown-divider-v23"></div>
-                    <div className="gst-breakdown-item-v23 payable">
-                      <span className="label-v23">GST Payable</span>
-                      <span className="value-v23">₹73,051</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-
-            {/* 3. GST Documents Section */}
-            <div className="gst-documents-section-v25">
-              <div className="gst-documents-card-v25">
-                <h4>GST Documents</h4>
-                <div className="gst-documents-grid-v25">
-                  <button className="gst-download-btn-v25">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
-                    Download GSTR-1 Data
-                  </button>
-                  <button className="gst-download-btn-v25">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
-                    Download GSTR-3B Summary
-                  </button>
-                  <button className="gst-download-btn-v25">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><line x1="12" y1="18" x2="12" y2="12" /><polyline points="9 15 12 12 15 15" /></svg>
-                    Download B2B Invoices
-                  </button>
-                  <button className="gst-download-btn-v25 optional">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" /></svg>
-                    Download GST Summary <span className="optional-tag-v25">(optional)</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* 4. Reporting Footnote & Compliance Guidance */}
-            <div className="gst-footer-advice-v20">
-              <div className="advice-card-v20 share-ca">
-                <div className="advice-meta-v20">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                  <p>Share this report with your <strong>Chartered Accountant (CA)</strong> for final GST filing.</p>
-                </div>
-              </div>
-              <div className="advice-card-v20 disclaimer">
-                <div className="advice-meta-v20">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                  <p>System-generated report based on your bookings. Please <strong>verify all details</strong> before filing.</p>
-                </div>
-              </div>
-            </div>
-
-          </div>
+          <GSTCompliance />
         )}
 
         {activeReportTab === 'TDS' && (
@@ -6244,6 +5967,9 @@ const Bookings = () => {
       menuName: 'Premium Sadhya Menu',
       guests: 200,
       amount: 145000,
+      originalAmount: 160000,
+      discount: 15000,
+      payout: 41235,
       paid: 43500,
       status: 'Preparing',
       menuSelection: [
@@ -6268,6 +5994,9 @@ const Bookings = () => {
       menuName: 'Executive Buffet',
       guests: 150,
       amount: 85000,
+      originalAmount: 95000,
+      discount: 10000,
+      payout: 24225,
       paid: 25500,
       status: 'Upcoming',
       menuSelection: [
@@ -6290,6 +6019,9 @@ const Bookings = () => {
       menuName: 'High Tea Special',
       guests: 80,
       amount: 45000,
+      originalAmount: 50000,
+      discount: 5000,
+      payout: 12825,
       paid: 13500,
       status: 'Completed',
       menuSelection: [
@@ -6313,6 +6045,9 @@ const Bookings = () => {
       menuName: 'Romantic Four-Course',
       guests: 12,
       amount: 15000,
+      originalAmount: 18000,
+      discount: 3000,
+      payout: 4275,
       paid: 4500,
       status: 'Upcoming',
       menuSelection: [
@@ -6333,6 +6068,9 @@ const Bookings = () => {
       menuName: 'Healthy Salads & Juice',
       guests: 40,
       amount: 35000,
+      originalAmount: 40000,
+      discount: 5000,
+      payout: 9975,
       paid: 10500,
       status: 'Upcoming',
       menuSelection: [
@@ -6354,6 +6092,9 @@ const Bookings = () => {
       menuName: 'Royal North Indian',
       guests: 25,
       amount: 60000,
+      originalAmount: 65000,
+      discount: 5000,
+      payout: 17100,
       paid: 18000,
       status: 'Upcoming',
       menuSelection: [
@@ -6374,6 +6115,9 @@ const Bookings = () => {
       menuName: 'Kids Special Menu',
       guests: 50,
       amount: 25000,
+      originalAmount: 28000,
+      discount: 3000,
+      payout: 7125,
       paid: 7500,
       status: 'Cancelled',
       cancelledBy: 'Vendor',
@@ -6396,6 +6140,9 @@ const Bookings = () => {
       menuName: 'Premium Feast',
       guests: 30,
       amount: 45000,
+      originalAmount: 50000,
+      discount: 5000,
+      payout: 12825,
       paid: 13500,
       status: 'Cancelled',
       cancelledBy: 'Customer',
@@ -6418,6 +6165,9 @@ const Bookings = () => {
       menuName: 'Executive Buffet',
       guests: 150,
       amount: 120000,
+      originalAmount: 130000,
+      discount: 10000,
+      payout: 34200,
       paid: 36000,
       status: 'Upcoming',
       menuSelection: [
@@ -6439,6 +6189,9 @@ const Bookings = () => {
       menuName: 'Grand Royal Feast',
       guests: 350,
       amount: 450000,
+      originalAmount: 500000,
+      discount: 50000,
+      payout: 128250,
       paid: 135000,
       status: 'Upcoming',
       menuSelection: [
@@ -7492,7 +7245,7 @@ const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
           {activeTab === 'dashboard' && <HomeView setActiveTab={setActiveTab} />}
           {activeTab === 'tickets' && <Tickets />}
           {activeTab === 'service-settings' && (
-            <ServiceSettings 
+            <ServiceSettings
               menus={menus}
               setMenus={setMenus}
               isAddingMenu={isAddingMenu}
