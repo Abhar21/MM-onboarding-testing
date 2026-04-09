@@ -2658,7 +2658,8 @@ const ServiceSettings = ({
   setMenuEditingId,
   handleImageUpload,
   handleSaveSection,
-  resetAddMenu
+  resetAddMenu,
+  profileData
 }: any) => {
   const [activeCategory, setActiveCategory] = useState('breakfast');
   const [isEditingService, setIsEditingService] = useState(false);
@@ -2845,7 +2846,7 @@ const ServiceSettings = ({
   };
 
 
-  const totalItemsCount = sections.reduce((acc: number, sec: any) => acc + (sec.items?.length || 0), 0);
+
 
 
   // Compute min/max time constraints based on other services' occupied ranges
@@ -2965,7 +2966,9 @@ const ServiceSettings = ({
                 onClick={() => handleCategoryChange(cat.id)}
               >
                 <span className="cat-tab-label">{cat.label}</span>
-                <span className="cat-tab-badge">Active</span>
+                <span className={`cat-tab-badge ${!settings[cat.id as keyof typeof settings].acceptingOrders ? 'paused' : ''}`}>
+                  {settings[cat.id as keyof typeof settings].acceptingOrders ? 'Active' : 'Paused'}
+                </span>
               </button>
             ))}
           </nav>
@@ -3202,11 +3205,36 @@ const ServiceSettings = ({
                   </div>
 
                   <div className="menu-list">
-                    {menus.filter((m: any) => m.category === activeCategory && (dietFilter === 'All' || m.dietType === dietFilter)).map((menu: any) => (
-                      <div key={menu.id} className="menu-card-v2">
+                    {(() => {
+                      const filtered = menus.filter((m: any) => m.category === activeCategory && (dietFilter === 'All' || m.dietType === dietFilter));
+                      
+                      if (filtered.length === 0) {
+                        return (
+                          <div className="menu-builder-empty">
+                            <div className="empty-vector-wrap">
+                              <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M12 2v20M2 12h20" strokeDasharray="4 4" opacity="0.3"/>
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                                <line x1="9" y1="9" x2="15" y2="15" />
+                                <line x1="15" y1="9" x2="9" y2="15" />
+                              </svg>
+                            </div>
+                            <h4 className="empty-title">No menus found</h4>
+                            <p className="empty-text">
+                              There are no {dietFilter !== 'All' ? dietFilter : ''} menus added to this category yet. 
+                              Click '+ Add Menu' to create one.
+                            </p>
+                          </div>
+                        );
+                      }
+
+                      return filtered.map((menu: any) => (
+                      <div key={menu.id} className={`menu-card-v2 ${menu.status !== 'Active' ? 'is-hidden' : ''}`}>
                         {/* Top Image Section */}
                         <div className="menu-image-section">
-                          <div className="live-status-badge">Live</div>
+                          <div className={`live-status-badge ${menu.status !== 'Active' ? 'is-hidden' : ''}`}>
+                            {menu.status === 'Active' ? 'Live' : 'Hidden'}
+                          </div>
                           {menu.image ? (
                             <img src={menu.image} alt={menu.name} />
                           ) : (
@@ -3214,12 +3242,6 @@ const ServiceSettings = ({
                               <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
                             </div>
                           )}
-                          
-                          {/* Capacity Overlay */}
-                          <div className="pax-overlay">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                            min {menu.minMembers || 50} - max {menu.maxMembers || 200}
-                          </div>
 
                           {/* Float Actions */}
                           <div className="card-actions-v2">
@@ -3240,7 +3262,7 @@ const ServiceSettings = ({
                                 setIsAddingMenu(true);
                               }}
                             >
-                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2-2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                             </button>
                             <button
                               className="action-btn-circle settings-btn"
@@ -3258,10 +3280,9 @@ const ServiceSettings = ({
                         <div className="menu-details-section">
                           <h4 className="menu-title-v2">{menu.name}</h4>
                           <div className="menu-meta-row-v2">
-                            <div className="menu-rating-row">
-                              <span className="star-icon">★</span>
-                              <strong>4.1</strong>
-                              <span>(1,802)</span>
+                            <div className="menu-members-row">
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                              <span>min {menu.minMembers} - max {menu.maxMembers}</span>
                             </div>
 
                             <div className={`diet-badge-v2 ${menu.dietType === 'Veg' ? 'veg' : 'non-veg'}`}>
@@ -3269,7 +3290,7 @@ const ServiceSettings = ({
                               {menu.dietType}
                             </div>
                           </div>
-                          
+
                           <hr className="menu-divider-dashed" />
                         </div>
 
@@ -3283,20 +3304,13 @@ const ServiceSettings = ({
                                 <span className="price-unit">/ Person</span>
                               </div>
                             </div>
-                            <button className="items-btn-v2" onClick={() => {
-                              setMenuEditingId(menu.id);
-                              setMenuStep(2); // Jump to food sections
-                              setIsAddingMenu(true);
-                            }}>
-                              Items
-                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"></path></svg>
-                            </button>
                           </div>
                         </div>
                       </div>
-                    ))}
+                    ));
+                  })()}
 
-                    {menuActionId && (
+                  {menuActionId && (
                       <div className="modal-overlay" onClick={() => {
                         setMenuActionId(null);
                         setSelectedMenuAction(null);
@@ -3400,125 +3414,73 @@ const ServiceSettings = ({
 
 
           {isAddingMenu && (
-            <div className="modal-overlay">
-              <div className="modal-container medium-large">
-                <div className="modal-header">
-                  <div className="modal-title-group">
-                    <h3 className="modal-title">{menuEditingId ? 'Edit Menu' : 'Create New Menu'}</h3>
-                    <p className="modal-subtitle">
-                      {menuEditingId ? 'Update menu basics and food sections' : 'Create menu basics before adding food sections'}
-                    </p>
-                  </div>
-                  <button className="close-modal" onClick={resetAddMenu}>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                  </button>
-                </div>
+            <div className="side-drawer-overlay" onClick={resetAddMenu}>
+              <div className="side-drawer-container slide-in-right" onClick={(e) => e.stopPropagation()}>
+                {/* Left Pane: Conditional Preview/Education */}
+                <div className="drawer-preview-pane">
+                  <h3 className="preview-pane-heading">
+                    {menuStep === 2 ? 'How it works' : 'Live Preview'}
+                  </h3>
 
-                <div className="modal-content">
-                  {menuStep === 1 && (
-                    <div className="step-content">
-                      <div className="commercial-setup-grid">
-                        {/* Block 1: Menu Identity */}
-                        <div className="form-section-flat">
-                          <h4 className="block-title">Menu Identity</h4>
-                          <div className="form-group full-width">
-                            <label className="input-label">Menu Name</label>
-                            <input
-                              type="text"
-                              className="input-field"
-                              placeholder="e.g. Standard Breakfast"
-                              value={menuIdentity.name}
-                              onChange={(e) => setMenuIdentity((prev: any) => ({ ...prev, name: e.target.value }))}
-                            />
+                  {menuStep === 2 ? (
+                    <div className="education-pane">
+                      <div className="edu-guide-card">
+                        <div className="edu-image-container">
+                          <img
+                            src="/images/menu_structure_guide.png"
+                            alt="Menu Structure Guide"
+                          />
+                        </div>
+                        <div className="edu-info-box">
+                          <h4 className="edu-info-title">Sections & Items</h4>
+                          <p className="edu-info-text">
+                            <strong>Sections</strong> represent categories like Starters, Main Course, or Desserts.
+                            <br /><br />
+                            <strong>Items</strong> are the specific food preparations within those sections.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="preview-sticky-card">
+                      <div className="menu-card-v2" style={{ margin: 0, width: '100%', boxShadow: '0 10px 30px rgba(0,0,0,0.08)' }}>
+                        <div className="menu-image-section">
+                          {menuIdentity.image ? (
+                            <img src={menuIdentity.image} alt="Preview" />
+                          ) : (
+                            <div className="menu-image-placeholder">
+                              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                            </div>
+                          )}
+                          <div className="pax-overlay">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                            min {menuIdentity.minMembers || 20} - max {menuIdentity.maxMembers || 100}
                           </div>
                         </div>
-
-                        <div className="form-section-flat">
-                          <div className="form-group" style={{ marginBottom: '1.5rem' }}>
-                            <label className="input-label">Diet Type</label>
-                            <div className="radio-group-pills">
-                              {['Veg', 'Non-Veg'].map(type => (
-                                <button
-                                  key={type}
-                                  className={`pill-btn ${type === 'Veg' ? 'pill-veg' : 'pill-non-veg'} ${menuIdentity.dietType === type ? 'active' : ''}`}
-                                  onClick={() => setMenuIdentity((prev: any) => ({ ...prev, dietType: type }))}
-                                >
-                                  <span className="pill-icon">
-                                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="0.5" y="0.5" width="11" height="11" rx="1.5" stroke="currentColor" /><circle cx="6" cy="6" r="3" fill="currentColor" /></svg>
-                                  </span>
-                                  {type}
-                                </button>
-                              ))}
+                        <div className="menu-details-section">
+                          <h4 className="menu-title-v2">{menuIdentity.name || 'Untitled Menu'}</h4>
+                          <div className="menu-meta-row-v2">
+                            <div className={`diet-badge-v2 ${menuIdentity.dietType === 'Veg' ? 'veg' : 'non-veg'}`}>
+                              <svg width="8" height="8" viewBox="0 0 12 12" fill="none"><rect x="0.5" y="0.5" width="11" height="11" rx="1.5" stroke="currentColor" strokeWidth="2" /><circle cx="6" cy="6" r="3" fill="currentColor" /></svg>
+                              {menuIdentity.dietType}
                             </div>
                           </div>
-
-                          <div className="form-group" style={{ maxWidth: '320px', marginBottom: '1.5rem' }}>
-                            <label className="input-label">Price Per Person</label>
-                            <div className="input-with-prefix-fixed">
-                              <span className="prefix-fixed">₹</span>
-                              <input
-                                type="number"
-                                className="input-field pill-input"
-                                placeholder="0"
-                                value={menuIdentity.price}
-                                onChange={(e) => setMenuIdentity((prev: any) => ({ ...prev, price: e.target.value }))}
-                              />
-                            </div>
-                          </div>
-
-                          <div className="form-row-2" style={{ marginBottom: '1.5rem' }}>
-                            <div className="form-group">
-                              <label className="input-label">Minimum Members</label>
-                              <input
-                                type="number"
-                                className="input-field"
-                                placeholder="Min pax"
-                                value={menuIdentity.minMembers}
-                                onChange={(e) => setMenuIdentity((prev: any) => ({ ...prev, minMembers: e.target.value }))}
-                              />
-                              <span className="helper-text-label">Applicable booking size for this menu</span>
-                            </div>
-                            <div className="form-group">
-                              <label className="input-label">Maximum Members</label>
-                              <input
-                                type="number"
-                                className="input-field"
-                                placeholder="Max pax"
-                                value={menuIdentity.maxMembers}
-                                onChange={(e) => setMenuIdentity((prev: any) => ({ ...prev, maxMembers: e.target.value }))}
-                              />
-                              <span className="helper-text-label">Applicable booking size for this menu</span>
-                            </div>
-                          </div>
-
-                          <div className="form-group full-width">
-                            <label className="input-label">Menu Image</label>
-                            <input
-                              type="file"
-                              ref={fileInputRef}
-                              style={{ display: 'none' }}
-                              accept="image/*"
-                              onChange={handleImageUpload}
-                            />
-                            <div className="image-dashed-upload-v2" onClick={() => fileInputRef.current?.click()}>
-                              {menuIdentity.image ? (
-                                <div className="upload-preview-container">
-                                  <img src={menuIdentity.image} alt="Menu Preview" className="upload-preview-img" />
-                                  <div className="upload-overlay-v2">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M23 4v6h-6"></path><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
-                                    <span>Change Image</span>
-                                  </div>
-                                </div>
-                              ) : (
-                                <>
-                                  <div className="upload-icon-circle">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-                                  </div>
-                                  <div className="upload-texts">
-                                    <span className="upload-main">Click to upload menu image</span>
-                                    <span className="upload-sub">PNG, JPG or WebP (Max 5MB)</span>
-                                  </div>
-                                </>
+                          <hr className="menu-divider-dashed" />
+                        </div>
+                        <div className="menu-price-footer">
+                          <div className="price-box-v2">
+                            <div className="price-left-v2">
+                              <span className="price-label-v2">Starting</span>
+                              <div className="price-main-v2">
+                                <span className="current-price">
+                                  ₹{profileData.header.gstType === 'Regular'
+                                    ? (Number(menuIdentity.price || 0) * 1.18).toLocaleString(undefined, { maximumFractionDigits: 0 })
+                                    : Number(menuIdentity.price || 0).toLocaleString()}
+                                </span>
+                                <span className="price-unit">/ Person</span>
+                              </div>
+                              {profileData.header.gstType === 'Regular' && (
+                                <div className="price-gst-tag-v2">Price includes 18% GST</div>
                               )}
                             </div>
                           </div>
@@ -3526,333 +3488,478 @@ const ServiceSettings = ({
                       </div>
                     </div>
                   )}
+                </div>
 
-                  {menuStep === 2 && (
-                    <div className="step-content">
-                      <h5 className="block-title" style={{ marginBottom: '0.75rem' }}>Example</h5>
-                      <div className="builder-helper-minimal" style={{ marginBottom: '1.5rem', background: '#f8fafc', padding: '1.25rem', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: 'none', minHeight: '140px' }}>
-                      </div>
+                {/* Right Pane: Form Content */}
+                <div className="drawer-form-pane">
+                  <div className="modal-header">
+                    <div className="modal-title-group">
+                      <h3 className="modal-title">{menuEditingId ? 'Edit Menu' : 'Create New Menu'}</h3>
+                      <p className="modal-subtitle">
+                        {menuEditingId ? 'Update menu basics and food sections' : 'Create menu basics before adding food sections'}
+                      </p>
+                    </div>
+                    <button className="close-modal" onClick={resetAddMenu}>
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                  </div>
 
-                      <div className="builder-header-minimal">
-                        <h4 className="builder-main-title">Sections</h4>
-                        <p className="builder-helper-text">Build food groups inside this menu</p>
-                        <div className="menu-status-hint">
-                          Menu was created you can customise or edit from dashboard
+                  <div className="modal-content">
+                    {menuStep === 1 && (
+                      <div className="step-content">
+                        <div className="commercial-setup-grid">
+                          <div className="form-section-flat">
+                            <h4 className="block-title">Menu Identity</h4>
+                            <div className="form-group full-width" style={{ marginBottom: '1.5rem' }}>
+                              <label className="input-label">Menu Name</label>
+                              <input
+                                type="text"
+                                className="input-field"
+                                placeholder="e.g. Standard Breakfast"
+                                value={menuIdentity.name}
+                                onChange={(e) => setMenuIdentity((prev: any) => ({ ...prev, name: e.target.value }))}
+                              />
+                            </div>
+
+                            <div className="form-group" style={{ marginBottom: '1.5rem' }}>
+                              <label className="input-label">Diet Type</label>
+                              <div className="radio-group-pills">
+                                {['Veg', 'Non-Veg'].map(type => (
+                                  <button
+                                    key={type}
+                                    className={`pill-btn ${type === 'Veg' ? 'pill-veg' : 'pill-non-veg'} ${menuIdentity.dietType === type ? 'active' : ''}`}
+                                    onClick={() => setMenuIdentity((prev: any) => ({ ...prev, dietType: type }))}
+                                  >
+                                    <span className="pill-icon">
+                                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="0.5" y="0.5" width="11" height="11" rx="1.5" stroke="currentColor" /><circle cx="6" cy="6" r="3" fill="currentColor" /></svg>
+                                    </span>
+                                    {type}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+
+                            <div className="form-group" style={{ marginBottom: '1.5rem' }}>
+                              <label className="input-label">Price Per Person</label>
+                              <div className="input-with-prefix-fixed">
+                                <span className="prefix-fixed">₹</span>
+                                <input
+                                  type="number"
+                                  className="input-field pill-input"
+                                  placeholder="0"
+                                  value={menuIdentity.price}
+                                  onChange={(e) => setMenuIdentity((prev: any) => ({ ...prev, price: e.target.value }))}
+                                />
+                              </div>
+
+                              {profileData.header.gstType === 'Regular' && menuIdentity.price && Number(menuIdentity.price) > 0 && (
+                                <div className="gst-breakdown-box">
+                                  <div className="gst-info-tag">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                                    GST applicable 18%
+                                  </div>
+                                  <div className="gst-breakdown-row">
+                                    <span className="gst-label">Base Price</span>
+                                    <span className="gst-value">₹{Number(menuIdentity.price).toLocaleString()}</span>
+                                  </div>
+                                  <div className="gst-breakdown-row">
+                                    <span className="gst-label">GST (18%)</span>
+                                    <span className="gst-value">+ ₹{(Number(menuIdentity.price) * 0.18).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}</span>
+                                  </div>
+                                  <div className="gst-breakdown-row">
+                                    <span className="gst-label-total">Total Price</span>
+                                    <span className="gst-value-total">₹{(Number(menuIdentity.price) * 1.18).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}</span>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+
+                            <div className="form-row-2" style={{ marginBottom: '0.75rem' }}>
+                              <div className="form-group">
+                                <label className="input-label">Minimum Members</label>
+                                <input
+                                  type="number"
+                                  className="input-field"
+                                  placeholder="Min pax"
+                                  value={menuIdentity.minMembers}
+                                  onChange={(e) => setMenuIdentity((prev: any) => ({ ...prev, minMembers: e.target.value }))}
+                                />
+                                <span className="helper-text-label">Applicable booking size for this menu</span>
+                              </div>
+                              <div className="form-group">
+                                <label className="input-label">Maximum Members</label>
+                                <input
+                                  type="number"
+                                  className="input-field"
+                                  placeholder="Max pax"
+                                  value={menuIdentity.maxMembers}
+                                  onChange={(e) => setMenuIdentity((prev: any) => ({ ...prev, maxMembers: e.target.value }))}
+                                />
+                                <span className="helper-text-label">Applicable booking size for this menu</span>
+                              </div>
+                            </div>
+
+                            <div className="form-group full-width">
+                              <label className="input-label">Menu Image</label>
+                              <input
+                                type="file"
+                                ref={fileInputRef}
+                                style={{ display: 'none' }}
+                                accept="image/*"
+                                onChange={handleImageUpload}
+                              />
+                              <div className="image-dashed-upload-v2" onClick={() => fileInputRef.current?.click()}>
+                                {menuIdentity.image ? (
+                                  <div className="upload-preview-container">
+                                    <img src={menuIdentity.image} alt="Menu Preview" className="upload-preview-img" />
+                                    <div className="upload-overlay-v2">
+                                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M23 4v6h-6"></path><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                                      <span>Change Image</span>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <>
+                                    <div className="upload-icon-circle">
+                                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                                    </div>
+                                    <div className="upload-texts">
+                                      <span className="upload-main">Click to upload menu image</span>
+                                      <span className="upload-sub">PNG, JPG or WebP (Max 5MB)</span>
+                                    </div>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       </div>
+                    )}
 
-                      {!isAddingSection && sections.length === 0 && (
-                        <div className="builder-empty-state">
-                          <div className="empty-state-card">
-                            <div className="empty-icon-wrap">
-                              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20v-6M9 20V10M15 20V4"></path></svg>
+                    {menuStep === 2 && (
+                      <div className="step-content">
+
+                        <div className="builder-header-minimal">
+                          <h4 className="builder-main-title">Sections</h4>
+                          <p className="builder-helper-text">Build food groups inside this menu</p>
+                        </div>
+
+                        {!isAddingSection && sections.length === 0 && (
+                          <div className="builder-empty-state">
+                            <div className="empty-state-card">
+                              <div className="empty-icon-wrap">
+                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20v-6M9 20V10M15 20V4"></path></svg>
+                              </div>
+                              <h5>No sections added yet</h5>
+                              <p>Start by creating your first food group like Starters or Main Course</p>
+                              <button
+                                className="btn btn-primary"
+                                onClick={() => {
+                                  setCurrentSection({ name: '', type: 'All Included', limit: 0, items: [{ name: '', description: '', image: null }] });
+                                  setIsAddingSection(true);
+                                }}
+                              >
+                                + Add First Section
+                              </button>
                             </div>
-                            <h5>No sections added yet</h5>
-                            <p>Start by creating your first food group like Starters or Main Course</p>
+                          </div>
+                        )}
+
+                        <div className="saved-sections-list">
+                          {sections.map((sec: any, idx: number) => {
+                            if (idx === sectionEditingIndex) return null;
+                            return (
+                              <div key={idx} className="section-summary-card">
+                                <div className="sec-sum-info">
+                                  <span className="sec-sum-name">{sec.name}</span>
+                                  <span className="sec-sum-rule">
+                                    {sec.type === 'All Included' ? 'All items included' : `Choose any ${sec.limit} from ${sec.items.length} items`}
+                                  </span>
+                                </div>
+                                <div className="section-actions-inline">
+                                  <button className="icon-btn edit-btn" onClick={() => {
+                                    setCurrentSection({ ...sec });
+                                    setSectionEditingIndex(idx);
+                                    setIsAddingSection(true);
+                                  }}>
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                  </button>
+                                  <button className="icon-btn delete-btn" onClick={() => {
+                                    setSections(sections.filter((_: any, i: number) => i !== idx));
+                                  }}>
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                  </button>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+
+                        {!isAddingSection && sections.length > 0 && (
+                          <div className="add-sec-bar-inline">
                             <button
-                              className="btn btn-primary"
+                              className="btn btn-outline btn-sm"
                               onClick={() => {
                                 setCurrentSection({ name: '', type: 'All Included', limit: 0, items: [{ name: '', description: '', image: null }] });
                                 setIsAddingSection(true);
                               }}
                             >
-                              + Add First Section
+                              + Add Another Section
                             </button>
                           </div>
-                        </div>
-                      )}
+                        )}
 
-                      <div className="saved-sections-list">
-                        {sections.map((sec: any, idx: number) => {
-                          if (idx === sectionEditingIndex) return null;
-                          return (
-                            <div key={idx} className="section-summary-card">
-                              <div className="sec-sum-info">
-                                <span className="sec-sum-name">{sec.name}</span>
-                                <span className="sec-sum-rule">
-                                  {sec.type === 'All Included' ? 'All items included' : `Choose any ${sec.limit} from ${sec.items.length} items`}
-                                </span>
-                              </div>
-                              <div className="section-actions-inline">
-                                <button className="icon-btn edit-btn" onClick={() => {
-                                  setCurrentSection({ ...sec });
-                                  setSectionEditingIndex(idx);
-                                  setIsAddingSection(true);
-                                }}>
-                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                                </button>
-                                <button className="icon-btn delete-btn" onClick={() => {
-                                  setSections(sections.filter((_: any, i: number) => i !== idx));
-                                }}>
-                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                                </button>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-
-                      {!isAddingSection && sections.length > 0 && (
-                        <div className="add-sec-bar-inline">
-                          <button
-                            className="btn btn-outline btn-sm"
-                            onClick={() => {
-                              setCurrentSection({ name: '', type: 'All Included', limit: 0, items: [{ name: '', description: '', image: null }] });
-                              setIsAddingSection(true);
-                            }}
-                          >
-                            + Add Another Section
-                          </button>
-                        </div>
-                      )}
-
-                      {isAddingSection && (
-                        <div className="section-inline-editor">
-                          <div className="section-form-top">
-                            <div className="form-group full-width">
-                              <label className="input-label">Section Name</label>
-                              <input
-                                type="text"
-                                className="input-field"
-                                placeholder="e.g. Starters"
-                                value={currentSection.name}
-                                onChange={(e) => setCurrentSection((prev: any) => ({ ...prev, name: e.target.value }))}
-                              />
-                            </div>
-
-                            <div className="selection-type-row">
-                              <div className="form-group flex-1">
-                                <label className="input-label">Selection Type</label>
-                                <select
-                                  className="input-field"
-                                  value={currentSection.type}
-                                  onChange={(e) => setCurrentSection((prev: any) => ({ ...prev, type: e.target.value }))}
-                                >
-                                  <option>All Included</option>
-                                  <option>Limited Selection</option>
-                                </select>
-                              </div>
-                              <div className="form-group mini-limit">
-                                <label className="input-label">Choose Any</label>
+                        {isAddingSection && (
+                          <div className="section-inline-editor">
+                            <div className="section-form-top">
+                              <div className="form-group full-width">
+                                <label className="input-label">Section Name</label>
                                 <input
-                                  type="number"
+                                  type="text"
                                   className="input-field"
-                                  placeholder="0"
-                                  disabled={currentSection.type === 'All Included'}
-                                  value={currentSection.limit || ''}
-                                  onChange={(e) => setCurrentSection((prev: any) => ({ ...prev, limit: parseInt(e.target.value) || 0 }))}
+                                  placeholder="e.g. Starters"
+                                  value={currentSection.name}
+                                  onChange={(e) => setCurrentSection((prev: any) => ({ ...prev, name: e.target.value }))}
                                 />
                               </div>
-                            </div>
-                          </div>
 
-                          <div className="items-area-inline">
-                            <label className="input-label">Items in this Section</label>
-                            <div className="item-cards-list">
-                              {currentSection.items.map((item: any, i: number) => (
-                                <div key={i} className="section-item-row-v5">
-                                  {/* ... contents ... */}
-                                  <div className="item-photo-column-v5">
-                                    <div className="photo-upload-mini-v5" onClick={() => {
-                                      const input = document.createElement('input');
-                                      input.type = 'file';
-                                      input.accept = 'image/*';
-                                      input.onchange = (e: any) => {
-                                        const file = e.target.files?.[0];
-                                        if (file) {
-                                          const reader = new FileReader();
-                                          reader.onloadend = () => {
-                                            const newItems = [...currentSection.items];
-                                            newItems[i].image = reader.result as string;
-                                            setCurrentSection((prev: any) => ({ ...prev, items: newItems }));
-                                          };
-                                          reader.readAsDataURL(file);
-                                        }
-                                      };
-                                      input.click();
-                                    }}>
-                                      {item.image ? (
-                                        <img src={item.image} alt="Item" className="uploaded-mini-thumb-v5" />
-                                      ) : (
-                                        <div className="upload-placeholder-mini-v5">
-                                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                                          <span>Photo</span>
-                                        </div>
-                                      )}
-                                    </div>
-                                  </div>
-
-                                  <div className="item-fields-column-v5">
-                                    <div className="form-group-compact-v5">
-                                      <input
-                                        type="text"
-                                        className="input-field item-name-field-v5"
-                                        placeholder="Item Name"
-                                        value={item.name}
-                                        onChange={(e) => {
-                                          const newItems = [...currentSection.items];
-                                          newItems[i].name = e.target.value;
-                                          setCurrentSection((prev: any) => ({ ...prev, items: newItems }));
-                                        }}
-                                      />
-                                    </div>
-                                    <div className="form-group-compact-v5">
-                                      <textarea
-                                        className="textarea-field item-desc-field-v5"
-                                        placeholder="Short Description (max 1000 chars)"
-                                        maxLength={1000}
-                                        value={item.description}
-                                        onChange={(e) => {
-                                          const newItems = [...currentSection.items];
-                                          newItems[i].description = e.target.value;
-                                          setCurrentSection((prev: any) => ({ ...prev, items: newItems }));
-                                        }}
-                                      />
-                                    </div>
-                                  </div>
-
-                                  {currentSection.items.length > 1 && (
-                                    <button className="item-remove-btn-v5" onClick={() => {
-                                      setCurrentSection((prev: any) => ({ ...prev, items: prev.items.filter((_: any, idx: number) => idx !== i) }));
-                                    }}>
-                                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                                    </button>
-                                  )}
+                              <div className="selection-type-row">
+                                <div className="form-group flex-1">
+                                  <label className="input-label">Selection Type</label>
+                                  <select
+                                    className="input-field"
+                                    value={currentSection.type}
+                                    onChange={(e) => setCurrentSection((prev: any) => ({ ...prev, type: e.target.value }))}
+                                  >
+                                    <option>All Included</option>
+                                    <option>Limited Selection</option>
+                                  </select>
                                 </div>
-                              ))}
-                            </div>
-
-                            <button
-                              className="add-item-btn-inline"
-                              onClick={() => {
-                                setCurrentSection((prev: any) => ({
-                                  ...prev,
-                                  items: [...prev.items, { name: '', description: '', image: null }]
-                                }));
-                              }}
-                            >
-                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                              Add Another Item
-                            </button>
-                          </div>
-
-                          <div className="section-builder-actions">
-                            <button className="btn btn-ghost" onClick={() => setIsAddingSection(false)}>Cancel</button>
-                            <button
-                              className="btn btn-primary-blue"
-                              disabled={!currentSection.name || currentSection.items.length === 0}
-                              onClick={handleSaveSection}
-                            >
-                              Save Section
-                            </button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {menuStep === 3 && (
-                    <div className="step-content">
-                      <div className="preview-card-v5">
-                        <div className="preview-header-v5">
-                          <div className="preview-img-box-v5">
-                            <img
-                              src={menuIdentity.image || "https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?w=160&h=160&fit=crop"}
-                              alt="Menu Preview"
-                            />
-                          </div>
-                          <div className="preview-info-v5">
-                            <div className="preview-title-row-v5">
-                              <h4 className="preview-menu-name-v5">{menuIdentity.name || 'Untitled Menu'}</h4>
-                              <span className={`diet-tag-v4 ${menuIdentity.dietType === 'Veg' ? 'veg' : 'non-veg'}`}>
-                                <svg width="8" height="8" viewBox="0 0 12 12" fill="none"><rect x="0.5" y="0.5" width="11" height="11" rx="1.5" stroke="currentColor" strokeWidth="2" /><circle cx="6" cy="6" r="3" fill="currentColor" /></svg>
-                                {menuIdentity.dietType}
-                              </span>
-                            </div>
-                            <div className="preview-summary-v5">
-                              {activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1)} • {sections.length} Sections • {totalItemsCount} Items
-                            </div>
-                            <div className="preview-price-v5">₹{menuIdentity.price || '0'}</div>
-                          </div>
-                        </div>
-
-                        <div className="preview-sections-v5">
-                          {sections.map((sec: any, idx: number) => (
-                            <div key={idx} className="preview-section-block-v5">
-                              <div className="p-sec-header-v5">
-                                <h5 className="p-sec-title-v5">{sec.name}</h5>
-                                <span className="p-sec-type-badge-v5">
-                                  {sec.type?.toLowerCase().trim() === 'all included' ? 'All included' : `Choose ${sec.limit}`}
-                                </span>
+                                <div className="form-group mini-limit">
+                                  <label className="input-label">Choose Any</label>
+                                  <input
+                                    type="number"
+                                    className="input-field"
+                                    placeholder="0"
+                                    disabled={currentSection.type === 'All Included'}
+                                    value={currentSection.limit || ''}
+                                    onChange={(e) => setCurrentSection((prev: any) => ({ ...prev, limit: parseInt(e.target.value) || 0 }))}
+                                  />
+                                </div>
                               </div>
-                              <div className="p-sec-items-v5">
-                                {sec.items.map((item: any, i: number) => (
-                                  <div key={i} className="p-item-v5">
-                                    <div className="p-item-name-v5">{item.name}</div>
+                            </div>
+
+                            <div className="items-area-inline">
+                              <label className="input-label">Items in this Section</label>
+                              <div className="item-cards-list">
+                                {currentSection.items.map((item: any, i: number) => (
+                                  <div key={i} className="section-item-row-v5">
+                                    <div className="item-photo-column-v5">
+                                      <div className="photo-upload-mini-v5" onClick={() => {
+                                        const input = document.createElement('input');
+                                        input.type = 'file';
+                                        input.accept = 'image/*';
+                                        input.onchange = (e: any) => {
+                                          const file = e.target.files?.[0];
+                                          if (file) {
+                                            const reader = new FileReader();
+                                            reader.onloadend = () => {
+                                              const newItems = [...currentSection.items];
+                                              newItems[i].image = reader.result as string;
+                                              setCurrentSection((prev: any) => ({ ...prev, items: newItems }));
+                                            };
+                                            reader.readAsDataURL(file);
+                                          }
+                                        };
+                                        input.click();
+                                      }}>
+                                        {item.image ? (
+                                          <img src={item.image} alt="Item" className="uploaded-mini-thumb-v5" />
+                                        ) : (
+                                          <div className="upload-placeholder-mini-v5">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                                            <span>Photo</span>
+                                          </div>
+                                        )}
+                                      </div>
+                                    </div>
+
+                                    <div className="item-fields-column-v5">
+                                      <div className="form-group-compact-v5">
+                                        <input
+                                          type="text"
+                                          className="input-field item-name-field-v5"
+                                          placeholder="Item Name"
+                                          value={item.name}
+                                          onChange={(e) => {
+                                            const newItems = [...currentSection.items];
+                                            newItems[i].name = e.target.value;
+                                            setCurrentSection((prev: any) => ({ ...prev, items: newItems }));
+                                          }}
+                                        />
+                                      </div>
+                                      <div className="form-group-compact-v5">
+                                        <textarea
+                                          className="textarea-field item-desc-field-v5"
+                                          placeholder="Short Description (max 1000 chars)"
+                                          maxLength={1000}
+                                          value={item.description}
+                                          onChange={(e) => {
+                                            const newItems = [...currentSection.items];
+                                            newItems[i].description = e.target.value;
+                                            setCurrentSection((prev: any) => ({ ...prev, items: newItems }));
+                                          }}
+                                        />
+                                      </div>
+                                    </div>
+
+                                    {currentSection.items.length > 1 && (
+                                      <button className="item-remove-btn-v5" onClick={() => {
+                                        setCurrentSection((prev: any) => ({ ...prev, items: prev.items.filter((_: any, idx: number) => idx !== i) }));
+                                      }}>
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                      </button>
+                                    )}
                                   </div>
                                 ))}
                               </div>
+
+                              <button
+                                className="add-item-btn-inline"
+                                onClick={() => {
+                                  setCurrentSection((prev: any) => ({
+                                    ...prev,
+                                    items: [...prev.items, { name: '', description: '', image: null }]
+                                  }));
+                                }}
+                              >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                Add Another Item
+                              </button>
                             </div>
-                          ))}
+
+                            <div className="section-builder-actions">
+                              <button className="btn btn-ghost" onClick={() => setIsAddingSection(false)}>Cancel</button>
+                              <button
+                                className="btn btn-primary-blue"
+                                disabled={!currentSection.name || currentSection.items.length === 0}
+                                onClick={handleSaveSection}
+                              >
+                                Save Section
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {menuStep === 3 && (
+                      <div className="step-content">
+                        <div className="preview-card-v5">
+                          <div className="preview-header-v5">
+                            <div className="preview-img-box-v5">
+                              <img
+                                src={menuIdentity.image || "https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?w=160&h=160&fit=crop"}
+                                alt="Menu Preview"
+                              />
+                            </div>
+                            <div className="preview-info-v5">
+                              <div className="preview-title-row-v5">
+                                <h4 className="preview-menu-name-v5">{menuIdentity.name || 'Untitled Menu'}</h4>
+                                <span className={`diet-tag-v4 ${menuIdentity.dietType === 'Veg' ? 'veg' : 'non-veg'}`}>
+                                  <svg width="8" height="8" viewBox="0 0 12 12" fill="none"><rect x="0.5" y="0.5" width="11" height="11" rx="1.5" stroke="currentColor" strokeWidth="2" /><circle cx="6" cy="6" r="3" fill="currentColor" /></svg>
+                                  {menuIdentity.dietType}
+                                </span>
+                              </div>
+                              <div className="preview-summary-v5">
+                                {activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1)} • {sections.length} Sections • {(() => {
+                                  const totalItems = sections.reduce((acc: number, sec: any) => acc + (sec.items?.length || 0), 0);
+                                  return totalItems;
+                                })()} Items
+                              </div>
+                              <div className="preview-price-v5">
+                                ₹{profileData.header.gstType === 'Regular' ? (Number(menuIdentity.price) * 1.18).toLocaleString() : Number(menuIdentity.price).toLocaleString()}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="preview-sections-v5">
+                            {sections.map((sec: any, idx: number) => (
+                              <div key={idx} className="preview-section-block-v5">
+                                <div className="p-sec-header-v5">
+                                  <h5 className="p-sec-title-v5">{sec.name}</h5>
+                                  <span className="p-sec-type-badge-v5">
+                                    {sec.type?.toLowerCase().trim() === 'all included' ? 'All included' : `Choose ${sec.limit}`}
+                                  </span>
+                                </div>
+                                <div className="p-sec-items-v5">
+                                  {sec.items.map((item: any, i: number) => (
+                                    <div key={i} className="p-item-v5">
+                                      <div className="p-item-name-v5">{item.name}</div>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  )}
-                </div>
-
-                <div className="modal-footer">
-                  <div className="footer-left">
-                    <span className="step-counter-badge">Step {menuStep}/3</span>
+                    )}
                   </div>
-                  <div className="footer-right">
-                    {menuStep > 1 && (
-                      <button className="btn btn-outline" onClick={() => setMenuStep((prev: number) => prev - 1)}>Back</button>
-                    )}
 
-                    {menuStep < 3 ? (
-                      <button
-                        className="btn btn-primary-blue"
-                        onClick={() => setMenuStep((prev: number) => prev + 1)}
-                        disabled={menuStep === 1 && !menuIdentity.name}
-                      >
-                        Next
-                      </button>
-                    ) : (
-                      <button
-                        className="btn btn-primary-blue"
-                        onClick={() => {
-                          if (menuEditingId) {
-                            setMenus((prev: any[]) => prev.map((m: any) => m.id === menuEditingId ? {
-                              ...m,
-                              name: menuIdentity.name,
-                              price: parseInt(menuIdentity.price) || 0,
-                              minMembers: menuIdentity.minMembers,
-                              maxMembers: menuIdentity.maxMembers,
-                              dietType: menuIdentity.dietType,
-                              image: menuIdentity.image,
-                              sections: [...sections]
-                            } : m));
-                          } else {
-                            const newMenuObj = {
-                              id: Date.now(),
-                              name: menuIdentity.name,
-                              price: parseInt(menuIdentity.price) || 0,
-                              status: 'Active',
-                              category: activeCategory,
-                              minMembers: menuIdentity.minMembers,
-                              maxMembers: menuIdentity.maxMembers,
-                              dietType: menuIdentity.dietType,
-                              image: menuIdentity.image,
-                              sections: [...sections]
-                            };
-                            setMenus((prev: any[]) => [...prev, newMenuObj]);
-                          }
-                          resetAddMenu();
-                        }}
-                      >
-                        Save Menu
-                      </button>
-                    )}
+                  <div className="modal-footer">
+                    <div className="footer-left">
+                      <span className="step-counter-badge">Step {menuStep}/3</span>
+                    </div>
+                    <div className="footer-right">
+                      {menuStep > 1 && (
+                        <button className="btn btn-outline" onClick={() => setMenuStep((prev: number) => prev - 1)}>Back</button>
+                      )}
+
+                      {menuStep < 3 ? (
+                        <button
+                          className="btn btn-primary-blue"
+                          onClick={() => setMenuStep((prev: number) => prev + 1)}
+                          disabled={menuStep === 1 && !menuIdentity.name}
+                        >
+                          Next
+                        </button>
+                      ) : (
+                        <button
+                          className="btn btn-primary-blue"
+                          onClick={() => {
+                            if (menuEditingId) {
+                              setMenus((prev: any[]) => prev.map((m: any) => m.id === menuEditingId ? {
+                                ...m,
+                                name: menuIdentity.name,
+                                price: parseInt(menuIdentity.price) || 0,
+                                minMembers: menuIdentity.minMembers,
+                                maxMembers: menuIdentity.maxMembers,
+                                dietType: menuIdentity.dietType,
+                                image: menuIdentity.image,
+                                sections: [...sections]
+                              } : m));
+                            } else {
+                              const newMenuObj = {
+                                id: Date.now(),
+                                name: menuIdentity.name,
+                                price: parseInt(menuIdentity.price) || 0,
+                                status: 'Active',
+                                category: activeCategory,
+                                minMembers: menuIdentity.minMembers,
+                                maxMembers: menuIdentity.maxMembers,
+                                dietType: menuIdentity.dietType,
+                                image: menuIdentity.image,
+                                sections: [...sections]
+                              };
+                              setMenus((prev: any[]) => [...prev, newMenuObj]);
+                            }
+                            resetAddMenu();
+                          }}
+                        >
+                          Save Menu
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -7309,6 +7416,7 @@ const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
               handleImageUpload={handleImageUpload}
               handleSaveSection={handleSaveSection}
               resetAddMenu={resetAddMenu}
+              profileData={profileData}
             />
           )}
           {activeTab === 'ratings' && <Ratings />}
