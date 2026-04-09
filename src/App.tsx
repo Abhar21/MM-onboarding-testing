@@ -3203,35 +3203,28 @@ const ServiceSettings = ({
 
                   <div className="menu-list">
                     {menus.filter((m: any) => m.category === activeCategory && (dietFilter === 'All' || m.dietType === dietFilter)).map((menu: any) => (
-                      <div key={menu.id} className="menu-card">
-                        <div className="menu-card-header">
-                          <div className="menu-header-left">
-                            <div className="menu-card-image-wrapper">
-                              {menu.image ? (
-                                <img src={menu.image} alt={menu.name} className="header-menu-image" />
-                              ) : (
-                                <div className="menu-image-placeholder">
-                                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                                </div>
-                              )}
+                      <div key={menu.id} className="menu-card-v2">
+                        {/* Top Image Section */}
+                        <div className="menu-image-section">
+                          <div className="live-status-badge">Live</div>
+                          {menu.image ? (
+                            <img src={menu.image} alt={menu.name} />
+                          ) : (
+                            <div className="menu-image-placeholder">
+                              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
                             </div>
-                            <div className="menu-main-info">
-                              <h4>{menu.name}</h4>
-                              <div className="menu-diet-status-v4">
-                                <span className={`diet-tag-v4 ${menu.dietType === 'Veg' ? 'veg' : 'non-veg'}`}>
-                                  <svg width="8" height="8" viewBox="0 0 12 12" fill="none"><rect x="0.5" y="0.5" width="11" height="11" rx="1.5" stroke="currentColor" strokeWidth="2" /><circle cx="6" cy="6" r="3" fill="currentColor" /></svg>
-                                  {menu.dietType}
-                                </span>
-                                <span className={`status-badge ${menu.status.toLowerCase()}`}>{menu.status}</span>
-                              </div>
-                              <div className="menu-meta">
-                                <span className="menu-price">₹{menu.price}</span>
-                              </div>
-                            </div>
+                          )}
+                          
+                          {/* Capacity Overlay */}
+                          <div className="pax-overlay">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                            min {menu.minMembers || 50} - max {menu.maxMembers || 200}
                           </div>
-                          <div className="menu-actions">
+
+                          {/* Float Actions */}
+                          <div className="card-actions-v2">
                             <button
-                              className="icon-btn edit-btn"
+                              className="action-btn-circle"
                               onClick={() => {
                                 setMenuIdentity({
                                   name: menu.name,
@@ -3247,19 +3240,57 @@ const ServiceSettings = ({
                                 setIsAddingMenu(true);
                               }}
                             >
-                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2-2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                             </button>
                             <button
-                              className="icon-btn manage-btn"
+                              className="action-btn-circle settings-btn"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setMenuActionId(menuActionId === menu.id ? null : menu.id);
                               }}
                             >
-                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                             </button>
+                          </div>
+                        </div>
 
-                            {/* Existing Edit/Delete buttons */}
+                        {/* Content Section */}
+                        <div className="menu-details-section">
+                          <h4 className="menu-title-v2">{menu.name}</h4>
+                          <div className="menu-meta-row-v2">
+                            <div className="menu-rating-row">
+                              <span className="star-icon">★</span>
+                              <strong>4.1</strong>
+                              <span>(1,802)</span>
+                            </div>
+
+                            <div className={`diet-badge-v2 ${menu.dietType === 'Veg' ? 'veg' : 'non-veg'}`}>
+                              <svg width="8" height="8" viewBox="0 0 12 12" fill="none"><rect x="0.5" y="0.5" width="11" height="11" rx="1.5" stroke="currentColor" strokeWidth="2" /><circle cx="6" cy="6" r="3" fill="currentColor" /></svg>
+                              {menu.dietType}
+                            </div>
+                          </div>
+                          
+                          <hr className="menu-divider-dashed" />
+                        </div>
+
+                        {/* Price Footer Box */}
+                        <div className="menu-price-footer">
+                          <div className="price-box-v2">
+                            <div className="price-left-v2">
+                              <span className="price-label-v2">Starting</span>
+                              <div className="price-main-v2">
+                                <span className="current-price">₹{menu.price}</span>
+                                <span className="price-unit">/ Person</span>
+                              </div>
+                            </div>
+                            <button className="items-btn-v2" onClick={() => {
+                              setMenuEditingId(menu.id);
+                              setMenuStep(2); // Jump to food sections
+                              setIsAddingMenu(true);
+                            }}>
+                              Items
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"></path></svg>
+                            </button>
                           </div>
                         </div>
                       </div>
@@ -6882,9 +6913,16 @@ const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
   const [menus, setMenus] = useState<any[]>([
     {
       id: 1, name: 'Standard Breakfast', price: 250, status: 'Active', category: 'breakfast',
-      minMembers: '20', maxMembers: '100', dietType: 'Veg', image: null as string | null,
+      minMembers: '20', maxMembers: '100', dietType: 'Veg', image: '/premium_breakfast.png',
       sections: [
         { name: 'Starters', type: 'All Included', limit: 0, items: [{ name: 'Idli', description: 'Steamed rice cakes', image: null as string | null }] }
+      ]
+    },
+    {
+      id: 4, name: 'Elite Breakfast', price: 450, status: 'Active', category: 'breakfast',
+      minMembers: '10', maxMembers: '50', dietType: 'Veg', image: '/premium_breakfast.png',
+      sections: [
+        { name: 'Starters', type: 'All Included', limit: 0, items: [{ name: 'Vada', description: 'Crispy lentil donuts', image: null as string | null }] }
       ]
     },
     {
