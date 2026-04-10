@@ -5833,19 +5833,19 @@ const fullMonthNames: Record<string, string> = {
 };
 const revenueHeights = [45, 60, 55, 75, 85, 70, 90, 80, 65, 95, 88, 100];
 
-const getNextMonthInfo = (month: string) => {
-  const idx = monthsList.indexOf(month);
-  const nextIdx = (idx + 1) % 12;
-  const deadlineIdx = (idx + 2) % 12;
-  const nextMonth = monthsList[nextIdx];
-  const deadlineMonth = monthsList[deadlineIdx];
+// const getNextMonthInfo = (month: string) => {
+//   const idx = monthsList.indexOf(month);
+//   const nextIdx = (idx + 1) % 12;
+//   const deadlineIdx = (idx + 2) % 12;
+//   const nextMonth = monthsList[nextIdx];
+//   const deadlineMonth = monthsList[deadlineIdx];
 
-  return {
-    name: nextMonth,
-    fullName: fullMonthNames[nextMonth],
-    deadlineMonthName: fullMonthNames[deadlineMonth]
-  };
-};
+//   return {
+//     name: nextMonth,
+//     fullName: fullMonthNames[nextMonth],
+//     deadlineMonthName: fullMonthNames[deadlineMonth]
+//   };
+// };
 
 const Reports = () => {
   const [activeReportTab, setActiveReportTab] = useState('Revenue');
@@ -5878,8 +5878,8 @@ const Reports = () => {
   // ];
 
   // const [gstPage] = useState(1);
-  const [selectedFY, setSelectedFY] = useState('FY 2025-26');
-  const [selectedMonthTab, setSelectedMonthTab] = useState('Mar');
+  // const [selectedFY, setSelectedFY] = useState('FY 2025-26');
+  // const [selectedMonthTab, setSelectedMonthTab] = useState('Mar');
 
   const [selectedRevenueMonth, setSelectedRevenueMonth] = useState('Oct');
   const [selectedTdsQuarter, setSelectedTdsQuarter] = useState('Quarter 2 (Jul-Sep)');
@@ -5937,7 +5937,7 @@ const Reports = () => {
 
 
 
-  const nextMonthInfo = getNextMonthInfo(selectedMonthTab);
+  // const nextMonthInfo = getNextMonthInfo(selectedMonthTab);
 
   const tabs = ['Revenue', 'GST', 'TDS'];
 
