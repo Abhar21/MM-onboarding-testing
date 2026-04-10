@@ -14083,7 +14083,7 @@ input:checked+.slider-v4:before {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 1.5rem;
-  margin-bottom: 2rem;
+  margin-bottom: 0.75rem;
 }
 
 .tds-summary-card-v14 {
@@ -14094,7 +14094,7 @@ input:checked+.slider-v4:before {
   display: flex;
   gap: 1rem;
   align-items: center;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  box-shadow: none;
 }
 
 .tds-card-icon-v14 {
@@ -14129,8 +14129,9 @@ input:checked+.slider-v4:before {
 
 .tds-value-group-v14 {
   display: flex;
-  align-items: baseline;
-  gap: 0.5rem;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.125rem;
 }
 
 .tds-main-value-v14 {
@@ -17078,6 +17079,18 @@ input:checked+.slider-v4:before {
   font-weight: 500;
 }
 
+.tds-period-badge-v16 {
+  padding: 6px 12px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #475569;
+  display: inline-flex;
+  align-items: center;
+}
+
 .header-right-v15 {
   display: flex;
   align-items: center;
@@ -17152,23 +17165,17 @@ input:checked+.slider-v4:before {
 
 .tds-table-v15.monthly-tds th.tds-col-num-v16,
 .tds-table-v15.monthly-tds td.tds-cell-num-v16 {
-  text-align: right;
-  width: 28%;
+  text-align: center;
 }
 
-/* Specific width for the breakdown columns to ensure headers don't feel too loose */
-.tds-table-v15.monthly-tds th:nth-child(2),
-.tds-table-v15.monthly-tds td:nth-child(2) {
-  width: 28%;
-}
-
-.tds-table-v15.monthly-tds th:nth-child(3),
-.tds-table-v15.monthly-tds td:nth-child(3) {
-  width: 32%;
+/* Let columns adjust based on content (hug/autolayout) */
+.tds-table-v15.monthly-tds th,
+.tds-table-v15.monthly-tds td {
+  width: auto;
 }
 
 .tds-cell-num-v16 {
-  padding-right: 24px !important;
+  padding-right: 0 !important;
 }
 
 
@@ -17301,6 +17308,68 @@ input:checked+.slider-v4:before {
 .net-paid-v15 {
   font-weight: 700;
   color: #10b981;
+}
+
+.tds-primary-amount {
+  color: #0077ff !important;
+}
+
+.tds-card-internal-note-v16 {
+  margin-top: auto;
+  padding: 8px 10px;
+  background: #f8fafc;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  color: #475569;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  line-height: 1.4;
+  margin-top: 12px;
+}
+
+.tds-card-internal-note-v16 i {
+  margin-top: 2px;
+  color: #0077ff;
+  flex-shrink: 0;
+}
+
+.tds-timestamp-v16 {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tds-empty-state-v16 {
+  padding: 48px 24px;
+  text-align: center;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 2px dashed #e2e8f0;
+  margin: 24px 0;
+}
+
+.tds-empty-state-icon-v16 {
+  font-size: 2.5rem;
+  margin-bottom: 16px;
+  display: block;
+}
+
+.tds-empty-state-v16 h4 {
+  color: #1e293b;
+  margin-bottom: 8px;
+  font-size: 1.1rem;
+}
+
+.tds-empty-state-v16 p {
+  color: #64748b;
+  font-size: 0.9rem;
+  max-width: 400px;
+  margin: 0 auto;
+  line-height: 1.6;
 }
 
 .status-pill-v15 {

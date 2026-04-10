@@ -3018,9 +3018,9 @@ const ServiceSettings = ({
                       {isEditingService ? (
                         <div className="edit-actions-btns" style={{ display: 'flex', gap: '8px' }}>
                           <button className="btn btn-secondary-gray btn-sm" onClick={handleCancelClick}>Cancel</button>
-                          <button 
-                            className="btn btn-primary-green btn-sm" 
-                            style={{ minWidth: '100px' }} 
+                          <button
+                            className="btn btn-primary-green btn-sm"
+                            style={{ minWidth: '100px' }}
                             onClick={handleSaveClick}
                             disabled={!currentSettings.bookingLimit || Number(currentSettings.bookingLimit) < 1 || Number(currentSettings.bookingLimit) > 20 || !!overlapError}
                           >
@@ -6001,9 +6001,8 @@ const Reports = () => {
 
             <div className="tds-summary-grid-v14">
               <div className="tds-summary-card-v14">
-                <div className="tds-card-icon-v14 payout">₹</div>
                 <div className="tds-card-info-v14">
-                  <label>Total Net Payout</label>
+                  <label>Total Amount Received</label>
                   <div className="tds-value-group-v14">
                     <span className="tds-main-value-v14">₹{tdsTotals.net.toLocaleString('en-IN')}</span>
                     <span className="tds-helper-v14">(after TDS deduction)</span>
@@ -6011,13 +6010,15 @@ const Reports = () => {
                 </div>
               </div>
               <div className="tds-summary-card-v14">
-                <div className="tds-card-icon-v14 tax">🧾</div>
                 <div className="tds-card-info-v14">
                   <label>Total TDS Deducted</label>
                   <div className="tds-value-group-v14">
-                    <span className="tds-main-value-v14">₹{tdsTotals.tds.toLocaleString('en-IN')}</span>
+                    <span className="tds-main-value-v14 tds-primary-amount">₹{tdsTotals.tds.toLocaleString('en-IN')}</span>
                   </div>
-                  <p className="tds-sub-helper-v14">Deposited with Income Tax Department</p>
+                  <div className="tds-card-internal-note-v16">
+                    <i className="fa-light fa-circle-info"></i>
+                    <span>0.1% TDS is deducted as per government regulations and can be claimed while filing your income tax return.</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -6028,64 +6029,62 @@ const Reports = () => {
                 <div className="tds-breakdown-header-v15">
                   <div className="header-left-v15">
                     <h4>Monthly TDS Breakdown</h4>
-                    <div className="tds-title-subtitle-v25">
-                      {currentTdsCertificate.quarter} ({currentTdsCertificate.period})
-                    </div>
                     <p className="tds-note-v15">Summary of your earnings, tax deductions, and net payouts</p>
                   </div>
                   <div className="header-right-v15">
-                    <button className="tds-export-btn-v16" onClick={() => {/* Download Excel Logic */ }}>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                        <polyline points="7 10 12 15 17 10"></polyline>
-                        <line x1="12" y1="15" x2="12" y2="3"></line>
-                      </svg>
-                      Download as Excel
-                    </button>
+                    <span className="tds-period-badge-v16">
+                      {currentTdsCertificate.quarter} ({currentTdsCertificate.period})
+                    </span>
                   </div>
                 </div>
 
                 <div className="tds-table-container-v15">
-                  <table className="tds-table-v15 monthly-tds">
-                    <thead>
-                      <tr>
-                        <th className="tds-col-month-v16">Month</th>
-                        <th className="tds-col-num-v16">Total Earnings</th>
-                        <th className="tds-col-num-v16">
-                          TDS Deducted
-                          <div className="tds-info-tooltip-v16" title="TDS deducted and deposited with the Income Tax Department on your behalf">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                              <circle cx="12" cy="12" r="10"></circle>
-                              <line x1="12" y1="16" x2="12" y2="12"></line>
-                              <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                            </svg>
-                          </div>
-                        </th>
-                        <th className="tds-col-num-v16">Net Received</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {monthlyTdsData.map((row, idx) => (
-                        <tr key={idx}>
-                          <td className="tds-cell-month-v16">{row.month}</td>
-                          <td className="tds-cell-num-v16">₹{row.earnings.toLocaleString('en-IN')}</td>
-                          <td className="tds-cell-num-v16 tds-amt-v15">₹{row.tds.toLocaleString('en-IN')}</td>
-                          <td className="tds-cell-num-v16 net-paid-v15">₹{row.net.toLocaleString('en-IN')}</td>
+                  {tdsTotals.tds === 0 ? (
+                    <div className="tds-empty-state-v16">
+                      <span className="tds-empty-state-icon-v16">🛡️</span>
+                      <h4>No TDS deducted for this period</h4>
+                      <p>TDS will apply once your earnings cross ₹5,00,000 in a financial year as per government regulations.</p>
+                    </div>
+                  ) : (
+                    <table className="tds-table-v15 monthly-tds">
+                      <thead>
+                        <tr>
+                          <th className="tds-col-month-v16">Month</th>
+                          <th className="tds-col-num-v16">Payout Amount (Before TDS)</th>
+                          <th className="tds-col-num-v16">
+                            TDS Deducted
+                            <div className="tds-info-tooltip-v16" title="TDS deducted under Section 194-O by the platform">
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="16" x2="12" y2="12"></line>
+                                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                              </svg>
+                            </div>
+                          </th>
+                          <th className="tds-col-num-v16">Net Received</th>
                         </tr>
-                      ))}
-                    </tbody>
-                    <tfoot>
-                      <tr className="tds-total-row-v16">
-                        <td className="tds-cell-month-v16">Total</td>
-                        <td className="tds-cell-num-v16">₹{tdsTotals.earnings.toLocaleString('en-IN')}</td>
-                        <td className="tds-cell-num-v16 tds-amt-v15">₹{tdsTotals.tds.toLocaleString('en-IN')}</td>
-                        <td className="tds-cell-num-v16 net-paid-total-v16">₹{tdsTotals.net.toLocaleString('en-IN')}</td>
-                      </tr>
-                    </tfoot>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {monthlyTdsData.map((row, idx) => (
+                          <tr key={idx}>
+                            <td className="tds-cell-month-v16">{row.month}</td>
+                            <td className="tds-cell-num-v16">₹{row.earnings.toLocaleString('en-IN')}</td>
+                            <td className="tds-cell-num-v16 tds-amt-v15">₹{row.tds.toLocaleString('en-IN')}</td>
+                            <td className="tds-cell-num-v16 net-paid-v15">₹{row.net.toLocaleString('en-IN')}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                      <tfoot>
+                        <tr className="tds-total-row-v16">
+                          <td className="tds-cell-month-v16">Total</td>
+                          <td className="tds-cell-num-v16">₹{tdsTotals.earnings.toLocaleString('en-IN')}</td>
+                          <td className="tds-cell-num-v16 tds-amt-v15">₹{tdsTotals.tds.toLocaleString('en-IN')}</td>
+                          <td className="tds-cell-num-v16 net-paid-total-v16">₹{tdsTotals.net.toLocaleString('en-IN')}</td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  )}
                 </div>
-
-                <p className="tds-helper-bottom-v16">This data matches your Form 16A and can be used for income tax filing.</p>
               </div>
 
               {/* TDS Certificate Section - Now on the Right */}
@@ -6104,16 +6103,13 @@ const Reports = () => {
                   </div>
                 </div>
 
-                <p className="tds-cert-desc-v14">Use this certificate while filing your income tax return (ITR).</p>
+                <p className="tds-cert-desc-v14">Use this certificate to claim your TDS while filing your income tax return (ITR).</p>
 
                 <div className="tds-cert-details-v14">
                   {currentTdsCertificate.status === 'Available' ? (
                     <>
                       <div className="tds-cert-item-v14">
                         <label>Issued on: {currentTdsCertificate.issuedOn}</label>
-                        <div className="tds-filing-context-v14">
-                          Based on TDS return filed on: {currentTdsCertificate.filedOn}
-                        </div>
                       </div>
                       <p className="tds-cert-note-v14">Includes all TDS deducted for {currentTdsCertificate.period}</p>
                     </>
@@ -6137,12 +6133,13 @@ const Reports = () => {
                       <polyline points="7 10 12 15 17 10"></polyline>
                       <line x1="12" y1="15" x2="12" y2="3"></line>
                     </svg>
-                    {currentTdsCertificate.status === 'Available' ? 'Download Certificate (Form 16A)' : 'Download Temporarily Unavailable'}
+                    {currentTdsCertificate.status === 'Available' ? 'Download Form 16A' : 'Download Temporarily Unavailable'}
                   </button>
                   <p className="tds-cert-helper-v14">This certificate will also reflect in your Form 26AS</p>
                 </div>
               </div>
             </div>
+
           </div>
         )}
       </div>
