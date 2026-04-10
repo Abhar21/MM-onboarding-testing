@@ -2656,6 +2656,8 @@ const ServiceSettings = ({
   setSelectedMenuAction,
   menuEditingId,
   setMenuEditingId,
+  showDeleteConfirmation,
+  setShowDeleteConfirmation,
   handleImageUpload,
   handleSaveSection,
   resetAddMenu,
@@ -2807,10 +2809,10 @@ const ServiceSettings = ({
   ];
 
   const [settings, setSettings] = useState({
-    breakfast: { startTime: '07:00', endTime: '11:00', acceptingOrders: true, stopOrdersValue: '4', stopOrdersUnit: 'Days', style: ['Buffet Service'], sitDownExtraPrice: 0, bookingLimit: '' },
-    lunch: { startTime: '12:00', endTime: '15:30', acceptingOrders: true, stopOrdersValue: '4', stopOrdersUnit: 'Days', style: ['Buffet Service', 'Sit-down Service'], sitDownExtraPrice: 10, bookingLimit: '' },
-    snacks: { startTime: '16:00', endTime: '18:30', acceptingOrders: false, stopOrdersValue: '4', stopOrdersUnit: 'Days', style: ['Buffet Service'], sitDownExtraPrice: 0, bookingLimit: '' },
-    dinner: { startTime: '19:00', endTime: '23:00', acceptingOrders: true, stopOrdersValue: '4', stopOrdersUnit: 'Days', style: ['Buffet Service', 'Sit-down Service'], sitDownExtraPrice: 15, bookingLimit: '' },
+    breakfast: { startTime: '07:00', endTime: '11:00', acceptingOrders: true, stopOrdersValue: '4', stopOrdersUnit: 'Days', style: ['Buffet Service'], sitDownExtraPrice: 0, bookingLimit: '1' },
+    lunch: { startTime: '12:00', endTime: '15:30', acceptingOrders: true, stopOrdersValue: '4', stopOrdersUnit: 'Days', style: ['Buffet Service', 'Sit-down Service'], sitDownExtraPrice: 10, bookingLimit: '1' },
+    snacks: { startTime: '16:00', endTime: '18:30', acceptingOrders: false, stopOrdersValue: '4', stopOrdersUnit: 'Days', style: ['Buffet Service'], sitDownExtraPrice: 0, bookingLimit: '1' },
+    dinner: { startTime: '19:00', endTime: '23:00', acceptingOrders: true, stopOrdersValue: '4', stopOrdersUnit: 'Days', style: ['Buffet Service', 'Sit-down Service'], sitDownExtraPrice: 15, bookingLimit: '1' },
   });
 
   const [overallStatus, setOverallStatus] = useState('All changes saved');
@@ -2822,11 +2824,17 @@ const ServiceSettings = ({
 
   const handleEditClick = () => {
     setIsEditingService(true);
-    setTempSettings({ ...settings[activeCategory as keyof typeof settings] });
+    const existingSettings = { ...settings[activeCategory as keyof typeof settings] };
+    // Ensure bookingLimit starts from at least 1
+    if (!existingSettings.bookingLimit || Number(existingSettings.bookingLimit) < 1) {
+      existingSettings.bookingLimit = '1';
+    }
+    setTempSettings(existingSettings);
   };
 
   const handleSaveClick = () => {
-    if (overlapError) return;
+    const limit = Number(tempSettings?.bookingLimit);
+    if (overlapError || !tempSettings?.bookingLimit || limit < 1 || limit > 20) return;
     setSettings(prev => ({
       ...prev,
       [activeCategory]: tempSettings
@@ -3010,7 +3018,14 @@ const ServiceSettings = ({
                       {isEditingService ? (
                         <div className="edit-actions-btns" style={{ display: 'flex', gap: '8px' }}>
                           <button className="btn btn-secondary-gray btn-sm" onClick={handleCancelClick}>Cancel</button>
-                          <button className="btn btn-primary-green btn-sm" style={{ minWidth: '100px' }} onClick={handleSaveClick}>Save</button>
+                          <button 
+                            className="btn btn-primary-green btn-sm" 
+                            style={{ minWidth: '100px' }} 
+                            onClick={handleSaveClick}
+                            disabled={!currentSettings.bookingLimit || Number(currentSettings.bookingLimit) < 1 || Number(currentSettings.bookingLimit) > 20 || !!overlapError}
+                          >
+                            Save
+                          </button>
                         </div>
                       ) : (
                         <button className="btn btn-outline btn-sm edit-section-btn" style={{ paddingLeft: '1.25rem', paddingRight: '1.25rem' }} onClick={handleEditClick}>
@@ -3018,6 +3033,15 @@ const ServiceSettings = ({
                         </button>
                       )}
                     </div>
+                  </div>
+
+                  <div className="policy-note-v4">
+                    <div className="note-icon">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                    </div>
+                    <span>
+                      <strong>Note:</strong>
+                    </span>Customers can book this service at least 4 days in advance, due to refund policy & Preparing time.
                   </div>
 
                   <div className="settings-grid-rows">
@@ -3061,34 +3085,23 @@ const ServiceSettings = ({
 
                     <div className="settings-row-vertical">
                       <div className="form-group" style={{ marginBottom: '1.5rem' }}>
-                        <label className="input-label">Manage Bookings</label>
-                        <input
-                          type="number"
-                          className="input-field"
-                          placeholder="No Limit"
-                          value={currentSettings.bookingLimit}
-                          disabled={!isEditingService}
-                          onChange={(e) => updateSetting('bookingLimit', e.target.value)}
-                        />
-                      </div>
-                      <div className="form-group">
-                        <label className="input-label">Booking Cut-off Time</label>
-                        <div className="booking-cutoff-wrapper">
-                          <div className="cutoff-input-group">
-                            <select
-                              className="input-field cutoff-input"
-                              value={currentSettings.stopOrdersValue}
-                              disabled={!isEditingService}
-                              onChange={(e) => updateSetting('stopOrdersValue', e.target.value)}
-                            >
-                              {Array.from({ length: 27 }, (_, i) => i + 4).map(val => (
-                                <option key={val} value={val}>{val}</option>
-                              ))}
-                            </select>
-                            <button className="cutoff-unit-btn" disabled>Days</button>
+                        <label className="input-label" style={{ display: 'flex', alignItems: 'center' }}>
+                          Booking Capacity
+                          <div className="tds-info-tooltip-v16 tooltip-v4" data-tooltip="Set how many bookings you can handle for this particular category in mentioned timings">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
                           </div>
-                          <p className="input-helper-v4">Bookings will close min 4 days before the event date due to refund policy</p>
-                          <p className="input-example-v4">Example: For an event on Jan 10, bookings close on Jan 6</p>
+                        </label>
+                        <div className="input-with-icon-v4">
+                          <input
+                            type="number"
+                            className="input-field"
+                            value={currentSettings.bookingLimit}
+                            disabled={!isEditingService}
+                            onChange={(e) => updateSetting('bookingLimit', e.target.value)}
+                          />
+                          {isEditingService && (!currentSettings.bookingLimit || Number(currentSettings.bookingLimit) < 1 || Number(currentSettings.bookingLimit) > 20) && (
+                            <p className="input-helper-v4 error">Enter a capacity between 1 and 20</p>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -3207,13 +3220,13 @@ const ServiceSettings = ({
                   <div className="menu-list">
                     {(() => {
                       const filtered = menus.filter((m: any) => m.category === activeCategory && (dietFilter === 'All' || m.dietType === dietFilter));
-                      
+
                       if (filtered.length === 0) {
                         return (
                           <div className="menu-builder-empty">
                             <div className="empty-vector-wrap">
                               <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M12 2v20M2 12h20" strokeDasharray="4 4" opacity="0.3"/>
+                                <path d="M12 2v20M2 12h20" strokeDasharray="4 4" opacity="0.3" />
                                 <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
                                 <line x1="9" y1="9" x2="15" y2="15" />
                                 <line x1="15" y1="9" x2="9" y2="15" />
@@ -3221,7 +3234,7 @@ const ServiceSettings = ({
                             </div>
                             <h4 className="empty-title">No menus found</h4>
                             <p className="empty-text">
-                              There are no {dietFilter !== 'All' ? dietFilter : ''} menus added to this category yet. 
+                              There are no {dietFilter !== 'All' ? dietFilter : ''} menus added to this category yet.
                               Click '+ Add Menu' to create one.
                             </p>
                           </div>
@@ -3229,168 +3242,224 @@ const ServiceSettings = ({
                       }
 
                       return filtered.map((menu: any) => (
-                      <div key={menu.id} className={`menu-card-v2 ${menu.status !== 'Active' ? 'is-hidden' : ''}`}>
-                        {/* Top Image Section */}
-                        <div className="menu-image-section">
-                          <div className={`live-status-badge ${menu.status !== 'Active' ? 'is-hidden' : ''}`}>
-                            {menu.status === 'Active' ? 'Live' : 'Hidden'}
-                          </div>
-                          {menu.image ? (
-                            <img src={menu.image} alt={menu.name} />
-                          ) : (
-                            <div className="menu-image-placeholder">
-                              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                        <div key={menu.id} className={`menu-card-v2 ${menu.status !== 'Active' ? 'is-hidden' : ''}`}>
+                          {/* Top Image Section */}
+                          <div className="menu-image-section">
+                            <div className={`live-status-badge ${menu.status !== 'Active' ? 'is-hidden' : ''}`}>
+                              {menu.status === 'Active' ? 'Live' : 'Hidden'}
                             </div>
-                          )}
+                            {menu.image ? (
+                              <img src={menu.image} alt={menu.name} />
+                            ) : (
+                              <div className="menu-image-placeholder">
+                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                              </div>
+                            )}
 
-                          {/* Float Actions */}
-                          <div className="card-actions-v2">
-                            <button
-                              className="action-btn-circle"
-                              onClick={() => {
-                                setMenuIdentity({
-                                  name: menu.name,
-                                  price: menu.price.toString(),
-                                  minMembers: menu.minMembers,
-                                  maxMembers: menu.maxMembers,
-                                  dietType: menu.dietType,
-                                  image: menu.image
-                                });
-                                setSections([...menu.sections]);
-                                setMenuEditingId(menu.id);
-                                setMenuStep(1);
-                                setIsAddingMenu(true);
-                              }}
-                            >
-                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
-                            </button>
-                            <button
-                              className="action-btn-circle settings-btn"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setMenuActionId(menuActionId === menu.id ? null : menu.id);
-                              }}
-                            >
-                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* Content Section */}
-                        <div className="menu-details-section">
-                          <h4 className="menu-title-v2">{menu.name}</h4>
-                          <div className="menu-meta-row-v2">
-                            <div className="menu-members-row">
-                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
-                              <span>min {menu.minMembers} - max {menu.maxMembers}</span>
-                            </div>
-
-                            <div className={`diet-badge-v2 ${menu.dietType === 'Veg' ? 'veg' : 'non-veg'}`}>
-                              <svg width="8" height="8" viewBox="0 0 12 12" fill="none"><rect x="0.5" y="0.5" width="11" height="11" rx="1.5" stroke="currentColor" strokeWidth="2" /><circle cx="6" cy="6" r="3" fill="currentColor" /></svg>
-                              {menu.dietType}
+                            {/* Float Actions */}
+                            <div className="card-actions-v2">
+                              <button
+                                className="action-btn-circle"
+                                onClick={() => {
+                                  setMenuIdentity({
+                                    name: menu.name,
+                                    price: menu.price.toString(),
+                                    minMembers: menu.minMembers,
+                                    maxMembers: menu.maxMembers,
+                                    dietType: menu.dietType,
+                                    image: menu.image
+                                  });
+                                  setSections([...menu.sections]);
+                                  setMenuEditingId(menu.id);
+                                  setMenuStep(1);
+                                  setIsAddingMenu(true);
+                                }}
+                              >
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                              </button>
+                              <button
+                                className="action-btn-circle settings-btn"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setMenuActionId(menuActionId === menu.id ? null : menu.id);
+                                }}
+                              >
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                              </button>
                             </div>
                           </div>
 
-                          <hr className="menu-divider-dashed" />
-                        </div>
+                          {/* Content Section */}
+                          <div className="menu-details-section">
+                            <h4 className="menu-title-v2">{menu.name}</h4>
+                            <div className="menu-meta-row-v2">
+                              <div className="menu-members-row">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                                <span>min {menu.minMembers} - max {menu.maxMembers}</span>
+                              </div>
 
-                        {/* Price Footer Box */}
-                        <div className="menu-price-footer">
-                          <div className="price-box-v2">
-                            <div className="price-left-v2">
-                              <span className="price-label-v2">Starting</span>
-                              <div className="price-main-v2">
-                                <span className="current-price">₹{menu.price}</span>
-                                <span className="price-unit">/ Person</span>
+                              <div className={`diet-badge-v2 ${menu.dietType === 'Veg' ? 'veg' : 'non-veg'}`}>
+                                <svg width="8" height="8" viewBox="0 0 12 12" fill="none"><rect x="0.5" y="0.5" width="11" height="11" rx="1.5" stroke="currentColor" strokeWidth="2" /><circle cx="6" cy="6" r="3" fill="currentColor" /></svg>
+                                {menu.dietType}
+                              </div>
+                            </div>
+
+                            <hr className="menu-divider-dashed" />
+                          </div>
+
+                          {/* Price Footer Box */}
+                          <div className="menu-price-footer">
+                            <div className="price-box-v2">
+                              <div className="price-left-v2">
+                                <span className="price-label-v2">Starting</span>
+                                <div className="price-main-v2">
+                                  <span className="current-price">₹{menu.price}</span>
+                                  <span className="price-unit">/ Person</span>
+                                </div>
                               </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    ));
-                  })()}
+                      ));
+                    })()}
 
-                  {menuActionId && (
+                    {menuActionId && (
                       <div className="modal-overlay" onClick={() => {
-                        setMenuActionId(null);
-                        setSelectedMenuAction(null);
+                        if (!showDeleteConfirmation) {
+                          setMenuActionId(null);
+                          setSelectedMenuAction(null);
+                        }
                       }}>
-                        <div className="modal-container mini" onClick={e => e.stopPropagation()}>
-                          <div className="modal-header">
-                            <div className="modal-title-group">
-                              <h3 className="modal-title">Manage Menu</h3>
-                              <p className="modal-subtitle">Choose an action for this menu</p>
+                        {!showDeleteConfirmation ? (
+                          <div className="modal-container mini" onClick={e => e.stopPropagation()}>
+                            <div className="modal-header">
+                              <div className="modal-title-group">
+                                <h3 className="modal-title">Manage Menu</h3>
+                                <p className="modal-subtitle">Choose what you want to do with this menu</p>
+                              </div>
+                              <button className="close-modal" onClick={() => {
+                                setMenuActionId(null);
+                                setSelectedMenuAction(null);
+                              }}>
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                              </button>
                             </div>
-                            <button className="close-modal" onClick={() => {
-                              setMenuActionId(null);
-                              setSelectedMenuAction(null);
-                            }}>
-                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                            </button>
-                          </div>
 
-                          <div className="modal-content" style={{ padding: '0 1.5rem 1.5rem' }}>
-                            <div className="action-options-modal">
+                            <div className="modal-content" style={{ padding: '0 1.5rem 1.5rem' }}>
                               {(() => {
                                 const menu = menus.find((m: any) => m.id === menuActionId);
                                 if (!menu) return null;
                                 return (
                                   <>
-                                    <label className={`action-option-v2 ${selectedMenuAction === 'hide' ? 'selected' : ''}`} onClick={() => setSelectedMenuAction('hide')}>
-                                      <div className="option-radio">
-                                        <div className="radio-inner"></div>
+                                    {menu.status !== 'Disabled' && (
+                                      <div className="live-note">
+                                        <div className="live-indicator"></div>
+                                        This menu is currently visible to customers
                                       </div>
-                                      <div className="option-info">
-                                        <span className="option-label">{menu.status === 'Disabled' ? 'Show Menu' : 'Hide Menu'}</span>
-                                        <span className="option-desc">{menu.status === 'Disabled' ? 'Make this menu visible to customers' : 'Temporarily hide this menu from customers'}</span>
-                                      </div>
-                                    </label>
+                                    )}
 
-                                    <label className={`action-option-v2 ${selectedMenuAction === 'delete' ? 'selected delete-selected' : ''}`} onClick={() => setSelectedMenuAction('delete')}>
-                                      <div className="option-radio">
-                                        <div className="radio-inner"></div>
+                                    <div className="action-options-modal">
+                                      <div
+                                        className={`action-card ${selectedMenuAction === 'hide' ? 'selected' : ''}`}
+                                        onClick={() => setSelectedMenuAction('hide')}
+                                      >
+                                        <div className="card-icon">
+                                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+                                        </div>
+                                        <div className="card-content">
+                                          <div className="card-title-row">
+                                            <span className="card-title">{menu.status === 'Disabled' ? 'Show Menu' : 'Hide Menu'}</span>
+                                          </div>
+                                          <span className="recommended-tag">Recommended for temporary changes</span>
+                                          <p className="card-desc">
+                                            {menu.status === 'Disabled' ? 'Make this menu visible to customers again.' : 'Temporarily hide this menu from customers. You can enable it anytime.'}
+                                          </p>
+                                        </div>
                                       </div>
-                                      <div className="option-info">
-                                        <span className="option-label delete">Delete Menu</span>
-                                        <span className="option-desc">Permanently remove this menu and its sections</span>
+
+                                      <div
+                                        className={`action-card destructive ${selectedMenuAction === 'delete' ? 'selected' : ''}`}
+                                        onClick={() => setSelectedMenuAction('delete')}
+                                      >
+                                        <div className="card-icon">
+                                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                                        </div>
+                                        <div className="card-content">
+                                          <div className="card-title-row">
+                                            <span className="card-title">Delete Menu</span>
+                                          </div>
+                                          <p className="card-desc">Permanently delete this menu and all its items. This action cannot be undone.</p>
+                                        </div>
                                       </div>
-                                    </label>
+                                    </div>
                                   </>
                                 );
                               })()}
                             </div>
-                          </div>
 
-                          <div className="modal-footer" style={{ borderTop: '1px solid #f1f5f9', padding: '1.25rem 1.5rem' }}>
-                            <div className="footer-right" style={{ width: '100%', justifyContent: 'flex-end', gap: '0.75rem' }}>
-                              <button
-                                className="btn btn-ghost"
-                                onClick={() => {
-                                  setMenuActionId(null);
-                                  setSelectedMenuAction(null);
-                                }}
-                              >
-                                Cancel
-                              </button>
-                              <button
-                                className={`btn ${selectedMenuAction === 'delete' ? 'btn-primary-red' : 'btn-primary-blue'}`}
-                                disabled={!selectedMenuAction}
-                                style={{ minWidth: '120px' }}
-                                onClick={() => {
-                                  if (selectedMenuAction === 'hide') {
-                                    setMenus(menus.map((m: any) => m.id === menuActionId ? { ...m, status: m.status === 'Disabled' ? 'Active' : 'Disabled' } : m));
-                                  } else if (selectedMenuAction === 'delete') {
-                                    setMenus(menus.filter((m: any) => m.id !== menuActionId));
-                                  }
-                                  setMenuActionId(null);
-                                  setSelectedMenuAction(null);
-                                }}
-                              >
-                                {!selectedMenuAction ? 'Okay' : (selectedMenuAction === 'delete' ? 'Delete Menu' : (menus.find((m: any) => m.id === menuActionId)?.status === 'Disabled' ? 'Show Menu' : 'Hide Menu'))}
-                              </button>
+                            <div className="modal-footer" style={{ borderTop: '1px solid #f1f5f9', padding: '1.25rem 1.5rem' }}>
+                              <div className="footer-right" style={{ width: '100%', justifyContent: 'flex-end', gap: '0.75rem' }}>
+                                <button
+                                  className="btn btn-ghost"
+                                  onClick={() => {
+                                    setMenuActionId(null);
+                                    setSelectedMenuAction(null);
+                                  }}
+                                >
+                                  Cancel
+                                </button>
+                                <button
+                                  className={`btn ${selectedMenuAction === 'delete' ? 'btn-primary-red' : 'btn-primary-blue'}`}
+                                  disabled={!selectedMenuAction}
+                                  style={{ minWidth: '140px' }}
+                                  onClick={() => {
+                                    if (selectedMenuAction === 'hide') {
+                                      setMenus(menus.map((m: any) => m.id === menuActionId ? { ...m, status: m.status === 'Disabled' ? 'Active' : 'Disabled' } : m));
+                                      setMenuActionId(null);
+                                      setSelectedMenuAction(null);
+                                    } else if (selectedMenuAction === 'delete') {
+                                      setShowDeleteConfirmation(true);
+                                    }
+                                  }}
+                                >
+                                  {selectedMenuAction === 'delete' ? 'Delete Permanently' : (menus.find((m: any) => m.id === menuActionId)?.status === 'Disabled' ? 'Show Menu' : 'Hide Menu')}
+                                </button>
+                              </div>
                             </div>
                           </div>
-                        </div>
+                        ) : (
+                          <div className="modal-container mini" onClick={e => e.stopPropagation()}>
+                            <div className="modal-header" style={{ paddingBottom: '0.5rem' }}>
+                              <h3 className="modal-title" style={{ color: '#ef4444' }}>Are you sure you want to delete this menu?</h3>
+                            </div>
+                            <div className="modal-content" style={{ padding: '0 1.5rem 1.5rem' }}>
+                              <p style={{ color: '#64748b', fontSize: '0.9rem', lineHeight: '1.6' }}>
+                                This action cannot be undone. All menu items and settings will be permanently removed.
+                              </p>
+                            </div>
+                            <div className="modal-footer" style={{ borderTop: 'none', padding: '0.5rem 1.5rem 1.5rem' }}>
+                              <div className="footer-right" style={{ width: '100%', justifyContent: 'flex-end', gap: '0.75rem' }}>
+                                <button
+                                  className="btn btn-ghost"
+                                  onClick={() => setShowDeleteConfirmation(false)}
+                                >
+                                  Cancel
+                                </button>
+                                <button
+                                  className="btn btn-primary-red"
+                                  onClick={() => {
+                                    setMenus(menus.filter((m: any) => m.id !== menuActionId));
+                                    setMenuActionId(null);
+                                    setSelectedMenuAction(null);
+                                    setShowDeleteConfirmation(false);
+                                  }}
+                                >
+                                  Yes, Delete Menu
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     )}
 
@@ -3440,14 +3509,14 @@ const ServiceSettings = ({
                               <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
                             </div>
                           )}
-                          <div className="pax-overlay">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                            min {menuIdentity.minMembers || 20} - max {menuIdentity.maxMembers || 100}
-                          </div>
                         </div>
                         <div className="menu-details-section">
                           <h4 className="menu-title-v2">{menuIdentity.name || 'Untitled Menu'}</h4>
                           <div className="menu-meta-row-v2">
+                            <div className="menu-members-row">
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                              <span>min {menuIdentity.minMembers || 20} - max {menuIdentity.maxMembers || 100}</span>
+                            </div>
                             <div className={`diet-badge-v2 ${menuIdentity.dietType === 'Veg' ? 'veg' : 'non-veg'}`}>
                               <svg width="8" height="8" viewBox="0 0 12 12" fill="none"><rect x="0.5" y="0.5" width="11" height="11" rx="1.5" stroke="currentColor" strokeWidth="2" /><circle cx="6" cy="6" r="3" fill="currentColor" /></svg>
                               {menuIdentity.dietType}
@@ -7053,6 +7122,7 @@ const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
   const [sectionEditingIndex, setSectionEditingIndex] = useState<number | null>(null);
   const [menuActionId, setMenuActionId] = useState<number | null>(null);
   const [selectedMenuAction, setSelectedMenuAction] = useState<'hide' | 'delete' | null>(null);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [menuEditingId, setMenuEditingId] = useState<number | null>(null);
 
 
@@ -7401,6 +7471,8 @@ const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
               setSelectedMenuAction={setSelectedMenuAction}
               menuEditingId={menuEditingId}
               setMenuEditingId={setMenuEditingId}
+              showDeleteConfirmation={showDeleteConfirmation}
+              setShowDeleteConfirmation={setShowDeleteConfirmation}
               handleImageUpload={handleImageUpload}
               handleSaveSection={handleSaveSection}
               resetAddMenu={resetAddMenu}
