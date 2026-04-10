@@ -54,7 +54,7 @@ const GSTCompliance = () => {
   // Mock data for Non-GST dashboard
   const nonGstData = {
     totalEarnings: 825000,
-    platformEarnings: 450000,
+    platformEarnings: 330000,
     tdsDeducted: 450,
     netPaid: 449550,
     tdsRate: 0.1,
@@ -102,35 +102,44 @@ const GSTCompliance = () => {
       {/* 1. HEADER SECTION */}
       <header className="gst-header">
         <div className="gst-title-area">
-          <h1>GST Reporting & Compliance</h1>
+          <h1>{activeTab === 'non-gst' ? 'Earnings Overview' : 'GST Reporting & Compliance'}</h1>
           <p className="gst-subtitle">
             {activeTab === 'regular' && `Manage your GST filings for ${selectedMonth} ${selectedYear}`}
             {activeTab === 'composition' && `Quarterly tax summary and CMP-08 filing for ${selectedQuarter} 2025-26`}
-            {activeTab === 'non-gst' && `Earnings and TDS summary for ${selectedMonth} FY ${selectedYear}`}
+            {activeTab === 'non-gst' && 'Summary of your earnings and platform charges'}
           </p>
         </div>
 
-        <div className="gst-filters">
-          <select className="gst-filter-select" value={selectedYear} onChange={(e) => setSelectedYear(e.target.value)}>
-            <option value="2025-26">FY {selectedYear}</option>
-            <option value="2024-25">FY 2024-25</option>
-          </select>
-
-          {activeTab !== 'composition' && (
-            <select className="gst-filter-select" value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)}>
-              <option value="March">March</option>
-              <option value="February">February</option>
-              <option value="January">January</option>
+        <div className="gst-header-actions">
+          <div className="gst-filters">
+            <select className="gst-filter-select" value={selectedYear} onChange={(e) => setSelectedYear(e.target.value)}>
+              <option value="2025-26">FY {selectedYear}</option>
+              <option value="2024-25">FY 2024-25</option>
             </select>
-          )}
 
-          {activeTab === 'composition' && (
-            <select className="gst-filter-select" value={selectedQuarter} onChange={(e) => setSelectedQuarter(e.target.value)}>
-              <option value="Q4">Q4 (Jan-Mar)</option>
-              <option value="Q3">Q3 (Oct-Dec)</option>
-              <option value="Q2">Q2 (Jul-Sep)</option>
-              <option value="Q1">Q1 (Apr-Jun)</option>
-            </select>
+            {activeTab !== 'composition' && (
+              <select className="gst-filter-select" value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)}>
+                <option value="March">March</option>
+                <option value="February">February</option>
+                <option value="January">January</option>
+              </select>
+            )}
+
+            {activeTab === 'composition' && (
+              <select className="gst-filter-select" value={selectedQuarter} onChange={(e) => setSelectedQuarter(e.target.value)}>
+                <option value="Q4">Q4 (Jan-Mar)</option>
+                <option value="Q3">Q3 (Oct-Dec)</option>
+                <option value="Q2">Q2 (Jul-Sep)</option>
+                <option value="Q1">Q1 (Apr-Jun)</option>
+              </select>
+            )}
+          </div>
+
+          {activeTab === 'non-gst' && (
+            <button className="gst-download-report-btn">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              Earnings Report
+            </button>
           )}
         </div>
       </header>
@@ -349,22 +358,43 @@ const GSTCompliance = () => {
 
       {activeTab === 'composition' && (
         <div className="gst-composition-view">
+          {/* 1. TOP BANNER */}
+          <div className="gst-info-banner">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            <div>
+              <strong>You are under GST Composition Scheme</strong>
+              Pay a fixed tax on your total turnover and ITC is not claimable
+            </div>
+          </div>
+
           {/* 3.2 TOP CARDS (COMPOSITION) */}
           <div className="gst-summary-grid gst-grid-3">
+
             <div className="gst-summary-card">
               <div className="gst-card-header">
                 <h3 className="gst-card-label">Total Turnover (Quarter)</h3>
               </div>
               <div className="gst-card-value">{formatCurrency(compositionData.turnover.total)}</div>
+              <p className="gst-card-subtitle">Includes platform and offline earnings</p>
 
-              <div className="gst-card-breakdown">
-                <div className="gst-breakdown-item">
-                  <span className="gst-breakdown-label">Platform Earnings</span>
-                  <span className="gst-breakdown-val">{formatCurrency(compositionData.turnover.platform)}</span>
+              <div className="gst-earnings-split-row">
+                <div className="gst-earnings-split-item">
+                  <span>Platform:</span>
+                  <span>{formatCurrency(compositionData.turnover.platform)}</span>
                 </div>
-                <div className="gst-breakdown-item">
-                  <span className="gst-breakdown-label">Offline Earnings</span>
-                  <span className="gst-breakdown-val">{formatCurrency(compositionData.turnover.offline)}</span>
+                <div className="gst-earnings-split-item">
+                  <span>Offline:</span>
+                  <span>{formatCurrency(compositionData.turnover.offline)}</span>
+                </div>
+              </div>
+
+              <div className="gst-card-trust-area">
+                <div className="gst-data-tag gst-tag-verified">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  Platform data is verified
+                </div>
+                <div className="gst-data-tag gst-tag-review">
+                  Offline earnings are self-reported
                 </div>
               </div>
             </div>
@@ -485,8 +515,8 @@ const GSTCompliance = () => {
           <div className="gst-info-banner">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
             <div>
-              <strong>You are not registered under GST.</strong>
-              GST is not applicable
+              <strong>GST is not applicable for your account</strong>
+              No need to collect or file GST
             </div>
           </div>
 
@@ -497,6 +527,7 @@ const GSTCompliance = () => {
                 <h3 className="gst-card-label">Total Earnings</h3>
               </div>
               <div className="gst-card-value">{formatCurrency(nonGstData.totalEarnings)}</div>
+              <p className="gst-card-subtitle">Includes platform and offline earnings</p>
               <div className="gst-earnings-split-row">
                 <div className="gst-earnings-split-item">
                   <span>Platform:</span>
@@ -507,6 +538,18 @@ const GSTCompliance = () => {
                   <span>{formatCurrency(nonGstData.totalEarnings - nonGstData.platformEarnings)}</span>
                 </div>
               </div>
+              <div className="gst-card-trust-area">
+                <div className="gst-data-tag gst-tag-verified">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  Platform data is verified
+                </div>
+                <div className="gst-data-tag gst-tag-review">
+                  Offline earnings are self-reported
+                </div>
+              </div>
+              <p className="gst-card-subtitle" style={{ fontSize: '0.75rem', marginTop: '1rem', color: 'var(--gst-text-muted)' }}>
+                GST registration may be required if your total business turnover exceeds ₹20L in a financial year.
+              </p>
             </div>
 
             <div className="gst-summary-card">
@@ -516,19 +559,16 @@ const GSTCompliance = () => {
               <div className="gst-card-value">
                 {formatCurrency(nonGstData.monthlyBreakdown.reduce((acc, curr) => acc + curr.fee, 0))}
               </div>
-              <p className="gst-card-subtitle" style={{ marginTop: '0.75rem', fontSize: '0.75rem' }}>
-                Includes commission + GST (GST is not claimable for non-registered vendors)
+              <p className="gst-card-subtitle" style={{ marginTop: '0.75rem' }}>
+                Includes platform commission and applicable taxes
+              </p>
+              <p className="gst-card-subtitle" style={{ fontSize: '0.75rem', marginTop: '0.25rem', color: 'var(--gst-text-muted)', fontWeight: 500 }}>
+                (GST included in platform charges is not claimable for non-GST registered vendors)
               </p>
             </div>
           </div>
 
-          <footer className="gst-footer">
-            <div className="gst-disclaimer">
-              <p>• GST is not applicable for your account</p>
-              <p>• TDS is deducted as per Section 194-O</p>
-              <p>• TDS can be claimed while filing your income tax return</p>
-            </div>
-          </footer>
+
         </div>
       )}
 
