@@ -11,8 +11,8 @@ const GSTCompliance = () => {
   const regularData = {
     taxableValue: {
       total: 825000,
-      platform: 650000,
-      offline: 175000
+      platform: 330000,
+      offline: 495000
     },
     outputGST: 148500,
     itcAvailable: 12400,
@@ -36,8 +36,8 @@ const GSTCompliance = () => {
   const compositionData = {
     turnover: {
       total: 825000,
-      platform: 450000,
-      offline: 375000
+      platform: 330000,
+      offline: 495000
     },
     taxRate: 6, // 6% composition rate
     estimatedTax: 49500,
@@ -45,9 +45,9 @@ const GSTCompliance = () => {
     dueDate: 'April 18, 2026',
     daysRemaining: 9,
     monthlyBreakdown: [
-      { month: 'January', turnover: 250000, platform: 120000, offline: 130000, tax: 15000, fee: 1800 },
-      { month: 'February', turnover: 300000, platform: 150000, offline: 150000, tax: 18000, fee: 1800 },
-      { month: 'March', turnover: 275000, platform: 180000, offline: 95000, tax: 16500, fee: 1800 }
+      { month: 'January', turnover: 250000, platform: 100000, offline: 150000, tax: 15000, fee: 1800 },
+      { month: 'February', turnover: 300000, platform: 120000, offline: 180000, tax: 18000, fee: 1800 },
+      { month: 'March', turnover: 275000, platform: 110000, offline: 165000, tax: 16500, fee: 1800 }
     ]
   };
 
@@ -147,7 +147,7 @@ const GSTCompliance = () => {
       {activeTab === 'regular' && (
         <>
           {/* 2. TOP SUMMARY CARDS */}
-          <div className="gst-summary-grid">
+          <div className="gst-summary-grid gst-grid-4">
             {/* Card 1: Total Taxable Value */}
             <div className="gst-summary-card">
               <div className="gst-card-header">
@@ -159,23 +159,28 @@ const GSTCompliance = () => {
                 </h3>
               </div>
               <div className="gst-card-value">{formatCurrency(regularData.taxableValue.total)}</div>
-              <div className="gst-card-breakdown">
-                <div className="gst-breakdown-item">
-                  <span className="gst-breakdown-label">Platform Earnings</span>
-                  <span className="gst-breakdown-val">{formatCurrency(regularData.taxableValue.platform)}</span>
+              <p className="gst-card-subtitle">Includes platform and offline earnings</p>
+
+              <div className="gst-earnings-split-row">
+                <div className="gst-earnings-split-item">
+                  <span>Platform:</span>
+                  <span>{formatCurrency(regularData.taxableValue.platform)}</span>
                 </div>
-                <div className="gst-breakdown-item">
-                  <span className="gst-breakdown-label">Offline Earnings</span>
-                  <span className="gst-breakdown-val">{formatCurrency(regularData.taxableValue.offline)}</span>
+                <div className="gst-earnings-split-item">
+                  <span>Offline:</span>
+                  <span>{formatCurrency(regularData.taxableValue.offline)}</span>
                 </div>
               </div>
-              <div className="gst-data-tag gst-tag-verified">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                Platform data verified
-              </div>
-              <div className="gst-data-tag gst-tag-review">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                Offline data self-reported
+
+              <div className="gst-card-trust-area">
+                <div className="gst-data-tag gst-tag-verified">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  Platform data verified
+                </div>
+                <div className="gst-data-tag gst-tag-review">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                  Offline data self-reported
+                </div>
               </div>
             </div>
 

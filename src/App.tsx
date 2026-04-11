@@ -5440,7 +5440,8 @@ const BookingDetailModal = ({
 
   const nextAction = nextActionsMap[booking.status];
 
-  const [showMenuDetail, setShowMenuDetail] = useState(false);
+  const [showMenuDetail, setShowMenuDetail] = useState(true);
+  const [showCalculations, setShowCalculations] = useState(false);
 
   return (
     <div className="modal-overlay-v4 drawer-overlay-v7" onClick={onClose} style={{ zIndex: 10000 }}>
@@ -5527,80 +5528,115 @@ const BookingDetailModal = ({
 
           <div className="detail-section-v7">
             <h4 className="section-title-v7">PAYMENT SUMMARY</h4>
-            <div className="payment-summary-v25">
-              <div className="payment-section-v25">
-                <div className="payment-row-v25 row-total-v25">
-                  <label>TOTAL BOOKING VALUE</label>
+            <div className="financial-breakdown-v30">
+              {/* Step 1: Total Booking Value */}
+              <div className="breakdown-section-v30">
+                <div className="section-label-v30">1. Total Booking Value</div>
+                <div className="breakdown-row-v30">
+                  <label>Booking Amount</label>
                   <span>₹{(booking.originalAmount || booking.amount).toLocaleString()}</span>
                 </div>
+                <span className="helper-text-v30">Includes GST</span>
                 {booking.discount > 0 && (
-                  <div className="payment-row-v25 row-discount-v25">
-                    <label>Discount Applied</label>
-                    <span>-₹{booking.discount.toLocaleString()}</span>
-                  </div>
+                  <>
+                    <div className="breakdown-row-v30" style={{ color: '#ef4444', marginTop: '12px' }}>
+                      <label>Discount Applied</label>
+                      <span style={{ color: '#ef4444' }}>-₹{booking.discount.toLocaleString()}</span>
+                    </div>
+                    <span className="helper-text-v30">Discount applied on total booking value</span>
+                  </>
                 )}
-                <div className="payment-row-v25 row-final-v25">
-                  <label>Final Booking Value</label>
-                  <span>₹{booking.amount.toLocaleString()}</span>
+                <div className="breakdown-row-v30" style={{ borderTop: '1px solid #f1f5f9', paddingTop: '8px', marginTop: '12px' }}>
+                  <label style={{ fontWeight: 700 }}>Final Booking Value</label>
+                  <span style={{ fontSize: '1.1rem' }}>₹{booking.amount.toLocaleString()}</span>
                 </div>
               </div>
 
-              <div className="payment-divider-v25"></div>
-
-              <div className="payment-section-v25">
-                <div className="payment-row-v25">
-                  <div className="label-with-subtext-v25">
-                    <label>Advance Received</label>
-                    <span className="subtext-v25">(via platform)</span>
-                  </div>
+              {/* Step 2: Payment Split */}
+              <div className="breakdown-section-v30">
+                <div className="section-label-v30">2. Payment Split</div>
+                <div className="breakdown-row-v30">
+                  <label>Platform Payment (Advance)</label>
                   <span style={{ color: '#10b981' }}>₹{booking.paid.toLocaleString()}</span>
                 </div>
-                <div className="payment-row-v25">
-                  <div className="label-with-subtext-v25">
-                    <label>To be collected</label>
-                    <span className="subtext-v25">(from customer)</span>
-                  </div>
+                <div className="breakdown-row-v30">
+                  <label>Offline Payment (Remaining)</label>
                   <span style={{ color: '#f59e0b' }}>₹{(booking.amount - booking.paid).toLocaleString()}</span>
+                </div>
+                <div className="breakdown-note-v30 collection-highlight-v30">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                  <span>Remaining amount is collected directly from customer</span>
                 </div>
               </div>
 
-              <div className="payout-section-v25">
-                <div className="payment-row-v25 row-payout-v25">
-                  <label>PAYOUT TO YOU</label>
-                  <span>₹{(booking.payout || booking.paid).toLocaleString()}</span>
+              {/* Step 3: Platform Deductions */}
+              <div className="breakdown-section-v30">
+                <div className="section-header-row-v30">
+                  <div className="section-label-v30">3. Platform Deductions</div>
+                  <button
+                    className="calculation-toggle-btn-v30"
+                    onClick={() => setShowCalculations(!showCalculations)}
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points={showCalculations ? "18 15 12 9 6 15" : "6 9 12 15 18 9"}></polyline>
+                    </svg>
+                    {showCalculations ? 'Hide details' : 'Show details'}
+                  </button>
                 </div>
-                <div className="payout-info-v25">
-                  <p className="payout-info-title-v25">Includes:</p>
-                  <ul className="payout-list-v25">
-                    <li>Platform charges applied</li>
-                    <li>GST included</li>
-                    <li>TDS deducted (if applicable)</li>
-                  </ul>
-                  <p className="payout-footer-v25">
-                    Processed on: {
-                      (() => {
-                        const d = new Date(booking.date);
-                        d.setDate(d.getDate() - 1);
-                        return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-                      })()
-                    }
-                  </p>
-                </div>
+
+                {(() => {
+                  const commission = Math.round(booking.paid * 0.10);
+                  const commissionGst = Math.round(commission * 0.18);
+                  const tds = Math.round(booking.paid * 0.01);
+                  const totalDeductions = commission + commissionGst + tds;
+                  const vendorPayout = booking.paid - totalDeductions;
+                  const totalEarnings = vendorPayout + (booking.amount - booking.paid);
+
+                  return (
+                    <>
+                      {showCalculations && (
+                        <div className="details-wrapper-v30">
+                          <div className="deduction-item-v30">
+                            <span>Platform Commission (10% of advance)</span>
+                            <span className="deduction-value">-₹{commission.toLocaleString()}</span>
+                          </div>
+                          <div className="deduction-item-v30">
+                            <span>GST on Commission (18%)</span>
+                            <span className="deduction-value">-₹{commissionGst.toLocaleString()}</span>
+                          </div>
+                          <div className="deduction-item-v30">
+                            <span>TDS (1%)</span>
+                            <span className="deduction-value">-₹{tds.toLocaleString()}</span>
+                          </div>
+                          <div className="breakdown-note-v30" style={{ marginTop: '8px' }}>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                            <span>Deductions are calculated only on platform-collected amount, GST & TDS are claimable</span>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Step 4: Final Payout */}
+                      <div className="section-label-v30" style={{ marginTop: '24px' }}>4. Final Settlement</div>
+                      <div className="breakdown-row-v30">
+                        <label style={{ fontWeight: 600 }}>You Receive (Payout)</label>
+                        <span style={{ color: '#10b981', fontSize: '1.2rem' }}>₹{vendorPayout.toLocaleString()}</span>
+                      </div>
+
+                      {/* Step 5: Total Earnings */}
+                      <div className="total-earnings-card-v30">
+                        <div className="earnings-label">
+                          <label>TOTAL EARNINGS</label>
+                          <span>₹{totalEarnings.toLocaleString()}</span>
+                          <div className="earnings-helper-v30">Includes offline collection + platform payout</div>
+                        </div>
+                        <div className="payout-badge-v30">PLATFORM + OFFLINE</div>
+                      </div>
+                    </>
+                  );
+                })()}
               </div>
             </div>
 
-            {booking.status !== 'Cancelled' && booking.status !== 'Completed' && (
-              <div className="collection-warning-v11" style={{ marginTop: '1.5rem' }}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                <span>Collect remaining amount on event day</span>
-              </div>
-            )}
-            {booking.status === 'Completed' && (
-              <div className="collection-warning-v11 completed" style={{ marginTop: '1.5rem' }}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                <span>You marked as booking completed which is remaining amount is collected</span>
-              </div>
-            )}
           </div>
 
 
@@ -8475,16 +8511,41 @@ const RevenueAnalytics = ({
   const growthString = (growthValNum >= 0 ? "+" : "") + growthValNum.toFixed(1) + "%";
   const currentTrend = growthValNum >= 0 ? 'up' : 'down';
 
+  const totalEarningsVal = currentMonthVal * 4500;
+  const platformEarningsVal = totalEarningsVal * 0.4;
+  const offlineEarningsVal = totalEarningsVal * 0.6;
+
   const summaryCards = [
-    { label: 'Total Revenue', value: `₹${(currentMonthVal * 4500).toLocaleString('en-IN')}`, growth: growthString, icon: '💰', trend: currentTrend },
-    { label: 'Net Earnings', value: `₹${(currentMonthVal * 4400).toLocaleString('en-IN')}`, growth: growthString, icon: '🏦', trend: currentTrend },
-    { label: 'Total Bookings', value: Math.round(currentMonthVal / 3).toString(), growth: '+8%', icon: '📅', trend: 'up' },
+    {
+      label: 'Total Earnings (incl. GST)',
+      value: `₹${totalEarningsVal.toLocaleString('en-IN')}`,
+      subtitle: 'Includes platform + offline earnings',
+      split: `Platform: ₹${platformEarningsVal.toLocaleString('en-IN')} | Offline: ₹${offlineEarningsVal.toLocaleString('en-IN')}`,
+      growth: growthString,
+      icon: '💰',
+      trend: currentTrend
+    },
+    {
+      label: 'Net Received',
+      value: `₹${(currentMonthVal * 4400).toLocaleString('en-IN')}`,
+      subtitle: 'Amount credited after platform charges & TDS',
+      growth: growthString,
+      icon: '🏦',
+      trend: currentTrend
+    },
+    {
+      label: 'Total Bookings',
+      value: Math.round(currentMonthVal / 3).toString(),
+      subtitle: 'Total orders processed for this period',
+      growth: '+8%',
+      icon: '📅',
+      trend: 'up'
+    },
   ];
 
   const payoutSummary = [
-    { label: 'Paid', value: '₹3,25,000', status: 'Credited to your bank', color: '#16a34a' },
-    { label: 'Upcoming', value: '₹65,850', status: 'From 4 bookings', color: '#7c3aed', subtext: '' },
-    { label: 'Processing', value: '₹35,000', status: 'Processing (1–2 days)', color: '#f59e0b', subtext: '' }
+    { label: 'Total Paid Out', value: '₹3,25,000', status: 'Credited to your bank', color: '#16a34a' },
+    { label: 'Upcoming', value: '₹65,850', status: 'From 4 completed bookings', color: '#7c3aed', subtext: '' }
   ];
 
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
@@ -8520,12 +8581,6 @@ const RevenueAnalytics = ({
     conversion: '89.2%'
   };
 
-  const revenueSplit = {
-    b2b: 60, // percentage to match reference
-    b2c: 40,
-    b2bAmount: '₹7,45,000',
-    b2cAmount: '₹5,00,000'
-  };
 
   const [selectedFY, setSelectedFY] = useState('FY 2025-26');
 
@@ -8569,12 +8624,20 @@ const RevenueAnalytics = ({
         {summaryCards.map((card, idx) => {
           const isHero = idx === 0;
           return (
-            <div key={idx} className={isHero ? "rev-hero-card-v22" : "rev-refined-card-v22"}>
+            <div key={idx} className={isHero ? "rev-hero-card-v22 shadowless" : "rev-refined-card-v22 shadowless"}>
               <div className="card-top-row-v22">
                 {isHero ? <span className="rev-hero-rupee-v22">₹</span> : <span className="rev-refined-icon-v22">{card.icon}</span>}
-                <p className={isHero ? "rev-hero-label-v22" : "rev-refined-label-v22"}>{card.label}</p>
+                <div className="label-group-v24">
+                  <p className={isHero ? "rev-hero-label-v22" : "rev-refined-label-v22"}>{card.label}</p>
+                </div>
               </div>
               <div className={isHero ? "rev-hero-value-v22" : "rev-refined-value-v22"}>{card.value}</div>
+              {card.subtitle && <p className="rev-card-subtitle-v24">{card.subtitle}</p>}
+              {card.split && (
+                <div className="rev-card-split-row-v24">
+                  {card.split}
+                </div>
+              )}
             </div>
           );
         })}
@@ -8586,7 +8649,7 @@ const RevenueAnalytics = ({
         <div className="revenue-chart-section-v5">
           <div className="chart-header-v25">
             <div className="header-left-v25">
-              <h3>Revenue Trend</h3>
+              <h3>Total Earnings</h3>
             </div>
             <div className="best-month-card-v25">
               <div className="card-label-v25">Best Month</div>
@@ -8640,7 +8703,7 @@ const RevenueAnalytics = ({
         <div className="revenue-sidebar-v5">
           <div className="booking-performance-card-v24">
             <div className="card-header-v24">
-              <h4>Booking Performance</h4>
+              <h4>Order Insights</h4>
             </div>
             <div className="perf-grid-v24">
               <div className="perf-item-v24">
@@ -8662,31 +8725,6 @@ const RevenueAnalytics = ({
             </div>
           </div>
 
-          <div className="revenue-breakdown-card-v24">
-            <h4>Revenue Breakdown</h4>
-            <div className="breakdown-chart-v24">
-              <div className="breakdown-legend-v24">
-                <div className="legend-item-v24">
-                  <div className="legend-left-v24">
-                    <span className="dot b2b"></span>
-                    <label>B2B Revenue</label>
-                  </div>
-                  <span className="legend-value-v24">{revenueSplit.b2bAmount} ({revenueSplit.b2b}%)</span>
-                </div>
-                <div className="legend-item-v24">
-                  <div className="legend-left-v24">
-                    <span className="dot b2c"></span>
-                    <label>B2C Revenue</label>
-                  </div>
-                  <span className="legend-value-v24">{revenueSplit.b2cAmount} ({revenueSplit.b2c}%)</span>
-                </div>
-              </div>
-              <div className="progress-bar-v24">
-                <div className="progress-fill-v24 b2b" style={{ width: `${revenueSplit.b2b}%` }}></div>
-                <div className="progress-fill-v24 b2c" style={{ width: `${revenueSplit.b2c}%` }}></div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -8715,7 +8753,10 @@ const RevenueAnalytics = ({
         <div className="inner-card-v24">
           <div className="card-header-v24">
             <div className="header-title-row-v24">
-              <h4>Payout Summary</h4>
+              <div className="title-group-v24">
+                <h4>Payout Summary</h4>
+                <p className="payout-context-v24">Showing payouts for selected period</p>
+              </div>
               <button className="view-history-btn-v24" onClick={() => setIsHistoryOpen(true)}>
                 View Payout History
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-history"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /><path d="M12 7v5l4 2" /></svg>
@@ -8728,8 +8769,8 @@ const RevenueAnalytics = ({
           </div>
           <div className="payout-grid-v24">
             {payoutSummary.map((payout, idx) => (
-              <div key={idx} className={`payout-status-card-v24 ${payout.label.toLowerCase()}`}>
-                <label>{payout.label} Payout</label>
+              <div key={idx} className={`payout-status-card-v24 ${payout.label.toLowerCase().replace(/ /g, '-')}`}>
+                <label>{payout.label}</label>
                 <div className="payout-value-v24">{payout.value}</div>
                 <div className="payout-status-row-v24">
                   {payout.status && <span className="status-tag-v24">{payout.status}</span>}
@@ -8740,14 +8781,6 @@ const RevenueAnalytics = ({
           </div>
         </div>
 
-        <div className="revenue-footer-advice-v24">
-          <div className="advice-meta-v24">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-            <div className="advice-texts-v24">
-              <p>Revenue is based on completed bookings. Payouts are processed based on event schedule and settlement timelines.</p>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );

@@ -116,6 +116,10 @@
   grid-template-columns: repeat(3, 1fr);
 }
 
+.gst-summary-grid.gst-grid-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
 .gst-summary-card {
   background: var(--gst-card-bg);
   border-radius: var(--gst-radius);
