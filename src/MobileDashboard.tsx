@@ -4540,7 +4540,6 @@ const MobileCreateMenuView = ({
 const MobileServiceSettingsView = ({
   setIsAddingMenu,
   menus,
-  setMenus,
   setMenuIdentity,
   setSections,
   setMenuEditingId,
@@ -4548,7 +4547,6 @@ const MobileServiceSettingsView = ({
 }: {
   setIsAddingMenu: (val: boolean) => void,
   menus: any[],
-  setMenus: (val: any[] | ((prev: any[]) => any[])) => void,
   setMenuIdentity: (val: any | ((prev: any) => any)) => void,
   setSections: (val: any[] | ((prev: any[]) => any[])) => void,
   setMenuEditingId: (val: number | null) => void,
@@ -4905,7 +4903,6 @@ const MobileDashboard = (props: MobileDashboardProps) => {
         <MobileServiceSettingsView
           setIsAddingMenu={setIsAddingMenu}
           menus={menus}
-          setMenus={setMenus}
           setMenuIdentity={setMenuIdentity}
           setSections={setSections}
           setMenuEditingId={setMenuEditingId}
