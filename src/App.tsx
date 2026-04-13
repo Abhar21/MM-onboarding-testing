@@ -5914,8 +5914,7 @@ const Reports = () => {
   // ];
 
   // const [gstPage] = useState(1);
-  // const [selectedFY, setSelectedFY] = useState('FY 2025-26');
-  // const [selectedMonthTab, setSelectedMonthTab] = useState('Mar');
+
 
   const [selectedRevenueMonth, setSelectedRevenueMonth] = useState('Oct');
   const [selectedTdsQuarter, setSelectedTdsQuarter] = useState('Quarter 2 (Jul-Sep)');
@@ -5973,7 +5972,7 @@ const Reports = () => {
 
 
 
-  // const nextMonthInfo = getNextMonthInfo(selectedMonthTab);
+
 
   const tabs = ['Revenue', 'GST', 'TDS'];
 
