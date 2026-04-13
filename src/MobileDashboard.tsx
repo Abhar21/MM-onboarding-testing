@@ -310,6 +310,7 @@ const MobileBookingDetailView = ({
 }) => {
   const [isMarkingComplete, setIsMarkingComplete] = useState(false);
   const [isMenuSheetOpen, setIsMenuSheetOpen] = useState(false);
+  const [showCalculations, setShowCalculations] = useState(false);
 
   const handleComplete = () => {
     setIsMarkingComplete(true);
@@ -431,55 +432,113 @@ const MobileBookingDetailView = ({
         {/* Payment Summary Section */}
         <div className="detail-section-v50 card">
           <h3 className="section-title-v50 small">Payment Summary</h3>
-          <div className="payment-summary-box-v50">
-            <div className="payment-main-row-v50">
-              <span className="label">Total Booking Value</span>
-              <span className="value primary">₹{Number(booking.amount || 0).toLocaleString()}</span>
+          <div className="financial-breakdown-v30 mobile-version">
+            {/* Step 1: Total Booking Value */}
+            <div className="breakdown-section-v30">
+              <div className="section-label-v30">1. Total Booking Value</div>
+              <div className="breakdown-row-v30">
+                <label>Booking Amount</label>
+                <span>₹{Number((booking as any).originalAmount || booking.amount || 0).toLocaleString()}</span>
+              </div>
+              <span className="helper-text-v30">Includes GST</span>
+              {((booking as any).discount > 0) && (
+                <>
+                  <div className="breakdown-row-v30" style={{ color: '#ef4444', marginTop: '12px' }}>
+                    <label>Discount Applied</label>
+                    <span style={{ color: '#ef4444' }}>-₹{Number((booking as any).discount).toLocaleString()}</span>
+                  </div>
+                  <span className="helper-text-v30">Discount applied on total booking value</span>
+                </>
+              )}
+              <div className="breakdown-row-v30 highlight-row">
+                <label style={{ fontWeight: 700 }}>Final Booking Value</label>
+                <span style={{ fontSize: '1.1rem' }}>₹{Number(booking.amount || 0).toLocaleString()}</span>
+              </div>
             </div>
-            <div className="payment-divider-v50"></div>
-            <div className="payment-sub-grid-v50">
-              <div className="payment-sub-item-v50">
-                <label>Advance Paid</label>
-                <div className="amount-status-v50">
-                  <span className="amount received">₹{Number(booking.paid || 0).toLocaleString()}</span>
-                  <span className="tag success">Received</span>
-                </div>
+
+            {/* Step 2: Payment Split */}
+            <div className="breakdown-section-v30">
+              <div className="section-label-v30">2. Payment Split</div>
+              <div className="breakdown-row-v30">
+                <label>Platform Payment (Advance)</label>
+                <span style={{ color: '#10b981' }}>₹{Number(booking.paid || 0).toLocaleString()}</span>
               </div>
-              <div className="payment-sub-item-v50">
-                <label>Pending Balance</label>
-                <div className="amount-status-v50">
-                  <span className="amount pending">₹{(Number(booking.amount || 0) - Number(booking.paid || 0)).toLocaleString()}</span>
-                  <span className="tag warning">Pending</span>
-                </div>
+              <div className="breakdown-row-v30">
+                <label>Offline Payment (Remaining)</label>
+                <span style={{ color: '#f59e0b' }}>₹{(Number(booking.amount || 0) - Number(booking.paid || 0)).toLocaleString()}</span>
+              </div>
+              <div className="breakdown-note-v30 collection-highlight-v30">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                <span>Remaining amount is collected directly from customer</span>
               </div>
             </div>
-            <div className="payout-info-grid-v50">
-              <div className="payout-detail-row-v50">
-                <label>Payout:</label>
-                <span className="value accent">₹{Number(booking.paid || 0).toLocaleString()}</span>
+
+            {/* Step 3: Platform Deductions */}
+            <div className="breakdown-section-v30">
+              <div className="section-header-row-v30">
+                <div className="section-label-v30">3. Platform Deductions</div>
+                <button
+                  className="calculation-toggle-btn-v30"
+                  onClick={() => setShowCalculations(!showCalculations)}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points={showCalculations ? "18 15 12 9 6 15" : "6 9 12 15 18 9"}></polyline>
+                  </svg>
+                  {showCalculations ? 'Hide details' : 'Show details'}
+                </button>
               </div>
-              <div className="payout-detail-row-v50">
-                <label>Payout Processed At:</label>
-                <span className="value">{
-                  (() => {
-                    if (!booking.date) return 'N/A';
-                    const d = new Date(booking.date);
-                    d.setDate(d.getDate() - 1);
-                    return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-                  })()
-                }</span>
-              </div>
-              <div className="payout-detail-row-v50">
-                <label>GST Month:</label>
-                <span className="value">{
-                  (() => {
-                    if (!booking.date) return 'N/A';
-                    const d = new Date(booking.date);
-                    d.setMonth(d.getMonth() + 1);
-                    return d.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
-                  })()
-                }</span>
-              </div>
+
+              {(() => {
+                const amountPaid = Number(booking.paid || 0);
+                const commission = Math.round(amountPaid * 0.10);
+                const commissionGst = Math.round(commission * 0.18);
+                const tds = Math.round(amountPaid * 0.01);
+                const totalDeductions = commission + commissionGst + tds;
+                const vendorPayout = amountPaid - totalDeductions;
+                const totalEarnings = vendorPayout + (Number(booking.amount || 0) - amountPaid);
+
+                return (
+                  <>
+                    {showCalculations && (
+                      <div className="details-wrapper-v30">
+                        <div className="deduction-item-v30">
+                          <span>Platform Commission (10%)</span>
+                          <span className="deduction-value">-₹{commission.toLocaleString()}</span>
+                        </div>
+                        <div className="deduction-item-v30">
+                          <span>GST on Commission (18%)</span>
+                          <span className="deduction-value">-₹{commissionGst.toLocaleString()}</span>
+                        </div>
+                        <div className="deduction-item-v30">
+                          <span>TDS (1%)</span>
+                          <span className="deduction-value">-₹{tds.toLocaleString()}</span>
+                        </div>
+                        <div className="breakdown-note-v30" style={{ marginTop: '8px' }}>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                          <span>Deductions calculated on platform amount, GST & TDS are claimable</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Step 4: Final Payout */}
+                    <div className="section-label-v30" style={{ marginTop: '16px' }}>4. Final Settlement</div>
+                    <div className="breakdown-row-v30 payout-row">
+                      <label style={{ fontWeight: 600 }}>You Receive (Payout)</label>
+                      <span style={{ color: '#10b981', fontSize: '1.2rem' }}>₹{vendorPayout.toLocaleString()}</span>
+                    </div>
+
+                    {/* Step 5: Total Earnings */}
+                    <div className="total-earnings-card-v30 mobile">
+                      <div className="earnings-label">
+                        <label>TOTAL EARNINGS</label>
+                        <span>₹{totalEarnings.toLocaleString()}</span>
+                        <div className="earnings-helper-v30">Includes offline + platform payout</div>
+                      </div>
+                      <div className="payout-badge-v30">ALL INCLUSIVE</div>
+                    </div>
+                  </>
+                );
+              })()}
             </div>
           </div>
         </div>
@@ -494,6 +553,8 @@ const MobileBookingDetailView = ({
         <div className="detail-section-v50">
           <h3 className="section-title-v50 small">Documents</h3>
           <div className="mobile-doc-list-v50">
+            {/* Advance Receipt: Shown for all except Cancelled? No, user said both for cancelled. */}
+            {/* Upcoming, Preparing, Completed, Cancelled all get Advance Receipt */}
             <div className="doc-row-v50">
               <div className="doc-left-v50">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
@@ -504,16 +565,34 @@ const MobileBookingDetailView = ({
               </div>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" strokeWidth="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
             </div>
-            <div className="doc-row-v50">
-              <div className="doc-left-v50">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-                <div className="doc-info-v50">
-                  <span className="doc-name-v50">Tax Invoice (Final)</span>
-                  <span className="doc-meta-v50">Unavailable</span>
+
+            {/* Tax Invoice: Only for Completed */}
+            {booking.status === 'Completed' && (
+              <div className="doc-row-v50">
+                <div className="doc-left-v50">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                  <div className="doc-info-v50">
+                    <span className="doc-name-v50">Tax Invoice (Final)</span>
+                    <span className="doc-meta-v50">PDF • 2.4 MB</span>
+                  </div>
                 </div>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" strokeWidth="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
               </div>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" strokeWidth="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
-            </div>
+            )}
+
+            {/* Credit Note: Only for Cancelled */}
+            {booking.status === 'Cancelled' && (
+              <div className="doc-row-v50">
+                <div className="doc-left-v50">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                  <div className="doc-info-v50">
+                    <span className="doc-name-v50">Credit Note</span>
+                    <span className="doc-meta-v50">PDF • 1.1 MB</span>
+                  </div>
+                </div>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" strokeWidth="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </div>
+            )}
           </div>
         </div>
 
@@ -961,6 +1040,10 @@ const MobileRevenueView = () => {
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 
   const monthsList = ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar'];
+  const fullMonthNames: Record<string, string> = {
+    'Apr': 'April', 'May': 'May', 'Jun': 'June', 'Jul': 'July', 'Aug': 'August', 'Sep': 'September',
+    'Oct': 'October', 'Nov': 'November', 'Dec': 'December', 'Jan': 'January', 'Feb': 'February', 'Mar': 'March'
+  };
 
   const trendData = [
     { month: 'Apr', revenue: 65000 },
@@ -981,6 +1064,14 @@ const MobileRevenueView = () => {
 
   return (
     <div className="mobile-revenue-container-v50">
+      {/* Header Section */}
+      <div className="mobile-revenue-header-v52">
+        <h3 className="rev-header-title-v52">Revenue Insights & Trends</h3>
+        <p className="rev-header-subtitle-v52">
+          Financial performance and growth analysis for {fullMonthNames[selectedMonth]} {selectedFY}
+        </p>
+      </div>
+
       {/* Single Row Filters */}
       <div className="mobile-revenue-filters-v50">
         <div className="filter-row-single-v50">
@@ -994,25 +1085,37 @@ const MobileRevenueView = () => {
         </div>
       </div>
 
-      {/* KPI Hierarchy */}
-      <div className="mobile-rev-kpi-stack-v50">
-        <div className="rev-kpi-hero-card-v50">
-          <div className="hero-head-v50">
-            <div className="hero-title-group-v50">
-              <span className="label-v50">Total Revenue</span>
-            </div>
+      {/* KPI Hierarchy - Modernized v52 */}
+      <div className="revenue-kpi-row-v52">
+        {/* Total Earnings Hero Card */}
+        <div className="rev-kpi-card-v52 rev-hero-green-v52">
+          <div className="rev-card-main-info-v52">
+            <div className="rev-card-title-v52">Total Earnings (incl. GST)</div>
+            <div className="rev-card-value-v52">₹4,05,000</div>
+            <div className="rev-card-subtitle-v52">Includes platform + offline earnings</div>
           </div>
-          <div className="hero-value-v50">₹4,25,840</div>
+          <div className="rev-card-footer-v52">
+            <span>Platform: ₹1,62,000</span>
+            <span style={{ opacity: 0.5 }}>|</span>
+            <span>Offline: ₹2,43,000</span>
+          </div>
         </div>
 
-        <div className="rev-kpi-secondary-row-v50">
-          <div className="rev-kpi-card-v51">
-            <label>Net Earnings</label>
-            <div className="val-v51">₹3,82,410</div>
+        {/* Net Received Card */}
+        <div className="rev-kpi-card-v52 rev-white-card-v52 net-received-card-v52">
+          <div className="rev-card-main-info-v52">
+            <div className="rev-card-title-v52">NET RECEIVED</div>
+            <div className="rev-card-value-v52">₹3,96,000</div>
+            <div className="rev-card-subtitle-v52">Amount credited after platform charges & TDS</div>
           </div>
-          <div className="rev-kpi-card-v51">
-            <label>Total Bookings</label>
-            <div className="val-v51">148</div>
+        </div>
+
+        {/* Total Bookings Card */}
+        <div className="rev-kpi-card-v52 rev-white-card-v52 bookings-card-v52">
+          <div className="rev-card-main-info-v52">
+            <div className="rev-card-title-v52">TOTAL BOOKINGS</div>
+            <div className="rev-card-value-v52">30</div>
+            <div className="rev-card-subtitle-v52">Total orders processed for this period</div>
           </div>
         </div>
       </div>
@@ -1088,37 +1191,16 @@ const MobileRevenueView = () => {
           </div>
         </div>
 
-        <div className="rev-card-v51">
-          <div className="card-head-v51">
-            <h4>Revenue Breakdown</h4>
-          </div>
-          <div className="breakdown-v51">
-            <div className="breakdown-stat-v51">
-              <div className="label-bar-v51">
-                <span className="dot b2b"></span>
-                <label>B2B Revenue</label>
-              </div>
-              <span className="val-v51">₹3,25,000 (60%)</span>
-            </div>
-            <div className="breakdown-stat-v51">
-              <div className="label-bar-v51">
-                <span className="dot b2c"></span>
-                <label>B2C Revenue</label>
-              </div>
-              <span className="val-v51">₹2,16,666 (40%)</span>
-            </div>
-            <div className="rev-progress-v51">
-              <div className="fill-v51 b2b" style={{ width: '60%' }}></div>
-              <div className="fill-v51 b2c" style={{ width: '40%' }}></div>
-            </div>
-          </div>
-        </div>
       </div>
+
 
       {/* Payout Summary */}
       <div className="mobile-rev-action-card-v51">
         <div className="card-head-v51">
-          <h4>Payout Summary</h4>
+          <div className="payout-title-group-v52">
+            <h4>Payout Summary</h4>
+            <p className="payout-context-v52">Showing payouts for selected period</p>
+          </div>
           <button className="text-link-v51" onClick={() => setIsHistoryOpen(true)}>
             History <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="9 18 15 12 9 6"></polyline></svg>
           </button>
@@ -1134,11 +1216,10 @@ const MobileRevenueView = () => {
             <div className="payout-val-v50">₹65,850</div>
             <div className="payout-badge-v50">FROM 4 BOOKINGS</div>
           </div>
-          <div className="payout-card-v50 processing">
-            <label className="payout-label-v50">PROCESSING PAYOUT</label>
-            <div className="payout-val-v50">₹35,000</div>
-            <div className="payout-badge-v50">PROCESSING (1-2 DAYS)</div>
-          </div>
+        </div>
+        <div className="payout-footer-notes-v52">
+          <div className="payout-note-v52">Payouts are processed 24–48 hours before the event date</div>
+          <div className="payout-deduction-note-v52">Payout amounts are after TDS deductions</div>
         </div>
       </div>
 
@@ -1345,137 +1426,562 @@ const MobilePayoutHistorySheet = ({ onClose, defaultMonth }: { onClose: () => vo
 const MobileGSTView = () => {
   const [selectedFY, setSelectedFY] = useState('FY 2025-26');
   const [selectedMonth, setSelectedMonth] = useState('Mar');
+  const [selectedQuarter, setSelectedQuarter] = useState('Q4 (Jan-Mar)');
+  const [gstType, setGstType] = useState('regular');
 
   const monthsList = ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar'];
+  const quartersList = ['Q1 (Apr-Jun)', 'Q2 (Jul-Sep)', 'Q3 (Oct-Dec)', 'Q4 (Jan-Mar)'];
 
   return (
     <div className="mobile-gst-container-v52">
+      <div className="gst-type-segment-v52">
+        <div 
+          className={`gst-segment-item-v52 ${gstType === 'regular' ? 'active' : ''}`}
+          onClick={() => setGstType('regular')}
+        >
+          GST Regular
+        </div>
+        <div 
+          className={`gst-segment-item-v52 ${gstType === 'composition' ? 'active' : ''}`}
+          onClick={() => setGstType('composition')}
+        >
+          GST Composition
+        </div>
+        <div 
+          className={`gst-segment-item-v52 ${gstType === 'non-gst' ? 'active' : ''}`}
+          onClick={() => setGstType('non-gst')}
+        >
+          Non-GST
+        </div>
+      </div>
+
+      <div className="gst-header-section-v52">
+        <h2 className="gst-main-title-v52">
+          {gstType === 'non-gst' ? 'Earnings Overview' : 'GST Reporting & Compliance'}
+        </h2>
+        <p className="gst-main-subtitle-v52">
+          {gstType === 'non-gst' 
+            ? 'Summary of your earnings and platform charges' 
+            : `Manage your GST filings for ${gstType === 'composition' ? selectedQuarter : selectedMonth} ${selectedFY.replace('FY ', '')}`}
+        </p>
+      </div>
+
       {/* Filters Section */}
       <div className="gst-filters-v52">
         <select value={selectedFY} onChange={e => setSelectedFY(e.target.value)} className="gst-select-v52">
           <option>FY 2025–26</option>
           <option>FY 2024–25</option>
         </select>
-        <select value={selectedMonth} onChange={e => setSelectedMonth(e.target.value)} className="gst-select-v52">
-          {monthsList.map(m => (
-            <option key={m} value={m}>{m} '26</option>
-          ))}
-        </select>
+        
+        {gstType === 'composition' ? (
+          <select value={selectedQuarter} onChange={e => setSelectedQuarter(e.target.value)} className="gst-select-v52">
+            {quartersList.map((q, idx) => (
+              <option key={idx} value={q}>{q}</option>
+            ))}
+          </select>
+        ) : (
+          <select value={selectedMonth} onChange={e => setSelectedMonth(e.target.value)} className="gst-select-v52">
+            {monthsList.map((m, idx) => (
+              <option key={idx} value={m}>{m} '26</option>
+            ))}
+          </select>
+        )}
       </div>
 
       {/* KPI Cards (Stacked Layout) */}
       <div className="gst-kpi-stack-v52">
-        <div className="gst-kpi-card-v52 primary">
-          <div className="card-label-v52">GST Payable</div>
-          <div className="card-value-v52">₹73,051</div>
-          <div className="card-subtitle-v52">After ITC adjustments</div>
-        </div>
-        <div className="gst-kpi-card-v52">
-          <div className="card-label-v52">Taxable Amount</div>
-          <div className="card-value-v52">₹4,25,840</div>
-          <div className="card-subtitle-v52">Total taxable value for March FY 2025-26</div>
-        </div>
-        <div className="gst-kpi-card-v52">
-          <div className="card-label-v52">Total GST This Month</div>
-          <div className="card-value-v52">₹76,651</div>
-          <div className="card-subtitle-v52">Calculated for Mar</div>
-        </div>
-        <div className="gst-kpi-card-v52">
-          <div className="card-label-v52">ITC Available</div>
-          <div className="card-value-v52">₹3,600</div>
-          <div className="card-subtitle-v52">Available for credit</div>
-        </div>
+        {/* Regular GST View */}
+        {gstType === 'regular' && (
+          <>
+            {/* Card 1: Total Taxable Value */}
+            <div className="gst-kpi-card-v52">
+              <div className="gst-card-label-row-v52">
+                <label>Total Taxable Value</label>
+                <svg className="gst-info-icon-v52" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+              </div>
+              <div className="gst-card-value-v52">₹8,25,000</div>
+              <p className="gst-card-subtitle-v52">Includes platform and offline earnings</p>
+              <div className="gst-card-divider-v52 dashed"></div>
+              
+              <div className="gst-breakdown-box-v52" style={{ marginBottom: '16px' }}>
+                <div className="gst-breakdown-row-v52" style={{ justifyContent: 'space-between', display: 'flex' }}>
+                  <div className="inline-entry-v52">
+                    <span className="label-v52">Platform:</span>
+                    <span className="val-v52">₹3,30,000</span>
+                  </div>
+                  <div className="inline-entry-v52">
+                    <span className="label-v52">Offline:</span>
+                    <span className="val-v52">₹4,95,000</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="gst-badge-row-v52" style={{ gap: '10px' }}>
+                <div className="gst-status-pill-v52 verified" style={{ borderRadius: '6px' }}>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  Platform data is verified
+                </div>
+                <div className="gst-status-pill-v52 warning-banner-v52">
+                  Offline earnings are self-reported
+                </div>
+              </div>
+            </div>
+
+            {/* Card 2: Total Output GST */}
+            <div className="gst-kpi-card-v52">
+              <div className="gst-card-label-row-v52">
+                <label>Total Output GST</label>
+                <svg className="gst-info-icon-v52" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+              </div>
+              <div className="gst-card-value-v52">₹1,48,500</div>
+              <div className="gst-card-divider-v52"></div>
+              <div className="gst-breakdown-box-v52">
+                <div className="gst-breakdown-row-v52">
+                  <label>Platform GST</label>
+                  <span>₹59,400</span>
+                </div>
+                <div className="gst-breakdown-row-v52">
+                  <label>Offline GST</label>
+                  <span>₹89,100</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Card 3: Input Tax Credit (ITC) */}
+            <div className="gst-kpi-card-v52">
+              <div className="gst-card-label-row-v52">
+                <label>Input Tax Credit (ITC)</label>
+                <svg className="gst-info-icon-v52" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+              </div>
+              <div className="gst-card-value-v52">₹12,400</div>
+              <p className="gst-card-subtitle-v52">Includes GST paid on platform fees and eligible expenses</p>
+            </div>
+
+            {/* Card 4: Net GST Payable */}
+            <div className="gst-kpi-card-v52 gst-payable-card-v52">
+              <div className="gst-card-label-row-v52">
+                <label>Net GST Payable</label>
+                <svg className="gst-info-icon-v52" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+              </div>
+              <div className="gst-card-value-v52">₹1,36,100</div>
+              <p className="gst-card-subtitle-v52">After ITC adjustment</p>
+              <div className="gst-status-pill-v52 due">Due by April 20, 2026</div>
+            </div>
+          </>
+        )}
+
+        {/* Composition GST View */}
+        {gstType === 'composition' && (
+          <>
+            {/* Composition Info Banner */}
+            <div className="gst-info-banner-v52">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0077ff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+              <div className="info-banner-content-v52">
+                <div className="info-banner-title-v52">You are under GST Composition Scheme</div>
+                <div className="info-banner-subtitle-v52">Pay a fixed tax on your total turnover and ITC is not claimable</div>
+              </div>
+            </div>
+
+            {/* Card 1: Total Turnover (Quarter) */}
+            <div className="gst-kpi-card-v52">
+              <div className="gst-card-label-row-v52">
+                <label>Total Turnover (Quarter)</label>
+                <svg className="gst-info-icon-v52" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+              </div>
+              <div className="gst-card-value-v52">₹8,25,000</div>
+              <p className="gst-card-subtitle-v52">Includes platform and offline earnings</p>
+              <div className="gst-card-divider-v52 dashed"></div>
+              
+              <div className="gst-breakdown-box-v52" style={{ marginBottom: '16px' }}>
+                <div className="gst-breakdown-row-v52" style={{ justifyContent: 'space-between', display: 'flex' }}>
+                  <div className="inline-entry-v52">
+                    <span className="label-v52">Platform:</span>
+                    <span className="val-v52">₹3,30,000</span>
+                  </div>
+                  <div className="inline-entry-v52">
+                    <span className="label-v52">Offline:</span>
+                    <span className="val-v52">₹4,95,000</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="gst-badge-row-v52" style={{ gap: '10px' }}>
+                <div className="gst-status-pill-v52 verified" style={{ borderRadius: '6px' }}>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  Platform data is verified
+                </div>
+                <div className="gst-status-pill-v52 warning-banner-v52">
+                  Offline earnings are self-reported
+                </div>
+              </div>
+            </div>
+
+            {/* Card 2: Estimated Tax Payable */}
+            <div className="gst-kpi-card-v52">
+              <div className="gst-card-label-row-v52">
+                <label>Estimated Tax Payable</label>
+                <svg className="gst-info-icon-v52" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+              </div>
+              <div className="gst-card-value-v52 primary-blue-v52">₹49,500</div>
+              <p className="comp-rate-label-v52">@6% composition rate</p>
+              
+              <div className="comp-calc-info-v52">
+                <p>Composition tax is calculated based on your business type (1% / 5% / 6%)</p>
+                <p className="ca-recommend-v52">We recommend verifying the correct rate with your Chartered Accountant (CA)</p>
+              </div>
+            </div>
+
+            {/* Card 3: CMP-08 Due Date */}
+            <div className="gst-kpi-card-v52 highlight-blue-card-v52">
+              <div className="gst-card-label-row-v52">
+                <label>CMP-08 Due Date</label>
+                <svg className="gst-info-icon-v52" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+              </div>
+              <div className="gst-card-value-v52">April 18, 2026</div>
+              <div className="gst-status-pill-v52 due-pill-v52">Due in 9 days</div>
+            </div>
+          </>
+        )}
+
+        {/* Non-GST View */}
+        {gstType === 'non-gst' && (
+          <>
+            {/* Non-GST Info Banner */}
+            <div className="gst-info-banner-v52">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0077ff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+              <div className="info-banner-content-v52">
+                <div className="info-banner-title-v52">GST is not applicable for your account</div>
+                <div className="info-banner-subtitle-v52">No need to collect or file GST</div>
+              </div>
+            </div>
+
+            {/* Card 1: Total Earnings */}
+            <div className="gst-kpi-card-v52">
+              <div className="gst-card-label-row-v52">
+                <label>Total Earnings</label>
+                <svg className="gst-info-icon-v52" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+              </div>
+              <div className="gst-card-value-v52">₹8,25,000</div>
+              <p className="gst-card-subtitle-v52">Includes platform and offline earnings</p>
+              <div className="gst-card-divider-v52 dashed"></div>
+              
+              <div className="gst-breakdown-box-v52" style={{ marginBottom: '16px' }}>
+                <div className="gst-breakdown-row-v52" style={{ justifyContent: 'space-between', display: 'flex' }}>
+                  <div className="inline-entry-v52">
+                    <span className="label-v52">Platform:</span>
+                    <span className="val-v52">₹3,30,000</span>
+                  </div>
+                  <div className="inline-entry-v52">
+                    <span className="label-v52">Offline:</span>
+                    <span className="val-v52">₹4,95,000</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="gst-badge-row-v52" style={{ gap: '10px', marginBottom: '16px' }}>
+                <div className="gst-status-pill-v52 verified" style={{ borderRadius: '6px' }}>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  Platform data is verified
+                </div>
+                <div className="gst-status-pill-v52 warning-banner-v52">
+                  Offline earnings are self-reported
+                </div>
+              </div>
+
+              <p className="gst-card-footnote-v52">
+                GST registration may be required if your total business turnover exceeds ₹20L in a financial year.
+              </p>
+            </div>
+
+            {/* Card 2: Platform Charges */}
+            <div className="gst-kpi-card-v52">
+              <div className="gst-card-label-row-v52">
+                <label>Platform Charges</label>
+                <svg className="gst-info-icon-v52" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+              </div>
+              <div className="gst-card-value-v52">₹5,400</div>
+              <p className="gst-card-subtitle-v52">Includes platform commission and applicable taxes</p>
+              <p className="gst-card-footnote-v52">
+                (GST included in platform charges is not claimable for non-GST registered vendors)
+              </p>
+            </div>
+          </>
+        )}
       </div>
 
-      {/* Upcoming Filing Deadlines */}
-      <div className="gst-section-v52">
-        <h3 className="section-title-v52">Upcoming Filing Deadlines</h3>
-        <div className="merged-deadline-card-v52">
-          <div className="deadline-item-v52">
-            <div className="deadline-info-v52">
-              <span className="deadline-title-v52">GSTR-1</span>
-              <span className="deadline-date-v52">Due Date: 11 Apr 2026</span>
+      {/* Upcoming Filing Deadlines - Only for Regular */}
+      {gstType === 'regular' && (
+        <div className="gst-section-v52">
+          <h3 className="section-title-v52">Upcoming Filing Deadlines</h3>
+          <div className="split-card-v52">
+            <div className="deadline-item-v52">
+              <div className="deadline-info-v52">
+                <div className="deadline-item-title-v52">GSTR-1 (Outward Supplies)</div>
+                <div className="deadline-item-date-v52">Due Date: April 11, 2026</div>
+              </div>
+              <div className="deadline-pill-v52 orange">DUE IN 2 DAYS</div>
             </div>
-            <div className="deadline-badge-v52">Due in 11 days</div>
-          </div>
-          <div className="deadline-divider-v52"></div>
-          <div className="deadline-item-v52">
-            <div className="deadline-info-v52">
-              <span className="deadline-title-v52">GSTR-3B</span>
-              <span className="deadline-date-v52">Due Date: 20 Apr 2026</span>
+
+            <div className="split-divider-v52"></div>
+
+            <div className="deadline-item-v52">
+              <div className="deadline-info-v52">
+                <div className="deadline-item-title-v52">GSTR-3B (Summary Return)</div>
+                <div className="deadline-item-date-v52">Due Date: April 20, 2026</div>
+              </div>
+              <div className="deadline-pill-v52 slate">DUE IN 11 DAYS</div>
             </div>
-            <div className="deadline-badge-v52">Due in 20 days</div>
+
+            <div className="deadline-success-note-v52">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>No missed deadlines this month</span>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
-      {/* GST Split Section */}
-      <div className="gst-section-v52">
-        <h3 className="section-title-v52">GST Split (Mar)</h3>
+      {/* GST Breakdown Section - Only for Regular & Composition */}
+      {gstType !== 'non-gst' && (
+        <div className="gst-section-v52">
+        {gstType === 'regular' ? (
+          <>
+            <div className="gst-breakdown-header-v52">
+              <h3 className="section-title-v52">GST Breakdown for March</h3>
+            </div>
+            
+            <div className="split-card-v52">
+              <div className="breakdown-item-v52">
+                <div className="item-info-v52">
+                  <label>CGST (intra-state)</label>
+                  <span className="subtitle-v52">Central Goods and Services Tax</span>
+                </div>
+                <span className="value-v52">₹37,125</span>
+              </div>
+
+              <div className="breakdown-item-v52">
+                <div className="item-info-v52">
+                  <label>SGST (intra-state)</label>
+                  <span className="subtitle-v52">State Goods and Services Tax</span>
+                </div>
+                <span className="value-v52">₹37,125</span>
+              </div>
+
+              <div className="breakdown-item-v52">
+                <div className="item-info-v52">
+                  <label>IGST (inter-state)</label>
+                  <span className="subtitle-v52">Integrated Goods and Services Tax</span>
+                </div>
+                <span className="value-v52">₹74,250</span>
+              </div>
+
+              <div className="split-divider-v52"></div>
+
+              <div className="split-row-v52 bold">
+                <label>GST Collected</label>
+                <span>₹1,48,500</span>
+              </div>
+              <div className="split-row-v52 error bold">
+                <label>ITC Available</label>
+                <span>-₹12,400</span>
+              </div>
+
+              <div className="final-payable-box-v52">
+                <div className="final-label-v52">Final GST Payable</div>
+                <div className="final-value-v52">₹1,36,100</div>
+              </div>
+
+              <div className="gst-report-period-v52">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                <span>This report includes transactions received between March 01, 2026 and March 31, 2026</span>
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="monthly-ref-header-v52">
+              <h3 className="section-title-v52">Monthly Breakdown (for reference)</h3>
+              <div className="monthly-instructions-v52">
+                <p>Monthly breakdown is for reference. Tax is filed quarterly.</p>
+                <p>Platform charges include commission + GST (GST is not claimable under composition scheme)</p>
+              </div>
+            </div>
+
+            {/* January Card */}
+            <div className="month-record-card-v52">
+              <div className="record-month-name-v52">January</div>
+              <div className="record-data-grid-v52">
+                <div className="record-row-v52">
+                  <div className="record-label-v52">Total Turnover</div>
+                  <div className="record-value-container-v52">
+                    <span className="record-main-val-v52">₹2,50,000</span>
+                    <span className="turnover-split-muted-v52">₹1,00,000 platform + ₹1,50,000 offline</span>
+                  </div>
+                </div>
+                <div className="record-row-v52">
+                  <div className="record-label-v52">Estimated Tax</div>
+                  <div className="record-value-container-v52">
+                    <span className="record-main-val-v52">₹15,000</span>
+                  </div>
+                </div>
+                <div className="record-row-v52">
+                  <div className="record-label-v52">Platform Fee</div>
+                  <div className="record-value-container-v52">
+                    <span className="record-main-val-v52">₹1,800</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* February Card */}
+            <div className="month-record-card-v52">
+              <div className="record-month-name-v52">February</div>
+              <div className="record-data-grid-v52">
+                <div className="record-row-v52">
+                  <div className="record-label-v52">Total Turnover</div>
+                  <div className="record-value-container-v52">
+                    <span className="record-main-val-v52">₹3,00,000</span>
+                    <span className="turnover-split-muted-v52">₹1,20,000 platform + ₹1,80,000 offline</span>
+                  </div>
+                </div>
+                <div className="record-row-v52">
+                  <div className="record-label-v52">Estimated Tax</div>
+                  <div className="record-value-container-v52">
+                    <span className="record-main-val-v52">₹18,000</span>
+                  </div>
+                </div>
+                <div className="record-row-v52">
+                  <div className="record-label-v52">Platform Fee</div>
+                  <div className="record-value-container-v52">
+                    <span className="record-main-val-v52">₹1,800</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* March Card */}
+            <div className="month-record-card-v52">
+              <div className="record-month-name-v52">March</div>
+              <div className="record-data-grid-v52">
+                <div className="record-row-v52">
+                  <div className="record-label-v52">Total Turnover</div>
+                  <div className="record-value-container-v52">
+                    <span className="record-main-val-v52">₹2,75,000</span>
+                    <span className="turnover-split-muted-v52">₹1,10,000 platform + ₹1,65,000 offline</span>
+                  </div>
+                </div>
+                <div className="record-row-v52">
+                  <div className="record-label-v52">Estimated Tax</div>
+                  <div className="record-value-container-v52">
+                    <span className="record-main-val-v52">₹16,500</span>
+                  </div>
+                </div>
+                <div className="record-row-v52">
+                  <div className="record-label-v52">Platform Fee</div>
+                  <div className="record-value-container-v52">
+                    <span className="record-main-val-v52">₹1,800</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Total Quarter Card */}
+            <div className="month-record-card-v52 quarter-total-highlight-v52">
+              <div className="record-month-name-v52">Total (Quarter)</div>
+              <div className="record-data-grid-v52">
+                <div className="record-row-v52">
+                  <div className="record-label-v52">Total Turnover</div>
+                  <div className="record-value-container-v52">
+                    <span className="record-main-val-v52">₹8,25,000</span>
+                    <span className="turnover-split-muted-v52">₹3,30,000 platform + ₹4,95,000 offline</span>
+                  </div>
+                </div>
+                <div className="record-row-v52">
+                  <div className="record-label-v52">Estimated Tax</div>
+                  <div className="record-value-container-v52">
+                    <span className="record-main-val-v52">₹49,500</span>
+                  </div>
+                </div>
+                <div className="record-row-v52">
+                  <div className="record-label-v52">Platform Fee</div>
+                  <div className="record-value-container-v52">
+                    <span className="record-main-val-v52">₹5,400</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+      )}
+
+      {/* Compliance Documents - Only for GST Registered */}
+      {gstType !== 'non-gst' && (
+        <div className="gst-section-v52">
+        <h3 className="section-title-v52">Compliance Documents</h3>
         <div className="split-card-v52">
-          <div className="split-row-v52">
-            <label>CGST</label>
-            <span>₹17,246</span>
+          <div className="doc-category-v52" style={{ marginTop: 0 }}>
+            <div className="doc-sublabel-v52">REPORTS</div>
+            <div className="doc-grid-v52">
+              <button className="doc-btn-v52">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0077ff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                <span>GSTR-1 Data</span>
+              </button>
+              <button className="doc-btn-v52">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0077ff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                <span>GSTR-3B Summary</span>
+              </button>
+            </div>
           </div>
-          <div className="split-row-v52">
-            <label>SGST</label>
-            <span>₹17,246</span>
+
+          <div className="doc-category-v52">
+            <div className="doc-sublabel-v52">INVOICES</div>
+            <div className="doc-grid-v52">
+              <button className="doc-btn-v52">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0077ff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                <span>B2B Invoices</span>
+              </button>
+            </div>
           </div>
-          <div className="split-row-v52">
-            <label>IGST</label>
-            <span>₹42,158</span>
+
+          <div className="doc-category-v52">
+            <div className="doc-sublabel-v52">OPTIONAL</div>
+            <div className="doc-grid-v52">
+              <button className="doc-btn-v52">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0077ff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                <span>Full GST Summary</span>
+              </button>
+            </div>
           </div>
-          <div className="split-divider-v52"></div>
-          <div className="split-row-v52">
-            <label>GST Collected</label>
-            <span>₹76,651</span>
-          </div>
-          <div className="split-row-v52 success">
-            <label>ITC Available</label>
-            <span>-₹3,600</span>
-          </div>
-          <div className="split-divider-v52"></div>
-          <div className="split-row-v52 highlight">
-            <label>GST Payable</label>
-            <span className="payable-value-v52">₹73,051</span>
           </div>
         </div>
-      </div>
+      )}
 
-      {/* GST Documents */}
-      <div className="gst-section-v52">
-        <h3 className="section-title-v52">GST Documents</h3>
-        <div className="document-stack-v52">
-          <button className="doc-btn-v52">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-            <span>Download GSTR-1 Data</span>
-          </button>
-          <button className="doc-btn-v52">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-            <span>Download GSTR-3B Summary</span>
-          </button>
-          <button className="doc-btn-v52">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-            <span>Download B2B Invoices</span>
-          </button>
-          <button className="doc-btn-v52">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-            <span>Download GST Summary</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Bottom Info Section */}
-      <div className="gst-footer-info-v52">
+      {/* Bottom Info Section - Only for GST Registered */}
+      {gstType !== 'non-gst' && (
+        <div className="gst-footer-info-v52">
         <div className="footer-notice-v52 c-accountant">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
           <p>Share this report with your <strong>Chartered Accountant (CA)</strong> for final GST filing.</p>
         </div>
         <div className="footer-notice-v52 disclaimer">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-          <p>System-generated report based on your bookings. Please <strong>verify all details</strong> before filing.</p>
+          <div className="disclaimer-list-v52">
+            {gstType === 'regular' ? (
+              <>
+                <p>• This report includes platform transactions and self-reported earnings. Please verify all details before filing.</p>
+                <p>• GST reporting is based on common tax rules. Consult with your tax advisor for specific cases.</p>
+              </>
+            ) : (
+              <>
+                <p>• Tax is calculated on total turnover</p>
+                <p>• Input Tax Credit (ITC) is not applicable under composition scheme</p>
+                <p>• GST is not charged separately to customers</p>
+              </>
+            )}
+          </div>
         </div>
       </div>
+      )}
     </div>
   );
 };
@@ -1497,6 +2003,10 @@ const MobileTDSView = () => {
 
   return (
     <div className="mobile-tds-container-v53">
+      <div className="tds-header-section-v53">
+        <h2 className="tds-main-title-v53">TDS Compliance Dashboard</h2>
+        <p className="tds-main-subtitle-v53">Track your Tax Deducted at Source (TDS) and download certificates.</p>
+      </div>
       {/* Filters Section (Sticky Candidate) */}
       <div className="tds-filters-v53">
         <select value={selectedFY} onChange={e => setSelectedFY(e.target.value)} className="tds-select-v53">
@@ -1511,19 +2021,22 @@ const MobileTDSView = () => {
         </select>
       </div>
 
-      {/* Summary Cards (Stacked) */}
-      <div className="tds-summary-stack-v53">
-        <div className="tds-summary-card-v53 primary">
-          <div className="summary-label-v53">Total Net Payout</div>
-          <div className="summary-value-v53">₹2,87,100</div>
-          <div className="summary-subtext-v53">after TDS deduction</div>
+      <div className="tds-summary-grid-v53">
+        <div className="tds-summary-card-v53">
+          <div className="summary-label-v53">Total Amount Received</div>
+          <div className="summary-value-v53">₹{totalNet.toLocaleString()}</div>
+          <div className="summary-subtext-v53">(after TDS deduction)</div>
         </div>
+        
         <div className="tds-summary-card-v53">
           <div className="summary-label-v53">Total TDS Deducted</div>
-          <div className="summary-value-v53">₹2,900</div>
-          <div className="summary-subtext-v53">Deposited with Income Tax Department</div>
+          <div className="summary-value-v53 highlight-blue">₹{totalTDS.toLocaleString()}</div>
+          <div className="regulatory-info-v53">
+            0.1% TDS is deducted as per government regulations and can be claimed while filing your income tax return.
+          </div>
         </div>
       </div>
+
 
       {/* Monthly TDS Breakdown */}
       <div className="tds-section-v53">
@@ -1532,10 +2045,6 @@ const MobileTDSView = () => {
             <h3 className="section-title-v53">Monthly TDS Breakdown</h3>
             <span className="section-subtitle-v53">Q2 (Jul–Sep 2025)</span>
           </div>
-          <button className="export-btn-v53">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-            <span>Excel</span>
-          </button>
         </div>
 
         <div className="tds-month-stack-v53">
@@ -1544,15 +2053,15 @@ const MobileTDSView = () => {
               <div className="month-name-v53">{d.month} 2025</div>
               <div className="month-grid-v53">
                 <div className="grid-item-v53">
-                  <label>Earnings</label>
+                  <label>PAYOUT AMOUNT (BEFORE TDS)</label>
                   <span>₹{d.earnings.toLocaleString()}</span>
                 </div>
                 <div className="grid-item-v53">
-                  <label>TDS</label>
+                  <label>TDS DEDUCTED</label>
                   <span>₹{d.tds.toLocaleString()}</span>
                 </div>
                 <div className="grid-item-v53 highlight">
-                  <label>Net Received</label>
+                  <label>NET RECEIVED</label>
                   <span className="net-val-v53">₹{d.net.toLocaleString()}</span>
                 </div>
               </div>
@@ -1561,18 +2070,18 @@ const MobileTDSView = () => {
 
           {/* Total Row */}
           <div className="tds-total-card-v53">
-            <div className="total-label-v53">Quarter Total</div>
+            <div className="total-label-v53">Total</div>
             <div className="month-grid-v53">
               <div className="grid-item-v53">
-                <label>Total Earnings</label>
+                <label>PAYOUT AMOUNT (BEFORE TDS)</label>
                 <span>₹{totalEarnings.toLocaleString()}</span>
               </div>
               <div className="grid-item-v53">
-                <label>Total TDS</label>
+                <label>TDS DEDUCTED</label>
                 <span>₹{totalTDS.toLocaleString()}</span>
               </div>
               <div className="grid-item-v53 highlight">
-                <label>Net Received</label>
+                <label>NET RECEIVED</label>
                 <span className="net-val-v53">₹{totalNet.toLocaleString()}</span>
               </div>
             </div>
@@ -1585,31 +2094,33 @@ const MobileTDSView = () => {
 
       {/* TDS Certificate Section */}
       <div className="tds-section-v53 certificate-bg">
-        <div className="cert-header-v53">
-          <div className="title-group-v53">
+        <div className="cert-header-section-v53">
+          <div className="cert-title-row-v53">
             <h3 className="section-title-v53">Your TDS Certificate (Form 16A)</h3>
-            <span className="cert-status-badge-v53">Available</span>
+            <span className="cert-status-badge-new-v53">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              Available
+            </span>
           </div>
+          <span className="cert-quarter-sub-v53">Quarter: Q2 (Jul – Sep 2025)</span>
         </div>
-        <div className="cert-details-v53">
-          <div className="cert-detail-row-v53">
-            <label>Quarter</label>
-            <span>Q2 (Jul–Sep 2025)</span>
-          </div>
-          <div className="cert-detail-row-v53">
-            <label>Issued on</label>
-            <span>15 Nov 2025</span>
-          </div>
-        </div>
-        <p className="cert-info-v53">
-          Your TDS certificate for the selected period is ready for download.
+
+        <p className="cert-main-desc-v53">
+          Use this certificate to claim your TDS while filing your income tax return (ITR).
         </p>
+
+        <div className="cert-info-box-v53">
+          <div className="cert-issue-date-v53">ISSUED ON: 15 NOV 2025</div>
+          <div className="cert-includes-text-v53">Includes all TDS deducted for Jul – Sep 2025</div>
+        </div>
+
         <button className="primary-doc-btn-v53">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-          Download Certificate (Form 16A)
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          Download Form 16A
         </button>
+
         <p className="cert-helper-v53">
-          This certificate will also reflect in Form 26AS.
+          This certificate will also reflect in your Form 26AS
         </p>
       </div>
     </div>
@@ -3286,7 +3797,7 @@ const MobileSettingsView = ({ profileData, setIsChangingPassword, setSecurityCon
               <span className="plan-label-v70">CURRENT ACTIVE PLAN</span>
               <span className="plan-badge-v70">ACTIVE</span>
             </div>
-            
+
             <div className="plan-main-v70">
               <div className="plan-title-wrapper-v70">
                 <h2 className="plan-name-v70">Growth Plan</h2>
@@ -3329,7 +3840,7 @@ const MobileSettingsView = ({ profileData, setIsChangingPassword, setSecurityCon
                   </div>
                   <span className="card-amount-v70">{invoice.amount}</span>
                 </div>
-                
+
                 <div className="card-middle-row-v70">
                   <div className="card-plan-info-v70">
                     <span className="card-plan-name-v70">{invoice.plan}</span>
@@ -3437,7 +3948,7 @@ const MobileSettingsView = ({ profileData, setIsChangingPassword, setSecurityCon
               {plans.map((plan) => (
                 <div key={plan.id} className={`plan-grid-card-v71 theme-${plan.type}-v71`}>
                   {plan.badge && <span className="plan-modal-badge-v71">{plan.badge}</span>}
-                  
+
                   <div className="plan-grid-sparkles-v71">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" opacity="0.4"><path d="M12 1L14.39 8.26L22 9.27L16.5 14.14L18.18 21.02L12 17.77L5.82 21.02L7.5 14.14L2 9.27L9.61 8.26L12 1Z"></path></svg>
                     <svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor" opacity="0.3"><path d="M12 1L14.39 8.26L22 9.27L16.5 14.14L18.18 21.02L12 17.77L5.82 21.02L7.5 14.14L2 9.27L9.61 8.26L12 1Z"></path></svg>
@@ -3459,7 +3970,7 @@ const MobileSettingsView = ({ profileData, setIsChangingPassword, setSecurityCon
                     </div>
                   </div>
 
-                  <button 
+                  <button
                     className={`plan-switch-btn-v71 ${plan.isCurrent ? 'current-plan-v71' : ''}`}
                     disabled={plan.isCurrent}
                   >
@@ -4048,8 +4559,6 @@ const MobileServiceSettingsView = ({
   const [isEditing, setIsEditing] = useState(false);
   const [selectedStyles, setSelectedStyles] = useState(['Buffet']);
   const [menuFilter, setMenuFilter] = useState('All');
-  const [stopAcceptValue, setStopAcceptValue] = useState(2);
-  const [stopAcceptUnit, setStopAcceptUnit] = useState('Hours');
   const [manageBookingsCount, setManageBookingsCount] = useState(1);
 
   const toggleStyle = (style: string) => {
@@ -4110,6 +4619,20 @@ const MobileServiceSettingsView = ({
 
           <div className="card-subsection-v54">
             <h4 className="card-subtitle-v54">Timing & Bookings</h4>
+            
+            <div className="service-notice-box-v54">
+              <div className="notice-icon-v54">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="16" x2="12" y2="12"></line>
+                  <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+              </div>
+              <div className="notice-text-v54">
+                <strong>Note:</strong> Customers can book this service at least 4 days in advance, due to refund policy & Preparing time.
+              </div>
+            </div>
+
             <div className="form-grid-v54">
               <div className="form-group-v54">
                 <label>Start Time</label>
@@ -4120,7 +4643,7 @@ const MobileServiceSettingsView = ({
                 <input type="time" defaultValue="11:00" disabled={!isEditing} />
               </div>
               <div className="form-group-v54 full">
-                <label>Manage Bookings</label>
+                <label>Booking Capacity</label>
                 <input
                   type="number"
                   min="1"
@@ -4129,33 +4652,8 @@ const MobileServiceSettingsView = ({
                   disabled={!isEditing}
                 />
               </div>
-              <div className="form-group-v54 full inline">
-                <label>Stop accepting orders</label>
-                <div className="input-group-row-v54">
-                  <select
-                    value={stopAcceptValue}
-                    onChange={(e) => setStopAcceptValue(Number(e.target.value))}
-                    disabled={!isEditing}
-                  >
-                    {Array.from({ length: stopAcceptUnit === 'Hours' ? 24 : 30 }, (_, i) => i + 1).map(v => (
-                      <option key={v} value={v}>{v}</option>
-                    ))}
-                  </select>
-                  <select
-                    value={stopAcceptUnit}
-                    onChange={(e) => {
-                      setStopAcceptUnit(e.target.value);
-                      if (e.target.value === 'Hours' && stopAcceptValue > 24) setStopAcceptValue(24);
-                    }}
-                    disabled={!isEditing}
-                  >
-                    <option value="Hours">Hours</option>
-                    <option value="Days">Days</option>
-                  </select>
-                </div>
               </div>
             </div>
-          </div>
 
           <div className="card-divider-v54"></div>
 
@@ -4219,6 +4717,8 @@ const MobileServiceSettingsView = ({
                 className={`filter-chip-v54 ${menuFilter === f ? 'active' : ''}`}
                 onClick={() => setMenuFilter(f)}
               >
+                {f === 'Veg' && <span className="dot-v54 veg"></span>}
+                {f === 'Non-Veg' && <span className="dot-v54 nonveg"></span>}
                 {f}
               </button>
             ))}
@@ -4227,48 +4727,69 @@ const MobileServiceSettingsView = ({
           <div className="menu-item-stack-v54">
             {filteredMenus.map((item: any) => (
               <div key={item.id} className="menu-item-card-v54">
-                <div className="item-image-box-v54">
+                {/* Header Image with Overlays */}
+                <div className="item-image-header-v54">
                   {item.image ? (
-                    <img src={item.image} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }} />
+                    <img src={item.image} alt={item.name} className="header-img-v54" />
                   ) : (
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                    <div className="placeholder-img-v54">
+                      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                    </div>
                   )}
-                </div>
-                <div className="item-info-v54">
-                  <h4 className="item-title-v54">{item.name}</h4>
-                  <div className="item-tag-row-v54">
-                    <span className={`type-tag-v54 ${item.dietType?.toLowerCase() === 'veg' ? 'veg' : 'nonveg'}`}>
-                      <span className="type-icon-v54">▣</span>
-                      {item.dietType}
-                    </span>
-                    <span className="active-tag-v54">{item.status || 'Active'}</span>
+                  
+                  {/* Status Badge */}
+                  <div className="live-status-badge-v54">LIVE</div>
+
+                  {/* Top Right Action Buttons */}
+                  <div className="header-actions-v54">
+                    <button className="header-action-btn-v54" onClick={() => {
+                      setMenuIdentity({
+                        name: item.name,
+                        price: item.price.toString(),
+                        minMembers: item.minMembers || '',
+                        maxMembers: item.maxMembers || '',
+                        dietType: item.dietType,
+                        image: item.image
+                      });
+                      setSections(item.sections || []);
+                      setMenuEditingId(item.id);
+                      setMenuStep(1);
+                      setIsAddingMenu(true);
+                    }}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
+                    </button>
+                    <button className="header-action-btn-v54 settings" onClick={() => {
+                      // Placeholder for settings/extra options
+                      console.log('Settings clicked for', item.id);
+                    }}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                    </button>
                   </div>
-                  <div className="item-price-v54">₹{item.price}</div>
                 </div>
-                <div className="item-actions-v54">
-                  <button className="item-action-icon-v54 btn-edit" onClick={() => {
-                    setMenuIdentity({
-                      name: item.name,
-                      price: item.price.toString(),
-                      minMembers: item.minMembers || '',
-                      maxMembers: item.maxMembers || '',
-                      dietType: item.dietType,
-                      image: item.image
-                    });
-                    setSections(item.sections || []);
-                    setMenuEditingId(item.id);
-                    setMenuStep(1);
-                    setIsAddingMenu(true);
-                  }}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                  </button>
-                  <button className="item-action-icon-v54 btn-settings" onClick={() => {
-                    if (confirm('Are you sure you want to delete this menu?')) {
-                      setMenus((prev: any[]) => prev.filter((m: any) => m.id !== item.id));
-                    }
-                  }}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                  </button>
+
+                {/* Content Section */}
+                <div className="item-content-body-v54">
+                  <h3 className="item-title-v54-new">{item.name}</h3>
+                  <div className="item-meta-row-v54">
+                    <div className="guest-capacity-v54">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                      <span>min {item.minMembers || '20'} - max {item.maxMembers || '100'}</span>
+                    </div>
+                    <span className={`diet-badge-v54 ${item.dietType?.toLowerCase() || 'veg'}`}>
+                      <span className="dot">▣</span>
+                      {item.dietType || 'Veg'}
+                    </span>
+                  </div>
+
+                  <div className="item-divider-v54"></div>
+
+                  {/* Price Box */}
+                  <div className="item-price-card-v54">
+                    <label>Starting</label>
+                    <div className="price-value-v54">
+                      ₹{item.price} <span>/ Person</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             ))}

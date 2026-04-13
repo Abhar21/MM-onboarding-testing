@@ -7625,9 +7625,9 @@ input:checked+.service-slider:before {
 }
 
 .input-field:disabled {
-  background-color: #f8fafc;
-  cursor: not-allowed;
-  color: #64748b;
+  background-color: #f1f5f9;
+  cursor: default;
+  color: #94a3b8;
 }
 
 /* Account Edit Modal */
@@ -22173,13 +22173,12 @@ input:checked+.slider-v4:before {
 
 /* Unified UI - Disabled Input Styles for View Mode */
 .input-field:disabled {
-  background-color: #f8fafc !important;
-  color: #1e293b !important;
+  background-color: #f1f5f9 !important;
+  color: #94a3b8 !important;
   cursor: default !important;
-  border-color: #e2e8f0 !important;
+  border-color: #f1f5f9 !important;
   opacity: 1 !important;
-  -webkit-text-fill-color: #1e293b !important;
-  /* For Safari/iOS */
+  -webkit-text-fill-color: #94a3b8 !important; /* For Safari/iOS */
 }
 
 .input-helper-v4 {
