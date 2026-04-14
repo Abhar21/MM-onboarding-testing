@@ -1,6 +1,8 @@
 /* MobileDashboard.tsx - Isolated components for Mobile Devices */
 import React, { useState, useEffect, useRef } from 'react';
 import './MobileDashboard.css';
+import ManageMembershipModal from './ManageMembership';
+import MembershipStatusBanner from './MembershipStatusBanner';
 
 /* ─────────────────── MOBILE INTERFACES ─────────────────── */
 
@@ -443,7 +445,7 @@ const MobileBookingDetailView = ({
 
             return (
               <div className="financial-breakdown-v30 mobile-version">
-                <div className="section-header-row-v30" style={{ marginBottom: '16px' }}>
+                <div className="section-header-row-v30" style={{ marginBottom: '8px' }}>
                   <h3 className="section-title-v50 small" style={{ margin: 0 }}>Payment Summary</h3>
                   <button
                     className="calculation-toggle-btn-v30"
@@ -538,13 +540,13 @@ const MobileBookingDetailView = ({
                 )}
 
                 {/* Step 4: Final Payout */}
-                <div className="section-label-v30" style={{ marginTop: '24px' }}>Final Settlement</div>
+                <div className="section-label-v30" style={{ marginTop: '0px' }}>Final Settlement</div>
                 <div className="breakdown-row-v30 payout-row">
                   <label style={{ fontWeight: 600 }}>You Receive (Payout)</label>
                   <span style={{ color: '#10b981', fontSize: '1.2rem' }}>₹{vendorPayout.toLocaleString()}</span>
                 </div>
                 
-                <div className="breakdown-note-v30 payout-timing-note-v30" style={{ marginTop: '12px', marginBottom: '16px' }}>
+                <div className="breakdown-note-v30 payout-timing-note-v30" style={{ marginTop: '4px' }}>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
                   <span>Payout between 18–20 May (12–48 hrs before event)</span>
                 </div>
@@ -2204,6 +2206,10 @@ interface MobileDashboardProps {
   profileData: ProfileData;
   navigationGroups: NavigationGroup[];
   onLogout: () => void;
+  membershipStatus: any;
+  setMembershipStatus: any;
+  isBannerDismissed: boolean;
+  setIsBannerDismissed: (val: boolean) => void;
   // Menu Creation Props
   isAddingMenu: boolean;
   setIsAddingMenu: (val: boolean) => void;
@@ -3641,10 +3647,30 @@ const MobileChangePasswordView = ({ onClose }: { onClose: () => void }) => {
 
 /* ─────────────────── MOBILE SETTINGS VIEW (v64) ─────────────────── */
 
-const MobileSettingsView = ({ profileData, setIsChangingPassword, setSecurityConfirmModal }: { profileData: any, setIsChangingPassword: (v: boolean) => void, setSecurityConfirmModal: (type: 'logout-all' | 'remove-device' | null) => void }) => {
+const MobileSettingsView = ({ 
+  profileData, 
+  setIsChangingPassword, 
+  setSecurityConfirmModal,
+  membershipStatus,
+  setMembershipStatus,
+  isBannerDismissed,
+  setIsBannerDismissed,
+  isManageModalOpen,
+  setIsManageModalOpen
+}: { 
+  profileData: any, 
+  setIsChangingPassword: (v: boolean) => void, 
+  setSecurityConfirmModal: (type: 'logout-all' | 'remove-device' | null) => void,
+  membershipStatus: any,
+  setMembershipStatus: any,
+  isBannerDismissed: boolean,
+  setIsBannerDismissed: (val: boolean) => void,
+  isManageModalOpen: boolean,
+  setIsManageModalOpen: (val: boolean) => void
+}) => {
   const [activeSubTab, setActiveSubTab] = useState('Account');
   const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
-  const subTabs = ['Account', 'Documents', 'Subscription', 'Security', 'Danger'];
+  const subTabs = ['Account', 'Documents', 'myMembership', 'Security', 'Danger'];
 
   const renderAccountSettings = () => (
     <div className="settings-account-tab-v64">
@@ -3810,8 +3836,13 @@ const MobileSettingsView = ({ profileData, setIsChangingPassword, setSecurityCon
       <div className="subscription-tab-v70">
         <div className="plan-section-v70">
           <div className="subscription-header-row-v70">
-            <h3 className="settings-section-title-v64">Subscription Plan</h3>
-            <button className="manage-subscription-btn-v70">Manage Subscription</button>
+            <h3 className="settings-section-title-v64">myMembership Plan</h3>
+            <button 
+              className="manage-subscription-btn-v70"
+              onClick={() => setIsManageModalOpen(true)}
+            >
+              Manage myMembership
+            </button>
           </div>
           <div className="plan-card-v70">
             <div className="plan-sparkles-v70">
@@ -3962,7 +3993,7 @@ const MobileSettingsView = ({ profileData, setIsChangingPassword, setSecurityCon
       <div className="plan-modal-overlay-v71">
         <div className="plan-modal-container-v71 mobile-scroller-v50">
           <div className="plan-modal-header-v71">
-            <h3>Choose Subscription Plan</h3>
+            <h3>Choose myMembership Plan</h3>
             <button className="plan-modal-close-v71" onClick={() => setIsPlanModalOpen(false)}>
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
@@ -4024,10 +4055,18 @@ const MobileSettingsView = ({ profileData, setIsChangingPassword, setSecurityCon
 
   return (
     <div className="mobile-settings-view-v64 mobile-scroller-v50">
+      {activeSubTab === 'myMembership' && !isBannerDismissed && (
+        <MembershipStatusBanner 
+          status={membershipStatus} 
+          isDashboard={true}
+          onAction={() => setIsManageModalOpen(true)}
+          onDismiss={() => setIsBannerDismissed(true)}
+        />
+      )}
       {renderPlanModal()}
       <div className="settings-header-v64">
         <h2>Settings</h2>
-        <p>Manage your account preferences, subscription, and security.</p>
+        <p>Manage your account preferences, myMembership, and security.</p>
       </div>
 
       <div className="profile-tabs-nav-v60 settings-tabs-v64 border-bottom-v64">
@@ -4046,9 +4085,19 @@ const MobileSettingsView = ({ profileData, setIsChangingPassword, setSecurityCon
         {activeSubTab === 'Account' && renderAccountSettings()}
         {activeSubTab === 'Documents' && renderDocumentsSettings()}
         {activeSubTab === 'Security' && renderSecuritySettings(setIsChangingPassword, setSecurityConfirmModal)}
-        {activeSubTab === 'Subscription' && renderSubscriptionSettings()}
+        {activeSubTab === 'myMembership' && renderSubscriptionSettings()}
+        <ManageMembershipModal
+          isOpen={isManageModalOpen}
+          onClose={() => setIsManageModalOpen(false)}
+          status={membershipStatus}
+          setStatus={setMembershipStatus}
+          onUpgrade={() => {
+            setIsManageModalOpen(false);
+            setIsPlanModalOpen(true);
+          }}
+        />
         {activeSubTab === 'Danger' && renderDangerZone()}
-        {activeSubTab !== 'Account' && activeSubTab !== 'Documents' && activeSubTab !== 'Security' && activeSubTab !== 'Subscription' && activeSubTab !== 'Danger' && (
+        {activeSubTab !== 'Account' && activeSubTab !== 'Documents' && activeSubTab !== 'Security' && activeSubTab !== 'myMembership' && activeSubTab !== 'Danger' && (
           <div className="settings-placeholder-v64">
             <div className="placeholder-icon-v64">⚙️</div>
             <h4>{activeSubTab} coming soon</h4>
@@ -4839,6 +4888,10 @@ const MobileDashboard = (props: MobileDashboardProps) => {
     profileData,
     navigationGroups,
     onLogout,
+    membershipStatus,
+    setMembershipStatus,
+    isBannerDismissed,
+    setIsBannerDismissed,
     isAddingMenu,
     setIsAddingMenu,
     menuStep,
@@ -4869,6 +4922,7 @@ const MobileDashboard = (props: MobileDashboardProps) => {
   const [isAddingBank, setIsAddingBank] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [securityConfirmModal, setSecurityConfirmModal] = useState<'logout-all' | 'remove-device' | null>(null);
+  const [isManageModalOpen, setIsManageModalOpen] = useState(false);
   const [coupons, setCoupons] = useState<Coupon[]>([
     { id: '1', code: 'WELCOME10', type: 'Percentage', value: '10%', status: 'Active', usage: '45/100', validFrom: '2026-03-01', validTo: '2026-03-31', maxCap: '500', minAmount: '1000', source: 'vendor', applicability: 'orders', scope: 'all', perUserLimit: '1' },
     { id: '2', code: 'FLAT500', type: 'Flat Amount', value: '₹500', status: 'Paused', usage: '12/50', validFrom: '2026-03-20', validTo: '2026-04-15', minAmount: '2000', source: 'vendor', applicability: 'orders', maxCap: '0', scope: 'all', perUserLimit: '1' },
@@ -4880,6 +4934,25 @@ const MobileDashboard = (props: MobileDashboardProps) => {
   useEffect(() => {
     setIsDrawerOpen(false);
   }, [activeTab]);
+
+  const renderBannerOnHome = () => {
+    if (activeTab === 'dashboard' && !isBannerDismissed && (membershipStatus === 'paused' || membershipStatus === 'cancelled_active')) {
+      return (
+        <div style={{ padding: '0 16px 12px 16px' }}>
+          <MembershipStatusBanner 
+            status={membershipStatus} 
+            isDashboard={true}
+            onAction={() => {
+              setActiveTab('settings');
+              setIsManageModalOpen(true);
+            }}
+            onDismiss={() => setIsBannerDismissed(true)}
+          />
+        </div>
+      );
+    }
+    return null;
+  };
 
   return (
     <div className="mobile-dashboard-wrapper-v50">
@@ -4902,6 +4975,8 @@ const MobileDashboard = (props: MobileDashboardProps) => {
           </div>
         </div>
       </div>
+
+      {renderBannerOnHome()}
 
       {/* Main View Area */}
       {activeTab === 'dashboard' ? (
@@ -4934,7 +5009,17 @@ const MobileDashboard = (props: MobileDashboardProps) => {
           setMenuStep={setMenuStep}
         />
       ) : activeTab === 'settings' ? (
-        <MobileSettingsView profileData={profileData} setIsChangingPassword={setIsChangingPassword} setSecurityConfirmModal={setSecurityConfirmModal} />
+        <MobileSettingsView 
+          profileData={profileData} 
+          setIsChangingPassword={setIsChangingPassword} 
+          setSecurityConfirmModal={setSecurityConfirmModal}
+          membershipStatus={membershipStatus}
+          setMembershipStatus={setMembershipStatus}
+          isBannerDismissed={isBannerDismissed}
+          setIsBannerDismissed={setIsBannerDismissed}
+          isManageModalOpen={isManageModalOpen}
+          setIsManageModalOpen={setIsManageModalOpen}
+        />
       ) : activeTab === 'profile' ? (
         <MobileProfileView
           profileData={profileData}

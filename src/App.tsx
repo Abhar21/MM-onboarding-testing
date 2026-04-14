@@ -2,6 +2,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Routes, Route, useNavigate, Navigate, Link } from 'react-router-dom';
 import MobileDashboard from './MobileDashboard';
+import ManageMembershipModal from './ManageMembership';
+import MembershipStatusBanner from './MembershipStatusBanner';
 import GSTCompliance from './GSTCompliance';
 import './MobileDashboard.css';
 import './App.css';
@@ -1501,10 +1503,10 @@ const Coupons = () => {
                   <div className="applied-badges-container-v7">
                     {/* Merge Platform + Subscription, but remove Platform for Orders */}
                     {coupon.source === 'platform' && coupon.applicability === 'subscription' ? (
-                      <span className="platform-subs-merged-badge-v8">Platform Subscription</span>
+                      <span className="platform-subs-merged-badge-v8">Platform myMembership</span>
                     ) : (
                       <span className={`applicability-badge-v7 ${coupon.applicability || 'orders'}`}>
-                        {coupon.applicability === 'subscription' ? 'Subscription' : 'Orders'}
+                        {coupon.applicability === 'subscription' ? 'myMembership' : 'Orders'}
                       </span>
                     )}
                   </div>
@@ -1563,16 +1565,25 @@ const Settings = ({
   setShowAccountEditModal,
   setNewEditValue,
   setEditStep,
-  setEditOtp
+  setEditOtp,
+  membershipStatus,
+  setMembershipStatus,
+  isBannerDismissed,
+  setIsBannerDismissed
 }: {
   profileForm: any,
   setShowAccountEditModal: (val: 'Mobile' | 'Email' | null) => void,
   setNewEditValue: (val: string) => void,
   setEditStep: (val: number) => void,
-  setEditOtp: (val: string) => void
+  setEditOtp: (val: string) => void,
+  membershipStatus: 'active' | 'paused' | 'cancelled_active' | 'cancelled_expired',
+  setMembershipStatus: (val: any) => void,
+  isBannerDismissed: boolean,
+  setIsBannerDismissed: (val: boolean) => void
 }) => {
   const [activeTab, setActiveTab] = useState('account');
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
+  const [showManageMembership, setShowManageMembership] = useState(false);
 
   // Change Password State
   const [showPasswordModal, setShowPasswordModal] = useState(false);
@@ -1673,7 +1684,7 @@ const Settings = ({
   const tabs = [
     { id: 'account', label: 'Account' },
     { id: 'documents', label: 'Documents' },
-    { id: 'subscription', label: 'Subscription' },
+    { id: 'subscription', label: 'myMembership' },
     { id: 'security', label: 'Security' },
     { id: 'danger', label: 'Danger Zone' },
   ];
@@ -1718,6 +1729,14 @@ const Settings = ({
 
   return (
     <div className="settings-container-v4">
+      {activeTab === 'subscription' && !isBannerDismissed && (
+        <MembershipStatusBanner 
+          status={membershipStatus} 
+          isDashboard={true}
+          onAction={() => setShowManageMembership(true)}
+          onDismiss={() => setIsBannerDismissed(true)}
+        />
+      )}
       <div className="section-header">
         <h2 className="section-title">Settings</h2>
         <p className="section-subtitle">Manage your account preferences, subscription, and security.</p>
@@ -1802,8 +1821,13 @@ const Settings = ({
           {activeTab === 'subscription' && (
             <div className="settings-pane-v4">
               <div className="subscription-header-row-v4">
-                <h3 className="pane-title">Subscription Plan</h3>
-                <button className="manage-subscription-btn-v4">Manage Subscription</button>
+                <h3 className="pane-title">myMembership Plan</h3>
+                <button 
+                  className="manage-subscription-btn-v4"
+                  onClick={() => setShowManageMembership(true)}
+                >
+                  Manage myMembership
+                </button>
               </div>
 
               <div className="active-plan-container-v4 main-display-v4 growth-premium">
@@ -1860,6 +1884,17 @@ const Settings = ({
                 }}
               />
 
+              <ManageMembershipModal 
+                isOpen={showManageMembership}
+                onClose={() => setShowManageMembership(false)}
+                status={membershipStatus}
+                setStatus={setMembershipStatus}
+                onUpgrade={() => {
+                  setShowManageMembership(false);
+                  setShowSubscriptionModal(true);
+                }}
+              />
+
               <CheckoutModal
                 isOpen={showCheckoutModal}
                 plan={checkoutPlan}
@@ -1898,7 +1933,7 @@ const Settings = ({
                             <span>Auto-renew ON April 01, 2026</span>
                           </div>
                           <div className="info-card-body-v4">
-                            <p>Your subscription will renew automatically.</p>
+                            <p>Your myMembership will renew automatically.</p>
                           </div>
                         </div>
                       )}
@@ -1950,7 +1985,7 @@ const Settings = ({
                       <line x1="12" y1="9" x2="12" y2="13"></line>
                       <line x1="12" y1="17" x2="12.01" y2="17"></line>
                     </svg>
-                    <span>Your subscription is expiring in 3 days. Renew now to avoid interruption.</span>
+                    <span>Your myMembership is expiring in 3 days. Renew now to avoid interruption.</span>
                   </div>
                   <button className="alert-btn-v4" onClick={() => setAutoRenew(true)}>Renew Now</button>
                 </div>
@@ -2547,7 +2582,7 @@ const Settings = ({
                       style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc', fontSize: '0.9rem', color: '#1e293b' }}
                     >
                       <option value="">Select a reason</option>
-                      <option value="expensive">Subscription is too expensive</option>
+                      <option value="expensive">myMembership is too expensive</option>
                       <option value="features">Missing features I need</option>
                       <option value="ui">UI is difficult to use</option>
                       <option value="business">Closing my business</option>
@@ -5542,7 +5577,7 @@ const BookingDetailModal = ({
 
               return (
                 <div className="financial-breakdown-v30">
-                  <div className="section-header-row-v30" style={{ marginBottom: '16px' }}>
+                  <div className="section-header-row-v30" style={{ marginBottom: '8px' }}>
                     <h4 className="section-title-v7" style={{ margin: 0 }}>PAYMENT SUMMARY</h4>
                     <button
                       className="calculation-toggle-btn-v30"
@@ -5637,13 +5672,13 @@ const BookingDetailModal = ({
                   )}
 
                   {/* Step 4: Final Payout */}
-                  <div className="section-label-v30" style={{ marginTop: '24px' }}>Final Settlement</div>
+                  <div className="section-label-v30" style={{ marginTop: '0px' }}>Final Settlement</div>
                   <div className="breakdown-row-v30">
                     <label style={{ fontWeight: 600 }}>You Receive (Payout)</label>
                     <span style={{ color: '#10b981', fontSize: '1.2rem' }}>₹{vendorPayout.toLocaleString()}</span>
                   </div>
 
-                  <div className="breakdown-note-v30 payout-timing-note-v30" style={{ marginTop: '12px' }}>
+                  <div className="breakdown-note-v30 payout-timing-note-v30" style={{ marginTop: '4px' }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
                     <span>Payout between 18–20 May (12–48 hrs before event)</span>
                   </div>
@@ -7094,7 +7129,19 @@ const HomeView = ({ setActiveTab }: { setActiveTab: (tab: string) => void }) => 
 };
 
 /* ─────────────────── DASHBOARD ─────────────────── */
-const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
+const Dashboard = ({ 
+  navigate, 
+  membershipStatus, 
+  setMembershipStatus, 
+  isBannerDismissed, 
+  setIsBannerDismissed 
+}: { 
+  navigate: (val: string) => void,
+  membershipStatus: any,
+  setMembershipStatus: any,
+  isBannerDismissed: any,
+  setIsBannerDismissed: any
+}) => {
   const isMobile = useIsMobile();
 
   // Menu Creation Shared State (Internal to Dashboard)
@@ -7290,6 +7337,23 @@ const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
 
   const [activeTab, setActiveTab] = useState('dashboard');
 
+  const renderBannerOnDashboard = () => {
+    if (activeTab === 'dashboard' && !isBannerDismissed && (membershipStatus === 'paused' || membershipStatus === 'cancelled_active')) {
+      return (
+        <MembershipStatusBanner 
+          status={membershipStatus} 
+          isDashboard={true}
+          onAction={() => {
+            setActiveTab('settings');
+            // We should ideally open the modal too, but shifting to settings is a good first step
+          }}
+          onDismiss={() => setIsBannerDismissed(true)}
+        />
+      );
+    }
+    return null;
+  };
+
   const navigationGroups = [
     {
       title: 'Business',
@@ -7400,6 +7464,10 @@ const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
         profileData={profileData}
         navigationGroups={navigationGroups}
         onLogout={() => navigate('/login')}
+        membershipStatus={membershipStatus}
+        setMembershipStatus={setMembershipStatus}
+        isBannerDismissed={isBannerDismissed}
+        setIsBannerDismissed={setIsBannerDismissed}
         // Menu Creation Props
         isAddingMenu={isAddingMenu}
         setIsAddingMenu={setIsAddingMenu}
@@ -7468,7 +7536,8 @@ const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
         </div>
       </aside>
       <main className="dashboard-main">
-        <div className="dashboard-content no-header">
+        {renderBannerOnDashboard()}
+        <div className="dashboard-content">
           {activeTab === 'dashboard' && <HomeView setActiveTab={setActiveTab} />}
           {activeTab === 'tickets' && <Tickets />}
           {activeTab === 'service-settings' && (
@@ -7523,6 +7592,10 @@ const Dashboard = ({ navigate }: { navigate: (val: string) => void }) => {
               setNewEditValue={setNewFieldValue}
               setEditStep={setEditStep}
               setEditOtp={setEditOtp}
+              membershipStatus={membershipStatus}
+              setMembershipStatus={setMembershipStatus}
+              isBannerDismissed={isBannerDismissed}
+              setIsBannerDismissed={setIsBannerDismissed}
             />
           )}
           {activeTab === 'coupons' && <Coupons />}
@@ -7683,7 +7756,7 @@ const CheckoutModal = ({ isOpen, plan, onClose }: { isOpen: boolean, plan: any, 
               <div className="subtle-sparkle-v5">✨</div>
             </div>
             <div className="subscription-note-v5">
-              <span>Note:</span> This payment will reflect after current subscription is completed
+              <span>Note:</span> This payment will reflect after current myMembership is completed
             </div>
 
             {/* 2. Coupon Section */}
@@ -7909,7 +7982,7 @@ const SubscriptionPlanModal = ({ isOpen, onClose, onSelectPlan }: { isOpen: bool
     <div className="modal-overlay-v4" onClick={onClose}>
       <div className="modal-content-v4 subscription-modal-v4" onClick={e => e.stopPropagation()}>
         <div className="modal-header-v4">
-          <h3>Choose Subscription Plan</h3>
+          <h3>Choose myMembership Plan</h3>
           <button className="modal-close-v4" onClick={onClose}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -8301,6 +8374,8 @@ function App() {
   // Password visibility toggles for onboarding Step 1
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [membershipStatus, setMembershipStatus] = useState<'active' | 'paused' | 'cancelled_active' | 'cancelled_expired'>('active');
+  const [isBannerDismissed, setIsBannerDismissed] = useState(false);
 
   // Screen & Step State
   const [currentScreen, setCurrentScreen] = useState<'login' | 'signup' | 'onboarding' | 'success' | 'dashboard'>(() => {
@@ -8467,7 +8542,15 @@ function App() {
       <Route path="/login" element={<LoginPage loginId={loginId} setLoginId={setLoginId} loginPassword={loginPassword} setLoginPassword={setLoginPassword} showLoginPassword={showLoginPassword} setShowLoginPassword={setShowLoginPassword} navigate={navigate} setCurrentScreen={setCurrentScreen} />} />
       <Route path="/signup" element={<SignupPage mobile={mobile} handleMobileChange={handleMobileChange} handleSendOtp={handleSendOtp} isTimerActive={isTimerActive} timer={timer} hasSentOtp={hasSentOtp} otp={otp} setOtp={setOtp} navigate={navigate} />} />
       <Route path="/onboarding" element={<OnboardingPage currentStep={currentStep} formData={formData} handleInputChange={handleInputChange} handleFileChange={handleFileChange} handleRemoveFile={handleRemoveFile} prevStep={prevStep} nextStep={nextStep} submitFinal={submitFinal} navigate={navigate} setCurrentScreen={setCurrentScreen} showPassword={showPassword} setShowPassword={setShowPassword} showConfirmPassword={showConfirmPassword} setShowConfirmPassword={setShowConfirmPassword} />} />
-      <Route path="/dashboard" element={<Dashboard navigate={navigate} />} />
+      <Route path="/dashboard" element={
+        <Dashboard 
+          navigate={navigate} 
+          membershipStatus={membershipStatus}
+          setMembershipStatus={setMembershipStatus}
+          isBannerDismissed={isBannerDismissed}
+          setIsBannerDismissed={setIsBannerDismissed}
+        />
+      } />
       <Route path="/success" element={<SuccessPage onBackToHome={() => { navigate('/login'); setCurrentStep(1); setIsTimerActive(false); setTimer(59); setHasSentOtp(false); }} />} />
     </Routes>
   );
