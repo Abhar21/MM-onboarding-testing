@@ -1305,11 +1305,37 @@
   color: #ffffff;
 }
 
+.incl-gst-bottom-v30 {
+  font-size: 0.7rem;
+  opacity: 0.8;
+  font-weight: 500;
+  margin-top: 0px;
+  margin-bottom: 4px;
+  color: #ffffff;
+}
+
 .earnings-helper-v30 {
   font-size: 0.65rem;
   color: #64748b;
   font-weight: 500;
   margin-top: 2px;
+}
+
+.gst-helper-text-v30 {
+  font-size: 0.65rem;
+  color: #64748b;
+  margin-top: 2px;
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+.gst-helper-text-v30.mobile-payout {
+  margin-bottom: 12px;
+}
+
+.total-earnings-card-v30.mobile .gst-helper-text-v30 {
+  color: #64748b;
+  margin-bottom: 0;
 }
 
 .payout-badge-v30 {
@@ -7522,6 +7548,29 @@
   font-weight: 800;
   color: #1e293b;
   margin-bottom: 20px;
+}
+
+.subscription-header-row-v70 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.subscription-header-row-v70 .settings-section-title-v64 {
+  margin-bottom: 0;
+}
+
+.manage-subscription-btn-v70 {
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #475569;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
 
 .settings-field-row-v64 {

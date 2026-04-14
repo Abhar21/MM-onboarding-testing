@@ -1801,7 +1801,10 @@ const Settings = ({
 
           {activeTab === 'subscription' && (
             <div className="settings-pane-v4">
-              <h3 className="pane-title">Subscription Plan</h3>
+              <div className="subscription-header-row-v4">
+                <h3 className="pane-title">Subscription Plan</h3>
+                <button className="manage-subscription-btn-v4">Manage Subscription</button>
+              </div>
 
               <div className="active-plan-container-v4 main-display-v4 growth-premium">
                 <div className="plan-card-bg-v4">
@@ -5443,6 +5446,7 @@ const BookingDetailModal = ({
 
   const [showMenuDetail, setShowMenuDetail] = useState(true);
   const [showCalculations, setShowCalculations] = useState(false);
+  const [isBreakdownExpanded, setIsBreakdownExpanded] = useState(false);
 
   return (
     <div className="modal-overlay-v4 drawer-overlay-v7" onClick={onClose} style={{ zIndex: 10000 }}>
@@ -5528,116 +5532,133 @@ const BookingDetailModal = ({
           </div>
 
           <div className="detail-section-v7">
-            <h4 className="section-title-v7">PAYMENT SUMMARY</h4>
-            <div className="financial-breakdown-v30">
-              {/* Step 1: Total Booking Value */}
-              <div className="breakdown-section-v30">
-                <div className="section-label-v30">1. Total Booking Value</div>
-                <div className="breakdown-row-v30">
-                  <label>Booking Amount</label>
-                  <span>₹{(booking.originalAmount || booking.amount).toLocaleString()}</span>
-                </div>
-                <span className="helper-text-v30">Includes GST</span>
-                {booking.discount > 0 && (
-                  <>
-                    <div className="breakdown-row-v30" style={{ color: '#ef4444', marginTop: '12px' }}>
-                      <label>Discount Applied</label>
-                      <span style={{ color: '#ef4444' }}>-₹{booking.discount.toLocaleString()}</span>
-                    </div>
-                    <span className="helper-text-v30">Discount applied on total booking value</span>
-                  </>
-                )}
-                <div className="breakdown-row-v30" style={{ borderTop: '1px solid #f1f5f9', paddingTop: '8px', marginTop: '12px' }}>
-                  <label style={{ fontWeight: 700 }}>Final Booking Value</label>
-                  <span style={{ fontSize: '1.1rem' }}>₹{booking.amount.toLocaleString()}</span>
-                </div>
-              </div>
+            {(() => {
+              const commission = Math.round(booking.paid * 0.10);
+              const commissionGst = Math.round(commission * 0.18);
+              const tds = Math.round(booking.paid * 0.001);
+              const totalDeductions = commission + commissionGst + tds;
+              const vendorPayout = booking.paid - totalDeductions;
+              const totalEarnings = vendorPayout + (booking.amount - booking.paid);
 
-              {/* Step 2: Payment Split */}
-              <div className="breakdown-section-v30">
-                <div className="section-label-v30">2. Payment Split</div>
-                <div className="breakdown-row-v30">
-                  <label>Platform Payment (Advance)</label>
-                  <span style={{ color: '#10b981' }}>₹{booking.paid.toLocaleString()}</span>
-                </div>
-                <div className="breakdown-row-v30">
-                  <label>Offline Payment (Remaining)</label>
-                  <span style={{ color: '#f59e0b' }}>₹{(booking.amount - booking.paid).toLocaleString()}</span>
-                </div>
-                <div className="breakdown-note-v30 collection-highlight-v30">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                  <span>Remaining amount is collected directly from customer</span>
-                </div>
-              </div>
+              return (
+                <div className="financial-breakdown-v30">
+                  <div className="section-header-row-v30" style={{ marginBottom: '16px' }}>
+                    <h4 className="section-title-v7" style={{ margin: 0 }}>PAYMENT SUMMARY</h4>
+                    <button
+                      className="calculation-toggle-btn-v30"
+                      onClick={() => setIsBreakdownExpanded(!isBreakdownExpanded)}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points={isBreakdownExpanded ? "18 15 12 9 6 15" : "6 9 12 15 18 9"}></polyline>
+                      </svg>
+                      {isBreakdownExpanded ? 'Hide details' : 'Show details'}
+                    </button>
+                  </div>
 
-              {/* Step 3: Platform Deductions */}
-              <div className="breakdown-section-v30">
-                <div className="section-header-row-v30">
-                  <div className="section-label-v30">3. Platform Deductions</div>
-                  <button
-                    className="calculation-toggle-btn-v30"
-                    onClick={() => setShowCalculations(!showCalculations)}
-                  >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points={showCalculations ? "18 15 12 9 6 15" : "6 9 12 15 18 9"}></polyline>
-                    </svg>
-                    {showCalculations ? 'Hide details' : 'Show details'}
-                  </button>
-                </div>
-
-                {(() => {
-                  const commission = Math.round(booking.paid * 0.10);
-                  const commissionGst = Math.round(commission * 0.18);
-                  const tds = Math.round(booking.paid * 0.01);
-                  const totalDeductions = commission + commissionGst + tds;
-                  const vendorPayout = booking.paid - totalDeductions;
-                  const totalEarnings = vendorPayout + (booking.amount - booking.paid);
-
-                  return (
+                  {isBreakdownExpanded && (
                     <>
-                      {showCalculations && (
-                        <div className="details-wrapper-v30">
-                          <div className="deduction-item-v30">
-                            <span>Platform Commission (10% of advance)</span>
-                            <span className="deduction-value">-₹{commission.toLocaleString()}</span>
-                          </div>
-                          <div className="deduction-item-v30">
-                            <span>GST on Commission (18%)</span>
-                            <span className="deduction-value">-₹{commissionGst.toLocaleString()}</span>
-                          </div>
-                          <div className="deduction-item-v30">
-                            <span>TDS (1%)</span>
-                            <span className="deduction-value">-₹{tds.toLocaleString()}</span>
-                          </div>
-                          <div className="breakdown-note-v30" style={{ marginTop: '8px' }}>
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                            <span>Deductions are calculated only on platform-collected amount, GST & TDS are claimable</span>
-                          </div>
+                      {/* Step 1: Total Booking Value */}
+                      <div className="breakdown-section-v30">
+                        <div className="section-label-v30">1. Total Booking Value</div>
+                        <div className="breakdown-row-v30">
+                          <label>Booking Amount</label>
+                          <span>₹{(booking.originalAmount || booking.amount).toLocaleString()}</span>
                         </div>
-                      )}
-
-                      {/* Step 4: Final Payout */}
-                      <div className="section-label-v30" style={{ marginTop: '24px' }}>4. Final Settlement</div>
-                      <div className="breakdown-row-v30">
-                        <label style={{ fontWeight: 600 }}>You Receive (Payout)</label>
-                        <span style={{ color: '#10b981', fontSize: '1.2rem' }}>₹{vendorPayout.toLocaleString()}</span>
+                        <span className="helper-text-v30">Includes GST</span>
+                        {booking.discount > 0 && (
+                          <>
+                            <div className="breakdown-row-v30" style={{ color: '#ef4444', marginTop: '12px' }}>
+                              <label>Discount Applied</label>
+                              <span style={{ color: '#ef4444' }}>-₹{booking.discount.toLocaleString()}</span>
+                            </div>
+                            <span className="helper-text-v30">Discount applied on total booking value</span>
+                          </>
+                        )}
+                        <div className="breakdown-row-v30" style={{ borderTop: '1px solid #f1f5f9', paddingTop: '8px', marginTop: '12px' }}>
+                          <label style={{ fontWeight: 700 }}>Final Booking Value</label>
+                          <span style={{ fontSize: '1.1rem' }}>₹{booking.amount.toLocaleString()}</span>
+                        </div>
                       </div>
 
-                      {/* Step 5: Total Earnings */}
-                      <div className="total-earnings-card-v30">
-                        <div className="earnings-label">
-                          <label>TOTAL EARNINGS</label>
-                          <span>₹{totalEarnings.toLocaleString()}</span>
-                          <div className="earnings-helper-v30">Includes offline collection + platform payout</div>
+                      {/* Step 2: Payment Split */}
+                      <div className="breakdown-section-v30">
+                        <div className="section-label-v30">2. Payment Split</div>
+                        <div className="breakdown-row-v30">
+                          <label>Platform Payment (Advance)</label>
+                          <span style={{ color: '#10b981' }}>₹{booking.paid.toLocaleString()}</span>
                         </div>
-                        <div className="payout-badge-v30">PLATFORM + OFFLINE</div>
+                        <div className="breakdown-row-v30">
+                          <label>Offline Payment (Remaining)</label>
+                          <span style={{ color: '#f59e0b' }}>₹{(booking.amount - booking.paid).toLocaleString()}</span>
+                        </div>
+                        <div className="breakdown-note-v30 collection-highlight-v30">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                          <span>Remaining amount is collected directly from customer</span>
+                        </div>
+                      </div>
+
+                      {/* Step 3: Platform Deductions */}
+                      <div className="breakdown-section-v30">
+                        <div className="section-header-row-v30">
+                          <div className="section-label-v30">3. Platform Deductions</div>
+                          <button
+                            className="calculation-toggle-btn-v30"
+                            onClick={() => setShowCalculations(!showCalculations)}
+                          >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                              <polyline points={showCalculations ? "18 15 12 9 6 15" : "6 9 12 15 18 9"}></polyline>
+                            </svg>
+                            {showCalculations ? 'Hide details' : 'Show details'}
+                          </button>
+                        </div>
+
+                        {showCalculations && (
+                          <div className="details-wrapper-v30">
+                            <div className="deduction-item-v30">
+                              <span>Platform Commission (10% of advance)</span>
+                              <span className="deduction-value">-₹{commission.toLocaleString()}</span>
+                            </div>
+                            <div className="deduction-item-v30">
+                              <span>GST on Commission (18%)</span>
+                              <span className="deduction-value">-₹{commissionGst.toLocaleString()}</span>
+                            </div>
+                            <div className="deduction-item-v30">
+                              <span>TDS (0.1%)</span>
+                              <span className="deduction-value">-₹{tds.toLocaleString()}</span>
+                            </div>
+                            <div className="breakdown-note-v30" style={{ marginTop: '8px' }}>
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                              <span>Deductions calculated on platform amount, GST & TDS are claimable</span>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </>
-                  );
-                })()}
-              </div>
-            </div>
+                  )}
 
+                  {/* Step 4: Final Payout */}
+                  <div className="section-label-v30" style={{ marginTop: '24px' }}>Final Settlement</div>
+                  <div className="breakdown-row-v30">
+                    <label style={{ fontWeight: 600 }}>You Receive (Payout)</label>
+                    <span style={{ color: '#10b981', fontSize: '1.2rem' }}>₹{vendorPayout.toLocaleString()}</span>
+                  </div>
+
+                  <div className="breakdown-note-v30 payout-timing-note-v30" style={{ marginTop: '12px' }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                    <span>Payout between 18–20 May (12–48 hrs before event)</span>
+                  </div>
+
+                  {/* Step 5: Total Earnings */}
+                  <div className="total-earnings-card-v30">
+                    <div className="earnings-label">
+                      <label>TOTAL EARNINGS</label>
+                      <span>₹{totalEarnings.toLocaleString()}</span>
+                      <div className="incl-gst-bottom-v30">(Incl. GST)</div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
           </div>
 
 

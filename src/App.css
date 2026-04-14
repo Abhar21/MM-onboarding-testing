@@ -3793,6 +3793,42 @@ input[type="file"].input-field::file-selector-button:hover {
   margin-bottom: 20px;
 }
 
+.subscription-header-row-v4 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.subscription-header-row-v4 .pane-title {
+  margin-bottom: 0;
+}
+
+.manage-subscription-btn-v4 {
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.manage-subscription-btn-v4:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #1e293b;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.manage-subscription-btn-v4:active {
+  transform: translateY(0);
+}
+
 /* Fix for Toggle Switch (Half-moon issue) */
 .service-switch {
   position: relative;
@@ -21440,7 +21476,8 @@ input:checked+.slider-v4:before {
   padding: 24px !important;
   border-radius: 20px !important;
   border: 1px solid #eef2f6 !important;
-  box-shadow: none !important; /* Unified flat design */
+  box-shadow: none !important;
+  /* Unified flat design */
   display: flex !important;
   flex-direction: column !important;
   flex: 1 !important;
@@ -22178,7 +22215,8 @@ input:checked+.slider-v4:before {
   cursor: default !important;
   border-color: #f1f5f9 !important;
   opacity: 1 !important;
-  -webkit-text-fill-color: #94a3b8 !important; /* For Safari/iOS */
+  -webkit-text-fill-color: #94a3b8 !important;
+  /* For Safari/iOS */
 }
 
 .input-helper-v4 {
@@ -22705,6 +22743,7 @@ input:checked+.slider-v4:before {
   font-style: italic;
   font-size: 13px;
 }
+
 /* --- Payment Summary Modernized (v30) --- */
 .financial-breakdown-v30 {
   display: flex;
@@ -22815,6 +22854,15 @@ input:checked+.slider-v4:before {
   color: #ffffff;
 }
 
+.incl-gst-bottom-v30 {
+  font-size: 0.75rem;
+  opacity: 0.8;
+  font-weight: 500;
+  margin-top: 0px;
+  margin-bottom: 6px;
+  color: #ffffff;
+}
+
 .payout-badge-v30 {
   background: rgba(16, 185, 129, 0.2);
   color: #10b981;
@@ -22869,6 +22917,20 @@ input:checked+.slider-v4:before {
   color: #cbd5e1;
   font-weight: 500;
   margin-top: 4px;
+}
+
+.gst-helper-text-v30 {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-top: 2px;
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+.gst-helper-text-v30.e-card {
+  color: #cbd5e1;
+  margin-bottom: 0;
+  margin-top: 2px;
 }
 
 /* --- Educational Helper Text (v30) --- */
