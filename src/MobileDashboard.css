@@ -4676,6 +4676,7 @@
   color: #1e293b;
   transition: all 0.2s;
   -webkit-appearance: none;
+  appearance: none;
 }
 
 .mobile-input-v55:focus {
@@ -5470,6 +5471,7 @@
   margin: 0;
   display: -webkit-box;
   -webkit-line-clamp: 3;
+  line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

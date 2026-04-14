@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import './ManageMembership.css';
-import MembershipStatusBanner from './MembershipStatusBanner';
 
 interface ManageMembershipProps {
 // ... (props stay the same)
