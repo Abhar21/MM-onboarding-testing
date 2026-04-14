@@ -473,9 +473,9 @@
   color: #2563eb;
 }
 
-.card-status-v50.preparing {
-  background: #fff7ed;
-  color: #ea580c;
+.card-status-v50.live {
+  background: #fef2f2;
+  color: #dc2626;
 }
 
 .card-status-v50.completed {
@@ -1008,9 +1008,9 @@
   text-transform: uppercase;
 }
 
-.detail-status-badge-v50.preparing {
-  background: #fef3c7;
-  color: #b45309;
+.detail-status-badge-v50.live {
+  background: #fef2f2;
+  color: #dc2626;
 }
 
 .detail-status-badge-v50.upcoming {

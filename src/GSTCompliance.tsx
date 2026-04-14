@@ -159,7 +159,7 @@ const GSTCompliance = () => {
                 </h3>
               </div>
               <div className="gst-card-value">{formatCurrency(regularData.taxableValue.total)}</div>
-              <p className="gst-card-subtitle">Includes platform and offline earnings</p>
+              <p className="gst-card-subtitle">Includes platform and Paid at Event earnings</p>
 
               <div className="gst-earnings-split-row">
                 <div className="gst-earnings-split-item">
@@ -167,7 +167,7 @@ const GSTCompliance = () => {
                   <span>{formatCurrency(regularData.taxableValue.platform)}</span>
                 </div>
                 <div className="gst-earnings-split-item">
-                  <span>Offline:</span>
+                  <span>Paid at Event:</span>
                   <span>{formatCurrency(regularData.taxableValue.offline)}</span>
                 </div>
               </div>
@@ -179,7 +179,7 @@ const GSTCompliance = () => {
                 </div>
                 <div className="gst-data-tag gst-tag-review">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                  Offline data self-reported
+                  Paid at Event data self-reported
                 </div>
               </div>
             </div>
@@ -201,7 +201,7 @@ const GSTCompliance = () => {
                   <span className="gst-breakdown-val">{formatCurrency(regularData.taxableValue.platform * 0.18)}</span>
                 </div>
                 <div className="gst-breakdown-item">
-                  <span className="gst-breakdown-label">Offline GST</span>
+                  <span className="gst-breakdown-label">Paid at Event GST</span>
                   <span className="gst-breakdown-val">{formatCurrency(regularData.taxableValue.offline * 0.18)}</span>
                 </div>
               </div>
@@ -237,16 +237,6 @@ const GSTCompliance = () => {
             </div>
           </div>
 
-          <div className="gst-status-bar">
-            <div className="gst-status-item important">
-              <svg className="gst-icon-check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-              Platform transactions are verified
-            </div>
-            <div className="gst-status-item">
-              <svg className="gst-icon-warning" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-              Offline earnings are self-reported and should be reviewed
-            </div>
-          </div>
 
           <div className="gst-content-grid">
             <div className="gst-left-col">
@@ -380,7 +370,7 @@ const GSTCompliance = () => {
                 <h3 className="gst-card-label">Total Turnover (Quarter)</h3>
               </div>
               <div className="gst-card-value">{formatCurrency(compositionData.turnover.total)}</div>
-              <p className="gst-card-subtitle">Includes platform and offline earnings</p>
+              <p className="gst-card-subtitle">Includes platform and Paid at Event earnings</p>
 
               <div className="gst-earnings-split-row">
                 <div className="gst-earnings-split-item">
@@ -388,7 +378,7 @@ const GSTCompliance = () => {
                   <span>{formatCurrency(compositionData.turnover.platform)}</span>
                 </div>
                 <div className="gst-earnings-split-item">
-                  <span>Offline:</span>
+                  <span>Paid at Event:</span>
                   <span>{formatCurrency(compositionData.turnover.offline)}</span>
                 </div>
               </div>
@@ -399,7 +389,7 @@ const GSTCompliance = () => {
                   Platform data is verified
                 </div>
                 <div className="gst-data-tag gst-tag-review">
-                  Offline earnings are self-reported
+                  Paid at Event earnings are self-reported
                 </div>
               </div>
             </div>
@@ -451,7 +441,7 @@ const GSTCompliance = () => {
                           <td>
                             {formatCurrency(row.turnover)}
                             <span className="gst-table-turnover-split">
-                              {formatCurrency(row.platform)} platform + {formatCurrency(row.offline)} offline
+                              {formatCurrency(row.platform)} platform + {formatCurrency(row.offline)} Paid at Event
                             </span>
                           </td>
                           <td>{formatCurrency(row.tax)}</td>
@@ -464,7 +454,7 @@ const GSTCompliance = () => {
                         <td>
                           {formatCurrency(compositionData.monthlyBreakdown.reduce((acc, curr) => acc + curr.turnover, 0))}
                           <span className="gst-table-turnover-split">
-                            {formatCurrency(compositionData.monthlyBreakdown.reduce((acc, curr) => acc + curr.platform, 0))} platform + {formatCurrency(compositionData.monthlyBreakdown.reduce((acc, curr) => acc + curr.offline, 0))} offline
+                            {formatCurrency(compositionData.monthlyBreakdown.reduce((acc, curr) => acc + curr.platform, 0))} platform + {formatCurrency(compositionData.monthlyBreakdown.reduce((acc, curr) => acc + curr.offline, 0))} Paid at Event
                           </span>
                         </td>
                         <td>{formatCurrency(compositionData.monthlyBreakdown.reduce((acc, curr) => acc + curr.tax, 0))}</td>
@@ -532,14 +522,14 @@ const GSTCompliance = () => {
                 <h3 className="gst-card-label">Total Earnings</h3>
               </div>
               <div className="gst-card-value">{formatCurrency(nonGstData.totalEarnings)}</div>
-              <p className="gst-card-subtitle">Includes platform and offline earnings</p>
+              <p className="gst-card-subtitle">Includes platform and Paid at Event earnings</p>
               <div className="gst-earnings-split-row">
                 <div className="gst-earnings-split-item">
                   <span>Platform:</span>
                   <span>{formatCurrency(nonGstData.platformEarnings)}</span>
                 </div>
                 <div className="gst-earnings-split-item">
-                  <span>Offline:</span>
+                  <span>Paid at Event:</span>
                   <span>{formatCurrency(nonGstData.totalEarnings - nonGstData.platformEarnings)}</span>
                 </div>
               </div>
@@ -549,7 +539,7 @@ const GSTCompliance = () => {
                   Platform data is verified
                 </div>
                 <div className="gst-data-tag gst-tag-review">
-                  Offline earnings are self-reported
+                  Paid at Event earnings are self-reported
                 </div>
               </div>
               <p className="gst-card-subtitle" style={{ fontSize: '0.75rem', marginTop: '1rem', color: 'var(--gst-text-muted)' }}>

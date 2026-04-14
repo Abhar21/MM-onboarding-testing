@@ -5312,7 +5312,7 @@ input:checked+.service-slider:before {
   top: 12px;
   left: 12px;
   z-index: 2;
-  background: #10b981;
+  background: #ef4444;
   color: white;
   padding: 4px 10px;
   border-radius: 6px;
@@ -13039,9 +13039,9 @@ input:checked+.slider-v4:before {
   color: #3b82f6;
 }
 
-.status-pill-v7.preparing {
-  background: #f5f3ff;
-  color: #8b5cf6;
+.status-pill-v7.live {
+  background: #fef2f2;
+  color: #dc2626;
 }
 
 .status-pill-v7.completed {

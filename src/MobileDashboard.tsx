@@ -443,6 +443,21 @@ const MobileBookingDetailView = ({
             const vendorPayout = amountPaid - totalDeductions;
             const totalEarnings = vendorPayout + (Number(booking.amount || 0) - amountPaid);
 
+            const eventDateObj = new Date(booking.date || '');
+            const payoutStart = new Date(eventDateObj);
+            payoutStart.setDate(eventDateObj.getDate() - 2);
+            const payoutEnd = new Date(eventDateObj);
+            payoutEnd.setDate(eventDateObj.getDate());
+
+            const startMonth = payoutStart.toLocaleDateString('en-GB', { month: 'short' });
+            const endMonth = payoutEnd.toLocaleDateString('en-GB', { month: 'short' });
+            const estimateStr = startMonth === endMonth
+              ? `${payoutStart.getDate()}-${payoutEnd.getDate()} ${startMonth} ${payoutStart.getFullYear()}`
+              : `${payoutStart.getDate()} ${startMonth} - ${payoutEnd.getDate()} ${endMonth} ${payoutStart.getFullYear()}`;
+
+            const diffHrsToEvent = (eventDateObj.getTime() - new Date().getTime()) / (1000 * 60 * 60);
+            const diffDaysToEvent = diffHrsToEvent / 24;
+
             return (
               <div className="financial-breakdown-v30 mobile-version">
                 <div className="section-header-row-v30" style={{ marginBottom: '8px' }}>
@@ -463,11 +478,13 @@ const MobileBookingDetailView = ({
                     {/* Step 1: Total Booking Value */}
                     <div className="breakdown-section-v30">
                       <div className="section-label-v30">1. Total Booking Value</div>
-                      <div className="breakdown-row-v30">
-                        <label>Booking Amount</label>
-                        <span>₹{Number((booking as any).originalAmount || booking.amount || 0).toLocaleString()}</span>
+                      <div className="breakdown-row-v30" style={{ alignItems: 'flex-start' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                          <label style={{ fontWeight: 600, fontSize: '1.05rem', color: '#1e293b' }}>Booking Amount</label>
+                          <span style={{ fontSize: '0.85rem', color: '#94a3b8', fontWeight: 500 }}>Includes GST</span>
+                        </div>
+                        <span style={{ fontWeight: 700, fontSize: '1.25rem', color: '#0f172a' }}>₹{Number((booking as any).originalAmount || booking.amount || 0).toLocaleString()}</span>
                       </div>
-                      <span className="helper-text-v30">Includes GST</span>
                       {((booking as any).discount > 0) && (
                         <>
                           <div className="breakdown-row-v30" style={{ color: '#ef4444', marginTop: '12px' }}>
@@ -491,7 +508,7 @@ const MobileBookingDetailView = ({
                         <span style={{ color: '#10b981' }}>₹{Number(booking.paid || 0).toLocaleString()}</span>
                       </div>
                       <div className="breakdown-row-v30">
-                        <label>Offline Payment (Remaining)</label>
+                        <label>Paid at Event Payment (Remaining)</label>
                         <span style={{ color: '#f59e0b' }}>₹{(Number(booking.amount || 0) - Number(booking.paid || 0)).toLocaleString()}</span>
                       </div>
                       <div className="breakdown-note-v30 collection-highlight-v30">
@@ -539,17 +556,42 @@ const MobileBookingDetailView = ({
                   </>
                 )}
 
-                {/* Step 4: Final Payout */}
-                <div className="section-label-v30" style={{ marginTop: '0px' }}>Final Settlement</div>
-                <div className="breakdown-row-v30 payout-row">
-                  <label style={{ fontWeight: 600 }}>You Receive (Payout)</label>
-                  <span style={{ color: '#10b981', fontSize: '1.2rem' }}>₹{vendorPayout.toLocaleString()}</span>
-                </div>
-                
-                <div className="breakdown-note-v30 payout-timing-note-v30" style={{ marginTop: '4px' }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                  <span>Payout between 18–20 May (12–48 hrs before event)</span>
-                </div>
+                <div className="section-label-v30" style={{ marginTop: '0px', marginBottom: '4px' }}>Final Settlement</div>
+                {booking.status === 'Live' || booking.status === 'Completed' || (booking.status === 'Upcoming' && diffDaysToEvent < 2) ? (
+                  <div style={{ backgroundColor: 'rgba(16, 185, 129, 0.06)', borderRadius: '8px', padding: '14px 12px', margin: '0 0 8px 0', border: '1px solid rgba(16, 185, 129, 0.15)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <div className="breakdown-row-v30" style={{ borderBottom: 'none', paddingBottom: 0, paddingTop: 0 }}>
+                      <label style={{ fontWeight: 600, color: '#0f172a' }}>You Receive (Payout)</label>
+                      <span style={{ color: '#10b981', fontSize: '1.25rem', fontWeight: 700 }}>₹{vendorPayout.toLocaleString()}</span>
+                    </div>
+                    <div className="breakdown-row-v30" style={{ paddingTop: 0, marginTop: 0, borderBottom: 'none' }}>
+                      <label style={{ color: '#047857', fontWeight: 500, fontSize: '0.9rem' }}>
+                        {booking.status === 'Live' || booking.status === 'Completed' || (booking.status === 'Upcoming' && diffDaysToEvent < 2) ? 'Payout date' : 'Estimate payout date'}
+                      </label>
+                      <span style={{ color: '#047857', fontWeight: 600, fontSize: '0.9rem' }}>{estimateStr}</span>
+                    </div>
+                    <div className="breakdown-note-v30" style={{ marginTop: '4px', color: '#059669', opacity: 0.9, backgroundColor: 'rgba(16, 185, 129, 0.04)', padding: '8px', borderRadius: '6px' }}>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                      <span style={{ fontSize: '0.8rem' }}>Payout between 12–48 hrs before event</span>
+                    </div>
+                  </div>
+                ) : (
+                    <div style={{ backgroundColor: 'rgba(16, 185, 129, 0.06)', borderRadius: '8px', padding: '14px 12px', margin: '0 0 8px 0', border: '1px solid rgba(16, 185, 129, 0.15)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      <div className="breakdown-row-v30" style={{ borderBottom: 'none', paddingBottom: 0, paddingTop: 0 }}>
+                        <label style={{ fontWeight: 600, color: '#1e293b' }}>You Receive (Payout)</label>
+                        <span style={{ color: '#10b981', fontSize: '1.25rem', fontWeight: 700 }}>₹{vendorPayout.toLocaleString()}</span>
+                      </div>
+                      <div className="breakdown-row-v30" style={{ paddingTop: 0, marginTop: 0, borderBottom: 'none' }}>
+                        <label style={{ color: '#047857', fontWeight: 500, fontSize: '0.9rem' }}>Estimate payout date</label>
+                        <span style={{ color: '#047857', fontWeight: 600, fontSize: '0.9rem' }}>{estimateStr}</span>
+                      </div>
+                      <div className="breakdown-note-v30" style={{ marginTop: '4px', color: '#047857', opacity: 0.8, backgroundColor: 'rgba(16, 185, 129, 0.04)', padding: '8px', borderRadius: '6px' }}>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                        <span style={{ fontSize: '0.8rem' }}>Payout between 12–48 hrs before event</span>
+                      </div>
+                    </div>
+                )}
+
+
 
                 {/* Step 5: Total Earnings */}
                 <div className="total-earnings-card-v30 mobile">
@@ -557,9 +599,8 @@ const MobileBookingDetailView = ({
                     <label>TOTAL EARNINGS</label>
                     <span>₹{totalEarnings.toLocaleString()}</span>
                     <div className="incl-gst-bottom-v30">(Incl. GST)</div>
-                    <div className="earnings-helper-v30">Includes offline + platform payout</div>
+                    <div className="earnings-helper-v30">Includes Paid at Event + platform payout</div>
                   </div>
-                  <div className="payout-badge-v30">ALL INCLUSIVE</div>
                 </div>
               </div>
             );
@@ -578,7 +619,7 @@ const MobileBookingDetailView = ({
           <h3 className="section-title-v50 small">Documents</h3>
           <div className="mobile-doc-list-v50">
             {/* Advance Receipt: Shown for all except Cancelled? No, user said both for cancelled. */}
-            {/* Upcoming, Preparing, Completed, Cancelled all get Advance Receipt */}
+            {/* Upcoming, Live, Completed, Cancelled all get Advance Receipt */}
             <div className="doc-row-v50">
               <div className="doc-left-v50">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
@@ -677,89 +718,169 @@ const MobileBookingsView = () => {
       customer: 'Amit Khurana',
       date: new Date().toISOString().split('T')[0],
       time: '12:30 PM',
+      type: 'Wedding Catering',
+      serviceCategory: 'Lunch',
       category: 'Lunch',
       menuName: 'Premium Sadhya Menu',
       guests: 200,
       amount: 145000,
+      originalAmount: 160000,
+      discount: 15000,
+      payout: 41235,
       paid: 43500,
-      status: 'Preparing',
+      status: 'Live',
       address: '402, Skyline Residency, Sector 44, Bengaluru',
-      taxType: 'B2B',
+      menuSelection: [
+        { name: 'Starters', type: 'Selected', items: ['Paneer Tikka', 'Hara Bhara Kabab'] },
+        { name: 'Main Course', type: 'All Items', items: ['Paneer Butter Masala', 'Dal Makhani', 'Veg Pulao', 'Butter Naan'] },
+        { name: 'Desserts', type: 'Selected', items: ['Gulab Jamun', 'Rasmalai'] }
+      ],
       menuDetails: {
         categories: [
-          { name: 'Starters', items: ['Hara Bhara Kabab', 'Paneer Tikka', 'Chilli Gobi', 'Veg Spring Roll'], status: 'All Items Included' },
-          { name: 'Main Course', items: ['Dal Makhani', 'Paneer Butter Masala', 'Mixed Veg Curry', 'Assorted Naan', 'Jeera Rice'], status: 'Customer Selected' },
-          { name: 'Desserts', items: ['Gulab Jamun', 'Vanilla Ice Cream with Chocolate Sauce', 'Fresh Fruit Salad'], status: 'All Items Included' }
+          { name: 'Starters', items: ['Paneer Tikka', 'Hara Bhara Kabab'], status: 'All Items Included' },
+          { name: 'Main Course', items: ['Paneer Butter Masala', 'Dal Makhani', 'Veg Pulao', 'Butter Naan'], status: 'Customer Selected' },
+          { name: 'Desserts', items: ['Gulab Jamun', 'Rasmalai'], status: 'All Items Included' }
         ]
-      }
-    },
-    {
-      id: 'BK-12402',
-      customer: 'Bhavya Singh',
-      date: new Date().toISOString().split('T')[0],
-      time: '01:00 PM',
-      category: 'Lunch',
-      menuName: 'Traditional South Indian',
-      guests: 120,
-      amount: 95000,
-      paid: 30000,
-      status: 'Preparing',
-      address: 'Plot 12, HSR Layout, 7th Sector, Bengaluru',
-      taxType: 'B2C',
-      menuDetails: {
-        categories: [
-          { name: 'Starters', items: ['Medhu Vada', 'Mini Idli', 'Onion Pakoda'], status: 'All Items Included' },
-          { name: 'Main Course', items: ['Sambar Rice', 'Curd Rice', 'Avial', 'Poriyal', 'Appalam'], status: 'Customer Selected' },
-          { name: 'Desserts', items: ['Payasam', 'Banana Halwa'], status: 'All Items Included' }
-        ]
-      }
+      },
+      timeline: [
+        { status: 'Pending', time: '15 Mar, 09:00 AM' },
+        { status: 'Confirmed', time: '15 Mar, 02:30 PM' },
+        { status: 'Live', time: '20 Mar, 08:00 AM' }
+      ],
+      taxType: 'B2C'
     },
     {
       id: 'BK-12405',
       customer: 'Siddharth Malhotra',
-      date: '2026-03-22',
+      date: new Date(Date.now() + 48 * 3600000).toISOString().split('T')[0], // Exactly 2 days away
       time: '07:30 PM',
+      type: 'Corporate Gala',
+      serviceCategory: 'Dinner',
       category: 'Dinner',
       menuName: 'Executive Buffet',
       guests: 150,
-      amount: 85000,
-      paid: 25500,
+      amount: 418000,
+      originalAmount: 450000,
+      discount: 32000,
+      payout: 118935,
+      paid: 125500,
       status: 'Upcoming',
       address: 'Apartment 701, Prestige Ferns Residency, Bellandur',
-      taxType: 'B2B',
+      menuSelection: [
+        { name: 'Dinner', type: 'Selected', items: ['Jeera Rice', 'Paneer Tikka', 'Butter Naan'] },
+        { name: 'Drinks', type: 'All Items', items: ['Butter Milk', 'Fresh Lime Soda'] }
+      ],
       menuDetails: {
         categories: [
-          { name: 'Starters', items: ['Chicken Tikka', 'Fish Finger', 'Veg Seekh Kabab'], status: 'Customer Selected' },
-          { name: 'Main Course', items: ['Butter Chicken', 'Mutton Rogan Josh', 'Dal Tadka', 'Garlic Naan'], status: 'Customer Selected' },
-          { name: 'Desserts', items: ['Shahi Tukda', 'Moong Dal Halwa'], status: 'All Items Included' }
+          { name: 'Dinner', items: ['Jeera Rice', 'Paneer Tikka', 'Butter Naan'], status: 'Customer Selected' },
+          { name: 'Drinks', items: ['Butter Milk', 'Fresh Lime Soda'], status: 'All Items Included' }
         ]
-      }
+      },
+      timeline: [
+        { status: 'Pending', time: '18 Mar, 11:15 AM' },
+        { status: 'Confirmed', time: '18 Mar, 05:00 PM' }
+      ],
+      taxType: 'B2B'
     },
-    // Defaulting other bookings with a standard menu for now
-    { id: 'BK-12398', customer: 'Ananya Pandey', date: '2026-03-20', time: '04:30 PM', category: 'Snacks', menuName: 'High Tea Special', guests: 80, amount: 45000, paid: 13500, status: 'Completed', address: 'No. 34, 1st Cross, Indiranagar 2nd Stage', taxType: 'B2C', menuDetails: { categories: [{ name: 'Starters', items: ['Samosa', 'Chai', 'Cookies'], status: 'All Included' }] } },
-    { id: 'BK-12410', customer: 'Varun Dhawan', date: '2026-03-24', time: '08:00 PM', category: 'Dinner', menuName: 'Romantic Four-Course', guests: 12, amount: 15000, paid: 4500, status: 'Upcoming', address: 'Flat 4A, Green Meadows Appts, Koramangala', taxType: 'B2B', menuDetails: { categories: [{ name: 'Starters', items: ['Soup'], status: 'All Included' }] } },
-    { id: 'BK-12412', customer: 'Kareena Kapoor', date: '2026-03-25', time: '01:00 PM', category: 'Lunch', menuName: 'Healthy Salads & Juice', guests: 40, amount: 35000, paid: 10500, status: 'Upcoming', address: 'Villa 5, Sterling Villa Grande, Kadugodi', taxType: 'B2C', menuDetails: { categories: [{ name: 'Starters', items: ['Salad'], status: 'All Included' }] } },
-    { id: 'BK-12415', customer: 'Rajeev Mehta', date: '2026-03-26', time: '08:30 PM', category: 'Dinner', menuName: 'Royal North Indian', guests: 50, amount: 40000, paid: 12000, status: 'Upcoming', address: 'Villa 88, Palm Meadows, Whitefield', taxType: 'B2B', menuDetails: { categories: [{ name: 'Starters', items: ['Tikka'], status: 'All Included' }] } },
-    { id: 'BK-12416', customer: 'Divya Reddy', date: '2026-03-27', time: '12:00 PM', category: 'Lunch', menuName: 'Continental Feast', guests: 80, amount: 55000, paid: 15000, status: 'Upcoming', address: 'House 56, 12th Main, Jayanagar 4th Block', taxType: 'B2C', menuDetails: { categories: [{ name: 'Starters', items: ['Pasta'], status: 'All Included' }] } },
-    { id: 'BK-12417', customer: 'Sita Ram', date: '2026-03-28', time: '07:00 PM', category: 'Dinner', menuName: 'Family Thali Special', guests: 30, amount: 20000, paid: 6000, status: 'Upcoming', address: 'No. 15, Malleshwaram 18th Cross', taxType: 'B2C', menuDetails: { categories: [{ name: 'Starters', items: ['Thali Items'], status: 'All Included' }] } },
-    { id: 'BK-12418', customer: 'Arun Kumar', date: '2026-03-29', time: '01:30 PM', category: 'Lunch', menuName: 'Business Buffet', guests: 60, amount: 30000, paid: 9000, status: 'Upcoming', address: 'Apartment 204, Embassy Lake Terraces, Hebbal', taxType: 'B2B', menuDetails: { categories: [{ name: 'Starters', items: ['Paneer'], status: 'All Included' }] } },
-    { id: 'BK-12420', customer: 'Nisha Gupta', date: '2026-04-01', time: '08:00 PM', category: 'Dinner', menuName: 'Grand Wedding Feast', guests: 300, amount: 250000, paid: 75000, status: 'Upcoming', address: 'Leela Palace Grand Ballroom, Old Airport Road', taxType: 'B2B', menuDetails: { categories: [{ name: 'Starters', items: ['Many Items'], status: 'All Included' }] } },
-    { id: 'BK-12421', customer: 'Rahul Bose', date: '2026-04-02', time: '12:30 PM', category: 'Lunch', menuName: 'Office Gathering Menu', guests: 45, amount: 35000, paid: 10000, status: 'Upcoming', address: 'EcoWorld Block 8-B, Marathahalli-Sarjapur Outer Ring Road', taxType: 'B2C', menuDetails: { categories: [{ name: 'Starters', items: ['Office Snacks'], status: 'All Included' }] } },
-    { id: 'BK-12422', customer: 'Vikram Seth', date: '2026-04-03', time: '07:30 PM', category: 'Dinner', menuName: 'Corporate Banquet', guests: 100, amount: 120000, paid: 40000, status: 'Upcoming', address: 'Sheraton Grand, Whitefield Main Road', taxType: 'B2B', menuDetails: { categories: [{ name: 'Starters', items: ['Corporate Items'], status: 'All Included' }] } },
-    { id: 'BK-12423', customer: 'Meera Iyer', date: '2026-04-04', time: '01:00 PM', category: 'Lunch', menuName: 'Celebration Meal', guests: 20, amount: 15000, paid: 5000, status: 'Upcoming', address: 'Door No. 12, Benson Cross Road, Benson Town', taxType: 'B2C', menuDetails: { categories: [{ name: 'Starters', items: ['Celebration Snacks'], status: 'All Included' }] } },
-    { id: 'BK-12424', customer: 'Deepak Jain', date: '2026-04-05', time: '08:30 PM', category: 'Dinner', menuName: 'Party Platter Special', guests: 75, amount: 65000, paid: 20000, status: 'Upcoming', address: 'Mantri Elegance, Bannerghatta Road', taxType: 'B2C', menuDetails: { categories: [{ name: 'Starters', items: ['Party items'], status: 'All Included' }] } },
-    { id: 'BK-12425', customer: 'Sunil Gavaskar', date: '2026-04-10', time: '07:30 PM', category: 'Breakfast', menuName: 'Sunrise Buffet', guests: 50, amount: 50000, paid: 15000, status: 'Upcoming', address: 'G-05, Sobha Quartz, Sarjapur Main Road', taxType: 'B2B', menuDetails: { categories: [{ name: 'Starters', items: ['Breakfast items'], status: 'All Included' }] } },
-    { id: 'BK-12426', customer: 'Kapil Dev', date: '2026-04-11', time: '08:00 PM', category: 'Dinner', menuName: 'Legendary Feast', guests: 100, amount: 90000, paid: 30000, status: 'Upcoming', address: 'Lakeside Pavilion, Ulsoor Lake Area', taxType: 'B2B', menuDetails: { categories: [{ name: 'Starters', items: ['Feast items'], status: 'All Included' }] } },
-    { id: 'BK-12427', customer: 'Sachin Tendulkar', date: '2026-04-12', time: '01:00 PM', category: 'Lunch', menuName: 'Masterclass Menu', guests: 80, amount: 75000, paid: 25000, status: 'Upcoming', address: 'Godrej Woodsman Estate, Tower B, Bellary Road', taxType: 'B2C', menuDetails: { categories: [{ name: 'Starters', items: ['Master items'], status: 'All Included' }] } },
-    { id: 'BK-12428', customer: 'MS Dhoni', date: '2026-04-13', time: '07:00 PM', category: 'Dinner', menuName: 'Captain’s Choice', guests: 150, amount: 150000, paid: 50000, status: 'Upcoming', address: 'Flat 505, Salarpuria Sattva Magnificia, Old Madras Road', taxType: 'B2B', menuDetails: { categories: [{ name: 'Starters', items: ['Captain items'], status: 'All Included' }] } },
-    { id: 'BK-12429', customer: 'Virat Kohli', date: '2026-04-14', time: '08:30 PM', category: 'Dinner', menuName: 'Fitness Focused Buffet', guests: 60, amount: 60000, paid: 20000, status: 'Upcoming', address: 'Penthouse A, Brigade Exotica, Old Madras Road', taxType: 'B2B', menuDetails: { categories: [{ name: 'Starters', items: ['Fitness items'], status: 'All Included' }] } },
-    { id: 'BK-12430', customer: 'Rohit Sharma', date: '2026-04-15', time: '01:30 PM', category: 'Lunch', menuName: 'Hitman Special', guests: 90, amount: 85000, paid: 25000, status: 'Upcoming', address: 'Tower 2, Floor 15, Karle Town Centre, Nagavara', taxType: 'B2B', menuDetails: { categories: [{ name: 'Starters', items: ['Hitman items'], status: 'All Included' }] } },
-    { id: 'BK-12431', customer: 'Hardik Pandya', date: '2026-04-16', time: '07:30 PM', category: 'Dinner', menuName: 'Vibrant Fusion', guests: 40, amount: 45000, paid: 15000, status: 'Upcoming', address: 'House No. 9, Windmill on the Hills, Whitefield', taxType: 'B2B', menuDetails: { categories: [{ name: 'Starters', items: ['Fusion items'], status: 'All Included' }] } },
-    { id: 'BK-12432', customer: 'KL Rahul', date: '2026-04-17', time: '08:00 PM', category: 'Dinner', menuName: 'Modern Classic', guests: 25, amount: 30000, paid: 10000, status: 'Upcoming', address: 'Flat 302, Total Environment Learning to Fly, Jayanagar', taxType: 'B2C', menuDetails: { categories: [{ name: 'Starters', items: ['Classic items'], status: 'All Included' }] } },
+    {
+      id: 'BK-12398',
+      customer: 'Ananya Pandey',
+      date: new Date(Date.now() - 24 * 3600000).toISOString().split('T')[0], // Yesterday
+      time: '04:30 PM',
+      type: 'Engagement Party',
+      serviceCategory: 'Snacks',
+      category: 'Snacks',
+      menuName: 'High Tea Special',
+      guests: 80,
+      amount: 45000,
+      originalAmount: 50000,
+      discount: 5000,
+      payout: 12825,
+      paid: 13500,
+      status: 'Completed',
+      address: 'No. 34, 1st Cross, Indiranagar 2nd Stage',
+      menuSelection: [
+        { name: 'Breakfast', type: 'All Items', items: ['Samosa', 'Chai', 'Sandwich'] }
+      ],
+      menuDetails: {
+        categories: [
+          { name: 'Snacks', items: ['Samosa', 'Chai', 'Sandwich'], status: 'All Included' }
+        ]
+      },
+      timeline: [
+        { status: 'Pending', time: '10 Mar, 10:00 AM' },
+        { status: 'Confirmed', time: '10 Mar, 12:00 PM' },
+        { status: 'Live', time: '19 Mar, 09:00 AM' },
+        { status: 'Completed', time: '20 Mar, 11:00 PM' }
+      ],
+      taxType: 'B2B'
+    },
+    {
+      id: 'BK-12410',
+      customer: 'Varun Dhawan',
+      date: new Date(Date.now() + 120 * 3600000).toISOString().split('T')[0], // 5 days away
+      time: '08:00 PM',
+      type: 'Private Dinner',
+      serviceCategory: 'Dinner',
+      category: 'Dinner',
+      menuName: 'Romantic Four-Course',
+      guests: 12,
+      amount: 15000,
+      originalAmount: 18000,
+      discount: 3000,
+      payout: 4275,
+      paid: 4500,
+      status: 'Upcoming',
+      address: 'Flat 4A, Green Meadows Appts, Koramangala',
+      menuSelection: [
+        { name: 'Dinner', type: 'Selected', items: ['Salad', 'Soup', 'Main Course'] }
+      ],
+      menuDetails: {
+        categories: [
+          { name: 'Dinner', items: ['Soup', 'Main Course'], status: 'All Included' }
+        ]
+      },
+      timeline: [
+        { status: 'Pending', time: '21 Mar, 08:30 AM' }
+      ],
+      taxType: 'B2C'
+    },
+    {
+      id: 'BK-12419',
+      customer: 'Rohit Verma',
+      date: '2026-03-28',
+      time: '08:00 PM',
+      type: 'Anniversary Dinner',
+      serviceCategory: 'Dinner',
+      category: 'Dinner',
+      menuName: 'Premium Feast',
+      guests: 30,
+      amount: 45000,
+      originalAmount: 50000,
+      discount: 5000,
+      payout: 12825,
+      paid: 13500,
+      status: 'Cancelled',
+      cancelledBy: 'Customer',
+      address: 'Penthouse B, Brigade Exotica, Old Madras Road',
+      menuSelection: [
+        { name: 'Dinner', type: 'Selected', items: ['Dal Makhani', 'Naan'] }
+      ],
+      menuDetails: {
+        categories: [
+          { name: 'Dinner', items: ['Dal Makhani', 'Naan'], status: 'All Included' }
+        ]
+      },
+      timeline: [
+        { status: 'Pending', time: '24 Mar, 09:00 AM' },
+        { status: 'Cancelled', time: '25 Mar, 04:00 PM' }
+      ],
+      taxType: 'B2B'
+    }
   ]);
 
   const [searchTerm, setSearchTerm] = useState('');
-  const [rangeShortcut, setRangeShortcut] = useState('All');
+  const [rangeShortcut, setRangeShortcut] = useState('Today & Upcoming');
   const [isNoteOpen, setIsNoteOpen] = useState(false);
   const [visibleCount, setVisibleCount] = useState(10);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -789,8 +910,8 @@ const MobileBookingsView = () => {
     if (!matchesSearch) return false;
 
     // 2. Handle Shortcuts (Today, Month, etc) - Overrides advanced date if active
-    if (rangeShortcut === 'Today') {
-      if (b.date !== today) return false;
+    if (rangeShortcut === 'Today & Upcoming') {
+      if (b.date < today) return false;
     } else if (rangeShortcut === 'This Month') {
       const bDate = new Date(b.date);
       const now = new Date();
@@ -805,6 +926,8 @@ const MobileBookingsView = () => {
     if (appliedFilters.status !== 'All' && b.status !== appliedFilters.status) return false;
 
     return true;
+  }).sort((a, b) => {
+    return new Date(a.date).getTime() - new Date(b.date).getTime();
   });
 
   const displayedBookings = filteredBookings.slice(0, visibleCount);
@@ -886,7 +1009,7 @@ const MobileBookingsView = () => {
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <div className="mobile-chips-scroll-v50" style={{ flex: 1 }}>
-            {['All', 'Today', 'This Month'].map(s => (
+            {['All', 'Today & Upcoming', 'This Month'].map(s => (
               <button
                 key={s}
                 className={`filter-chip-v50 ${rangeShortcut === s ? 'active' : ''}`}
@@ -1031,7 +1154,7 @@ const MobileBookingsView = () => {
               <div className="sheet-section-v50">
                 <div className="sheet-section-title-v50">Booking Status</div>
                 <div className="sheet-chips-v50">
-                  {['All', 'Preparing', 'Upcoming', 'Completed', 'Cancelled'].map(s => (
+                  {['All', 'Live', 'Upcoming', 'Completed', 'Cancelled'].map(s => (
                     <button
                       key={s}
                       className={`filter-chip-v50 ${tempFilters.status === s ? 'active' : ''}`}
@@ -1116,12 +1239,12 @@ const MobileRevenueView = () => {
           <div className="rev-card-main-info-v52">
             <div className="rev-card-title-v52">Total Earnings (incl. GST)</div>
             <div className="rev-card-value-v52">₹4,05,000</div>
-            <div className="rev-card-subtitle-v52">Includes platform + offline earnings</div>
+            <div className="rev-card-subtitle-v52">Includes platform + Paid at Event earnings</div>
           </div>
           <div className="rev-card-footer-v52">
             <span>Platform: ₹1,62,000</span>
             <span style={{ opacity: 0.5 }}>|</span>
-            <span>Offline: ₹2,43,000</span>
+            <span>Paid at Event: ₹2,43,000</span>
           </div>
         </div>
 
@@ -1459,19 +1582,19 @@ const MobileGSTView = () => {
   return (
     <div className="mobile-gst-container-v52">
       <div className="gst-type-segment-v52">
-        <div 
+        <div
           className={`gst-segment-item-v52 ${gstType === 'regular' ? 'active' : ''}`}
           onClick={() => setGstType('regular')}
         >
           GST Regular
         </div>
-        <div 
+        <div
           className={`gst-segment-item-v52 ${gstType === 'composition' ? 'active' : ''}`}
           onClick={() => setGstType('composition')}
         >
           GST Composition
         </div>
-        <div 
+        <div
           className={`gst-segment-item-v52 ${gstType === 'non-gst' ? 'active' : ''}`}
           onClick={() => setGstType('non-gst')}
         >
@@ -1484,8 +1607,8 @@ const MobileGSTView = () => {
           {gstType === 'non-gst' ? 'Earnings Overview' : 'GST Reporting & Compliance'}
         </h2>
         <p className="gst-main-subtitle-v52">
-          {gstType === 'non-gst' 
-            ? 'Summary of your earnings and platform charges' 
+          {gstType === 'non-gst'
+            ? 'Summary of your earnings and platform charges'
             : `Manage your GST filings for ${gstType === 'composition' ? selectedQuarter : selectedMonth} ${selectedFY.replace('FY ', '')}`}
         </p>
       </div>
@@ -1496,7 +1619,7 @@ const MobileGSTView = () => {
           <option>FY 2025–26</option>
           <option>FY 2024–25</option>
         </select>
-        
+
         {gstType === 'composition' ? (
           <select value={selectedQuarter} onChange={e => setSelectedQuarter(e.target.value)} className="gst-select-v52">
             {quartersList.map((q, idx) => (
@@ -1524,9 +1647,9 @@ const MobileGSTView = () => {
                 <svg className="gst-info-icon-v52" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
               </div>
               <div className="gst-card-value-v52">₹8,25,000</div>
-              <p className="gst-card-subtitle-v52">Includes platform and offline earnings</p>
+              <p className="gst-card-subtitle-v52">Includes platform and Paid at Event earnings</p>
               <div className="gst-card-divider-v52 dashed"></div>
-              
+
               <div className="gst-breakdown-box-v52" style={{ marginBottom: '16px' }}>
                 <div className="gst-breakdown-row-v52" style={{ justifyContent: 'space-between', display: 'flex' }}>
                   <div className="inline-entry-v52">
@@ -1534,7 +1657,7 @@ const MobileGSTView = () => {
                     <span className="val-v52">₹3,30,000</span>
                   </div>
                   <div className="inline-entry-v52">
-                    <span className="label-v52">Offline:</span>
+                    <span className="label-v52">Paid at Event:</span>
                     <span className="val-v52">₹4,95,000</span>
                   </div>
                 </div>
@@ -1546,7 +1669,7 @@ const MobileGSTView = () => {
                   Platform data is verified
                 </div>
                 <div className="gst-status-pill-v52 warning-banner-v52">
-                  Offline earnings are self-reported
+                  Paid at Event earnings are self-reported
                 </div>
               </div>
             </div>
@@ -1565,7 +1688,7 @@ const MobileGSTView = () => {
                   <span>₹59,400</span>
                 </div>
                 <div className="gst-breakdown-row-v52">
-                  <label>Offline GST</label>
+                  <label>Paid at Event GST</label>
                   <span>₹89,100</span>
                 </div>
               </div>
@@ -1613,9 +1736,9 @@ const MobileGSTView = () => {
                 <svg className="gst-info-icon-v52" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
               </div>
               <div className="gst-card-value-v52">₹8,25,000</div>
-              <p className="gst-card-subtitle-v52">Includes platform and offline earnings</p>
+              <p className="gst-card-subtitle-v52">Includes platform and Paid at Event earnings</p>
               <div className="gst-card-divider-v52 dashed"></div>
-              
+
               <div className="gst-breakdown-box-v52" style={{ marginBottom: '16px' }}>
                 <div className="gst-breakdown-row-v52" style={{ justifyContent: 'space-between', display: 'flex' }}>
                   <div className="inline-entry-v52">
@@ -1623,7 +1746,7 @@ const MobileGSTView = () => {
                     <span className="val-v52">₹3,30,000</span>
                   </div>
                   <div className="inline-entry-v52">
-                    <span className="label-v52">Offline:</span>
+                    <span className="label-v52">Paid at Event:</span>
                     <span className="val-v52">₹4,95,000</span>
                   </div>
                 </div>
@@ -1635,7 +1758,7 @@ const MobileGSTView = () => {
                   Platform data is verified
                 </div>
                 <div className="gst-status-pill-v52 warning-banner-v52">
-                  Offline earnings are self-reported
+                  Paid at Event earnings are self-reported
                 </div>
               </div>
             </div>
@@ -1648,7 +1771,7 @@ const MobileGSTView = () => {
               </div>
               <div className="gst-card-value-v52 primary-blue-v52">₹49,500</div>
               <p className="comp-rate-label-v52">@6% composition rate</p>
-              
+
               <div className="comp-calc-info-v52">
                 <p>Composition tax is calculated based on your business type (1% / 5% / 6%)</p>
                 <p className="ca-recommend-v52">We recommend verifying the correct rate with your Chartered Accountant (CA)</p>
@@ -1686,9 +1809,9 @@ const MobileGSTView = () => {
                 <svg className="gst-info-icon-v52" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
               </div>
               <div className="gst-card-value-v52">₹8,25,000</div>
-              <p className="gst-card-subtitle-v52">Includes platform and offline earnings</p>
+              <p className="gst-card-subtitle-v52">Includes platform and Paid at Event earnings</p>
               <div className="gst-card-divider-v52 dashed"></div>
-              
+
               <div className="gst-breakdown-box-v52" style={{ marginBottom: '16px' }}>
                 <div className="gst-breakdown-row-v52" style={{ justifyContent: 'space-between', display: 'flex' }}>
                   <div className="inline-entry-v52">
@@ -1696,7 +1819,7 @@ const MobileGSTView = () => {
                     <span className="val-v52">₹3,30,000</span>
                   </div>
                   <div className="inline-entry-v52">
-                    <span className="label-v52">Offline:</span>
+                    <span className="label-v52">Paid at Event:</span>
                     <span className="val-v52">₹4,95,000</span>
                   </div>
                 </div>
@@ -1708,7 +1831,7 @@ const MobileGSTView = () => {
                   Platform data is verified
                 </div>
                 <div className="gst-status-pill-v52 warning-banner-v52">
-                  Offline earnings are self-reported
+                  Paid at Event earnings are self-reported
                 </div>
               </div>
 
@@ -1767,215 +1890,215 @@ const MobileGSTView = () => {
       {/* GST Breakdown Section - Only for Regular & Composition */}
       {gstType !== 'non-gst' && (
         <div className="gst-section-v52">
-        {gstType === 'regular' ? (
-          <>
-            <div className="gst-breakdown-header-v52">
-              <h3 className="section-title-v52">GST Breakdown for March</h3>
-            </div>
-            
-            <div className="split-card-v52">
-              <div className="breakdown-item-v52">
-                <div className="item-info-v52">
-                  <label>CGST (intra-state)</label>
-                  <span className="subtitle-v52">Central Goods and Services Tax</span>
-                </div>
-                <span className="value-v52">₹37,125</span>
+          {gstType === 'regular' ? (
+            <>
+              <div className="gst-breakdown-header-v52">
+                <h3 className="section-title-v52">GST Breakdown for March</h3>
               </div>
 
-              <div className="breakdown-item-v52">
-                <div className="item-info-v52">
-                  <label>SGST (intra-state)</label>
-                  <span className="subtitle-v52">State Goods and Services Tax</span>
+              <div className="split-card-v52">
+                <div className="breakdown-item-v52">
+                  <div className="item-info-v52">
+                    <label>CGST (intra-state)</label>
+                    <span className="subtitle-v52">Central Goods and Services Tax</span>
+                  </div>
+                  <span className="value-v52">₹37,125</span>
                 </div>
-                <span className="value-v52">₹37,125</span>
+
+                <div className="breakdown-item-v52">
+                  <div className="item-info-v52">
+                    <label>SGST (intra-state)</label>
+                    <span className="subtitle-v52">State Goods and Services Tax</span>
+                  </div>
+                  <span className="value-v52">₹37,125</span>
+                </div>
+
+                <div className="breakdown-item-v52">
+                  <div className="item-info-v52">
+                    <label>IGST (inter-state)</label>
+                    <span className="subtitle-v52">Integrated Goods and Services Tax</span>
+                  </div>
+                  <span className="value-v52">₹74,250</span>
+                </div>
+
+                <div className="split-divider-v52"></div>
+
+                <div className="split-row-v52 bold">
+                  <label>GST Collected</label>
+                  <span>₹1,48,500</span>
+                </div>
+                <div className="split-row-v52 error bold">
+                  <label>ITC Available</label>
+                  <span>-₹12,400</span>
+                </div>
+
+                <div className="final-payable-box-v52">
+                  <div className="final-label-v52">Final GST Payable</div>
+                  <div className="final-value-v52">₹1,36,100</div>
+                </div>
+
+                <div className="gst-report-period-v52">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                  <span>This report includes transactions received between March 01, 2026 and March 31, 2026</span>
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="monthly-ref-header-v52">
+                <h3 className="section-title-v52">Monthly Breakdown (for reference)</h3>
+                <div className="monthly-instructions-v52">
+                  <p>Monthly breakdown is for reference. Tax is filed quarterly.</p>
+                  <p>Platform charges include commission + GST (GST is not claimable under composition scheme)</p>
+                </div>
               </div>
 
-              <div className="breakdown-item-v52">
-                <div className="item-info-v52">
-                  <label>IGST (inter-state)</label>
-                  <span className="subtitle-v52">Integrated Goods and Services Tax</span>
+              {/* January Card */}
+              <div className="month-record-card-v52">
+                <div className="record-month-name-v52">January</div>
+                <div className="record-data-grid-v52">
+                  <div className="record-row-v52">
+                    <div className="record-label-v52">Total Turnover</div>
+                    <div className="record-value-container-v52">
+                      <span className="record-main-val-v52">₹2,50,000</span>
+                      <span className="turnover-split-muted-v52">₹1,00,000 platform + ₹1,50,000 Paid at Event</span>
+                    </div>
+                  </div>
+                  <div className="record-row-v52">
+                    <div className="record-label-v52">Estimated Tax</div>
+                    <div className="record-value-container-v52">
+                      <span className="record-main-val-v52">₹15,000</span>
+                    </div>
+                  </div>
+                  <div className="record-row-v52">
+                    <div className="record-label-v52">Platform Fee</div>
+                    <div className="record-value-container-v52">
+                      <span className="record-main-val-v52">₹1,800</span>
+                    </div>
+                  </div>
                 </div>
-                <span className="value-v52">₹74,250</span>
               </div>
 
-              <div className="split-divider-v52"></div>
+              {/* February Card */}
+              <div className="month-record-card-v52">
+                <div className="record-month-name-v52">February</div>
+                <div className="record-data-grid-v52">
+                  <div className="record-row-v52">
+                    <div className="record-label-v52">Total Turnover</div>
+                    <div className="record-value-container-v52">
+                      <span className="record-main-val-v52">₹3,00,000</span>
+                      <span className="turnover-split-muted-v52">₹1,20,000 platform + ₹1,80,000 Paid at Event</span>
+                    </div>
+                  </div>
+                  <div className="record-row-v52">
+                    <div className="record-label-v52">Estimated Tax</div>
+                    <div className="record-value-container-v52">
+                      <span className="record-main-val-v52">₹18,000</span>
+                    </div>
+                  </div>
+                  <div className="record-row-v52">
+                    <div className="record-label-v52">Platform Fee</div>
+                    <div className="record-value-container-v52">
+                      <span className="record-main-val-v52">₹1,800</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-              <div className="split-row-v52 bold">
-                <label>GST Collected</label>
-                <span>₹1,48,500</span>
-              </div>
-              <div className="split-row-v52 error bold">
-                <label>ITC Available</label>
-                <span>-₹12,400</span>
+              {/* March Card */}
+              <div className="month-record-card-v52">
+                <div className="record-month-name-v52">March</div>
+                <div className="record-data-grid-v52">
+                  <div className="record-row-v52">
+                    <div className="record-label-v52">Total Turnover</div>
+                    <div className="record-value-container-v52">
+                      <span className="record-main-val-v52">₹2,75,000</span>
+                      <span className="turnover-split-muted-v52">₹1,10,000 platform + ₹1,65,000 Paid at Event</span>
+                    </div>
+                  </div>
+                  <div className="record-row-v52">
+                    <div className="record-label-v52">Estimated Tax</div>
+                    <div className="record-value-container-v52">
+                      <span className="record-main-val-v52">₹16,500</span>
+                    </div>
+                  </div>
+                  <div className="record-row-v52">
+                    <div className="record-label-v52">Platform Fee</div>
+                    <div className="record-value-container-v52">
+                      <span className="record-main-val-v52">₹1,800</span>
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              <div className="final-payable-box-v52">
-                <div className="final-label-v52">Final GST Payable</div>
-                <div className="final-value-v52">₹1,36,100</div>
-              </div>
-
-              <div className="gst-report-period-v52">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                <span>This report includes transactions received between March 01, 2026 and March 31, 2026</span>
-              </div>
-            </div>
-          </>
-        ) : (
-          <>
-            <div className="monthly-ref-header-v52">
-              <h3 className="section-title-v52">Monthly Breakdown (for reference)</h3>
-              <div className="monthly-instructions-v52">
-                <p>Monthly breakdown is for reference. Tax is filed quarterly.</p>
-                <p>Platform charges include commission + GST (GST is not claimable under composition scheme)</p>
-              </div>
-            </div>
-
-            {/* January Card */}
-            <div className="month-record-card-v52">
-              <div className="record-month-name-v52">January</div>
-              <div className="record-data-grid-v52">
-                <div className="record-row-v52">
-                  <div className="record-label-v52">Total Turnover</div>
-                  <div className="record-value-container-v52">
-                    <span className="record-main-val-v52">₹2,50,000</span>
-                    <span className="turnover-split-muted-v52">₹1,00,000 platform + ₹1,50,000 offline</span>
+              {/* Total Quarter Card */}
+              <div className="month-record-card-v52 quarter-total-highlight-v52">
+                <div className="record-month-name-v52">Total (Quarter)</div>
+                <div className="record-data-grid-v52">
+                  <div className="record-row-v52">
+                    <div className="record-label-v52">Total Turnover</div>
+                    <div className="record-value-container-v52">
+                      <span className="record-main-val-v52">₹8,25,000</span>
+                      <span className="turnover-split-muted-v52">₹3,30,000 platform + ₹4,95,000 Paid at Event</span>
+                    </div>
                   </div>
-                </div>
-                <div className="record-row-v52">
-                  <div className="record-label-v52">Estimated Tax</div>
-                  <div className="record-value-container-v52">
-                    <span className="record-main-val-v52">₹15,000</span>
+                  <div className="record-row-v52">
+                    <div className="record-label-v52">Estimated Tax</div>
+                    <div className="record-value-container-v52">
+                      <span className="record-main-val-v52">₹49,500</span>
+                    </div>
                   </div>
-                </div>
-                <div className="record-row-v52">
-                  <div className="record-label-v52">Platform Fee</div>
-                  <div className="record-value-container-v52">
-                    <span className="record-main-val-v52">₹1,800</span>
+                  <div className="record-row-v52">
+                    <div className="record-label-v52">Platform Fee</div>
+                    <div className="record-value-container-v52">
+                      <span className="record-main-val-v52">₹5,400</span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-
-            {/* February Card */}
-            <div className="month-record-card-v52">
-              <div className="record-month-name-v52">February</div>
-              <div className="record-data-grid-v52">
-                <div className="record-row-v52">
-                  <div className="record-label-v52">Total Turnover</div>
-                  <div className="record-value-container-v52">
-                    <span className="record-main-val-v52">₹3,00,000</span>
-                    <span className="turnover-split-muted-v52">₹1,20,000 platform + ₹1,80,000 offline</span>
-                  </div>
-                </div>
-                <div className="record-row-v52">
-                  <div className="record-label-v52">Estimated Tax</div>
-                  <div className="record-value-container-v52">
-                    <span className="record-main-val-v52">₹18,000</span>
-                  </div>
-                </div>
-                <div className="record-row-v52">
-                  <div className="record-label-v52">Platform Fee</div>
-                  <div className="record-value-container-v52">
-                    <span className="record-main-val-v52">₹1,800</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* March Card */}
-            <div className="month-record-card-v52">
-              <div className="record-month-name-v52">March</div>
-              <div className="record-data-grid-v52">
-                <div className="record-row-v52">
-                  <div className="record-label-v52">Total Turnover</div>
-                  <div className="record-value-container-v52">
-                    <span className="record-main-val-v52">₹2,75,000</span>
-                    <span className="turnover-split-muted-v52">₹1,10,000 platform + ₹1,65,000 offline</span>
-                  </div>
-                </div>
-                <div className="record-row-v52">
-                  <div className="record-label-v52">Estimated Tax</div>
-                  <div className="record-value-container-v52">
-                    <span className="record-main-val-v52">₹16,500</span>
-                  </div>
-                </div>
-                <div className="record-row-v52">
-                  <div className="record-label-v52">Platform Fee</div>
-                  <div className="record-value-container-v52">
-                    <span className="record-main-val-v52">₹1,800</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Total Quarter Card */}
-            <div className="month-record-card-v52 quarter-total-highlight-v52">
-              <div className="record-month-name-v52">Total (Quarter)</div>
-              <div className="record-data-grid-v52">
-                <div className="record-row-v52">
-                  <div className="record-label-v52">Total Turnover</div>
-                  <div className="record-value-container-v52">
-                    <span className="record-main-val-v52">₹8,25,000</span>
-                    <span className="turnover-split-muted-v52">₹3,30,000 platform + ₹4,95,000 offline</span>
-                  </div>
-                </div>
-                <div className="record-row-v52">
-                  <div className="record-label-v52">Estimated Tax</div>
-                  <div className="record-value-container-v52">
-                    <span className="record-main-val-v52">₹49,500</span>
-                  </div>
-                </div>
-                <div className="record-row-v52">
-                  <div className="record-label-v52">Platform Fee</div>
-                  <div className="record-value-container-v52">
-                    <span className="record-main-val-v52">₹5,400</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </>
-        )}
-      </div>
+            </>
+          )}
+        </div>
       )}
 
       {/* Compliance Documents - Only for GST Registered */}
       {gstType !== 'non-gst' && (
         <div className="gst-section-v52">
-        <h3 className="section-title-v52">Compliance Documents</h3>
-        <div className="split-card-v52">
-          <div className="doc-category-v52" style={{ marginTop: 0 }}>
-            <div className="doc-sublabel-v52">REPORTS</div>
-            <div className="doc-grid-v52">
-              <button className="doc-btn-v52">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0077ff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                <span>GSTR-1 Data</span>
-              </button>
-              <button className="doc-btn-v52">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0077ff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                <span>GSTR-3B Summary</span>
-              </button>
+          <h3 className="section-title-v52">Compliance Documents</h3>
+          <div className="split-card-v52">
+            <div className="doc-category-v52" style={{ marginTop: 0 }}>
+              <div className="doc-sublabel-v52">REPORTS</div>
+              <div className="doc-grid-v52">
+                <button className="doc-btn-v52">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0077ff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                  <span>GSTR-1 Data</span>
+                </button>
+                <button className="doc-btn-v52">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0077ff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                  <span>GSTR-3B Summary</span>
+                </button>
+              </div>
             </div>
-          </div>
 
-          <div className="doc-category-v52">
-            <div className="doc-sublabel-v52">INVOICES</div>
-            <div className="doc-grid-v52">
-              <button className="doc-btn-v52">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0077ff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                <span>B2B Invoices</span>
-              </button>
+            <div className="doc-category-v52">
+              <div className="doc-sublabel-v52">INVOICES</div>
+              <div className="doc-grid-v52">
+                <button className="doc-btn-v52">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0077ff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                  <span>B2B Invoices</span>
+                </button>
+              </div>
             </div>
-          </div>
 
-          <div className="doc-category-v52">
-            <div className="doc-sublabel-v52">OPTIONAL</div>
-            <div className="doc-grid-v52">
-              <button className="doc-btn-v52">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0077ff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                <span>Full GST Summary</span>
-              </button>
+            <div className="doc-category-v52">
+              <div className="doc-sublabel-v52">OPTIONAL</div>
+              <div className="doc-grid-v52">
+                <button className="doc-btn-v52">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0077ff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                  <span>Full GST Summary</span>
+                </button>
+              </div>
             </div>
-          </div>
           </div>
         </div>
       )}
@@ -1983,28 +2106,28 @@ const MobileGSTView = () => {
       {/* Bottom Info Section - Only for GST Registered */}
       {gstType !== 'non-gst' && (
         <div className="gst-footer-info-v52">
-        <div className="footer-notice-v52 c-accountant">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-          <p>Share this report with your <strong>Chartered Accountant (CA)</strong> for final GST filing.</p>
-        </div>
-        <div className="footer-notice-v52 disclaimer">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-          <div className="disclaimer-list-v52">
-            {gstType === 'regular' ? (
-              <>
-                <p>• This report includes platform transactions and self-reported earnings. Please verify all details before filing.</p>
-                <p>• GST reporting is based on common tax rules. Consult with your tax advisor for specific cases.</p>
-              </>
-            ) : (
-              <>
-                <p>• Tax is calculated on total turnover</p>
-                <p>• Input Tax Credit (ITC) is not applicable under composition scheme</p>
-                <p>• GST is not charged separately to customers</p>
-              </>
-            )}
+          <div className="footer-notice-v52 c-accountant">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            <p>Share this report with your <strong>Chartered Accountant (CA)</strong> for final GST filing.</p>
+          </div>
+          <div className="footer-notice-v52 disclaimer">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            <div className="disclaimer-list-v52">
+              {gstType === 'regular' ? (
+                <>
+                  <p>• This report includes platform transactions and self-reported earnings. Please verify all details before filing.</p>
+                  <p>• GST reporting is based on common tax rules. Consult with your tax advisor for specific cases.</p>
+                </>
+              ) : (
+                <>
+                  <p>• Tax is calculated on total turnover</p>
+                  <p>• Input Tax Credit (ITC) is not applicable under composition scheme</p>
+                  <p>• GST is not charged separately to customers</p>
+                </>
+              )}
+            </div>
           </div>
         </div>
-      </div>
       )}
     </div>
   );
@@ -2051,7 +2174,7 @@ const MobileTDSView = () => {
           <div className="summary-value-v53">₹{totalNet.toLocaleString()}</div>
           <div className="summary-subtext-v53">(after TDS deduction)</div>
         </div>
-        
+
         <div className="tds-summary-card-v53">
           <div className="summary-label-v53">Total TDS Deducted</div>
           <div className="summary-value-v53 highlight-blue">₹{totalTDS.toLocaleString()}</div>
@@ -3647,9 +3770,9 @@ const MobileChangePasswordView = ({ onClose }: { onClose: () => void }) => {
 
 /* ─────────────────── MOBILE SETTINGS VIEW (v64) ─────────────────── */
 
-const MobileSettingsView = ({ 
-  profileData, 
-  setIsChangingPassword, 
+const MobileSettingsView = ({
+  profileData,
+  setIsChangingPassword,
   setSecurityConfirmModal,
   membershipStatus,
   setMembershipStatus,
@@ -3657,9 +3780,9 @@ const MobileSettingsView = ({
   setIsBannerDismissed,
   isManageModalOpen,
   setIsManageModalOpen
-}: { 
-  profileData: any, 
-  setIsChangingPassword: (v: boolean) => void, 
+}: {
+  profileData: any,
+  setIsChangingPassword: (v: boolean) => void,
   setSecurityConfirmModal: (type: 'logout-all' | 'remove-device' | null) => void,
   membershipStatus: any,
   setMembershipStatus: any,
@@ -3837,7 +3960,7 @@ const MobileSettingsView = ({
         <div className="plan-section-v70">
           <div className="subscription-header-row-v70">
             <h3 className="settings-section-title-v64">myMembership Plan</h3>
-            <button 
+            <button
               className="manage-subscription-btn-v70"
               onClick={() => setIsManageModalOpen(true)}
             >
@@ -4056,8 +4179,8 @@ const MobileSettingsView = ({
   return (
     <div className="mobile-settings-view-v64 mobile-scroller-v50">
       {activeSubTab === 'myMembership' && !isBannerDismissed && (
-        <MembershipStatusBanner 
-          status={membershipStatus} 
+        <MembershipStatusBanner
+          status={membershipStatus}
           isDashboard={true}
           onAction={() => setIsManageModalOpen(true)}
           onDismiss={() => setIsBannerDismissed(true)}
@@ -4691,7 +4814,7 @@ const MobileServiceSettingsView = ({
 
           <div className="card-subsection-v54">
             <h4 className="card-subtitle-v54">Timing & Bookings</h4>
-            
+
             <div className="service-notice-box-v54">
               <div className="notice-icon-v54">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -4701,7 +4824,7 @@ const MobileServiceSettingsView = ({
                 </svg>
               </div>
               <div className="notice-text-v54">
-                <strong>Note:</strong> Customers can book this service at least 4 days in advance, due to refund policy & Preparing time.
+                <strong>Note:</strong> Customers can book this service at least 4 days in advance, due to refund policy & Live status.
               </div>
             </div>
 
@@ -4724,8 +4847,8 @@ const MobileServiceSettingsView = ({
                   disabled={!isEditing}
                 />
               </div>
-              </div>
             </div>
+          </div>
 
           <div className="card-divider-v54"></div>
 
@@ -4808,7 +4931,7 @@ const MobileServiceSettingsView = ({
                       <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
                     </div>
                   )}
-                  
+
                   {/* Status Badge */}
                   <div className="live-status-badge-v54">LIVE</div>
 
@@ -4939,8 +5062,8 @@ const MobileDashboard = (props: MobileDashboardProps) => {
     if (activeTab === 'dashboard' && !isBannerDismissed && (membershipStatus === 'paused' || membershipStatus === 'cancelled_active')) {
       return (
         <div style={{ padding: '0 16px 12px 16px' }}>
-          <MembershipStatusBanner 
-            status={membershipStatus} 
+          <MembershipStatusBanner
+            status={membershipStatus}
             isDashboard={true}
             onAction={() => {
               setActiveTab('settings');
@@ -5009,9 +5132,9 @@ const MobileDashboard = (props: MobileDashboardProps) => {
           setMenuStep={setMenuStep}
         />
       ) : activeTab === 'settings' ? (
-        <MobileSettingsView 
-          profileData={profileData} 
-          setIsChangingPassword={setIsChangingPassword} 
+        <MobileSettingsView
+          profileData={profileData}
+          setIsChangingPassword={setIsChangingPassword}
           setSecurityConfirmModal={setSecurityConfirmModal}
           membershipStatus={membershipStatus}
           setMembershipStatus={setMembershipStatus}

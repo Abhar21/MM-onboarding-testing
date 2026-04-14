@@ -3080,7 +3080,7 @@ const ServiceSettings = ({
                     </div>
                     <span>
                       <strong>Note:</strong>
-                    </span>Customers can book this service at least 4 days in advance, due to refund policy & Preparing time.
+                    </span>Customers can book this service at least 4 days in advance, due to refund policy & Live status.
                   </div>
 
                   <div className="settings-grid-rows">
@@ -5464,7 +5464,7 @@ const BookingDetailModal = ({
     switch (status) {
       case 'Pending': return '#f59e0b';
       case 'Confirmed': return '#3b82f6';
-      case 'Preparing': return '#8b5cf6';
+      case 'Live': return '#ef4444';
       case 'Completed': return '#10b981';
       case 'Cancelled': return '#ef4444';
       default: return '#64748b';
@@ -5473,8 +5473,8 @@ const BookingDetailModal = ({
 
   const nextActionsMap: Record<string, { label: string; next: string }> = {
     'Pending': { label: 'Accept Booking', next: 'Confirmed' },
-    'Confirmed': { label: 'Start Preparing', next: 'Preparing' },
-    'Preparing': { label: 'Mark Completed', next: 'Completed' }
+    'Confirmed': { label: 'Go Live', next: 'Live' },
+    'Live': { label: 'Mark Completed', next: 'Completed' }
   };
 
   const nextAction = nextActionsMap[booking.status];
@@ -5575,6 +5575,21 @@ const BookingDetailModal = ({
               const vendorPayout = booking.paid - totalDeductions;
               const totalEarnings = vendorPayout + (booking.amount - booking.paid);
 
+              const eventDateObj = new Date(booking.date || '');
+              const payoutStart = new Date(eventDateObj);
+              payoutStart.setDate(eventDateObj.getDate() - 2);
+              const payoutEnd = new Date(eventDateObj);
+              payoutEnd.setDate(eventDateObj.getDate());
+              
+              const startMonth = payoutStart.toLocaleDateString('en-GB', { month: 'short' });
+              const endMonth = payoutEnd.toLocaleDateString('en-GB', { month: 'short' });
+              const estimateStr = startMonth === endMonth
+                ? `${payoutStart.getDate()}-${payoutEnd.getDate()} ${startMonth} ${payoutStart.getFullYear()}`
+                : `${payoutStart.getDate()} ${startMonth} - ${payoutEnd.getDate()} ${endMonth} ${payoutStart.getFullYear()}`;
+
+              const diffHrsToEvent = (eventDateObj.getTime() - new Date().getTime()) / (1000 * 60 * 60);
+              const diffDaysToEvent = diffHrsToEvent / 24;
+
               return (
                 <div className="financial-breakdown-v30">
                   <div className="section-header-row-v30" style={{ marginBottom: '8px' }}>
@@ -5595,11 +5610,13 @@ const BookingDetailModal = ({
                       {/* Step 1: Total Booking Value */}
                       <div className="breakdown-section-v30">
                         <div className="section-label-v30">1. Total Booking Value</div>
-                        <div className="breakdown-row-v30">
-                          <label>Booking Amount</label>
-                          <span>₹{(booking.originalAmount || booking.amount).toLocaleString()}</span>
+                        <div className="breakdown-row-v30" style={{ alignItems: 'flex-start' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                            <label style={{ fontWeight: 600, fontSize: '1.05rem', color: '#1e293b' }}>Booking Amount</label>
+                            <span style={{ fontSize: '0.85rem', color: '#94a3b8', fontWeight: 500 }}>Includes GST</span>
+                          </div>
+                          <span style={{ fontWeight: 700, fontSize: '1.25rem', color: '#0f172a' }}>₹{(booking.originalAmount || booking.amount).toLocaleString()}</span>
                         </div>
-                        <span className="helper-text-v30">Includes GST</span>
                         {booking.discount > 0 && (
                           <>
                             <div className="breakdown-row-v30" style={{ color: '#ef4444', marginTop: '12px' }}>
@@ -5623,7 +5640,7 @@ const BookingDetailModal = ({
                           <span style={{ color: '#10b981' }}>₹{booking.paid.toLocaleString()}</span>
                         </div>
                         <div className="breakdown-row-v30">
-                          <label>Offline Payment (Remaining)</label>
+                          <label>Paid at Event Payment (Remaining)</label>
                           <span style={{ color: '#f59e0b' }}>₹{(booking.amount - booking.paid).toLocaleString()}</span>
                         </div>
                         <div className="breakdown-note-v30 collection-highlight-v30">
@@ -5671,17 +5688,42 @@ const BookingDetailModal = ({
                     </>
                   )}
 
-                  {/* Step 4: Final Payout */}
-                  <div className="section-label-v30" style={{ marginTop: '0px' }}>Final Settlement</div>
-                  <div className="breakdown-row-v30">
-                    <label style={{ fontWeight: 600 }}>You Receive (Payout)</label>
-                    <span style={{ color: '#10b981', fontSize: '1.2rem' }}>₹{vendorPayout.toLocaleString()}</span>
-                  </div>
+                  <div className="section-label-v30" style={{ marginTop: '0px', marginBottom: '4px' }}>Final Settlement</div>
+                  {booking.status === 'Live' || booking.status === 'Completed' || (booking.status === 'Upcoming' && diffDaysToEvent < 2) ? (
+                    <div style={{ backgroundColor: 'rgba(16, 185, 129, 0.06)', borderRadius: '8px', padding: '14px 12px', margin: '0 0 8px 0', border: '1px solid rgba(16, 185, 129, 0.15)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      <div className="breakdown-row-v30" style={{ borderBottom: 'none', paddingBottom: 0, paddingTop: 0 }}>
+                        <label style={{ fontWeight: 600, color: '#0f172a' }}>You Receive (Payout)</label>
+                        <span style={{ color: '#10b981', fontSize: '1.25rem', fontWeight: 700 }}>₹{vendorPayout.toLocaleString()}</span>
+                      </div>
+                      <div className="breakdown-row-v30" style={{ paddingTop: 0, marginTop: 0, borderBottom: 'none' }}>
+                        <label style={{ color: '#047857', fontWeight: 500, fontSize: '0.9rem' }}>
+                          {booking.status === 'Live' || booking.status === 'Completed' || (booking.status === 'Upcoming' && diffDaysToEvent < 2) ? 'Payout date' : 'Estimate payout date'}
+                        </label>
+                        <span style={{ color: '#047857', fontWeight: 600, fontSize: '0.9rem' }}>{estimateStr}</span>
+                      </div>
+                      <div className="breakdown-note-v30" style={{ marginTop: '4px', color: '#059669', opacity: 0.9, backgroundColor: 'rgba(16, 185, 129, 0.04)', padding: '8px', borderRadius: '6px' }}>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                        <span style={{ fontSize: '0.8rem' }}>Payout between 12–48 hrs before event</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div style={{ backgroundColor: 'rgba(16, 185, 129, 0.06)', borderRadius: '8px', padding: '14px 12px', margin: '0 0 8px 0', border: '1px solid rgba(16, 185, 129, 0.15)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      <div className="breakdown-row-v30" style={{ borderBottom: 'none', paddingBottom: 0, paddingTop: 0 }}>
+                        <label style={{ fontWeight: 600, color: '#1e293b' }}>You Receive (Payout)</label>
+                        <span style={{ color: '#10b981', fontSize: '1.25rem', fontWeight: 700 }}>₹{vendorPayout.toLocaleString()}</span>
+                      </div>
+                      <div className="breakdown-row-v30" style={{ paddingTop: 0, marginTop: 0, borderBottom: 'none' }}>
+                        <label style={{ color: '#047857', fontWeight: 500, fontSize: '0.9rem' }}>Estimate payout date</label>
+                        <span style={{ color: '#047857', fontWeight: 600, fontSize: '0.9rem' }}>{estimateStr}</span>
+                      </div>
+                      <div className="breakdown-note-v30 payment-timing-note-inside-v30" style={{ marginTop: '4px', color: '#047857', opacity: 0.8, backgroundColor: 'rgba(16, 185, 129, 0.04)', padding: '8px', borderRadius: '6px', border: 'none', boxShadow: 'none' }}>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                        <span style={{ fontSize: '0.8rem' }}>Payout between 12–48 hrs before event</span>
+                      </div>
+                    </div>
+                  )}
 
-                  <div className="breakdown-note-v30 payout-timing-note-v30" style={{ marginTop: '4px' }}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                    <span>Payout between 18–20 May (12–48 hrs before event)</span>
-                  </div>
+
 
                   {/* Step 5: Total Earnings */}
                   <div className="total-earnings-card-v30">
@@ -5689,6 +5731,7 @@ const BookingDetailModal = ({
                       <label>TOTAL EARNINGS</label>
                       <span>₹{totalEarnings.toLocaleString()}</span>
                       <div className="incl-gst-bottom-v30">(Incl. GST)</div>
+                      <div className="earnings-helper-v30">Includes Paid at Event + platform payout</div>
                     </div>
                   </div>
                 </div>
@@ -5700,7 +5743,7 @@ const BookingDetailModal = ({
           <div className="detail-section-v7 docs-section-v12">
             <h4 className="section-title-v7">Documents</h4>
             <div className="documents-card-v12">
-              {['Upcoming', 'Preparing', 'Cancelled'].includes(booking.status) && (
+              {['Upcoming', 'Live', 'Cancelled'].includes(booking.status) && (
                 <div className="document-item-v12">
                   <div className="doc-info-v12">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
@@ -5902,7 +5945,7 @@ const BookingDetailModal = ({
             eventDate.setHours(0, 0, 0, 0);
             const diffHrsToEvent = (eventDate.getTime() - new Date().getTime()) / (1000 * 60 * 60);
 
-            const isPayoutProcessed = booking.status === 'Preparing' || (booking.status === 'Upcoming' && diffHrsToEvent < 24);
+            const isPayoutProcessed = booking.status === 'Live' || booking.status === 'Completed' || (booking.status === 'Upcoming' && diffHrsToEvent < 48);
 
             if (isPayoutProcessed) return null;
 
@@ -6214,10 +6257,11 @@ const Bookings = () => {
     {
       id: 'BK-12401',
       customer: 'Amit Khurana',
-      date: new Date().toISOString().split('T')[0], // Today
+      date: new Date().toISOString().split('T')[0],
       time: '12:30 PM',
       type: 'Wedding Catering',
       serviceCategory: 'Lunch',
+      category: 'Lunch',
       menuName: 'Premium Sadhya Menu',
       guests: 200,
       amount: 145000,
@@ -6225,38 +6269,54 @@ const Bookings = () => {
       discount: 15000,
       payout: 41235,
       paid: 43500,
-      status: 'Preparing',
+      status: 'Live',
+      address: '402, Skyline Residency, Sector 44, Bengaluru',
       menuSelection: [
         { name: 'Starters', type: 'Selected', items: ['Paneer Tikka', 'Hara Bhara Kabab'] },
         { name: 'Main Course', type: 'All Items', items: ['Paneer Butter Masala', 'Dal Makhani', 'Veg Pulao', 'Butter Naan'] },
         { name: 'Desserts', type: 'Selected', items: ['Gulab Jamun', 'Rasmalai'] }
       ],
+      menuDetails: {
+        categories: [
+          { name: 'Starters', items: ['Paneer Tikka', 'Hara Bhara Kabab'], status: 'All Items Included' },
+          { name: 'Main Course', items: ['Paneer Butter Masala', 'Dal Makhani', 'Veg Pulao', 'Butter Naan'], status: 'Customer Selected' },
+          { name: 'Desserts', items: ['Gulab Jamun', 'Rasmalai'], status: 'All Items Included' }
+        ]
+      },
       timeline: [
         { status: 'Pending', time: '15 Mar, 09:00 AM' },
         { status: 'Confirmed', time: '15 Mar, 02:30 PM' },
-        { status: 'Preparing', time: '20 Mar, 08:00 AM' }
+        { status: 'Live', time: '20 Mar, 08:00 AM' }
       ],
       taxType: 'B2C'
     },
     {
       id: 'BK-12405',
       customer: 'Siddharth Malhotra',
-      date: '2026-03-22', // Upcoming
+      date: new Date(Date.now() + 48 * 3600000).toISOString().split('T')[0], // Exactly 2 days away
       time: '07:30 PM',
       type: 'Corporate Gala',
       serviceCategory: 'Dinner',
+      category: 'Dinner',
       menuName: 'Executive Buffet',
       guests: 150,
-      amount: 85000,
-      originalAmount: 95000,
-      discount: 10000,
-      payout: 24225,
-      paid: 25500,
+      amount: 418000,
+      originalAmount: 450000,
+      discount: 32000,
+      payout: 118935,
+      paid: 125500,
       status: 'Upcoming',
+      address: 'Apartment 701, Prestige Ferns Residency, Bellandur',
       menuSelection: [
         { name: 'Dinner', type: 'Selected', items: ['Jeera Rice', 'Paneer Tikka', 'Butter Naan'] },
         { name: 'Drinks', type: 'All Items', items: ['Butter Milk', 'Fresh Lime Soda'] }
       ],
+      menuDetails: {
+        categories: [
+          { name: 'Dinner', items: ['Jeera Rice', 'Paneer Tikka', 'Butter Naan'], status: 'Customer Selected' },
+          { name: 'Drinks', items: ['Butter Milk', 'Fresh Lime Soda'], status: 'All Items Included' }
+        ]
+      },
       timeline: [
         { status: 'Pending', time: '18 Mar, 11:15 AM' },
         { status: 'Confirmed', time: '18 Mar, 05:00 PM' }
@@ -6266,10 +6326,11 @@ const Bookings = () => {
     {
       id: 'BK-12398',
       customer: 'Ananya Pandey',
-      date: '2026-03-20', // Yesterday
+      date: new Date(Date.now() - 24 * 3600000).toISOString().split('T')[0], // Yesterday
       time: '04:30 PM',
       type: 'Engagement Party',
       serviceCategory: 'Snacks',
+      category: 'Snacks',
       menuName: 'High Tea Special',
       guests: 80,
       amount: 45000,
@@ -6278,13 +6339,19 @@ const Bookings = () => {
       payout: 12825,
       paid: 13500,
       status: 'Completed',
+      address: 'No. 34, 1st Cross, Indiranagar 2nd Stage',
       menuSelection: [
         { name: 'Breakfast', type: 'All Items', items: ['Samosa', 'Chai', 'Sandwich'] }
       ],
+      menuDetails: {
+        categories: [
+          { name: 'Snacks', items: ['Samosa', 'Chai', 'Sandwich'], status: 'All Included' }
+        ]
+      },
       timeline: [
         { status: 'Pending', time: '10 Mar, 10:00 AM' },
         { status: 'Confirmed', time: '10 Mar, 12:00 PM' },
-        { status: 'Preparing', time: '19 Mar, 09:00 AM' },
+        { status: 'Live', time: '19 Mar, 09:00 AM' },
         { status: 'Completed', time: '20 Mar, 11:00 PM' }
       ],
       taxType: 'B2B'
@@ -6292,10 +6359,11 @@ const Bookings = () => {
     {
       id: 'BK-12410',
       customer: 'Varun Dhawan',
-      date: '2026-03-24',
+      date: new Date(Date.now() + 120 * 3600000).toISOString().split('T')[0], // 5 days away
       time: '08:00 PM',
       type: 'Private Dinner',
       serviceCategory: 'Dinner',
+      category: 'Dinner',
       menuName: 'Romantic Four-Course',
       guests: 12,
       amount: 15000,
@@ -6304,83 +6372,17 @@ const Bookings = () => {
       payout: 4275,
       paid: 4500,
       status: 'Upcoming',
+      address: 'Flat 4A, Green Meadows Appts, Koramangala',
       menuSelection: [
         { name: 'Dinner', type: 'Selected', items: ['Salad', 'Soup', 'Main Course'] }
       ],
+      menuDetails: {
+        categories: [
+          { name: 'Dinner', items: ['Soup', 'Main Course'], status: 'All Included' }
+        ]
+      },
       timeline: [
         { status: 'Pending', time: '21 Mar, 08:30 AM' }
-      ],
-      taxType: 'B2C'
-    },
-    {
-      id: 'BK-12412',
-      customer: 'Kareena Kapoor',
-      date: '2026-03-25',
-      time: '01:00 PM',
-      type: 'Baby Shower',
-      serviceCategory: 'Lunch',
-      menuName: 'Healthy Salads & Juice',
-      guests: 40,
-      amount: 35000,
-      originalAmount: 40000,
-      discount: 5000,
-      payout: 9975,
-      paid: 10500,
-      status: 'Upcoming',
-      menuSelection: [
-        { name: 'Lunch', type: 'All Items', items: ['Healthy Salad', 'Fresh Juice'] }
-      ],
-      timeline: [
-        { status: 'Pending', time: '20 Mar, 04:00 PM' },
-        { status: 'Confirmed', time: '21 Mar, 10:00 AM' }
-      ],
-      taxType: 'B2B'
-    },
-    {
-      id: 'BK-12415',
-      customer: 'Ranbir Kapoor',
-      date: '2026-03-26',
-      time: '09:00 PM',
-      type: 'Bachelors Party',
-      serviceCategory: 'Dinner',
-      menuName: 'Royal North Indian',
-      guests: 25,
-      amount: 60000,
-      originalAmount: 65000,
-      discount: 5000,
-      payout: 17100,
-      paid: 18000,
-      status: 'Upcoming',
-      menuSelection: [
-        { name: 'Dinner', type: 'All Items', items: ['Naan', 'Butter Chicken', 'Dal Tadka'] }
-      ],
-      timeline: [
-        { status: 'Pending', time: '21 Mar, 11:00 AM' }
-      ],
-      taxType: 'B2C'
-    },
-    {
-      id: 'BK-12418',
-      customer: 'Priya Sharma',
-      date: '2026-03-22',
-      time: '01:00 PM',
-      type: 'Birthday Kids',
-      serviceCategory: 'Lunch',
-      menuName: 'Kids Special Menu',
-      guests: 50,
-      amount: 25000,
-      originalAmount: 28000,
-      discount: 3000,
-      payout: 7125,
-      paid: 7500,
-      status: 'Cancelled',
-      cancelledBy: 'Vendor',
-      menuSelection: [
-        { name: 'Lunch', type: 'Selected', items: ['Mini Pizza', 'Pasta', 'Fries'] }
-      ],
-      timeline: [
-        { status: 'Pending', time: '15 Mar, 10:00 AM' },
-        { status: 'Cancelled', time: `${new Date(Date.now() - 72 * 3600000).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}, 10:00 AM` }
       ],
       taxType: 'B2C'
     },
@@ -6461,8 +6463,9 @@ const Bookings = () => {
 
   const [filter, setFilter] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
-  const [dateRange, setDateRange] = useState({ from: '', to: '' });
-  const [rangeShortcut, setRangeShortcut] = useState('All');
+  const todayStr = new Date().toISOString().split('T')[0];
+  const [dateRange, setDateRange] = useState({ from: todayStr, to: '' });
+  const [rangeShortcut, setRangeShortcut] = useState('Today & Upcoming');
   const [selectedBooking, setSelectedBooking] = useState<any>(null);
   const [showDetail, setShowDetail] = useState(false);
   const [bookingsPage, setBookingsPage] = useState(1);
@@ -6472,16 +6475,12 @@ const Bookings = () => {
     setRangeShortcut(shortcut);
     setBookingsPage(1);
     const now = new Date();
-    if (shortcut === 'Today') {
+    if (shortcut === 'Today & Upcoming') {
       const todayStr = now.toISOString().split('T')[0];
-      setDateRange({ from: todayStr, to: todayStr });
+      setDateRange({ from: todayStr, to: '' });
     } else if (shortcut === 'This Month') {
       const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
       const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
-      setDateRange({ from: firstDay, to: lastDay });
-    } else if (shortcut === 'Last Month') {
-      const firstDay = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString().split('T')[0];
-      const lastDay = new Date(now.getFullYear(), now.getMonth(), 0).toISOString().split('T')[0];
       setDateRange({ from: firstDay, to: lastDay });
     } else if (shortcut === 'All') {
       setDateRange({ from: '', to: '' });
@@ -6507,7 +6506,7 @@ const Bookings = () => {
     // 2. Status Filter
     let matchesStatus = true;
     if (filter === 'Upcoming') matchesStatus = b.date > today && b.status !== 'Cancelled';
-    else if (filter === 'Preparing') matchesStatus = b.date === today && b.status !== 'Cancelled' && b.status !== 'Completed';
+    else if (filter === 'Live') matchesStatus = b.date === today && b.status !== 'Cancelled' && b.status !== 'Completed';
     else if (filter === 'Completed') matchesStatus = b.status === 'Completed' || (b.date === yesterday && b.status !== 'Cancelled');
     else if (filter === 'Cancelled') matchesStatus = b.status === 'Cancelled';
 
@@ -6518,6 +6517,8 @@ const Bookings = () => {
     if (dateRange.to && b.date > dateRange.to) return false;
 
     return true;
+  }).sort((a, b) => {
+    return new Date(a.date).getTime() - new Date(b.date).getTime();
   });
 
   const totalBookingsPages = Math.ceil(filteredBookings.length / bookingsPerPage);
@@ -6573,7 +6574,7 @@ const Bookings = () => {
     const diffHrsToEvent = (eventDate.getTime() - new Date().getTime()) / (1000 * 60 * 60);
     const diffDaysToEvent = Math.ceil(diffHrsToEvent / 24);
 
-    if (booking.status === 'Preparing' || booking.status === 'Completed') {
+    if (booking.status === 'Live' || booking.status === 'Completed') {
       statusText = 'Payout processed';
       statusClass = 'credited';
       return { amountText, statusText, statusClass };
@@ -6686,7 +6687,7 @@ const Bookings = () => {
                 }}>
                   <option value="All">All Bookings</option>
                   <option value="Upcoming">Upcoming</option>
-                  <option value="Preparing">Preparing</option>
+                  <option value="Live">Live</option>
                   <option value="Completed">Completed</option>
                   <option value="Cancelled">Cancelled</option>
                 </select>
@@ -6698,7 +6699,7 @@ const Bookings = () => {
             <div className="status-group-v11">
               <h3 className="section-title-v10">Status</h3>
               <div className="shortcut-pills-v9">
-                {['All', 'Today', 'This Month', 'Last Month'].map(s => (
+                {['All', 'Today & Upcoming', 'This Month'].map(s => (
                   <button
                     key={s}
                     className={`shortcut-btn-v9 ${rangeShortcut === s ? 'active' : ''}`}
@@ -8593,8 +8594,8 @@ const RevenueAnalytics = ({
     {
       label: 'Total Earnings (incl. GST)',
       value: `₹${totalEarningsVal.toLocaleString('en-IN')}`,
-      subtitle: 'Includes platform + offline earnings',
-      split: `Platform: ₹${platformEarningsVal.toLocaleString('en-IN')} | Offline: ₹${offlineEarningsVal.toLocaleString('en-IN')}`,
+      subtitle: 'Includes platform + Paid at Event earnings',
+      split: `Platform: ₹${platformEarningsVal.toLocaleString('en-IN')} | Paid at Event: ₹${offlineEarningsVal.toLocaleString('en-IN')}`,
       growth: growthString,
       icon: '💰',
       trend: currentTrend
