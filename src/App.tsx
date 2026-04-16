@@ -1,6 +1,24 @@
-// Force deployment to resolve stale build cache - 2026-04-13
 import React, { useState, useEffect, useRef } from 'react';
 import { Routes, Route, useNavigate, Navigate, Link } from 'react-router-dom';
+import { 
+  DndContext, 
+  closestCenter, 
+  KeyboardSensor, 
+  PointerSensor, 
+  useSensor, 
+  useSensors,
+  TouchSensor,
+  type DragEndEvent
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { GripVertical } from 'lucide-react';
 import MobileDashboard from './MobileDashboard';
 import ManageMembershipModal from './ManageMembership';
 import MembershipStatusBanner from './MembershipStatusBanner';
@@ -2702,6 +2720,35 @@ const ServiceSettings = ({
   resetAddMenu,
   profileData
 }: any) => {
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 250,
+        tolerance: 5,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      setSections((items: any[]) => {
+        const oldIndex = parseInt(active.id.toString());
+        const newIndex = parseInt(over.id.toString());
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
+  };
+
   const [activeCategory, setActiveCategory] = useState('breakfast');
   const [isEditingService, setIsEditingService] = useState(false);
   const [tempSettings, setTempSettings] = useState<any>(null);
@@ -3761,33 +3808,35 @@ const ServiceSettings = ({
                         )}
 
                         <div className="saved-sections-list">
-                          {sections.map((sec: any, idx: number) => {
-                            if (idx === sectionEditingIndex) return null;
-                            return (
-                              <div key={idx} className="section-summary-card">
-                                <div className="sec-sum-info">
-                                  <span className="sec-sum-name">{sec.name}</span>
-                                  <span className="sec-sum-rule">
-                                    {sec.type === 'All Included' ? 'All items included' : `Choose any ${sec.limit} from ${sec.items.length} items`}
-                                  </span>
-                                </div>
-                                <div className="section-actions-inline">
-                                  <button className="icon-btn edit-btn" onClick={() => {
-                                    setCurrentSection({ ...sec });
-                                    setSectionEditingIndex(idx);
-                                    setIsAddingSection(true);
-                                  }}>
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                                  </button>
-                                  <button className="icon-btn delete-btn" onClick={() => {
-                                    setSections(sections.filter((_: any, i: number) => i !== idx));
-                                  }}>
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                                  </button>
-                                </div>
-                              </div>
-                            );
-                          })}
+                          <DndContext
+                            sensors={sensors}
+                            collisionDetection={closestCenter}
+                            onDragEnd={handleDragEnd}
+                          >
+                            <SortableContext
+                              items={sections.map((_: any, i: number) => i.toString())}
+                              strategy={verticalListSortingStrategy}
+                            >
+                              {sections.map((sec: any, idx: number) => {
+                                if (idx === sectionEditingIndex) return null;
+                                return (
+                                  <SortableSectionItem
+                                    key={idx}
+                                    idx={idx}
+                                    sec={sec}
+                                    onEdit={() => {
+                                      setCurrentSection({ ...sec });
+                                      setSectionEditingIndex(idx);
+                                      setIsAddingSection(true);
+                                    }}
+                                    onDelete={() => {
+                                      setSections(sections.filter((_: any, i: number) => i !== idx));
+                                    }}
+                                  />
+                                );
+                              })}
+                            </SortableContext>
+                          </DndContext>
                         </div>
 
                         {!isAddingSection && sections.length > 0 && (
@@ -4015,7 +4064,7 @@ const ServiceSettings = ({
                         <button
                           className="btn btn-primary-blue"
                           onClick={() => setMenuStep((prev: number) => prev + 1)}
-                          disabled={menuStep === 1 && !menuIdentity.name}
+                          disabled={(menuStep === 1 && !menuIdentity.name) || (menuStep === 2 && (sections.length === 0 || isAddingSection))}
                         >
                           Next
                         </button>
@@ -5568,12 +5617,24 @@ const BookingDetailModal = ({
 
           <div className="detail-section-v7">
             {(() => {
-              const commission = Math.round(booking.paid * 0.10);
-              const commissionGst = Math.round(commission * 0.18);
-              const tds = Math.round(booking.paid * 0.001);
+              const commissionRate = 0.10;
+              const gstRate = 0.18;
+              const tdsRate = 0.001;
+
+              // Refund/Retention logic for Cancelled bookings
+              const refundPercentage = booking.refundPercentage ?? 50; 
+              const refundToCustomer = Math.round(booking.paid * (refundPercentage / 100));
+              const vendorRetain = booking.paid - refundToCustomer;
+
+              // Platform Deductions (calculated ONLY on retained amount)
+              const commission = Math.round(vendorRetain * commissionRate);
+              const commissionGst = Math.round(commission * gstRate);
+              const tds = Math.round(vendorRetain * tdsRate);
               const totalDeductions = commission + commissionGst + tds;
-              const vendorPayout = booking.paid - totalDeductions;
-              const totalEarnings = vendorPayout + (booking.amount - booking.paid);
+              
+              const vendorPayoutFromPlatform = vendorRetain - totalDeductions;
+              const vendorPayout = booking.status === 'Cancelled' ? vendorPayoutFromPlatform : (booking.paid - (Math.round(booking.paid * commissionRate) + Math.round(Math.round(booking.paid * commissionRate) * gstRate) + Math.round(booking.paid * tdsRate)));
+              const totalEarnings = booking.status === 'Cancelled' ? vendorPayout : (vendorPayout + (booking.amount - booking.paid));
 
               const eventDateObj = new Date(booking.date || '');
               const payoutStart = new Date(eventDateObj);
@@ -5592,22 +5653,43 @@ const BookingDetailModal = ({
 
               return (
                 <div className="financial-breakdown-v30">
-                  <div className="section-header-row-v30" style={{ marginBottom: '8px' }}>
-                    <h4 className="section-title-v7" style={{ margin: 0 }}>PAYMENT SUMMARY</h4>
-                    <button
-                      className="calculation-toggle-btn-v30"
-                      onClick={() => setIsBreakdownExpanded(!isBreakdownExpanded)}
-                    >
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                        <polyline points={isBreakdownExpanded ? "18 15 12 9 6 15" : "6 9 12 15 18 9"}></polyline>
-                      </svg>
-                      {isBreakdownExpanded ? 'Hide details' : 'Show details'}
-                    </button>
-                  </div>
+                  {booking.status === 'Cancelled' ? (
+                    <div style={{ backgroundColor: '#fff1f2', border: '1px solid #fecaca', borderRadius: '12px', padding: '16px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                        <h4 style={{ margin: 0, color: '#991b1b', fontSize: '1.1rem', fontWeight: 700 }}>Booking Cancelled</h4>
+                        <p style={{ margin: 0, color: '#b91c1c', fontSize: '0.85rem', fontWeight: 500 }}>Cancelled on {booking.cancelledAt || 'N/A'}</p>
+                        <p style={{ margin: 0, color: '#dc2626', fontSize: '0.8rem', opacity: 0.8 }}>Refund Policy Applied: {refundPercentage}%</p>
+                      </div>
+                      <div style={{ 
+                        padding: '6px 12px', 
+                        borderRadius: '20px', 
+                        fontSize: '0.85rem', 
+                        fontWeight: 700,
+                        backgroundColor: refundPercentage === 100 ? '#f0fdf4' : refundPercentage === 50 ? '#fff7ed' : '#fef2f2',
+                        color: refundPercentage === 100 ? '#166534' : refundPercentage === 50 ? '#9a3412' : '#991b1b',
+                        border: `1px solid ${refundPercentage === 100 ? '#bbf7d0' : refundPercentage === 50 ? '#fed7aa' : '#fecaca'}`
+                      }}>
+                        {refundPercentage === 100 ? 'Full Refund' : refundPercentage === 50 ? 'Partial Refund' : 'No Refund'}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="section-header-row-v30" style={{ marginBottom: '8px' }}>
+                      <h4 className="section-title-v7" style={{ margin: 0 }}>PAYMENT SUMMARY</h4>
+                      <button
+                        className="calculation-toggle-btn-v30"
+                        onClick={() => setIsBreakdownExpanded(!isBreakdownExpanded)}
+                      >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points={isBreakdownExpanded ? "18 15 12 9 6 15" : "6 9 12 15 18 9"}></polyline>
+                        </svg>
+                        {isBreakdownExpanded ? 'Hide details' : 'Show details'}
+                      </button>
+                    </div>
+                  )}
 
-                  {isBreakdownExpanded && (
+                  {(isBreakdownExpanded || booking.status === 'Cancelled') && (
                     <>
-                      {/* Step 1: Total Booking Value */}
+                      {/* Section 1: Total Booking Value */}
                       <div className="breakdown-section-v30">
                         <div className="section-label-v30">1. Total Booking Value</div>
                         <div className="breakdown-row-v30" style={{ alignItems: 'flex-start' }}>
@@ -5632,7 +5714,7 @@ const BookingDetailModal = ({
                         </div>
                       </div>
 
-                      {/* Step 2: Payment Split */}
+                      {/* Section 2: Payment Split */}
                       <div className="breakdown-section-v30">
                         <div className="section-label-v30">2. Payment Split</div>
                         <div className="breakdown-row-v30">
@@ -5640,34 +5722,56 @@ const BookingDetailModal = ({
                           <span style={{ color: '#10b981' }}>₹{booking.paid.toLocaleString()}</span>
                         </div>
                         <div className="breakdown-row-v30">
-                          <label>Paid at Event Payment (Remaining)</label>
-                          <span style={{ color: '#f59e0b' }}>₹{(booking.amount - booking.paid).toLocaleString()}</span>
+                          <label>Paid at Event (Remaining)</label>
+                          <span style={{ color: booking.status === 'Cancelled' ? '#94a3b8' : '#f59e0b' }}>₹{booking.status === 'Cancelled' ? '0' : (booking.amount - booking.paid).toLocaleString()}</span>
                         </div>
-                        <div className="breakdown-note-v30 collection-highlight-v30">
+                        <div className="breakdown-note-v30" style={{ 
+                          backgroundColor: booking.status === 'Cancelled' ? '#f8fafc' : 'rgba(245, 158, 11, 0.05)',
+                          color: booking.status === 'Cancelled' ? '#64748b' : '#d97706',
+                          border: `1px solid ${booking.status === 'Cancelled' ? '#e2e8f0' : 'rgba(245, 158, 11, 0.15)'}`
+                        }}>
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                          <span>Remaining amount is collected directly from customer</span>
+                          <span>{booking.status === 'Cancelled' ? 'Event was cancelled before final payment' : 'Remaining amount is collected directly from customer'}</span>
                         </div>
                       </div>
 
-                      {/* Step 3: Platform Deductions */}
+                      {/* Section 3: Refund Summary (New Section) */}
+                      {booking.status === 'Cancelled' && (
+                        <div className="breakdown-section-v30" style={{ backgroundColor: '#fff7ed', borderRadius: '12px', padding: '12px', border: '1px solid #fed7aa' }}>
+                          <div className="section-label-v30" style={{ color: '#c2410c' }}>3. Refund Summary</div>
+                          <div className="breakdown-row-v30" style={{ color: '#dc2626' }}>
+                            <label>Refund to Customer ({refundPercentage}%)</label>
+                            <span>-₹{refundToCustomer.toLocaleString()}</span>
+                          </div>
+                          <div className="breakdown-row-v30" style={{ color: '#16a34a', borderTop: '1px solid #fed7aa', paddingTop: '8px', marginTop: '8px' }}>
+                            <label style={{ fontWeight: 700 }}>You Retain</label>
+                            <span style={{ fontWeight: 700 }}>₹{vendorRetain.toLocaleString()}</span>
+                          </div>
+                          <div className="breakdown-note-v30" style={{ marginTop: '8px', color: '#9a3412', backgroundColor: 'transparent', border: 'none', padding: 0 }}>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                            <span style={{ fontStyle: 'italic', fontSize: '0.8rem' }}>Refund calculated as per cancellation policy</span>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Section 4: Platform Deductions */}
                       <div className="breakdown-section-v30">
                         <div className="section-header-row-v30">
-                          <div className="section-label-v30">3. Platform Deductions</div>
-                          <button
-                            className="calculation-toggle-btn-v30"
-                            onClick={() => setShowCalculations(!showCalculations)}
-                          >
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                              <polyline points={showCalculations ? "18 15 12 9 6 15" : "6 9 12 15 18 9"}></polyline>
-                            </svg>
-                            {showCalculations ? 'Hide details' : 'Show details'}
-                          </button>
+                          <div className="section-label-v30" style={{ color: booking.status === 'Cancelled' ? '#1e293b' : '' }}>{booking.status === 'Cancelled' ? '4. Platform Deductions' : '3. Platform Deductions'}</div>
+                          {booking.status !== 'Cancelled' && (
+                            <button className="calculation-toggle-btn-v30" onClick={() => setShowCalculations(!showCalculations)}>
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <polyline points={showCalculations ? "18 15 12 9 6 15" : "6 9 12 15 18 9"}></polyline>
+                              </svg>
+                              {showCalculations ? 'Hide details' : 'Show details'}
+                            </button>
+                          )}
                         </div>
 
-                        {showCalculations && (
+                        {(showCalculations || booking.status === 'Cancelled') && (
                           <div className="details-wrapper-v30">
                             <div className="deduction-item-v30">
-                              <span>Platform Commission (10% of advance)</span>
+                              <span>Platform Commission (10% of {booking.status === 'Cancelled' ? 'retained amount' : 'advance'})</span>
                               <span className="deduction-value">-₹{commission.toLocaleString()}</span>
                             </div>
                             <div className="deduction-item-v30">
@@ -5680,7 +5784,7 @@ const BookingDetailModal = ({
                             </div>
                             <div className="breakdown-note-v30" style={{ marginTop: '8px' }}>
                               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                              <span>Deductions calculated on platform amount, GST & TDS are claimable</span>
+                              <span>Deductions are applied only on {booking.status === 'Cancelled' ? 'retained amount' : 'platform amount'}</span>
                             </div>
                           </div>
                         )}
@@ -5688,50 +5792,55 @@ const BookingDetailModal = ({
                     </>
                   )}
 
-                  <div className="section-label-v30" style={{ marginTop: '0px', marginBottom: '4px' }}>Final Settlement</div>
-                  {booking.status === 'Live' || booking.status === 'Completed' || (booking.status === 'Upcoming' && diffDaysToEvent < 2) ? (
-                    <div style={{ backgroundColor: 'rgba(16, 185, 129, 0.06)', borderRadius: '8px', padding: '14px 12px', margin: '0 0 8px 0', border: '1px solid rgba(16, 185, 129, 0.15)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      <div className="breakdown-row-v30" style={{ borderBottom: 'none', paddingBottom: 0, paddingTop: 0 }}>
-                        <label style={{ fontWeight: 600, color: '#0f172a' }}>You Receive (Payout)</label>
-                        <span style={{ color: '#10b981', fontSize: '1.25rem', fontWeight: 700 }}>₹{vendorPayout.toLocaleString()}</span>
-                      </div>
-                      <div className="breakdown-row-v30" style={{ paddingTop: 0, marginTop: 0, borderBottom: 'none' }}>
-                        <label style={{ color: '#047857', fontWeight: 500, fontSize: '0.9rem' }}>
-                          {booking.status === 'Live' || booking.status === 'Completed' || (booking.status === 'Upcoming' && diffDaysToEvent < 2) ? 'Payout date' : 'Estimate payout date'}
-                        </label>
-                        <span style={{ color: '#047857', fontWeight: 600, fontSize: '0.9rem' }}>{estimateStr}</span>
-                      </div>
-                      <div className="breakdown-note-v30" style={{ marginTop: '4px', color: '#059669', opacity: 0.9, backgroundColor: 'rgba(16, 185, 129, 0.04)', padding: '8px', borderRadius: '6px' }}>
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                        <span style={{ fontSize: '0.8rem' }}>Payout between 12–48 hrs before event</span>
-                      </div>
+                  <div className="section-label-v30" style={{ marginTop: '0px', marginBottom: '4px' }}>{booking.status === 'Cancelled' ? '5. Final Settlement' : 'Final Settlement'}</div>
+                  <div style={{ 
+                    backgroundColor: booking.status === 'Cancelled' && refundPercentage === 100 ? '#f8fafc' : 'rgba(16, 185, 129, 0.06)', 
+                    borderRadius: '8px', 
+                    padding: '14px 12px', 
+                    margin: '0 0 8px 0', 
+                    border: `1px solid ${booking.status === 'Cancelled' && refundPercentage === 100 ? '#e2e8f0' : 'rgba(16, 185, 129, 0.15)'}`, 
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    gap: '8px' 
+                  }}>
+                    <div className="breakdown-row-v30" style={{ borderBottom: 'none', paddingBottom: 0, paddingTop: 0 }}>
+                      <label style={{ fontWeight: 600, color: '#0f172a' }}>You Receive</label>
+                      <span style={{ 
+                        color: booking.status === 'Cancelled' && refundPercentage === 100 ? '#64748b' : '#10b981', 
+                        fontSize: '1.25rem', 
+                        fontWeight: 700 
+                      }}>
+                        {booking.status === 'Cancelled' && refundPercentage === 100 ? 'No payout (fully refunded)' : `₹${vendorPayout.toLocaleString()}`}
+                      </span>
                     </div>
-                  ) : (
-                    <div style={{ backgroundColor: 'rgba(16, 185, 129, 0.06)', borderRadius: '8px', padding: '14px 12px', margin: '0 0 8px 0', border: '1px solid rgba(16, 185, 129, 0.15)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      <div className="breakdown-row-v30" style={{ borderBottom: 'none', paddingBottom: 0, paddingTop: 0 }}>
-                        <label style={{ fontWeight: 600, color: '#1e293b' }}>You Receive (Payout)</label>
-                        <span style={{ color: '#10b981', fontSize: '1.25rem', fontWeight: 700 }}>₹{vendorPayout.toLocaleString()}</span>
-                      </div>
-                      <div className="breakdown-row-v30" style={{ paddingTop: 0, marginTop: 0, borderBottom: 'none' }}>
-                        <label style={{ color: '#047857', fontWeight: 500, fontSize: '0.9rem' }}>Estimate payout date</label>
-                        <span style={{ color: '#047857', fontWeight: 600, fontSize: '0.9rem' }}>{estimateStr}</span>
-                      </div>
-                      <div className="breakdown-note-v30 payment-timing-note-inside-v30" style={{ marginTop: '4px', color: '#047857', opacity: 0.8, backgroundColor: 'rgba(16, 185, 129, 0.04)', padding: '8px', borderRadius: '6px', border: 'none', boxShadow: 'none' }}>
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                        <span style={{ fontSize: '0.8rem' }}>Payout between 12–48 hrs before event</span>
-                      </div>
+                    {booking.status !== 'Cancelled' && (
+                       <div className="breakdown-row-v30" style={{ paddingTop: 0, marginTop: 0, borderBottom: 'none' }}>
+                       <label style={{ color: '#047857', fontWeight: 500, fontSize: '0.9rem' }}>Estimate payout date</label>
+                       <span style={{ color: '#047857', fontWeight: 600, fontSize: '0.9rem' }}>{estimateStr}</span>
+                     </div>
+                    )}
+                    <div className="breakdown-note-v30" style={{ 
+                      marginTop: '4px', 
+                      color: booking.status === 'Cancelled' && refundPercentage === 100 ? '#64748b' : '#059669', 
+                      opacity: 0.9, 
+                      backgroundColor: 'transparent', 
+                      padding: 0, 
+                      borderRadius: 0,
+                      border: 'none',
+                      boxShadow: 'none'
+                    }}>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                      <span style={{ fontSize: '0.8rem' }}>{booking.status === 'Cancelled' ? 'Final settlement after refund and deductions' : 'Payout between 12–48 hrs before event'}</span>
                     </div>
-                  )}
+                  </div>
 
-
-
-                  {/* Step 5: Total Earnings */}
-                  <div className="total-earnings-card-v30">
+                  {/* Section 6: Total Earnings */}
+                  <div className="total-earnings-card-v30" style={{ marginTop: '16px' }}>
                     <div className="earnings-label">
-                      <label>TOTAL EARNINGS</label>
-                      <span>₹{totalEarnings.toLocaleString()}</span>
+                      <label>{booking.status === 'Cancelled' ? '6. TOTAL EARNINGS (Incl. GST)' : 'TOTAL EARNINGS'}</label>
+                      <span style={{ color: booking.status === 'Cancelled' && refundPercentage === 100 ? '#64748b' : '#10b981' }}>₹{totalEarnings.toLocaleString()}</span>
                       <div className="incl-gst-bottom-v30">(Incl. GST)</div>
-                      <div className="earnings-helper-v30">Includes Paid at Event + platform payout</div>
+                      <div className="earnings-helper-v30">{booking.status === 'Cancelled' ? 'Includes retained amount after refund and platform deductions' : 'Includes Paid at Event + platform payout'}</div>
                     </div>
                   </div>
                 </div>
@@ -6389,7 +6498,7 @@ const Bookings = () => {
     {
       id: 'BK-12419',
       customer: 'Rohit Verma',
-      date: '2026-03-28',
+      date: new Date(Date.now() + 48 * 3600000).toISOString().split('T')[0], // 2 days from now
       time: '08:00 PM',
       type: 'Anniversary Dinner',
       serviceCategory: 'Dinner',
@@ -6402,6 +6511,8 @@ const Bookings = () => {
       paid: 13500,
       status: 'Cancelled',
       cancelledBy: 'Customer',
+      refundPercentage: 100,
+      cancelledAt: '15 Apr 2026',
       menuSelection: [
         { name: 'Dinner', type: 'Selected', items: ['Dal Makhani', 'Naan'] }
       ],
@@ -6410,6 +6521,72 @@ const Bookings = () => {
         { status: 'Cancelled', time: `${new Date(Date.now() - 12 * 3600000).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}, 08:00 AM` }
       ],
       taxType: 'B2C'
+    },
+    {
+      id: 'BK-12430',
+      customer: 'Rahul Mehra',
+      date: new Date(Date.now() + 96 * 3600000).toISOString().split('T')[0], // 4 days from now
+      time: '01:30 PM',
+      type: 'Birthday Kids',
+      serviceCategory: 'Lunch',
+      category: 'Lunch',
+      menuName: 'Kids Special Menu',
+      guests: 40,
+      amount: 25000,
+      originalAmount: 28000,
+      discount: 3000,
+      payout: 7125,
+      paid: 7500,
+      status: 'Cancelled',
+      cancelledBy: 'Vendor',
+      refundPercentage: 50,
+      cancelledAt: '14 Apr 2026',
+      menuSelection: [
+        { name: 'Lunch', type: 'Selected', items: ['Mini Pizza', 'Pasta', 'Fries'] }
+      ],
+      menuDetails: {
+        categories: [
+          { name: 'Lunch', items: ['Mini Pizza', 'Pasta', 'Fries'], status: 'All Included' }
+        ]
+      },
+      timeline: [
+        { status: 'Pending', time: '10 Mar, 10:00 AM' },
+        { status: 'Cancelled', time: '11 Mar, 02:00 PM' }
+      ],
+      taxType: 'B2C'
+    },
+    {
+      id: 'BK-12435',
+      customer: 'Sia Kapoor',
+      date: new Date(Date.now() - 72 * 3600000).toISOString().split('T')[0],
+      time: '08:30 PM',
+      type: 'Private Dinner',
+      serviceCategory: 'Dinner',
+      category: 'Dinner',
+      menuName: 'Gourmet Italian',
+      guests: 15,
+      amount: 35000,
+      originalAmount: 38000,
+      discount: 3000,
+      payout: 9975,
+      paid: 10500,
+      status: 'Cancelled',
+      cancelledBy: 'Customer',
+      refundPercentage: 0,
+      cancelledAt: '13 Apr 2026',
+      menuSelection: [
+        { name: 'Dinner', type: 'Selected', items: ['Antipasti', 'Risotto'] }
+      ],
+      menuDetails: {
+        categories: [
+          { name: 'Dinner', items: ['Antipasti', 'Risotto'], status: 'All Included' }
+        ]
+      },
+      timeline: [
+        { status: 'Pending', time: '12 Mar, 04:00 PM' },
+        { status: 'Cancelled', time: '13 Mar, 10:30 AM' }
+      ],
+      taxType: 'B2B'
     },
     {
       id: 'BK-12423',
@@ -6611,7 +6788,9 @@ const Bookings = () => {
 
       let refundPct = 0;
 
-      if (isVendor) {
+      if (booking.refundPercentage !== undefined) {
+        refundPct = booking.refundPercentage;
+      } else if (isVendor) {
         refundPct = 100;
       } else {
         if (diffDaysToEventCancel > 7) refundPct = 100;
@@ -6620,7 +6799,7 @@ const Bookings = () => {
         else refundPct = 0;
       }
 
-      let vendorPct = 100 - refundPct;
+      const vendorPct = 100 - refundPct;
       amountText = `₹ ${(booking.paid * (vendorPct / 100)).toLocaleString()}`;
       statusText = `${refundPct}% refund`;
       statusClass = 'review';
@@ -8356,6 +8535,52 @@ const OnboardingPage = ({ currentStep, formData, handleInputChange, handleFileCh
     </div>
   </div>
 );
+
+const SortableSectionItem = ({ sec, idx, onEdit, onDelete }: any) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: idx.toString() });
+
+  const style = {
+    transform: transform ? CSS.Translate.toString(transform) : undefined,
+    transition: transform ? transition : 'transform 200ms cubic-bezier(0.2, 0, 0, 1)',
+    zIndex: isDragging ? 1001 : 1,
+    opacity: isDragging ? 0.9 : 1,
+    scale: isDragging ? '1.02' : '1',
+    boxShadow: isDragging ? '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)' : 'none',
+    position: 'relative' as const,
+    cursor: isDragging ? 'grabbing' : 'pointer',
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} className={`section-summary-card ${isDragging ? 'dragging' : ''}`}>
+      <div className="sec-item-content">
+        <div className="drag-handle" {...attributes} {...listeners}>
+          <GripVertical size={20} />
+        </div>
+        <div className="sec-sum-info">
+          <span className="sec-sum-name">{sec.name}</span>
+          <span className="sec-sum-rule">
+            {sec.type === 'All Included' ? 'All items included' : `Choose any ${sec.limit} from ${sec.items.length} items`}
+          </span>
+        </div>
+      </div>
+      <div className="section-actions-inline">
+        <button className="icon-btn edit-btn" onClick={onEdit}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+        </button>
+        <button className="icon-btn delete-btn" onClick={onDelete}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+        </button>
+      </div>
+    </div>
+  );
+};
 
 function App() {
   const navigate = useNavigate();

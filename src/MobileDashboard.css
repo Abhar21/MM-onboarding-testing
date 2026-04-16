@@ -4793,7 +4793,30 @@
   margin-bottom: 12px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  position: relative;
+}
+
+.mobile-section-card-v55.dragging {
+  opacity: 0.5;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  border-color: #0077ff;
+  border-style: dashed;
+  background: #f8fafc;
+  z-index: 1001;
+}
+
+.mobile-drag-handle-v55 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8;
+  padding: 10px 8px;
+  margin-right: 8px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sec-info-v55 {
+  flex: 1;
 }
 
 .sec-info-v55 h4 {

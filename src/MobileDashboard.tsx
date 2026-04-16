@@ -1,5 +1,24 @@
 /* MobileDashboard.tsx - Isolated components for Mobile Devices */
 import React, { useState, useEffect, useRef } from 'react';
+import { 
+  DndContext, 
+  closestCenter, 
+  KeyboardSensor, 
+  PointerSensor, 
+  useSensor, 
+  useSensors,
+  TouchSensor,
+  type DragEndEvent
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { GripVertical } from 'lucide-react';
 import './MobileDashboard.css';
 import ManageMembershipModal from './ManageMembership';
 import MembershipStatusBanner from './MembershipStatusBanner';
@@ -848,7 +867,7 @@ const MobileBookingsView = () => {
     {
       id: 'BK-12419',
       customer: 'Rohit Verma',
-      date: '2026-03-28',
+      date: new Date(Date.now() + 48 * 3600000).toISOString().split('T')[0], // 2 days from now
       time: '08:00 PM',
       type: 'Anniversary Dinner',
       serviceCategory: 'Dinner',
@@ -874,6 +893,70 @@ const MobileBookingsView = () => {
       timeline: [
         { status: 'Pending', time: '24 Mar, 09:00 AM' },
         { status: 'Cancelled', time: '25 Mar, 04:00 PM' }
+      ],
+      taxType: 'B2B'
+    },
+    {
+      id: 'BK-12430',
+      customer: 'Rahul Mehra',
+      date: new Date(Date.now() + 96 * 3600000).toISOString().split('T')[0], // 4 days from now
+      time: '01:30 PM',
+      type: 'Birthday Kids',
+      serviceCategory: 'Lunch',
+      category: 'Lunch',
+      menuName: 'Kids Special Menu',
+      guests: 40,
+      amount: 25000,
+      originalAmount: 28000,
+      discount: 3000,
+      payout: 7125,
+      paid: 7500,
+      status: 'Cancelled',
+      cancelledBy: 'Vendor',
+      address: 'Cloud 9 Apartments, Indiranagar',
+      menuSelection: [
+        { name: 'Lunch', type: 'Selected', items: ['Mini Pizza', 'Pasta', 'Fries'] }
+      ],
+      menuDetails: {
+        categories: [
+          { name: 'Lunch', items: ['Mini Pizza', 'Pasta', 'Fries'], status: 'All Included' }
+        ]
+      },
+      timeline: [
+        { status: 'Pending', time: '10 Mar, 10:00 AM' },
+        { status: 'Cancelled', time: '11 Mar, 02:00 PM' }
+      ],
+      taxType: 'B2C'
+    },
+    {
+      id: 'BK-12435',
+      customer: 'Sia Kapoor',
+      date: new Date(Date.now() - 72 * 3600000).toISOString().split('T')[0],
+      time: '08:30 PM',
+      type: 'Private Dinner',
+      serviceCategory: 'Dinner',
+      category: 'Dinner',
+      menuName: 'Gourmet Italian',
+      guests: 15,
+      amount: 35000,
+      originalAmount: 38000,
+      discount: 3000,
+      payout: 9975,
+      paid: 10500,
+      status: 'Cancelled',
+      cancelledBy: 'Customer',
+      address: 'Villa 12, Palm Meadows, Whitefield',
+      menuSelection: [
+        { name: 'Dinner', type: 'Selected', items: ['Antipasti', 'Risotto'] }
+      ],
+      menuDetails: {
+        categories: [
+          { name: 'Dinner', items: ['Antipasti', 'Risotto'], status: 'All Included' }
+        ]
+      },
+      timeline: [
+        { status: 'Pending', time: '12 Mar, 04:00 PM' },
+        { status: 'Cancelled', time: '13 Mar, 10:30 AM' }
       ],
       taxType: 'B2B'
     }
@@ -4400,6 +4483,49 @@ const MobileSectionEditor = ({
   );
 };
 
+const MobileSortableSectionItem = ({ sec, idx, onEdit, onDelete }: any) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: idx.toString() });
+
+  const style = {
+    transform: transform ? CSS.Translate.toString(transform) : undefined,
+    transition: transform ? transition : 'transform 200ms cubic-bezier(0.2, 0, 0, 1)',
+    zIndex: isDragging ? 2000 : 1,
+    opacity: isDragging ? 0.9 : 1,
+    scale: isDragging ? '1.02' : '1',
+    boxShadow: isDragging ? '0 10px 15px -3px rgb(0 0 0 / 0.1)' : 'none',
+    position: 'relative' as const,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} className={`mobile-section-card-v55 ${isDragging ? 'dragging' : ''}`}>
+      <div className="mobile-sec-content-v55" style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1 }}>
+        <div className="mobile-drag-handle-v55" {...attributes} {...listeners}>
+          <GripVertical size={20} />
+        </div>
+        <div className="sec-info-v55">
+          <h4>{sec.name}</h4>
+          <p>{sec.items.length} Items • {sec.type === 'All Included' ? 'All Chosen' : `Choose ${sec.limit}`}</p>
+        </div>
+      </div>
+      <div className="sec-actions-v55">
+        <button className="mobile-action-btn-v50" onClick={onEdit}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0077ff" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+        </button>
+        <button className="mobile-action-btn-v50" onClick={onDelete}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+        </button>
+      </div>
+    </div>
+  );
+};
+
 const MobileCreateMenuView = ({
   menuStep,
   setMenuStep,
@@ -4439,6 +4565,35 @@ const MobileCreateMenuView = ({
   menus: Menu[];
   setMenus: React.Dispatch<React.SetStateAction<Menu[]>>;
 }) => {
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 250,
+        tolerance: 5,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      setSections((items: Section[]) => {
+        const oldIndex = parseInt(active.id.toString());
+        const newIndex = parseInt(over.id.toString());
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
+  };
+
   const totalItems = sections.reduce((acc: number, sec: Section) => acc + (sec.items?.length || 0), 0);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -4623,26 +4778,30 @@ const MobileCreateMenuView = ({
             )}
 
             <div className="mobile-sections-list-v55">
-              {sections.map((sec: Section, idx: number) => (
-                <div key={idx} className="mobile-section-card-v55">
-                  <div className="sec-info-v55">
-                    <h4>{sec.name}</h4>
-                    <p>{sec.items.length} Items • {sec.type === 'All Included' ? 'All Chosen' : `Choose ${sec.limit}`}</p>
-                  </div>
-                  <div className="sec-actions-v55">
-                    <button className="mobile-action-btn-v50" onClick={() => {
-                      setCurrentSection({ ...sec });
-                      setSectionEditingIndex(idx);
-                      setIsAddingSection(true);
-                    }}>
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0077ff" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                    </button>
-                    <button className="mobile-action-btn-v50" onClick={() => setSections((prev: Section[]) => prev.filter((_: Section, i: number) => i !== idx))}>
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                    </button>
-                  </div>
-                </div>
-              ))}
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+              >
+                <SortableContext
+                  items={sections.map((_: any, i: number) => i.toString())}
+                  strategy={verticalListSortingStrategy}
+                >
+                  {sections.map((sec: Section, idx: number) => (
+                    <MobileSortableSectionItem
+                      key={idx}
+                      idx={idx}
+                      sec={sec}
+                      onEdit={() => {
+                        setCurrentSection({ ...sec });
+                        setSectionEditingIndex(idx);
+                        setIsAddingSection(true);
+                      }}
+                      onDelete={() => setSections((prev: Section[]) => prev.filter((_: Section, i: number) => i !== idx))}
+                    />
+                  ))}
+                </SortableContext>
+              </DndContext>
             </div>
 
             {!isAddingSection && sections.length > 0 && (
@@ -4723,7 +4882,7 @@ const MobileCreateMenuView = ({
           <button
             className="mobile-btn-v55 mobile-btn-primary-v55"
             style={{ padding: '8px 24px', borderRadius: '10px', fontSize: '0.75rem' }}
-            disabled={menuStep === 1 && !menuIdentity.name}
+            disabled={(menuStep === 1 && !menuIdentity.name) || (menuStep === 2 && (sections.length === 0 || isAddingSection))}
             onClick={menuStep === 3 ? finalizeSave : handleNext}
           >
             {menuStep === 3 ? (menuEditingId ? 'Update' : 'Next') : 'Next'}
