@@ -5648,8 +5648,7 @@ const BookingDetailModal = ({
                 ? `${payoutStart.getDate()}-${payoutEnd.getDate()} ${startMonth} ${payoutStart.getFullYear()}`
                 : `${payoutStart.getDate()} ${startMonth} - ${payoutEnd.getDate()} ${endMonth} ${payoutStart.getFullYear()}`;
 
-              const diffHrsToEvent = (eventDateObj.getTime() - new Date().getTime()) / (1000 * 60 * 60);
-              const diffDaysToEvent = diffHrsToEvent / 24;
+
 
               return (
                 <div className="financial-breakdown-v30">
