@@ -2718,7 +2718,9 @@ const ServiceSettings = ({
   handleImageUpload,
   handleSaveSection,
   resetAddMenu,
-  profileData
+  profileData,
+  boostCredits,
+  setIsBoostSheetOpen
 }: any) => {
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -3032,7 +3034,13 @@ const ServiceSettings = ({
           <h2 className="section-title">Service Settings</h2>
           <p className="section-subtitle">Manage your service timings, styles, and menu builder.</p>
         </div>
-
+        <div
+          className="boost-pill-v25 profile-pill-v25"
+          onClick={() => setIsBoostSheetOpen(true)}
+        >
+          <span className="boost-pill-icon">📈</span>
+          <span className="boost-pill-text">{boostCredits} Credits Available</span>
+        </div>
       </div>
 
       <div className="profile-tabs-nav-v4" style={{ marginBottom: '1.5rem' }}>
@@ -4388,7 +4396,9 @@ const VendorProfile = ({
   verification,
   setVerification,
   showEditProfileModal,
-  setShowEditProfileModal
+  setShowEditProfileModal,
+  boostCredits,
+  setIsBoostSheetOpen
 }: {
   profileData: any,
   setProfileData: any,
@@ -4397,7 +4407,9 @@ const VendorProfile = ({
   verification: any,
   setVerification: any,
   showEditProfileModal: boolean,
-  setShowEditProfileModal: any
+  setShowEditProfileModal: any,
+  boostCredits: number,
+  setIsBoostSheetOpen: any
 }) => {
   const [activeTab, setActiveTab] = useState('Summary');
 
@@ -4480,6 +4492,13 @@ const VendorProfile = ({
             </div>
           </div>
           <div className="header-right-v4">
+            <div 
+              className="boost-pill-v25 profile-pill-v25" 
+              onClick={() => setIsBoostSheetOpen(true)}
+            >
+              <span className="boost-pill-icon">📈</span>
+              <span className="boost-pill-text">{boostCredits} Credits Available</span>
+            </div>
             <button className="edit-profile-btn-v4" onClick={handleOpenEditProfile}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
               Edit Profile
@@ -7071,7 +7090,15 @@ const CountdownTimer = ({ targetISO }: { targetISO: string }) => {
   return <span>Starts in {timeLeft}</span>;
 }
 
-const HomeView = ({ setActiveTab }: { setActiveTab: (tab: string) => void }) => {
+const HomeView = ({ 
+  setActiveTab,
+  boostCredits,
+  setIsBoostSheetOpen
+}: { 
+  setActiveTab: (tab: string) => void,
+  boostCredits: number,
+  setIsBoostSheetOpen: any
+}) => {
   const todayDate = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
   const [showNotifications, setShowNotifications] = useState(false);
   const [activeNotifTab, setActiveNotifTab] = useState('all');
@@ -7135,6 +7162,15 @@ const HomeView = ({ setActiveTab }: { setActiveTab: (tab: string) => void }) => 
           </div>
         </div>
         <div className="home-header-actions-v25" ref={notifRef}>
+          {/* Boost Credits Entry Point */}
+          <button 
+            className="boost-pill-v25" 
+            onClick={() => setIsBoostSheetOpen(true)}
+          >
+            <span className="boost-icon">📈</span>
+            <span className="boost-text">{boostCredits > 0 ? `${boostCredits} Credits Available` : 'Boost'}</span>
+          </button>
+
           <button className="notification-btn-v25" onClick={() => setShowNotifications(!showNotifications)}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
             {unreadCount > 0 && <span className="notification-badge-v25"></span>}
@@ -7196,6 +7232,9 @@ const HomeView = ({ setActiveTab }: { setActiveTab: (tab: string) => void }) => 
           )}
         </div>
       </div>
+
+
+
 
       <div className="home-main-grid-v25">
         {/* 1. Summary Cards (Moved to top) */}
@@ -7322,6 +7361,38 @@ const Dashboard = ({
   setIsBannerDismissed: any
 }) => {
   const isMobile = useIsMobile();
+
+  // Boost Feature State (Lifted for mobile parity)
+  const [boostCredits, setBoostCredits] = useState(7);
+  const [isBoostSheetOpen, setIsBoostSheetOpen] = useState(false);
+  const [showBoostToast, setShowBoostToast] = useState(false);
+  const [isCalendarView, setIsCalendarView] = useState(false);
+  const [isUsageDetailsView, setIsUsageDetailsView] = useState(false);
+  const [selectedBoostDates, setSelectedBoostDates] = useState<string[]>([]);
+
+  // Mock Usage History for Demo
+  const usageHistory = [
+    { date: "2026-04-15", action: "Boost Applied", status: "Completed", views: 124, bookings: 3 },
+    { date: "2026-04-10", action: "Boost Applied", status: "Completed", views: 98, bookings: 1 },
+    { date: "2026-04-05", action: "Boost Applied", status: "Completed", views: 156, bookings: 5 }
+  ];
+
+  // Mock Booking Data for Demo
+  const mockBookingData: Record<string, 'available' | 'full' | 'partial' | 'recommended'> = {
+    '2026-04-18': 'full',
+    '2026-04-19': 'full',
+    '2026-04-20': 'available',
+    '2026-04-21': 'partial',
+    '2026-04-22': 'recommended',
+    '2026-04-23': 'recommended',
+    '2026-04-24': 'available',
+    '2026-04-25': 'partial',
+    '2026-04-26': 'full',
+    '2026-04-27': 'recommended',
+    '2026-04-28': 'available',
+    '2026-04-29': 'available',
+    '2026-04-30': 'available',
+  };
 
   // Menu Creation Shared State (Internal to Dashboard)
   const [menus, setMenus] = useState<any[]>([
@@ -7669,6 +7740,21 @@ const Dashboard = ({
         setMenuEditingId={setMenuEditingId}
         menus={menus}
         setMenus={setMenus}
+        // Boost Credits Props
+        boostCredits={boostCredits}
+        setBoostCredits={setBoostCredits}
+        isBoostSheetOpen={isBoostSheetOpen}
+        setIsBoostSheetOpen={setIsBoostSheetOpen}
+        showBoostToast={showBoostToast}
+        setShowBoostToast={setShowBoostToast}
+        isCalendarView={isCalendarView}
+        setIsCalendarView={setIsCalendarView}
+        selectedBoostDates={selectedBoostDates}
+        setSelectedBoostDates={setSelectedBoostDates}
+        mockBookingData={mockBookingData}
+        isUsageDetailsView={isUsageDetailsView}
+        setIsUsageDetailsView={setIsUsageDetailsView}
+        usageHistory={usageHistory}
       />
     );
   }
@@ -7717,7 +7803,13 @@ const Dashboard = ({
       <main className="dashboard-main">
         {renderBannerOnDashboard()}
         <div className="dashboard-content">
-          {activeTab === 'dashboard' && <HomeView setActiveTab={setActiveTab} />}
+          {activeTab === 'dashboard' && (
+            <HomeView 
+              setActiveTab={setActiveTab}
+              boostCredits={boostCredits}
+              setIsBoostSheetOpen={setIsBoostSheetOpen}
+            />
+          )}
           {activeTab === 'tickets' && <Tickets />}
           {activeTab === 'service-settings' && (
             <ServiceSettings
@@ -7737,6 +7829,8 @@ const Dashboard = ({
               setMenuStep={setMenuStep}
               sectionEditingIndex={sectionEditingIndex}
               setSectionEditingIndex={setSectionEditingIndex}
+              boostCredits={boostCredits}
+              setIsBoostSheetOpen={setIsBoostSheetOpen}
               menuActionId={menuActionId}
               setMenuActionId={setMenuActionId}
               selectedMenuAction={selectedMenuAction}
@@ -7762,6 +7856,8 @@ const Dashboard = ({
               setVerification={setVerification}
               showEditProfileModal={showEditProfileModal}
               setShowEditProfileModal={setShowEditProfileModal}
+              boostCredits={boostCredits}
+              setIsBoostSheetOpen={setIsBoostSheetOpen}
             />
           )}
           {activeTab === 'settings' && (
@@ -7788,6 +7884,180 @@ const Dashboard = ({
           )}
         </div>
       </main>
+
+      {/* ── Global Boost Modal (renders over any tab) ── */}
+      {isBoostSheetOpen && (
+        <div className="boost-sheet-overlay-v25" onClick={() => {
+          setIsBoostSheetOpen(false);
+          setIsCalendarView(false);
+          setSelectedBoostDates([]);
+        }}>
+          <div className="boost-bottom-sheet-v25 calendar-modal-v25" onClick={e => e.stopPropagation()}>
+            <div className="boost-sheet-header-v25 redesign single-row">
+              <button 
+                className={`boost-back-btn-pill-v25 icon-only ${(!isCalendarView && !isUsageDetailsView) ? 'hidden' : ''}`}
+                onClick={() => {
+                  if (isCalendarView) setIsCalendarView(false);
+                  else setIsUsageDetailsView(false);
+                }}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+              </button>
+              <h2 className="boost-sheet-title">
+                {isCalendarView ? 'Select Boost Dates' : isUsageDetailsView ? 'Boost Credits Overview' : 'Boost Your Profile'}
+              </h2>
+              <button className="boost-sheet-close-v25" onClick={() => {
+                setIsBoostSheetOpen(false);
+                setIsCalendarView(false);
+                setIsUsageDetailsView(false);
+                setSelectedBoostDates([]);
+              }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
+            </div>
+
+            <div className="boost-sheet-content-v25">
+              {isCalendarView ? (
+                <div className="calendar-view-container-v25">
+                  <div className="calendar-month-header-v25"><h3>April 2026</h3></div>
+                  <div className="calendar-grid-v25">
+                    {['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(day => (
+                      <div key={day} className="calendar-weekday-v25">{day}</div>
+                    ))}
+                    {[null,null,null].map((_,i) => <div key={`e-${i}`} className="calendar-day-empty-v25"></div>)}
+                    {Array.from({length:30},(_,i)=>{
+                      const day=i+1;
+                      const dateStr=`2026-04-${day<10?'0'+day:day}`;
+                      const status=mockBookingData[dateStr]||'available';
+                      const isSelected=selectedBoostDates.includes(dateStr);
+                      const isFull=status==='full';
+                      const isPast=day<17;
+                      return (
+                        <div key={day}
+                          className={`calendar-day-v25 state-${status} ${isSelected?'selected':''} ${isFull||isPast?'disabled':''}`}
+                          onClick={()=>{
+                            if(isFull||isPast) return;
+                            if(isSelected) setSelectedBoostDates((p:string[])=>p.filter(d=>d!==dateStr));
+                            else if(selectedBoostDates.length<boostCredits) setSelectedBoostDates((p:string[])=>[...p,dateStr]);
+                          }}
+                          title={isFull?'Fully booked':(status==='partial'?'Limited availability':'')}
+                        >
+                          <span className="day-number">{day}</span>
+                          {status==='partial'&&<span className="partial-indicator"></span>}
+                          {status==='recommended'&&<span className="recommended-sparkle">✨</span>}
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <div className="calendar-legend-v25">
+                    <div className="legend-item"><span className="swatch state-available"></span> Available</div>
+                    <div className="legend-item"><span className="swatch state-full"></span> Fully Booked</div>
+                    <div className="legend-item"><span className="swatch state-partial"></span> Partial</div>
+                    <div className="legend-item"><span className="swatch state-recommended"></span> Recommended</div>
+                  </div>
+                  <div className="selection-stats-v25">
+                    <div className="stats-row">
+                      <span className="stats-label">Selected dates:</span>
+                      <span className="stats-value">{selectedBoostDates.length>0?selectedBoostDates.map(d=>d.split('-')[2]).join(', '):'None'}</span>
+                    </div>
+                    <div className="stats-row-grid">
+                      <div className="stat-pill"><label>Credits Required</label><span>{selectedBoostDates.length}</span></div>
+                      <div className="stat-pill"><label>Credits Remaining</label><span>{boostCredits-selectedBoostDates.length}</span></div>
+                    </div>
+                  </div>
+                  <div className="boost-sheet-actions">
+                    <button className={`boost-now-btn-v25 ${selectedBoostDates.length===0?'disabled':''}`}
+                      disabled={selectedBoostDates.length===0}
+                      onClick={()=>{
+                        if(selectedBoostDates.length>0){
+                          setBoostCredits((p:number)=>p-selectedBoostDates.length);
+                          setIsBoostSheetOpen(false); setIsCalendarView(false);
+                          setIsUsageDetailsView(false); setSelectedBoostDates([]);
+                          setShowBoostToast(true); setTimeout(()=>setShowBoostToast(false),3000);
+                        }
+                      }}>Confirm Boost</button>
+                    <button className="boost-view-details-btn-v25" onClick={()=>setIsCalendarView(false)}>Cancel</button>
+                  </div>
+                </div>
+              ) : isUsageDetailsView ? (
+                <div className="usage-details-container-v25">
+                  <div className="usage-summary-card-v25">
+                    <div className="usage-grid-v25">
+                      <div className="usage-stat-item"><label>Total Credits</label><span>10</span></div>
+                      <div className="usage-stat-item"><label>Used</label><span>{10-boostCredits}</span></div>
+                      <div className="usage-stat-item"><label>Remaining</label><span className="highlight-remaining">{boostCredits}</span></div>
+                    </div>
+                    <div className="usage-progress-container-v25">
+                      <div className="usage-progress-bar-v25" style={{width:`${(boostCredits/10)*100}%`}}></div>
+                    </div>
+                    <p className="usage-expiry-date-v25">Valid till 15 May 2026</p>
+                  </div>
+                  <div className="active-boost-card-v25">
+                    <div className="active-header-v25"><h3>Active Boost</h3><span className="active-featured-badge">Featured</span></div>
+                    <div className="active-content-v25"><p className="active-date-v25">17 Apr 2026</p><p className="active-timer-v25">Expires in 18 hours</p></div>
+                  </div>
+                  <div className="usage-history-card-v25">
+                    <h3 className="usage-section-subtitle-v25">Usage History</h3>
+                    <div className="usage-history-table-container">
+                      <table className="usage-history-table-v25">
+                        <thead><tr><th>Date</th><th>Action</th><th>Status</th><th>Results</th></tr></thead>
+                        <tbody>{usageHistory.map((item,idx)=>(
+                          <tr key={idx}><td>{item.date}</td><td>{item.action}</td>
+                          <td><span className="status-completed-v25">{item.status}</span></td>
+                          <td className="usage-results-cell"><span>{item.views} views</span><span className="dot-separator"></span><span>{item.bookings} bookings</span></td></tr>
+                        ))}</tbody>
+                      </table>
+                    </div>
+                  </div>
+                  <div className="boost-sheet-actions">
+                    <button className={`boost-now-btn-v25 ${boostCredits===0?'disabled':''}`} disabled={boostCredits===0} onClick={()=>setIsCalendarView(true)}>Boost Again</button>
+                  </div>
+                </div>
+              ) : (
+                <div className="boost-summary-redesign-v25">
+                  <div className="boost-credits-hero-v25">
+                    <div className="hero-credits-main">
+                      <span className="hero-credits-count">{boostCredits}</span>
+                      <span className="hero-credits-label">Credits Available</span>
+                    </div>
+                    <div className="hero-credits-footer">
+                      <div className="hero-status-item">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                        <span>1 credit = 24h boost</span>
+                      </div>
+                      <div className="hero-status-item">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                        <span>Expires in 30 days</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="boost-benefits-simple-v25">
+                    <div className="simple-benefit-item"><div className="benefit-dot"></div><span>Get featured at top</span></div>
+                    <div className="simple-benefit-item"><div className="benefit-dot"></div><span>Increase bookings</span></div>
+                  </div>
+                  <div className="boost-smart-tip-v25">
+                    <div className="tip-icon">💡</div>
+                    <p>Use on low booking days for better results</p>
+                  </div>
+                  <div className="boost-sheet-actions vertical">
+                    <button className={`boost-now-btn-v25 ${boostCredits===0?'disabled':''}`} disabled={boostCredits===0} onClick={()=>setIsCalendarView(true)}>Boost Now</button>
+                    <button className="boost-view-usage-link-v25" onClick={()=>setIsUsageDetailsView(true)}>View Usage Details</button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Global Boost Toast */}
+      {showBoostToast && (
+        <div className="boost-toast-v25">
+          <span className="toast-icon">🚀</span>
+          <span className="toast-msg">Your profile is now featured</span>
+        </div>
+      )}
+
 
       <AccountEditModal
         show={showAccountEditModal}

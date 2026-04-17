@@ -19664,6 +19664,8 @@ input:checked+.slider-v4:before {
 
 .home-header-actions-v25 {
   position: relative;
+  display: flex;
+  align-items: center;
 }
 
 .notif-dropdown-v25 {
@@ -23017,4 +23019,1193 @@ input:checked+.slider-v4:before {
 .breakdown-note-v30.collection-highlight-v30 span {
   color: #92400e;
   font-weight: 600;
+}
+/* ─────────────────── BOOST CREDITS FEATURE (v25) ─────────────────── */
+
+.boost-pill-v25 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1.5px solid rgba(245, 158, 11, 0.3);
+  border-radius: 100px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-right: 12px;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.15);
+}
+
+.boost-pill-v25:hover {
+  background: rgba(245, 158, 11, 0.18);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(245, 158, 11, 0.25);
+  border-color: rgba(245, 158, 11, 0.5);
+}
+
+.boost-pill-v25:active {
+  transform: translateY(0);
+}
+
+.boost-pill-v25 .boost-icon {
+  font-size: 14px;
+  filter: drop-shadow(0 0 4px rgba(245, 158, 11, 0.3));
+}
+
+.boost-pill-v25 .boost-text {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #d97706;
+}
+
+/* Boost Bottom Sheet */
+.boost-sheet-overlay-v25 {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.boost-bottom-sheet-v25 {
+  width: 100%;
+  max-width: 440px;
+  background: white;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+  position: relative;
+  animation: modalScaleIn-v25 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalScaleIn-v25 {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.boost-sheet-header-v25 {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.boost-sheet-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #1e293b;
+  margin: 0 0 4px 0;
+}
+
+.boost-credits-available {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #64748b;
+  background: #f1f5f9;
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+
+.boost-sheet-close-v25 {
+  background: #f8fafc;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  cursor: pointer;
+}
+
+.boost-sheet-content-v25 {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.boost-feature-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: #f8fafc;
+  padding: 20px;
+  border-radius: 16px;
+  border: 1px solid #f1f5f9;
+}
+
+.boost-feature-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.boost-feature-icon {
+  font-size: 20px;
+  background: white;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  flex-shrink: 0;
+}
+
+.boost-feature-text strong {
+  display: block;
+  font-size: 0.9375rem;
+  color: #1e293b;
+  margin-bottom: 2px;
+}
+
+.boost-feature-text p {
+  font-size: 0.8125rem;
+  color: #64748b;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.boost-sheet-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.boost-now-btn-v25 {
+  width: 100%;
+  padding: 14px;
+  background: #f59e0b;
+  color: white;
+  border: none;
+  border-radius: 14px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(245, 158, 11, 0.25);
+}
+
+.boost-now-btn-v25:hover {
+  background: #d97706;
+}
+
+.boost-now-btn-v25.disabled {
+  background: #cbd5e1;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.boost-view-details-btn-v25 {
+  width: 100%;
+  padding: 14px;
+  background: white;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Boost Toast */
+.boost-toast-v25 {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1e293b;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 100px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 10000;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  animation: toastIn-v25 0.5s cubic-bezier(0.16, 1, 0.3, 1), toastOut-v25 0.5s cubic-bezier(0.16, 1, 0.3, 1) 2.5s forwards;
+}
+
+@keyframes toastIn-v25 {
+  from { transform: translate(-50%, 40px); opacity: 0; }
+  to { transform: translate(-50%, 0); opacity: 1; }
+}
+
+@keyframes toastOut-v25 {
+  from { transform: translate(-50%, 0); opacity: 1; }
+  to { transform: translate(-50%, -20px); opacity: 0; }
+}
+
+
+/* --- Redesigned Boost Modal Styles (v25) --- */
+
+.boost-credits-info-v25 {
+  margin-top: 4px;
+}
+
+.boost-credits-count-v25 {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #d97706;
+  background: rgba(245, 158, 11, 0.1);
+  padding: 4px 10px;
+  border-radius: 8px;
+  display: inline-block;
+}
+
+.boost-credits-subtext-v25 {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin: 6px 0 0 0;
+  font-weight: 500;
+}
+
+.boost-urgency-banner-v25 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fffbeb;
+  border: 1px solid #fef3c7;
+  padding: 10px 14px;
+  border-radius: 10px;
+  margin-top: 16px;
+  color: #92400e;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.boost-urgency-banner-v25 svg {
+  color: #d97706;
+  flex-shrink: 0;
+}
+
+.boost-sections-grid-v25 {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.boost-info-section-v25 {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.boost-section-title-v25 {
+  font-size: 0.875rem;
+  font-weight: 800;
+  color: #1e293b;
+  text-transform: uppercase;
+  letter-spacing: 0.05rem;
+  margin: 0;
+}
+
+.boost-list-v25 {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.boost-list-v25 li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9rem;
+  color: #475569;
+  font-weight: 500;
+}
+
+.boost-list-v25 li .dot {
+  width: 6px;
+  height: 6px;
+  background: #cbd5e1;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.boost-benefits-grid-v25 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.benefit-item-v25 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f8fafc;
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  color: #334155;
+  font-weight: 600;
+  border: 1px solid #f1f5f9;
+}
+
+.benefit-icon-v25 {
+  font-size: 16px;
+  background: white;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.boost-recommendation-box-v25 {
+  background: #f0f9ff;
+  border: 1.5px dashed #bae6fd;
+  padding: 16px;
+  border-radius: 16px;
+  margin-bottom: 24px;
+}
+
+.recommendation-header-v25 {
+  margin-bottom: 8px;
+}
+
+.recommendation-badge-v25 {
+  background: #0ea5e9;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 6px;
+  text-transform: uppercase;
+}
+
+.boost-recommendation-box-v25 p {
+  font-size: 0.875rem;
+  color: #0369a1;
+  line-height: 1.5;
+  margin: 0;
+  font-weight: 500;
+}
+
+
+/* --- Boost Calendar Styles (v25) --- */
+
+.calendar-modal-v25 {
+  max-width: 500px !important;
+}
+
+.boost-back-btn-v25 {
+  background: transparent;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  color: #64748b;
+  margin-right: 8px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s;
+}
+
+.boost-back-btn-v25:hover {
+  background: #f1f5f9;
+  color: #1e293b;
+}
+
+.boost-back-btn-v25.hidden {
+  display: none;
+}
+
+.calendar-view-container-v25 {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.calendar-month-header-v25 {
+  text-align: center;
+  padding: 8px 0;
+}
+
+.calendar-month-header-v25 h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #1e293b;
+}
+
+.calendar-grid-v25 {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  background: #f8fafc;
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid #f1f5f9;
+}
+
+.calendar-weekday-v25 {
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  padding-bottom: 8px;
+}
+
+.calendar-day-empty-v25 {
+  height: 44px;
+}
+
+.calendar-day-v25 {
+  height: 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #334155;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1.5px solid transparent;
+}
+
+.calendar-day-v25:hover:not(.disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-color: #e2e8f0;
+}
+
+.calendar-day-v25.selected {
+  background: #f59e0b;
+  color: white;
+  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+}
+
+.calendar-day-v25.disabled {
+  background: #f1f5f9;
+  color: #cbd5e1;
+  cursor: not-allowed;
+}
+
+.calendar-day-v25.state-full {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+.calendar-day-v25.state-partial {
+  border-color: #fef3c7;
+}
+
+.calendar-day-v25.state-recommended {
+  border-color: #bae6fd;
+}
+
+.partial-indicator {
+  position: absolute;
+  bottom: 6px;
+  width: 4px;
+  height: 4px;
+  background: #d97706;
+  border-radius: 50%;
+}
+
+.selected .partial-indicator {
+  background: white;
+}
+
+.recommended-sparkle {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  font-size: 10px;
+}
+
+.calendar-legend-v25 {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  padding: 8px 0;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+
+.swatch.state-available { background: white; border: 1px solid #e2e8f0; }
+.swatch.state-full { background: #f1f5f9; }
+.swatch.state-partial { background: white; border: 1.5px solid #fef3c7; }
+.swatch.state-recommended { background: white; border: 1.5px solid #bae6fd; }
+
+.selection-stats-v25 {
+  background: #f8fafc;
+  padding: 16px;
+  border-radius: 16px;
+  margin-top: 8px;
+}
+
+.stats-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.stats-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.stats-value {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #1e293b;
+  text-align: right;
+  max-width: 280px;
+}
+
+.stats-row-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.stat-pill {
+  background: white;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid #f1f5f9;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stat-pill label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: #94a3b8;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.stat-pill span {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #d97706;
+}
+
+
+/* --- Boost Usage Details Styles (v25) --- */
+
+.usage-details-container-v25 {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.usage-summary-card-v25 {
+  background: white;
+  padding: 24px;
+  border-radius: 20px;
+  border: 1px solid #f1f5f9;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+}
+
+.usage-grid-v25 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.usage-stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.usage-stat-item label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.usage-stat-item span {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #1e293b;
+}
+
+.highlight-remaining {
+  color: #f59e0b !important;
+}
+
+.usage-progress-container-v25 {
+  height: 8px;
+  background: #f1f5f9;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.usage-progress-bar-v25 {
+  height: 100%;
+  background: linear-gradient(90deg, #f59e0b, #fbbf24);
+  border-radius: 10px;
+  transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.usage-expiry-date-v25 {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.active-boost-card-v25 {
+  background: #fffbeb;
+  padding: 20px;
+  border-radius: 18px;
+  border: 1px solid #fef3c7;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.active-header-v25 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.active-header-v25 h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 800;
+  color: #92400e;
+}
+
+.active-featured-badge {
+  background: #f59e0b;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: 0 4px 10px rgba(245, 158, 11, 0.2);
+}
+
+.active-content-v25 {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.active-date-v25 {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #451a03;
+}
+
+.active-timer-v25 {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #d97706;
+}
+
+.usage-history-card-v25 {
+  background: white;
+  padding: 20px;
+  border-radius: 20px;
+  border: 1px solid #f1f5f9;
+}
+
+.usage-section-subtitle-v25 {
+  margin: 0 0 16px 0;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #1e293b;
+}
+
+.usage-history-table-container {
+  overflow-x: auto;
+}
+
+.usage-history-table-v25 {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.usage-history-table-v25 th {
+  text-align: left;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: #94a3b8;
+  padding-bottom: 12px;
+  font-weight: 700;
+}
+
+.usage-history-table-v25 td {
+  padding: 12px 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #334155;
+  border-top: 1px solid #f8fafc;
+}
+
+.status-completed-v25 {
+  background: #f0fdf4;
+  color: #16a34a;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+}
+
+.usage-results-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #64748b;
+}
+
+.dot-separator {
+  width: 3px;
+  height: 3px;
+  background: #cbd5e1;
+  border-radius: 50%;
+}
+
+.boost-recommendation-box-v25.secondary {
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  text-align: center;
+}
+
+.boost-recommendation-box-v25.secondary p {
+  color: #64748b;
+  font-style: italic;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+
+/* --- Boost Summary Redesign (v25) --- */
+
+.boost-summary-redesign-v25 {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 8px 0;
+  animation: fadeIn 0.4s ease-out;
+}
+
+.boost-credits-hero-v25 {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  padding: 32px 24px;
+  border-radius: 24px;
+  color: white;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.boost-credits-hero-v25::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero-credits-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 24px;
+}
+
+.hero-credits-count {
+  font-size: 4rem;
+  font-weight: 900;
+  line-height: 1;
+  background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+}
+
+.hero-credits-label {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.hero-credits-footer {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.hero-status-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #cbd5e1;
+}
+
+.hero-status-item svg {
+  color: #f59e0b;
+}
+
+.boost-benefits-simple-v25 {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+}
+
+.simple-benefit-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #334155;
+}
+
+.benefit-dot {
+  width: 6px;
+  height: 6px;
+  background: #f59e0b;
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.5);
+}
+
+.boost-smart-tip-v25 {
+  background: #f0f9ff;
+  border-radius: 16px;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid #bae6fd;
+}
+
+.tip-icon {
+  font-size: 1.2rem;
+}
+
+.boost-smart-tip-v25 p {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #0369a1;
+  line-height: 1.4;
+}
+
+.boost-sheet-actions.vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.boost-view-usage-link-v25 {
+  background: none;
+  border: none;
+  color: #64748b;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 8px;
+  transition: all 0.2s;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-color: rgba(100, 116, 139, 0.3);
+}
+
+.boost-view-usage-link-v25:hover {
+  color: #1e293b;
+  text-decoration-color: #1e293b;
+}
+
+/* --- Boost Header Redesign (v25) --- */
+
+.boost-sheet-header-v25.redesign {
+  padding: 16px 20px 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: white;
+  border-bottom: none;
+}
+
+.boost-header-top-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  min-height: 40px;
+}
+
+.boost-header-title-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding-bottom: 4px;
+}
+
+.boost-back-btn-pill-v25 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f1f5f9;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 50px;
+  color: #475569;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+}
+
+.boost-back-btn-pill-v25:hover {
+  background: #e2e8f0;
+  color: #1e293b;
+  transform: translateX(-2px);
+}
+
+.boost-back-btn-pill-v25.hidden {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.boost-sheet-header-v25.redesign .boost-sheet-title {
+  margin: 0;
+  text-align: center;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.boost-header-title-row .boost-sheet-title {
+  margin-top: 0;
+}
+
+/* Adjusting the content spacing after the header */
+.boost-sheet-content-v25 {
+  padding-top: 20px !important;
+}
+
+
+/* --- Refined Boost Header (Single Row) --- */
+
+.boost-sheet-header-v25.redesign.single-row {
+  display: grid;
+  grid-template-columns: 48px 1fr 48px;
+  align-items: center;
+  padding: 16px 20px;
+  gap: 0;
+  min-height: 64px;
+}
+
+.boost-back-btn-pill-v25.icon-only {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 12px;
+  background: #f8fafc;
+}
+
+.boost-back-btn-pill-v25.icon-only:hover {
+  background: #f1f5f9;
+}
+
+.boost-sheet-header-v25.redesign.single-row .boost-sheet-title {
+  grid-column: 2;
+  margin: 0;
+  font-size: 1.15rem;
+  white-space: nowrap;
+}
+
+.boost-sheet-header-v25.redesign.single-row .boost-sheet-close-v25 {
+  grid-column: 3;
+  justify-self: end;
+}
+
+
+/* --- Header & Calendar Alignment Cleanup --- */
+
+.boost-sheet-header-v25.redesign.single-row {
+  padding: 16px 8px; /* Reduced side padding to align buttons with calendar edge */
+  max-width: 100%;
+}
+
+.calendar-modal-v25 .boost-sheet-content-v25 {
+  padding-top: 0 !important; /* Remove substantial top padding to close the gap */
+}
+
+.calendar-month-header-v25 {
+  margin-top: 0;
+  padding-top: 4px; /* Tighten the gap to the header title */
+}
+
+
+/* --- Ultra-Tight Header & Calendar Spacing --- */
+
+.boost-sheet-header-v25.redesign.single-row {
+  padding-bottom: 4px !important; /* Reduce bottom padding significantly */
+}
+
+.calendar-month-header-v25 {
+  padding-top: 0 !important;
+  margin-top: -4px !important; /* Slight negative margin to pull it up if needed */
+}
+
+
+/* --- Profile Boost Pill Integration --- */
+
+.header-right-v4 {
+  display: flex !important;
+  align-items: center !important;
+  gap: 16px;
+}
+
+.profile-pill-v25 {
+  margin: 0 !important;
+  cursor: pointer;
+}
+
+.edit-profile-btn-v4 {
+  margin-left: 0 !important;
+}
+
+
+/* --- Service Settings Header Boost Pill --- */
+.service-settings-container .section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* ── Boost CTA Button (v25) ── */
+.boost-cta-btn-v25 {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  border: none;
+  border-radius: 14px;
+  padding: 10px 18px;
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+  box-shadow: 0 4px 14px rgba(249, 115, 22, 0.35);
+  text-align: left;
+  min-width: 200px;
+}
+
+.boost-cta-btn-v25:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(249, 115, 22, 0.45);
+  filter: brightness(1.05);
+}
+
+.boost-cta-btn-v25:active {
+  transform: translateY(0);
+  box-shadow: 0 3px 10px rgba(249, 115, 22, 0.3);
+}
+
+.boost-cta-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.boost-cta-icon {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.boost-cta-label {
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.boost-cta-subtext {
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding-left: 1.9rem; /* align under label, past icon */
+  white-space: nowrap;
+}
+
+/* ── Boost CTA Button — Primary Color Override ── */
+.boost-cta-btn-v25 {
+  background: linear-gradient(135deg, #0077ff 0%, #0055cc 100%) !important;
+  box-shadow: 0 4px 12px rgba(0, 119, 255, 0.3) !important;
+  padding: 8px 14px !important;
+  min-width: unset !important;
+  border-radius: 12px !important;
+}
+
+.boost-cta-btn-v25:hover {
+  box-shadow: 0 6px 18px rgba(0, 119, 255, 0.4) !important;
+  filter: brightness(1.06) !important;
 }

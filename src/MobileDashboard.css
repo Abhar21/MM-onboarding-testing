@@ -208,7 +208,7 @@
 }
 
 .card-status-pill-v50 {
-  padding: 4px 10px;
+  padding: 6px 14px;
   border-radius: 100px;
   font-size: 0.75rem;
   font-weight: 600;
@@ -463,7 +463,7 @@
 .card-status-v50 {
   font-size: 0.8rem;
   font-weight: 700;
-  padding: 4px 10px;
+  padding: 6px 14px;
   border-radius: 6px;
   text-transform: capitalize;
 }
@@ -993,7 +993,7 @@
 .detail-type-badge-v50 {
   font-size: 0.75rem;
   font-weight: 700;
-  padding: 4px 10px;
+  padding: 6px 14px;
   background: #eef2ff;
   color: #4f46e5;
   border-radius: 100px;
@@ -1003,7 +1003,7 @@
 .detail-status-badge-v50 {
   font-size: 0.75rem;
   font-weight: 700;
-  padding: 4px 10px;
+  padding: 6px 14px;
   border-radius: 100px;
   text-transform: uppercase;
 }
@@ -1466,7 +1466,7 @@
   font-size: 0.7rem;
   /* Reduced */
   font-weight: 700;
-  padding: 4px 10px;
+  padding: 6px 14px;
   /* Reduced */
   border-radius: 100px;
 }
@@ -4285,7 +4285,7 @@
   left: 12px;
   background: #10b981;
   color: white;
-  padding: 4px 10px;
+  padding: 6px 14px;
   border-radius: 6px;
   font-size: 0.75rem;
   font-weight: 800;
@@ -4353,7 +4353,7 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  padding: 4px 10px;
+  padding: 6px 14px;
   border-radius: 8px;
   font-size: 0.75rem;
   font-weight: 700;
@@ -4811,7 +4811,7 @@
   justify-content: center;
   color: #94a3b8;
   padding: 10px 8px;
-  margin-right: 8px;
+  margin-right: 14px;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -6063,7 +6063,7 @@
 .tkt-status-v57 {
   font-size: 0.7rem;
   font-weight: 700;
-  padding: 4px 10px;
+  padding: 6px 14px;
   border-radius: 100px;
   text-transform: uppercase;
 }
@@ -6180,7 +6180,7 @@
 }
 
 .coupon-status-pill-v58 {
-  padding: 4px 10px;
+  padding: 6px 14px;
   border-radius: 100px;
   font-size: 0.7rem;
   font-weight: 700;
@@ -6769,7 +6769,7 @@
   font-weight: 700;
   color: #64748b;
   background: #f1f5f9;
-  padding: 4px 10px;
+  padding: 6px 14px;
   border-radius: 6px;
 }
 
@@ -6778,7 +6778,7 @@
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.02em;
-  padding: 4px 10px;
+  padding: 6px 14px;
   border-radius: 20px;
   display: flex;
   align-items: center;
@@ -7132,7 +7132,7 @@
   font-weight: 800;
   color: #0077ff;
   background: #f0f7ff;
-  padding: 4px 10px;
+  padding: 6px 14px;
   border-radius: 20px;
 }
 
@@ -8383,7 +8383,7 @@
   font-weight: 800;
   background: #f0fdf4;
   color: #16a34a;
-  padding: 4px 10px;
+  padding: 6px 14px;
   border-radius: 8px;
 }
 
@@ -9268,7 +9268,7 @@
 .doc-status-v61 {
   font-size: 0.7rem;
   font-weight: 800;
-  padding: 4px 10px;
+  padding: 6px 14px;
   border-radius: 12px;
   background: #f1f5f9;
   color: #64748b;
@@ -9680,3 +9680,950 @@
   color: #059669;
   flex-shrink: 0;
 }
+/* ─────────────────── BOOST CREDITS FEATURE (v25) ─────────────────── */
+
+.mobile-boost-pill-v25 {
+  box-shadow: 0 1px 6px rgba(245, 158, 11, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 14px;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1.5px solid rgba(245, 158, 11, 0.4);
+  border-radius: 100px;
+  cursor: pointer;
+  margin-right: 14px;
+}
+
+.mobile-boost-pill-v25 .boost-icon {
+  font-size: 12px;
+}
+
+.mobile-boost-pill-v25 .boost-text {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #d97706;
+}
+
+/* Mobile Boost Bottom Sheet */
+.mobile-boost-sheet-overlay-v25 {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 10001;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.mobile-boost-bottom-sheet-v25 {
+  width: 100%;
+  background: white;
+  border-radius: 20px 20px 0 0;
+  padding: 24px 20px 40px 20px;
+  animation: mobileSlideUp-v25 0.3s ease-out;
+  box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.1);
+}
+
+@keyframes mobileSlideUp-v25 {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.mobile-boost-sheet-header-v25 {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.mobile-boost-sheet-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #1e293b;
+  margin: 0 0 4px 0;
+}
+
+.mobile-boost-credits-available {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #64748b;
+  background: #f1f5f9;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.mobile-boost-sheet-close-v25 {
+  background: #f8fafc;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-boost-sheet-content-v25 {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.mobile-boost-feature-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: #f8fafc;
+  padding: 16px;
+  border-radius: 12px;
+}
+
+.mobile-boost-feature-item {
+  display: flex;
+  gap: 12px;
+}
+
+.mobile-boost-feature-icon {
+  font-size: 18px;
+  background: white;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  flex-shrink: 0;
+}
+
+.mobile-boost-feature-text strong {
+  display: block;
+  font-size: 0.9rem;
+  color: #1e293b;
+  margin-bottom: 2px;
+}
+
+.mobile-boost-feature-text p {
+  font-size: 0.8rem;
+  color: #64748b;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.mobile-boost-sheet-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.mobile-boost-now-btn-v25 {
+  background: #f59e0b;
+  color: white;
+  border: none;
+  padding: 16px;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.mobile-boost-now-btn-v25.disabled {
+  background: #cbd5e1;
+}
+
+.mobile-boost-view-details-btn-v25 {
+  background: white;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+  padding: 16px;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+/* Mobile Boost Toast */
+.mobile-boost-toast-v25 {
+  position: fixed;
+  bottom: 100px;
+  left: 20px;
+  right: 20px;
+  background: #1e293b;
+  color: white;
+  padding: 14px 20px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 10002;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  animation: mobileToastIn-v25 0.4s ease-out, mobileToastOut-v25 0.3s ease-in 2.6s forwards;
+}
+
+@keyframes mobileToastIn-v25 {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes mobileToastOut-v25 {
+  from { transform: translateY(0); opacity: 1; }
+  to { transform: translateY(-10px); opacity: 0; }
+}
+
+.mobile-boost-toast-v25 .toast-icon {
+  font-size: 1.2rem;
+}
+
+.mobile-boost-toast-v25 .toast-msg {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+/* --- Redesigned Mobile Boost Bottom Sheet Styles (v25) --- */
+
+.mobile-boost-credits-info-v25 {
+  margin-top: 6px;
+}
+
+.mobile-boost-credits-count-v25 {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #d97706;
+  background: rgba(245, 158, 11, 0.1);
+  padding: 4px 8px;
+  border-radius: 6px;
+  display: inline-block;
+}
+
+.mobile-boost-credits-subtext-v25 {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin: 4px 0 0 0;
+  font-weight: 500;
+}
+
+.mobile-boost-urgency-banner-v25 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fffbeb;
+  border: 1px solid #fef3c7;
+  padding: 10px 12px;
+  border-radius: 10px;
+  margin-top: 14px;
+  color: #92400e;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.mobile-boost-urgency-banner-v25 svg {
+  color: #d97706;
+  flex-shrink: 0;
+}
+
+.mobile-boost-info-section-v25 {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.mobile-boost-section-title-v25 {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #1e293b;
+  text-transform: uppercase;
+  letter-spacing: 0.05rem;
+  margin: 0;
+}
+
+.mobile-boost-list-v25 {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mobile-boost-list-v25 li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: #475569;
+  font-weight: 500;
+}
+
+.mobile-boost-list-v25 li .dot {
+  width: 5px;
+  height: 5px;
+  background: #cbd5e1;
+  border-radius: 50%;
+}
+
+.mobile-boost-benefits-grid-v25 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.mobile-benefit-item-v25 {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  background: #f8fafc;
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  color: #334155;
+  font-weight: 600;
+  border: 1px solid #f1f5f9;
+}
+
+.mobile-benefit-icon-v25 {
+  font-size: 14px;
+  background: white;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.mobile-boost-recommendation-box-v25 {
+  background: #f0f9ff;
+  border: 1.5px dashed #bae6fd;
+  padding: 14px;
+  border-radius: 16px;
+  margin-bottom: 24px;
+}
+
+.mobile-recommendation-header-v25 {
+  margin-bottom: 6px;
+}
+
+.mobile-recommendation-badge-v25 {
+  background: #0ea5e9;
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.mobile-boost-recommendation-box-v25 p {
+  font-size: 0.8rem;
+  color: #0369a1;
+  line-height: 1.4;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* --- Mobile Boost Calendar Styles (v25) --- */
+
+.mobile-boost-back-btn-v25 {
+  background: transparent;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  color: #64748b;
+  margin-right: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.mobile-boost-back-btn-v25.hidden {
+  display: none;
+}
+
+.mobile-calendar-view-container-v25 {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.mobile-calendar-month-header-v25 {
+  text-align: center;
+}
+
+.mobile-calendar-month-header-v25 h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 800;
+  color: #1e293b;
+}
+
+.mobile-calendar-grid-v25 {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  background: #f8fafc;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #f1f5f9;
+}
+
+.mobile-calendar-weekday-v25 {
+  text-align: center;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #94a3b8;
+  padding-bottom: 6px;
+}
+
+.mobile-calendar-day-empty-v25 {
+  height: 38px;
+}
+
+.mobile-calendar-day-v25 {
+  height: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #334155;
+  position: relative;
+  border: 1.5px solid transparent;
+}
+
+.mobile-calendar-day-v25.selected {
+  background: #f59e0b;
+  color: white;
+}
+
+.mobile-calendar-day-v25.disabled {
+  background: #f1f5f9;
+  color: #cbd5e1;
+}
+
+.mobile-calendar-day-v25.state-full {
+  text-decoration: line-through;
+}
+
+.mobile-calendar-day-v25.state-partial {
+  border-color: #fef3c7;
+}
+
+.mobile-calendar-day-v25.state-recommended {
+  border-color: #bae6fd;
+}
+
+.mobile-recommended-dot {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 4px;
+  height: 4px;
+  background: #38bdf8;
+  border-radius: 50%;
+}
+
+.mobile-selection-stats-v25 {
+  background: #f8fafc;
+  padding: 12px;
+  border-radius: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.mobile-stats-count-v25 {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+.mobile-stats-credits-v25 {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #d97706;
+  margin: 0;
+}
+
+
+/* --- Mobile Calendar Legend Styles (v25) --- */
+
+.mobile-calendar-legend-v25 {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.mobile-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.7rem;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.mobile-swatch {
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+}
+
+.mobile-swatch.state-available { background: white; border: 1px solid #e2e8f0; }
+.mobile-swatch.state-full { background: #f1f5f9; }
+.mobile-swatch.state-partial { background: white; border: 1.5px solid #fef3c7; }
+.mobile-swatch.state-recommended { background: white; border: 1.5px solid #bae6fd; }
+
+
+/* --- Mobile Boost Usage Details Styles (v25) --- */
+
+.mobile-usage-details-container-v25 {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  animation: mobileFadeIn 0.3s ease-out;
+}
+
+.mobile-usage-summary-card-v25 {
+  background: white;
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid #f1f5f9;
+}
+
+.mobile-usage-grid-v25 {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 16px;
+}
+
+.mobile-stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.mobile-stat-item label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+}
+
+.mobile-stat-item span {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #1e293b;
+}
+
+.mobile-usage-progress-container-v25 {
+  height: 6px;
+  background: #f1f5f9;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.mobile-usage-progress-bar-v25 {
+  height: 100%;
+  background: #f59e0b;
+  border-radius: 10px;
+}
+
+.mobile-usage-expiry-v25 {
+  margin: 0;
+  font-size: 0.75rem;
+  color: #64748b;
+  text-align: center;
+}
+
+.mobile-active-boost-card-v25 {
+  background: #fffbeb;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid #fef3c7;
+}
+
+.mobile-active-header-v25 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.mobile-active-header-v25 h3 {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #92400e;
+}
+
+.mobile-active-badge {
+  background: #f59e0b;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.6rem;
+  font-weight: 800;
+}
+
+.mobile-active-timer-v25 {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #d97706;
+  font-weight: 600;
+}
+
+.mobile-usage-history-list-v25 {
+  background: white;
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid #f1f5f9;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mobile-usage-subtitle-v25 {
+  margin: 0 0 4px 0;
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #1e293b;
+}
+
+.mobile-history-item-v25 {
+  padding: 12px 0;
+  border-top: 1px solid #f8fafc;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mobile-history-main-v25 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.mobile-history-date-v25 {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #334155;
+}
+
+.mobile-history-status-v25 {
+  font-size: 0.7rem;
+  color: #16a34a;
+  background: #f0fdf4;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.mobile-history-stats-v25 {
+  font-size: 0.75rem;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.bullet {
+  color: #cbd5e1;
+}
+
+@keyframes mobileFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+
+/* --- Mobile Interactivity Fixes (v25) --- */
+
+.mobile-boost-sheet-content-v25 {
+  padding-bottom: 30px; /* Ensure space at bottom for actions */
+}
+
+.mobile-boost-sheet-actions {
+  margin-top: 10px;
+  position: relative;
+  z-index: 10;
+  padding-top: 10px;
+}
+
+.mobile-boost-view-details-btn-v25 {
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+
+/* --- Mobile Boost Summary Redesign (v25) --- */
+
+.mobile-boost-summary-redesign-v25 {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 4px 0;
+  animation: fadeInMobile 0.4s ease-out;
+}
+
+.mobile-boost-credits-hero-v25 {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  padding: 24px 20px;
+  border-radius: 20px;
+  color: white;
+  text-align: center;
+  box-shadow: 0 8px 25px rgba(15, 23, 42, 0.12);
+}
+
+.mobile-hero-credits-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  margin-bottom: 20px;
+}
+
+.mobile-hero-credits-count {
+  font-size: 3.5rem;
+  font-weight: 900;
+  line-height: 1;
+  background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.mobile-hero-credits-label {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.mobile-hero-credits-footer {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.mobile-hero-status-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #cbd5e1;
+}
+
+.mobile-hero-status-item svg {
+  color: #f59e0b;
+}
+
+.mobile-boost-benefits-simple-v25 {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.mobile-simple-benefit-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #334155;
+}
+
+.mobile-boost-smart-tip-v25 {
+  background: #f0f9ff;
+  border-radius: 14px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #bae6fd;
+}
+
+.mobile-boost-smart-tip-v25 p {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #0369a1;
+  line-height: 1.4;
+}
+
+.mobile-boost-sheet-actions.vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mobile-boost-view-usage-link-v25 {
+  background: none;
+  border: none;
+  color: #64748b;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 6px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: rgba(100, 116, 139, 0.3);
+}
+
+@keyframes fadeInMobile {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* --- Mobile Boost Header Redesign (v25) --- */
+
+.mobile-boost-sheet-header-v25.redesign {
+  padding: 16px 16px 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: white;
+}
+
+.mobile-boost-header-top-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.mobile-boost-header-title-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding-bottom: 4px;
+}
+
+.mobile-boost-back-btn-pill-v25 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #f1f5f9;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 50px;
+  color: #475569;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.mobile-boost-back-btn-pill-v25.hidden {
+  visibility: hidden;
+}
+
+.mobile-boost-sheet-header-v25.redesign .mobile-boost-sheet-title {
+  margin: 0;
+  text-align: center;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+
+/* --- Refined Mobile Boost Header (Single Row) --- */
+
+.mobile-boost-sheet-header-v25.redesign.single-row {
+  display: grid;
+  grid-template-columns: 44px 1fr 44px;
+  align-items: center;
+  padding: 12px 16px;
+  min-height: 56px;
+}
+
+.mobile-boost-back-btn-pill-v25.icon-only {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.mobile-boost-sheet-header-v25.redesign.single-row .mobile-boost-sheet-title {
+  grid-column: 2;
+  margin: 0;
+  font-size: 1.05rem;
+  text-align: center;
+}
+
+.mobile-boost-sheet-header-v25.redesign.single-row .mobile-boost-sheet-close-v25 {
+  grid-column: 3;
+  justify-self: end;
+}
+
+
+/* --- Mobile Header & Calendar Alignment Cleanup --- */
+
+.mobile-boost-sheet-header-v25.redesign.single-row {
+  padding: 12px 6px;
+}
+
+.mobile-calendar-view-container-v25 {
+  padding-top: 0;
+}
+
+.mobile-calendar-month-header-v25 {
+  margin-top: 4px;
+}
+
+
+/* --- Ultra-Tight Mobile Header & Calendar Spacing --- */
+
+.mobile-boost-sheet-header-v25.redesign.single-row {
+  padding-bottom: 2px !important;
+}
+
+.mobile-calendar-month-header-v25 {
+  padding-top: 0 !important;
+  margin-top: -2px !important;
+}
+
+
+/* --- Mobile Profile Boost Pill Integration --- */
+
+.profile-header-actions-v60 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.profile-pill-mobile-v25 {
+  margin: 0 !important;
+  height: 28px !important;
+  padding: 0 10px !important;
+  border-radius: 12px !important;
+  font-size: 0.75rem !important;
+}
+
+.profile-pill-mobile-v25 .mobile-boost-pill-text {
+  font-weight: 800;
+}
+
+.edit-profile-btn-v60 {
+  margin: 0 !important;
+}
+

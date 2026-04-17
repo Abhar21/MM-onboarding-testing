@@ -2439,6 +2439,21 @@ interface MobileDashboardProps {
   // Global Menus
   menus: Menu[];
   setMenus: React.Dispatch<React.SetStateAction<Menu[]>>;
+  // Boost Credits Props
+  boostCredits: number;
+  setBoostCredits: any;
+  isBoostSheetOpen: boolean;
+  setIsBoostSheetOpen: any;
+  showBoostToast: boolean;
+  setShowBoostToast: any;
+  isCalendarView: boolean;
+  setIsCalendarView: any;
+  selectedBoostDates: string[];
+  setSelectedBoostDates: any;
+  mockBookingData: Record<string, string>;
+  isUsageDetailsView: boolean;
+  setIsUsageDetailsView: any;
+  usageHistory: any[];
 }
 
 /* ─────────────────── MOBILE COUPON FORM VIEW (v59) ─────────────────── */
@@ -3204,14 +3219,14 @@ const MobileProfileView = ({
   profileData,
   onEdit,
   onAddBank,
-  onDeleteBank,
-  onSetPrimary
+  onSetPrimary,
+  onDeleteBank
 }: {
   profileData: ProfileData,
   onEdit: () => void,
   onAddBank: () => void,
-  onDeleteBank: (id: string) => void,
-  onSetPrimary: (id: string) => void
+  onSetPrimary: (id: string) => void,
+  onDeleteBank: (id: string) => void
 }) => {
   const [activeSubTab, setActiveSubTab] = useState('Summary');
   const subTabs = ['Summary', 'Documents', 'Bank Details'];
@@ -5194,7 +5209,22 @@ const MobileDashboard = (props: MobileDashboardProps) => {
     menuEditingId,
     setMenuEditingId,
     menus,
-    setMenus
+    setMenus,
+    // Boost Credits Props
+    boostCredits,
+    setBoostCredits,
+    isBoostSheetOpen,
+    setIsBoostSheetOpen,
+    showBoostToast,
+    setShowBoostToast,
+    isCalendarView,
+    setIsCalendarView,
+    isUsageDetailsView,
+    setIsUsageDetailsView,
+    selectedBoostDates,
+    setSelectedBoostDates,
+    mockBookingData,
+    usageHistory
   } = props;
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -5249,6 +5279,15 @@ const MobileDashboard = (props: MobileDashboardProps) => {
           </h2>
         </div>
         <div className="mobile-bar-right-v50">
+          {/* Boost Credits Chip */}
+          <button 
+            className="mobile-boost-pill-v25" 
+            onClick={() => setIsBoostSheetOpen(true)}
+          >
+            <span className="boost-icon">📈</span>
+            <span className="boost-text">{boostCredits > 0 ? `${boostCredits}` : ''}</span>
+          </button>
+
           <button className="mobile-action-btn-v50">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
           </button>
@@ -5445,6 +5484,240 @@ const MobileDashboard = (props: MobileDashboardProps) => {
           onClose={() => setSecurityConfirmModal(null)}
           onConfirm={() => console.log('Confirmed:', securityConfirmModal)}
         />
+      )}
+
+      {/* Boost Bottom Sheet */}
+      {isBoostSheetOpen && (
+        <div className="mobile-boost-sheet-overlay-v25" onClick={() => {
+          setIsBoostSheetOpen(false);
+          setIsCalendarView(false);
+          setSelectedBoostDates([]);
+        }}>
+          <div className="mobile-boost-bottom-sheet-v25" onClick={e => e.stopPropagation()}>
+            <div className="mobile-boost-sheet-header-v25 redesign single-row">
+              <button 
+                className={`mobile-boost-back-btn-pill-v25 icon-only ${(!isCalendarView && !isUsageDetailsView) ? 'hidden' : ''}`}
+                onClick={() => {
+                  if (isCalendarView) {
+                    setIsCalendarView(false);
+                  } else {
+                    setIsUsageDetailsView(false);
+                  }
+                }}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+              </button>
+              
+              <h2 className="mobile-boost-sheet-title">
+                {isCalendarView ? 'Select Dates' : (isUsageDetailsView ? 'Usage Overview' : 'Boost Your Profile')}
+              </h2>
+
+              <button className="mobile-boost-sheet-close-v25" onClick={() => {
+                setIsBoostSheetOpen(false);
+                setIsCalendarView(false);
+                setIsUsageDetailsView(false);
+                setSelectedBoostDates([]);
+              }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
+            </div>
+            
+            <div className="mobile-boost-sheet-content-v25">
+              {isCalendarView ? (
+                <div className="mobile-calendar-view-container-v25">
+                  <div className="mobile-calendar-month-header-v25">
+                    <h3>April 2026</h3>
+                  </div>
+                  
+                  <div className="mobile-calendar-grid-v25">
+                    {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, idx) => (
+                      <div key={idx} className="mobile-calendar-weekday-v25">{day}</div>
+                    ))}
+                    {[null, null, null].map((_, i) => <div key={`empty-${i}`} className="mobile-calendar-day-empty-v25"></div>)}
+                    
+                    {Array.from({ length: 30 }, (_, i) => {
+                      const day = i + 1;
+                      const dateStr = `2026-04-${day < 10 ? '0' + day : day}`;
+                      const status = mockBookingData[dateStr] || 'available';
+                      const isSelected = selectedBoostDates.includes(dateStr);
+                      const isFull = status === 'full';
+                      const isPast = day < 17; // Today is April 17, 2026
+                      
+                      return (
+                        <div 
+                          key={day} 
+                          className={`mobile-calendar-day-v25 state-${status} ${isSelected ? 'selected' : ''} ${isFull || isPast ? 'disabled' : ''}`}
+                          onClick={() => {
+                            if (isFull || isPast) return;
+                            if (isSelected) {
+                              setSelectedBoostDates((prev: string[]) => prev.filter(d => d !== dateStr));
+                            } else if (selectedBoostDates.length < boostCredits) {
+                              setSelectedBoostDates((prev: string[]) => [...prev, dateStr]);
+                            }
+                          }}
+                        >
+                          <span className="day-number">{day}</span>
+                          {status === 'recommended' && <span className="mobile-recommended-dot"></span>}
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <div className="mobile-calendar-legend-v25">
+                    <div className="mobile-legend-item"><span className="mobile-swatch state-available"></span> Available</div>
+                    <div className="mobile-legend-item"><span className="mobile-swatch state-full"></span> Full</div>
+                    <div className="mobile-legend-item"><span className="mobile-swatch state-partial"></span> Partial</div>
+                    <div className="mobile-legend-item"><span className="mobile-swatch state-recommended"></span> Recommended</div>
+                  </div>
+
+                  <div className="mobile-selection-stats-v25">
+                    <p className="mobile-stats-count-v25">{selectedBoostDates.length} days selected</p>
+                    <p className="mobile-stats-credits-v25">Credits left: {boostCredits - selectedBoostDates.length}</p>
+                  </div>
+
+                  <div className="mobile-boost-sheet-actions">
+                    <button 
+                      className={`mobile-boost-now-btn-v25 ${selectedBoostDates.length === 0 ? 'disabled' : ''}`}
+                      onClick={() => {
+                        if (selectedBoostDates.length > 0) {
+                          setBoostCredits((prev: number) => prev - selectedBoostDates.length);
+                          setIsBoostSheetOpen(false);
+                          setIsCalendarView(false);
+                          setIsUsageDetailsView(false);
+                          setSelectedBoostDates([]);
+                          setShowBoostToast(true);
+                          setTimeout(() => setShowBoostToast(false), 3000);
+                        }
+                      }}
+                      disabled={selectedBoostDates.length === 0}
+                    >
+                      Confirm Boost
+                    </button>
+                    <button className="mobile-boost-view-details-btn-v25" onClick={() => setIsCalendarView(false)}>
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : isUsageDetailsView ? (
+                <div className="mobile-usage-details-container-v25">
+                  <div className="mobile-usage-summary-card-v25">
+                    <div className="mobile-usage-grid-v25">
+                      <div className="mobile-stat-item">
+                        <label>Credits Left</label>
+                        <span>{boostCredits}</span>
+                      </div>
+                      <div className="mobile-stat-item">
+                        <label>Used</label>
+                        <span>{10 - boostCredits}</span>
+                      </div>
+                    </div>
+                    <div className="mobile-usage-progress-container-v25">
+                      <div className="mobile-usage-progress-bar-v25" style={{ width: `${(boostCredits / 10) * 100}%` }}></div>
+                    </div>
+                    <p className="mobile-usage-expiry-v25">Valid till 15 May 2026</p>
+                  </div>
+
+                  <div className="mobile-active-boost-card-v25">
+                    <div className="mobile-active-header-v25">
+                      <h3>Active Boost</h3>
+                      <span className="mobile-active-badge">Featured</span>
+                    </div>
+                    <p className="mobile-active-timer-v25">Expires in 18 hours</p>
+                  </div>
+
+                  <div className="mobile-usage-history-list-v25">
+                    <h3 className="mobile-usage-subtitle-v25">Usage History</h3>
+                    {usageHistory.map((item, idx) => (
+                      <div key={idx} className="mobile-history-item-v25">
+                        <div className="mobile-history-main-v25">
+                          <span className="mobile-history-date-v25">{item.date}</span>
+                          <span className="mobile-history-status-v25">{item.status}</span>
+                        </div>
+                        <div className="mobile-history-stats-v25">
+                          <span>{item.views} views</span>
+                          <span className="bullet">•</span>
+                          <span>{item.bookings} bookings</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="mobile-boost-sheet-actions">
+                    <button 
+                      className={`mobile-boost-now-btn-v25 ${boostCredits === 0 ? 'disabled' : ''}`}
+                      onClick={() => {
+                        setIsCalendarView(true);
+                      }}
+                      disabled={boostCredits === 0}
+                    >
+                      Boost Again
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="mobile-boost-summary-redesign-v25">
+                  {/* Hero Credits Card */}
+                  <div className="mobile-boost-credits-hero-v25">
+                    <div className="mobile-hero-credits-main">
+                      <span className="mobile-hero-credits-count">{boostCredits}</span>
+                      <span className="mobile-hero-credits-label">Credits Available</span>
+                    </div>
+                    <div className="mobile-hero-credits-footer">
+                      <div className="mobile-hero-status-item">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                        <span>1 credit = 24h</span>
+                      </div>
+                      <div className="mobile-hero-status-item">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                        <span>Exp. 30 days</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Simplified Benefits */}
+                  <div className="mobile-boost-benefits-simple-v25">
+                    <div className="mobile-simple-benefit-item">
+                      <div className="benefit-dot"></div>
+                      <span>Get featured at top</span>
+                    </div>
+                    <div className="mobile-simple-benefit-item">
+                      <div className="benefit-dot"></div>
+                      <span>Increase bookings</span>
+                    </div>
+                  </div>
+
+                  {/* Smart Tip */}
+                  <div className="mobile-boost-smart-tip-v25">
+                    <div className="tip-icon">💡</div>
+                    <p>Use on low booking days for better results</p>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="mobile-boost-sheet-actions vertical">
+                    <button 
+                      className={`mobile-boost-now-btn-v25 ${boostCredits === 0 ? 'disabled' : ''}`}
+                      onClick={() => setIsCalendarView(true)}
+                      disabled={boostCredits === 0}
+                    >
+                      Boost Now
+                    </button>
+                    <button className="mobile-boost-view-usage-link-v25" onClick={() => setIsUsageDetailsView(true)}>
+                      View Usage Details
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Boost Success Toast */}
+      {showBoostToast && (
+        <div className="mobile-boost-toast-v25">
+          <span className="toast-icon">🚀</span>
+          <span className="toast-msg">Your profile is now featured</span>
+        </div>
       )}
     </div>
   );
