@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Routes, Route, useNavigate, Navigate, Link } from 'react-router-dom';
-import { 
-  DndContext, 
-  closestCenter, 
-  KeyboardSensor, 
-  PointerSensor, 
-  useSensor, 
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
   useSensors,
   TouchSensor,
   type DragEndEvent
@@ -1748,8 +1748,8 @@ const Settings = ({
   return (
     <div className="settings-container-v4">
       {activeTab === 'subscription' && !isBannerDismissed && (
-        <MembershipStatusBanner 
-          status={membershipStatus} 
+        <MembershipStatusBanner
+          status={membershipStatus}
           isDashboard={true}
           onAction={() => setShowManageMembership(true)}
           onDismiss={() => setIsBannerDismissed(true)}
@@ -1840,7 +1840,7 @@ const Settings = ({
             <div className="settings-pane-v4">
               <div className="subscription-header-row-v4">
                 <h3 className="pane-title">myMembership Plan</h3>
-                <button 
+                <button
                   className="manage-subscription-btn-v4"
                   onClick={() => setShowManageMembership(true)}
                 >
@@ -1861,10 +1861,10 @@ const Settings = ({
                   <div className="active-plan-details-v4">
                     <div className="plan-name-row-v4">
                       <h3 className="plan-name-v4">Growth Plan</h3>
-                      <div className="plan-savings-v4 horizontal-badge-v4">Saved ₹1,200/year</div>
+                      <div className="plan-savings-v4 horizontal-badge-v4">Saved ₹600/year</div>
                     </div>
                     <div className="plan-pricing-v4 compact-v4">
-                      <span className="plan-rate-v4">₹499 / month</span>
+                      <span className="plan-rate-v4">₹549 / month</span>
                       <span className="plan-pricing-divider-v4">•</span>
                       <span className="plan-duration-v4">6 Months plan</span>
                     </div>
@@ -1902,7 +1902,7 @@ const Settings = ({
                 }}
               />
 
-              <ManageMembershipModal 
+              <ManageMembershipModal
                 isOpen={showManageMembership}
                 onClose={() => setShowManageMembership(false)}
                 status={membershipStatus}
@@ -4023,11 +4023,17 @@ const ServiceSettings = ({
                                   {menuIdentity.dietType}
                                 </span>
                               </div>
-                              <div className="preview-summary-v5">
-                                {activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1)} • {sections.length} Sections • {(() => {
-                                  const totalItems = sections.reduce((acc: number, sec: any) => acc + (sec.items?.length || 0), 0);
-                                  return totalItems;
-                                })()} Items
+                              <div className="preview-badges-row-v5">
+                                <div className="preview-summary-pill-v5">
+                                  {activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1)} • {sections.length} Sections • {(() => {
+                                    const totalItems = sections.reduce((acc: number, sec: any) => acc + (sec.items?.length || 0), 0);
+                                    return totalItems;
+                                  })()} Items
+                                </div>
+                                <div className="preview-min-max-pill-v5">
+                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                                  <span>{menuIdentity.minMembers || 0} - {menuIdentity.maxMembers || 0} Guests</span>
+                                </div>
                               </div>
                               <div className="preview-price-v5">
                                 ₹{profileData.header.gstType === 'Regular' ? (Number(menuIdentity.price) * 1.18).toLocaleString() : Number(menuIdentity.price).toLocaleString()}
@@ -4492,8 +4498,8 @@ const VendorProfile = ({
             </div>
           </div>
           <div className="header-right-v4">
-            <div 
-              className="boost-pill-v25 profile-pill-v25" 
+            <div
+              className="boost-pill-v25 profile-pill-v25"
               onClick={() => setIsBoostSheetOpen(true)}
             >
               <span className="boost-pill-icon">📈</span>
@@ -5641,7 +5647,7 @@ const BookingDetailModal = ({
               const tdsRate = 0.001;
 
               // Refund/Retention logic for Cancelled bookings
-              const refundPercentage = booking.refundPercentage ?? 50; 
+              const refundPercentage = booking.refundPercentage ?? 50;
               const refundToCustomer = Math.round(booking.paid * (refundPercentage / 100));
               const vendorRetain = booking.paid - refundToCustomer;
 
@@ -5650,7 +5656,7 @@ const BookingDetailModal = ({
               const commissionGst = Math.round(commission * gstRate);
               const tds = Math.round(vendorRetain * tdsRate);
               const totalDeductions = commission + commissionGst + tds;
-              
+
               const vendorPayoutFromPlatform = vendorRetain - totalDeductions;
               const vendorPayout = booking.status === 'Cancelled' ? vendorPayoutFromPlatform : (booking.paid - (Math.round(booking.paid * commissionRate) + Math.round(Math.round(booking.paid * commissionRate) * gstRate) + Math.round(booking.paid * tdsRate)));
               const totalEarnings = booking.status === 'Cancelled' ? vendorPayout : (vendorPayout + (booking.amount - booking.paid));
@@ -5660,7 +5666,7 @@ const BookingDetailModal = ({
               payoutStart.setDate(eventDateObj.getDate() - 2);
               const payoutEnd = new Date(eventDateObj);
               payoutEnd.setDate(eventDateObj.getDate());
-              
+
               const startMonth = payoutStart.toLocaleDateString('en-GB', { month: 'short' });
               const endMonth = payoutEnd.toLocaleDateString('en-GB', { month: 'short' });
               const estimateStr = startMonth === endMonth
@@ -5678,10 +5684,10 @@ const BookingDetailModal = ({
                         <p style={{ margin: 0, color: '#b91c1c', fontSize: '0.85rem', fontWeight: 500 }}>Cancelled on {booking.cancelledAt || 'N/A'}</p>
                         <p style={{ margin: 0, color: '#dc2626', fontSize: '0.8rem', opacity: 0.8 }}>Refund Policy Applied: {refundPercentage}%</p>
                       </div>
-                      <div style={{ 
-                        padding: '6px 12px', 
-                        borderRadius: '20px', 
-                        fontSize: '0.85rem', 
+                      <div style={{
+                        padding: '6px 12px',
+                        borderRadius: '20px',
+                        fontSize: '0.85rem',
                         fontWeight: 700,
                         backgroundColor: refundPercentage === 100 ? '#f0fdf4' : refundPercentage === 50 ? '#fff7ed' : '#fef2f2',
                         color: refundPercentage === 100 ? '#166534' : refundPercentage === 50 ? '#9a3412' : '#991b1b',
@@ -5743,7 +5749,7 @@ const BookingDetailModal = ({
                           <label>Paid at Event (Remaining)</label>
                           <span style={{ color: booking.status === 'Cancelled' ? '#94a3b8' : '#f59e0b' }}>₹{booking.status === 'Cancelled' ? '0' : (booking.amount - booking.paid).toLocaleString()}</span>
                         </div>
-                        <div className="breakdown-note-v30" style={{ 
+                        <div className="breakdown-note-v30" style={{
                           backgroundColor: booking.status === 'Cancelled' ? '#f8fafc' : 'rgba(245, 158, 11, 0.05)',
                           color: booking.status === 'Cancelled' ? '#64748b' : '#d97706',
                           border: `1px solid ${booking.status === 'Cancelled' ? '#e2e8f0' : 'rgba(245, 158, 11, 0.15)'}`
@@ -5810,39 +5816,39 @@ const BookingDetailModal = ({
                     </>
                   )}
 
-                  <div className="section-label-v30" style={{ marginTop: '0px', marginBottom: '4px' }}>{booking.status === 'Cancelled' ? '5. Final Settlement' : 'Final Settlement'}</div>
-                  <div style={{ 
-                    backgroundColor: booking.status === 'Cancelled' && refundPercentage === 100 ? '#f8fafc' : 'rgba(16, 185, 129, 0.06)', 
-                    borderRadius: '8px', 
-                    padding: '14px 12px', 
-                    margin: '0 0 8px 0', 
-                    border: `1px solid ${booking.status === 'Cancelled' && refundPercentage === 100 ? '#e2e8f0' : 'rgba(16, 185, 129, 0.15)'}`, 
-                    display: 'flex', 
-                    flexDirection: 'column', 
-                    gap: '8px' 
+                  <div className="section-label-v30" style={{ marginTop: '0px', marginBottom: '4px' }}>{booking.status === 'Cancelled' ? 'Final Settlement' : 'Final Settlement'}</div>
+                  <div style={{
+                    backgroundColor: booking.status === 'Cancelled' && refundPercentage === 100 ? '#f8fafc' : 'rgba(16, 185, 129, 0.06)',
+                    borderRadius: '8px',
+                    padding: '14px 12px',
+                    margin: '0 0 8px 0',
+                    border: `1px solid ${booking.status === 'Cancelled' && refundPercentage === 100 ? '#e2e8f0' : 'rgba(16, 185, 129, 0.15)'}`,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '8px'
                   }}>
                     <div className="breakdown-row-v30" style={{ borderBottom: 'none', paddingBottom: 0, paddingTop: 0 }}>
                       <label style={{ fontWeight: 600, color: '#0f172a' }}>You Receive</label>
-                      <span style={{ 
-                        color: booking.status === 'Cancelled' && refundPercentage === 100 ? '#64748b' : '#10b981', 
-                        fontSize: '1.25rem', 
-                        fontWeight: 700 
+                      <span style={{
+                        color: booking.status === 'Cancelled' && refundPercentage === 100 ? '#64748b' : '#10b981',
+                        fontSize: '1.25rem',
+                        fontWeight: 700
                       }}>
                         {booking.status === 'Cancelled' && refundPercentage === 100 ? 'No payout (fully refunded)' : `₹${vendorPayout.toLocaleString()}`}
                       </span>
                     </div>
                     {booking.status !== 'Cancelled' && (
-                       <div className="breakdown-row-v30" style={{ paddingTop: 0, marginTop: 0, borderBottom: 'none' }}>
-                       <label style={{ color: '#047857', fontWeight: 500, fontSize: '0.9rem' }}>Estimate payout date</label>
-                       <span style={{ color: '#047857', fontWeight: 600, fontSize: '0.9rem' }}>{estimateStr}</span>
-                     </div>
+                      <div className="breakdown-row-v30" style={{ paddingTop: 0, marginTop: 0, borderBottom: 'none' }}>
+                        <label style={{ color: '#047857', fontWeight: 500, fontSize: '0.9rem' }}>Estimate payout date</label>
+                        <span style={{ color: '#047857', fontWeight: 600, fontSize: '0.9rem' }}>{estimateStr}</span>
+                      </div>
                     )}
-                    <div className="breakdown-note-v30" style={{ 
-                      marginTop: '4px', 
-                      color: booking.status === 'Cancelled' && refundPercentage === 100 ? '#64748b' : '#059669', 
-                      opacity: 0.9, 
-                      backgroundColor: 'transparent', 
-                      padding: 0, 
+                    <div className="breakdown-note-v30" style={{
+                      marginTop: '4px',
+                      color: booking.status === 'Cancelled' && refundPercentage === 100 ? '#64748b' : '#059669',
+                      opacity: 0.9,
+                      backgroundColor: 'transparent',
+                      padding: 0,
                       borderRadius: 0,
                       border: 'none',
                       boxShadow: 'none'
@@ -5855,7 +5861,7 @@ const BookingDetailModal = ({
                   {/* Section 6: Total Earnings */}
                   <div className="total-earnings-card-v30" style={{ marginTop: '16px' }}>
                     <div className="earnings-label">
-                      <label>{booking.status === 'Cancelled' ? '6. TOTAL EARNINGS (Incl. GST)' : 'TOTAL EARNINGS'}</label>
+                      <label>{booking.status === 'Cancelled' ? 'TOTAL EARNINGS (Incl. GST)' : 'TOTAL EARNINGS'}</label>
                       <span style={{ color: booking.status === 'Cancelled' && refundPercentage === 100 ? '#64748b' : '#10b981' }}>₹{totalEarnings.toLocaleString()}</span>
                       <div className="incl-gst-bottom-v30">(Incl. GST)</div>
                       <div className="earnings-helper-v30">{booking.status === 'Cancelled' ? 'Includes retained amount after refund and platform deductions' : 'Includes Paid at Event + platform payout'}</div>
@@ -5917,148 +5923,7 @@ const BookingDetailModal = ({
             </div>
           </div>
 
-          {booking.status === 'Cancelled' && (
-            <div className="activity-log-v14">
-              <div className="al-header-v14">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
-                <span>Activity Log</span>
-              </div>
-              <div className="al-body-v14">
-                {(() => {
-                  const getInitials = (name: string) => name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
-                  const bookedEntry = booking.timeline.find((t: any) => t.status === 'Pending' || t.status === 'Confirmed');
-                  const bookedTime = bookedEntry ? bookedEntry.time : 'Unknown';
 
-                  const cancelledEntry = booking.timeline.find((t: any) => t.status === 'Cancelled');
-                  const cancelledTimeStr = cancelledEntry ? cancelledEntry.time : 'Unknown';
-
-                  const eventDateObj = new Date(booking.date);
-                  eventDateObj.setHours(0, 0, 0, 0);
-
-                  let diffDaysToEvent = 0;
-                  if (cancelledEntry) {
-                    const parts = cancelledEntry.time.split(', ');
-                    if (parts.length === 2) {
-                      const dateStr = parts[0] + ` ${new Date().getFullYear()} ` + parts[1];
-                      const parsed = new Date(dateStr).getTime();
-                      if (!isNaN(parsed)) {
-                        const timeUntilEvent = eventDateObj.getTime() - parsed;
-                        diffDaysToEvent = Math.max(0, Math.ceil(timeUntilEvent / (1000 * 60 * 60 * 24)));
-                      }
-                    }
-                  }
-
-                  const isVendor = (booking as any).cancelledBy === 'Vendor';
-                  const customerName = booking.customer || 'Customer';
-
-                  let refundPct = '0%';
-                  if (isVendor) refundPct = '100%';
-                  else {
-                    if (diffDaysToEvent > 7) refundPct = '100%';
-                    else if (diffDaysToEvent >= 5) refundPct = '50%';
-                    else if (diffDaysToEvent >= 2) refundPct = '25%';
-                  }
-
-                  let expRefundDate = 'TBD';
-                  if (cancelledEntry) {
-                    const parts = cancelledEntry.time.split(', ');
-                    if (parts.length === 2) {
-                      const dateStr = parts[0] + ` ${new Date().getFullYear()} ` + parts[1];
-                      const parsed = new Date(dateStr);
-                      parsed.setDate(parsed.getDate() + 2); // 48h resolution
-                      expRefundDate = parsed.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-                    }
-                  }
-
-                  return (
-                    <>
-                      {/* Node 1: Booking Created */}
-                      <div className="al-item-v14">
-                        <div className="al-icon-wrapper-v14">
-                          <div className="al-icon-v14 al-icon-blue">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                          </div>
-                        </div>
-                        <div className="al-content-v14">
-                          <div className="al-content-top-v14">
-                            <span className="al-title-v14">Booking Created</span>
-                            <span className="al-time-v14">{bookedTime}</span>
-                          </div>
-                          <div className="al-content-bottom-v14">
-                            <div className="al-avatar-v14">{getInitials(customerName)}</div>
-                            <span className="al-subtext-v14">{customerName}</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Node 2: Event Date */}
-                      <div className="al-item-v14">
-                        <div className="al-icon-wrapper-v14">
-                          <div className="al-icon-v14 al-icon-orange">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                          </div>
-                        </div>
-                        <div className="al-content-v14">
-                          <div className="al-content-top-v14">
-                            <span className="al-title-v14">Expected Event Date</span>
-                            <span className="al-time-v14">{booking.date}, {booking.time}</span>
-                          </div>
-                          <div className="al-content-bottom-v14">
-                            <div className="al-avatar-v14" style={{ background: '#fef3c7', color: '#d97706' }}>E</div>
-                            <span className="al-subtext-v14">{booking.serviceCategory} • {booking.guests} Guests</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Node 3: Cancellation */}
-                      <div className="al-item-v14">
-                        <div className="al-icon-wrapper-v14">
-                          <div className="al-icon-v14 al-icon-red">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                          </div>
-                        </div>
-                        <div className="al-content-v14">
-                          <div className="al-content-top-v14">
-                            <span className="al-title-v14">Booking Cancelled</span>
-                            <span className="al-time-v14">{cancelledTimeStr}</span>
-                          </div>
-                          <div className="al-content-bottom-v14">
-                            <div className="al-avatar-v14" style={{ background: '#fee2e2', color: '#b91c1c' }}>{isVendor ? 'VN' : 'CU'}</div>
-                            <div className="al-cancel-sub-v14" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                              <span className="al-subtext-v14">Cancelled by <strong>{isVendor ? 'Vendor' : 'Customer'}</strong></span>
-                              {isVendor && <span className="al-subtext-v14" style={{ color: '#d97706' }}>Cancelled by You, Full refund will be issued</span>}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Node 4: Refund Information */}
-                      <div className="al-item-v14">
-                        <div className="al-icon-wrapper-v14">
-                          <div className="al-icon-v14 al-icon-green">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                          </div>
-                        </div>
-                        <div className="al-content-v14">
-                          <div className="al-content-top-v14">
-                            <span className="al-title-v14">Refund Initiated</span>
-                            <span className="al-time-v14">Expected: {expRefundDate}</span>
-                          </div>
-                          <div className="al-content-bottom-v14">
-                            <div className="al-avatar-v14" style={{ background: '#d1fae5', color: '#047857' }}>₹</div>
-                            <span className="al-subtext-v14">
-                              Refund: <strong>₹{(booking.paid * (parseInt(refundPct) / 100)).toLocaleString()} ({refundPct})</strong> •{' '}
-                              Status: <strong>Processing</strong>
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </>
-                  );
-                })()}
-              </div>
-            </div>
-          )}
         </div>
 
         <div className="detail-modal-footer-v7">
@@ -7090,11 +6955,11 @@ const CountdownTimer = ({ targetISO }: { targetISO: string }) => {
   return <span>Starts in {timeLeft}</span>;
 }
 
-const HomeView = ({ 
+const HomeView = ({
   setActiveTab,
   boostCredits,
   setIsBoostSheetOpen
-}: { 
+}: {
   setActiveTab: (tab: string) => void,
   boostCredits: number,
   setIsBoostSheetOpen: any
@@ -7163,8 +7028,8 @@ const HomeView = ({
         </div>
         <div className="home-header-actions-v25" ref={notifRef}>
           {/* Boost Credits Entry Point */}
-          <button 
-            className="boost-pill-v25" 
+          <button
+            className="boost-pill-v25"
             onClick={() => setIsBoostSheetOpen(true)}
           >
             <span className="boost-icon">📈</span>
@@ -7245,14 +7110,11 @@ const HomeView = ({
           </div>
 
           <div className="home-stat-card-v25">
-            <span className="stat-card-label-v25">Today's Revenue</span>
-            <span className="stat-card-value-v25">₹45,800</span>
+            <span className="stat-card-label-v25">Today's Offline Payment Collection</span>
+            <span className="stat-card-value-v25">₹12,450</span>
           </div>
 
-          <div className="home-stat-card-v25">
-            <span className="stat-card-label-v25">Next Booking</span>
-            <span className="stat-card-value-v25 small-text">Starts in 2h 15m</span>
-          </div>
+
         </div>
 
         {/* 2. Top Grid (Today's & Upcoming) */}
@@ -7347,13 +7209,13 @@ const HomeView = ({
 };
 
 /* ─────────────────── DASHBOARD ─────────────────── */
-const Dashboard = ({ 
-  navigate, 
-  membershipStatus, 
-  setMembershipStatus, 
-  isBannerDismissed, 
-  setIsBannerDismissed 
-}: { 
+const Dashboard = ({
+  navigate,
+  membershipStatus,
+  setMembershipStatus,
+  isBannerDismissed,
+  setIsBannerDismissed
+}: {
   navigate: (val: string) => void,
   membershipStatus: any,
   setMembershipStatus: any,
@@ -7590,8 +7452,8 @@ const Dashboard = ({
   const renderBannerOnDashboard = () => {
     if (activeTab === 'dashboard' && !isBannerDismissed && (membershipStatus === 'paused' || membershipStatus === 'cancelled_active')) {
       return (
-        <MembershipStatusBanner 
-          status={membershipStatus} 
+        <MembershipStatusBanner
+          status={membershipStatus}
           isDashboard={true}
           onAction={() => {
             setActiveTab('settings');
@@ -7804,7 +7666,7 @@ const Dashboard = ({
         {renderBannerOnDashboard()}
         <div className="dashboard-content">
           {activeTab === 'dashboard' && (
-            <HomeView 
+            <HomeView
               setActiveTab={setActiveTab}
               boostCredits={boostCredits}
               setIsBoostSheetOpen={setIsBoostSheetOpen}
@@ -7894,7 +7756,7 @@ const Dashboard = ({
         }}>
           <div className="boost-bottom-sheet-v25 calendar-modal-v25" onClick={e => e.stopPropagation()}>
             <div className="boost-sheet-header-v25 redesign single-row">
-              <button 
+              <button
                 className={`boost-back-btn-pill-v25 icon-only ${(!isCalendarView && !isUsageDetailsView) ? 'hidden' : ''}`}
                 onClick={() => {
                   if (isCalendarView) setIsCalendarView(false);
@@ -7921,30 +7783,30 @@ const Dashboard = ({
                 <div className="calendar-view-container-v25">
                   <div className="calendar-month-header-v25"><h3>April 2026</h3></div>
                   <div className="calendar-grid-v25">
-                    {['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(day => (
+                    {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
                       <div key={day} className="calendar-weekday-v25">{day}</div>
                     ))}
-                    {[null,null,null].map((_,i) => <div key={`e-${i}`} className="calendar-day-empty-v25"></div>)}
-                    {Array.from({length:30},(_,i)=>{
-                      const day=i+1;
-                      const dateStr=`2026-04-${day<10?'0'+day:day}`;
-                      const status=mockBookingData[dateStr]||'available';
-                      const isSelected=selectedBoostDates.includes(dateStr);
-                      const isFull=status==='full';
-                      const isPast=day<17;
+                    {[null, null, null].map((_, i) => <div key={`e-${i}`} className="calendar-day-empty-v25"></div>)}
+                    {Array.from({ length: 30 }, (_, i) => {
+                      const day = i + 1;
+                      const dateStr = `2026-04-${day < 10 ? '0' + day : day}`;
+                      const status = mockBookingData[dateStr] || 'available';
+                      const isSelected = selectedBoostDates.includes(dateStr);
+                      const isFull = status === 'full';
+                      const isPast = day < 17;
                       return (
                         <div key={day}
-                          className={`calendar-day-v25 state-${status} ${isSelected?'selected':''} ${isFull||isPast?'disabled':''}`}
-                          onClick={()=>{
-                            if(isFull||isPast) return;
-                            if(isSelected) setSelectedBoostDates((p:string[])=>p.filter(d=>d!==dateStr));
-                            else if(selectedBoostDates.length<boostCredits) setSelectedBoostDates((p:string[])=>[...p,dateStr]);
+                          className={`calendar-day-v25 state-${status} ${isSelected ? 'selected' : ''} ${isFull || isPast ? 'disabled' : ''}`}
+                          onClick={() => {
+                            if (isFull || isPast) return;
+                            if (isSelected) setSelectedBoostDates((p: string[]) => p.filter(d => d !== dateStr));
+                            else if (selectedBoostDates.length < boostCredits) setSelectedBoostDates((p: string[]) => [...p, dateStr]);
                           }}
-                          title={isFull?'Fully booked':(status==='partial'?'Limited availability':'')}
+                          title={isFull ? 'Fully booked' : (status === 'partial' ? 'Limited availability' : '')}
                         >
                           <span className="day-number">{day}</span>
-                          {status==='partial'&&<span className="partial-indicator"></span>}
-                          {status==='recommended'&&<span className="recommended-sparkle">✨</span>}
+                          {status === 'partial' && <span className="partial-indicator"></span>}
+                          {status === 'recommended' && <span className="recommended-sparkle">✨</span>}
                         </div>
                       );
                     })}
@@ -7958,25 +7820,25 @@ const Dashboard = ({
                   <div className="selection-stats-v25">
                     <div className="stats-row">
                       <span className="stats-label">Selected dates:</span>
-                      <span className="stats-value">{selectedBoostDates.length>0?selectedBoostDates.map(d=>d.split('-')[2]).join(', '):'None'}</span>
+                      <span className="stats-value">{selectedBoostDates.length > 0 ? selectedBoostDates.map(d => d.split('-')[2]).join(', ') : 'None'}</span>
                     </div>
                     <div className="stats-row-grid">
                       <div className="stat-pill"><label>Credits Required</label><span>{selectedBoostDates.length}</span></div>
-                      <div className="stat-pill"><label>Credits Remaining</label><span>{boostCredits-selectedBoostDates.length}</span></div>
+                      <div className="stat-pill"><label>Credits Remaining</label><span>{boostCredits - selectedBoostDates.length}</span></div>
                     </div>
                   </div>
                   <div className="boost-sheet-actions">
-                    <button className={`boost-now-btn-v25 ${selectedBoostDates.length===0?'disabled':''}`}
-                      disabled={selectedBoostDates.length===0}
-                      onClick={()=>{
-                        if(selectedBoostDates.length>0){
-                          setBoostCredits((p:number)=>p-selectedBoostDates.length);
+                    <button className={`boost-now-btn-v25 ${selectedBoostDates.length === 0 ? 'disabled' : ''}`}
+                      disabled={selectedBoostDates.length === 0}
+                      onClick={() => {
+                        if (selectedBoostDates.length > 0) {
+                          setBoostCredits((p: number) => p - selectedBoostDates.length);
                           setIsBoostSheetOpen(false); setIsCalendarView(false);
                           setIsUsageDetailsView(false); setSelectedBoostDates([]);
-                          setShowBoostToast(true); setTimeout(()=>setShowBoostToast(false),3000);
+                          setShowBoostToast(true); setTimeout(() => setShowBoostToast(false), 3000);
                         }
                       }}>Confirm Boost</button>
-                    <button className="boost-view-details-btn-v25" onClick={()=>setIsCalendarView(false)}>Cancel</button>
+                    <button className="boost-view-details-btn-v25" onClick={() => setIsCalendarView(false)}>Cancel</button>
                   </div>
                 </div>
               ) : isUsageDetailsView ? (
@@ -7984,11 +7846,11 @@ const Dashboard = ({
                   <div className="usage-summary-card-v25">
                     <div className="usage-grid-v25">
                       <div className="usage-stat-item"><label>Total Credits</label><span>10</span></div>
-                      <div className="usage-stat-item"><label>Used</label><span>{10-boostCredits}</span></div>
+                      <div className="usage-stat-item"><label>Used</label><span>{10 - boostCredits}</span></div>
                       <div className="usage-stat-item"><label>Remaining</label><span className="highlight-remaining">{boostCredits}</span></div>
                     </div>
                     <div className="usage-progress-container-v25">
-                      <div className="usage-progress-bar-v25" style={{width:`${(boostCredits/10)*100}%`}}></div>
+                      <div className="usage-progress-bar-v25" style={{ width: `${(boostCredits / 10) * 100}%` }}></div>
                     </div>
                     <p className="usage-expiry-date-v25">Valid till 15 May 2026</p>
                   </div>
@@ -8001,16 +7863,16 @@ const Dashboard = ({
                     <div className="usage-history-table-container">
                       <table className="usage-history-table-v25">
                         <thead><tr><th>Date</th><th>Action</th><th>Status</th><th>Results</th></tr></thead>
-                        <tbody>{usageHistory.map((item,idx)=>(
+                        <tbody>{usageHistory.map((item, idx) => (
                           <tr key={idx}><td>{item.date}</td><td>{item.action}</td>
-                          <td><span className="status-completed-v25">{item.status}</span></td>
-                          <td className="usage-results-cell"><span>{item.views} views</span><span className="dot-separator"></span><span>{item.bookings} bookings</span></td></tr>
+                            <td><span className="status-completed-v25">{item.status}</span></td>
+                            <td className="usage-results-cell"><span>{item.views} views</span><span className="dot-separator"></span><span>{item.bookings} bookings</span></td></tr>
                         ))}</tbody>
                       </table>
                     </div>
                   </div>
                   <div className="boost-sheet-actions">
-                    <button className={`boost-now-btn-v25 ${boostCredits===0?'disabled':''}`} disabled={boostCredits===0} onClick={()=>setIsCalendarView(true)}>Boost Again</button>
+                    <button className={`boost-now-btn-v25 ${boostCredits === 0 ? 'disabled' : ''}`} disabled={boostCredits === 0} onClick={() => setIsCalendarView(true)}>Boost Again</button>
                   </div>
                 </div>
               ) : (
@@ -8040,8 +7902,8 @@ const Dashboard = ({
                     <p>Use on low booking days for better results</p>
                   </div>
                   <div className="boost-sheet-actions vertical">
-                    <button className={`boost-now-btn-v25 ${boostCredits===0?'disabled':''}`} disabled={boostCredits===0} onClick={()=>setIsCalendarView(true)}>Boost Now</button>
-                    <button className="boost-view-usage-link-v25" onClick={()=>setIsUsageDetailsView(true)}>View Usage Details</button>
+                    <button className={`boost-now-btn-v25 ${boostCredits === 0 ? 'disabled' : ''}`} disabled={boostCredits === 0} onClick={() => setIsCalendarView(true)}>Boost Now</button>
+                    <button className="boost-view-usage-link-v25" onClick={() => setIsUsageDetailsView(true)}>View Usage Details</button>
                   </div>
                 </div>
               )}
@@ -8380,52 +8242,53 @@ const SubscriptionPlanModal = ({ isOpen, onClose, onSelectPlan }: { isOpen: bool
 
   const plans = [
     {
+      id: 0,
       name: 'Starter Plan',
-      duration: '3 Months • Total ₹1,797',
-      price: '₹599',
-      total: 'Total ₹1,797',
-      yearlyCost: '₹7,188/year',
-      yearlyLabel: 'Normal yearly pricing',
-      badge: null,
+      monthlyEquivalent: '₹599',
+      totalDisplay: '₹1,797 for 3 months',
+      floatingBadge: 'Only ₹20/day',
+      pillBadge: 'Standard',
       isActive: false,
       premiumClass: 'starter-premium',
-      btnText: 'Switch Plan',
-      hasSavings: false,
-      platformDiscount: 0,
-      features: ['TDS Filing Support', 'Free Listing & Onboarding', 'Monthly Reports Access']
+      iconBenefits: [
+        { icon: 'trending-up', text: '7 free service boost credits' }
+      ],
+      dividerText: 'Starter Plan Benefits',
+      features: ['Standard visibility', 'Includes 7 Boost Credits', 'Basic reach to customers']
     },
     {
+      id: 1,
       name: 'Growth Plan',
-      duration: '6 Months • Total ₹2,994',
-      price: '₹499',
-      total: 'Total ₹2,994',
-      yearlyCost: '₹7,188/year',
-      yearlyLabel: 'Save ₹1,200/year',
-      badge: 'Most Popular',
+      monthlyEquivalent: '₹549',
+      totalDisplay: '₹3,294 for 6 months',
+      floatingBadge: 'Only ₹18/day',
+      pillBadge: 'Most Popular',
       isActive: true,
       premiumClass: 'growth-premium',
-      btnText: 'Current Active Plan',
-      hasSavings: true,
-      platformDiscount: 999,
-      features: ['TDS Filing Support', 'Faster Payout Tracking', 'Priority Vendor Support']
+      iconBenefits: [
+        { icon: 'trending-up', text: '14 boost credits included' }
+      ],
+      dividerText: 'Growth Plan Benefits',
+      features: ['Higher visibility', 'Includes 14 Boost Credits', 'Better reach to customers']
     },
     {
+      id: 2,
       name: 'Saving Plan',
-      duration: '12 Months • Total ₹5,388',
-      price: '₹449',
-      total: 'Total ₹5,388',
-      yearlyCost: '₹7,188/year',
-      yearlyLabel: 'Save ₹1,800/year',
-      badge: 'Best Value',
-      badgeColor: '#10b981',
+      monthlyEquivalent: '₹449',
+      totalDisplay: '₹5,388 for 12 months',
+      floatingBadge: 'Only ₹15/day',
+      pillBadge: 'Best Value',
       isActive: false,
       premiumClass: 'saving-premium',
-      btnText: 'Switch Plan',
-      hasSavings: true,
-      platformDiscount: 1800,
-      features: ['Full TDS Tracking', 'Priority Payout Support', 'Long-Term Savings Benefits']
+      iconBenefits: [
+        { icon: 'trending-up', text: '30 boost credits included' }
+      ],
+      dividerText: 'Savings Plan Benefits',
+      features: ['Highest visibility', 'Includes 30 Boost Credits', 'Maximum reach to customers']
     }
   ];
+
+  const currentPlanIdx = plans.findIndex(p => p.isActive);
 
   return (
     <div className="modal-overlay-v4" onClick={onClose}>
@@ -8444,56 +8307,77 @@ const SubscriptionPlanModal = ({ isOpen, onClose, onSelectPlan }: { isOpen: bool
           <div className="subscription-plans-grid-v4">
             {plans.map((plan, idx) => (
               <div key={idx} className={`plan-card-v4 ${plan.isActive ? 'active-selection' : ''} ${plan.premiumClass}`}>
-                {/* Clipped background layer */}
+                {plan.floatingBadge && (
+                  <div className="plan-floating-badge-v5">
+                    {plan.floatingBadge}
+                  </div>
+                )}
                 <div className="plan-card-bg-v4">
                   <PlanAbstract />
                   <PlanSparkles />
                 </div>
-                {plan.badge && (
-                  <div className="card-badge-v4" style={plan.badgeColor ? { background: plan.badgeColor } : {}}>
-                    {plan.badge}
-                  </div>
-                )}
-                <h5>{plan.name}</h5>
-                <div className="plan-duration-v4">{plan.duration}</div>
-
-                <div className="plan-price-large-v4">{plan.price} <span>/mo</span></div>
-
-                <div className="plan-savings-strip-v6">
-                  <div className="yearly-compare-v6">
-                    <span className={`yearly-price-v6 ${plan.hasSavings ? 'struck-v6' : ''}`}>
-                      {plan.yearlyCost}
-                    </span>
-                    {plan.hasSavings && (
-                      <span className="savings-green-v6">{plan.yearlyLabel}</span>
+                <div className="plan-header-v5">
+                  <div className="plan-title-pill-row-v5">
+                    <h4 className="plan-title-v5">{plan.name}</h4>
+                    {plan.pillBadge && (
+                      <span className={`plan-pill-v5 theme-${plan.id}`}>
+                        {plan.pillBadge}
+                      </span>
                     )}
                   </div>
                 </div>
 
+                <div className="plan-pricing-v5">
+                  <span className="price-amount-v5">{plan.monthlyEquivalent}</span>
+                  <span className="price-unit-v5">/month</span>
+                </div>
+
+                <div className="plan-total-info-v5">Total {plan.totalDisplay}</div>
+
                 <button
-                  className={`plan-btn-v4 ${plan.isActive ? 'current' : 'switch'}`}
+                  className={`plan-cta-v5 ${plan.isActive ? 'current' : ''}`}
+                  disabled={plan.isActive}
                   onClick={() => !plan.isActive && onSelectPlan(plan)}
                 >
-                  {plan.btnText || (plan.isActive ? 'Current Plan' : 'Switch Plan')}
+                  {plan.isActive ? 'Current Plan' : (idx > currentPlanIdx ? 'Upgrade Plan' : 'Choose Plan')}
                 </button>
 
-                <div className="plan-divider-v4" />
+                <div className="plan-icon-benefits-v5">
+                  {plan.iconBenefits.map((benefit, bIdx) => (
+                    <div key={bIdx} className="icon-benefit-v5">
+                      <div className="icon-box-v5">
+                        {benefit.icon === 'trending-up' ? (
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+                        ) : (
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                        )}
+                      </div>
+                      <span className="benefit-text-v5">{benefit.text}</span>
+                    </div>
+                  ))}
+                </div>
 
-                <div className="plan-features-list-v4">
-                  <h6>Benefits</h6>
+                <div className="plan-divider-v5">
+                  <span className="divider-line-v5"></span>
+                  <span className="divider-text-v5">{plan.dividerText}</span>
+                  <span className="divider-line-v5"></span>
+                </div>
+
+                <div className="plan-checklist-v5">
                   {plan.features.map(feat => (
-                    <div key={feat} className="plan-feature-v4">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                        <polyline points="20 6 9 17 4 12"></polyline>
-                      </svg>
-                      {feat}
+                    <div key={feat} className="checklist-item-v5">
+                      <div className="check-icon-v5">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      </div>
+                      <span className="checklist-text-v5">{feat}</span>
                     </div>
                   ))}
                 </div>
               </div>
             ))}
           </div>
-
         </div>
       </div>
     </div>
@@ -9038,8 +8922,8 @@ function App() {
       <Route path="/signup" element={<SignupPage mobile={mobile} handleMobileChange={handleMobileChange} handleSendOtp={handleSendOtp} isTimerActive={isTimerActive} timer={timer} hasSentOtp={hasSentOtp} otp={otp} setOtp={setOtp} navigate={navigate} />} />
       <Route path="/onboarding" element={<OnboardingPage currentStep={currentStep} formData={formData} handleInputChange={handleInputChange} handleFileChange={handleFileChange} handleRemoveFile={handleRemoveFile} prevStep={prevStep} nextStep={nextStep} submitFinal={submitFinal} navigate={navigate} setCurrentScreen={setCurrentScreen} showPassword={showPassword} setShowPassword={setShowPassword} showConfirmPassword={showConfirmPassword} setShowConfirmPassword={setShowConfirmPassword} />} />
       <Route path="/dashboard" element={
-        <Dashboard 
-          navigate={navigate} 
+        <Dashboard
+          navigate={navigate}
           membershipStatus={membershipStatus}
           setMembershipStatus={setMembershipStatus}
           isBannerDismissed={isBannerDismissed}

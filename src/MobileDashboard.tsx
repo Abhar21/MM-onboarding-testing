@@ -239,12 +239,8 @@ const MobileHomeView = ({ setActiveTab }: { setActiveTab: (tab: string) => void 
           <span className="mobile-item-value-v50">02</span>
         </div>
         <div className="mobile-stat-item-v50">
-          <span className="mobile-item-label-v50">Today's Revenue</span>
-          <span className="mobile-item-value-v50">₹45,800</span>
-        </div>
-        <div className="mobile-stat-item-v50">
-          <span className="mobile-item-label-v50">Next Booking</span>
-          <span className="mobile-item-value-v50 small">Starts in 2h 15m</span>
+          <span className="mobile-item-label-v50">Collect Offline Payment</span>
+          <span className="mobile-item-value-v50">₹12,450</span>
         </div>
       </div>
 
@@ -4177,38 +4173,52 @@ const MobileSettingsView = ({
       {
         id: 'starter',
         name: 'Starter Plan',
-        duration: '3 Months • Total ₹1,797',
-        price: '₹599 /mo',
-        annualBase: '₹7,188/year',
-        type: 'blue',
-        benefits: ['TDS Filing Support', 'Free Listing & Onboarding', 'Monthly Reports Access'],
-        isCurrent: false
+        monthlyEquivalent: '₹599',
+        totalDisplay: '₹1,797 for 3 months',
+        floatingBadge: 'Only ₹20/day',
+        pillBadge: 'Standard',
+        isCurrent: membershipStatus === 'active' && false,
+        type: 'starter',
+        iconBenefits: [
+          { icon: 'trending-up', text: '7 free service boost credits' }
+        ],
+        dividerText: 'Starter Plan Benefits',
+        features: ['Standard visibility', 'Includes 7 Boost Credits', 'Basic reach to customers']
       },
       {
         id: 'growth',
         name: 'Growth Plan',
-        duration: '6 Months • Total ₹2,994',
-        price: '₹499 /mo',
-        annualBase: '₹7,188/year',
-        savings: 'Save ₹1,200/year',
-        type: 'purple',
-        badge: 'Most Popular',
-        benefits: ['TDS Filing Support', 'Faster Payout Tracking', 'Priority Vendor Support'],
-        isCurrent: true
+        monthlyEquivalent: '₹549',
+        totalDisplay: '₹3,294 for 6 months',
+        floatingBadge: 'Only ₹18/day',
+        pillBadge: 'Most Popular',
+        isCurrent: membershipStatus === 'active' || true,
+        type: 'growth',
+        iconBenefits: [
+          { icon: 'trending-up', text: '14 boost credits included' }
+        ],
+        dividerText: 'Growth Plan Benefits',
+        features: ['Higher visibility', 'Includes 14 Boost Credits', 'Better reach to customers']
       },
       {
         id: 'saving',
         name: 'Saving Plan',
-        duration: '12 Months • Total ₹5,388',
-        price: '₹449 /mo',
-        annualBase: '₹7,188/year',
-        savings: 'Save ₹1,800/year',
-        type: 'gold',
+        monthlyEquivalent: '₹449',
+        totalDisplay: '₹5,388 for 12 months',
+        floatingBadge: 'Only ₹15/day',
+        pillBadge: 'Best Value',
+        isCurrent: false,
+        type: 'saving',
         badge: 'Best Value',
-        benefits: ['Full TDS Tracking', 'Priority Payout Support', 'Long-Term Savings Benefits'],
-        isCurrent: false
+        iconBenefits: [
+          { icon: 'trending-up', text: '30 boost credits included' }
+        ],
+        dividerText: 'Savings Plan Benefits',
+        features: ['Highest visibility', 'Includes 30 Boost Credits', 'Maximum reach to customers']
       }
     ];
+
+    const currentIdx = plans.findIndex(p => p.isCurrent);
 
     return (
       <div className="plan-modal-overlay-v71">
@@ -4222,48 +4232,70 @@ const MobileSettingsView = ({
 
           <div className="plan-modal-body-v71">
             <div className="plan-grid-list-v71">
-              {plans.map((plan) => (
-                <div key={plan.id} className={`plan-grid-card-v71 theme-${plan.type}-v71`}>
-                  {plan.badge && <span className="plan-modal-badge-v71">{plan.badge}</span>}
-
-                  <div className="plan-grid-sparkles-v71">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" opacity="0.4"><path d="M12 1L14.39 8.26L22 9.27L16.5 14.14L18.18 21.02L12 17.77L5.82 21.02L7.5 14.14L2 9.27L9.61 8.26L12 1Z"></path></svg>
-                    <svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor" opacity="0.3"><path d="M12 1L14.39 8.26L22 9.27L16.5 14.14L18.18 21.02L12 17.77L5.82 21.02L7.5 14.14L2 9.27L9.61 8.26L12 1Z"></path></svg>
-                  </div>
-
-                  <div className="plan-grid-top-v71">
-                    <h4>{plan.name}</h4>
-                    <span className="plan-grid-duration-v71">{plan.duration}</span>
-                  </div>
-
-                  <div className="plan-grid-main-v71">
-                    <div className="plan-grid-price-row-v71">
-                      <span className="plan-grid-amount-v71">{plan.price.split(' ')[0]}</span>
-                      <span className="plan-grid-mo-v71">/mo</span>
+              {plans.map((plan, idx) => (
+                <div key={plan.id} className={`plan-grid-card-v5 theme-${plan.type}-v5 ${plan.isCurrent ? 'active-mobile-card' : ''}`}>
+                  {plan.floatingBadge && (
+                    <div className="plan-floating-badge-v5">
+                      {plan.floatingBadge}
                     </div>
-                    <div className="plan-grid-savings-row-v71">
-                      <span className="plan-grid-base-v71">{plan.annualBase}</span>
-                      {plan.savings && <span className="plan-grid-save-tag-v71">{plan.savings}</span>}
+                  )}
+                  <div className="plan-header-v5">
+                    <div className="plan-title-pill-row-v5">
+                      <h4 className="plan-title-v5">{plan.name}</h4>
+                      {plan.pillBadge && (
+                        <span className={`plan-pill-v5 theme-${plan.id}`}>
+                          {plan.pillBadge}
+                        </span>
+                      )}
                     </div>
                   </div>
+
+                  <div className="plan-pricing-v5">
+                    <span className="price-amount-v5">{plan.monthlyEquivalent}</span>
+                    <span className="price-unit-v5">/month</span>
+                  </div>
+
+                  <div className="plan-total-info-v5">Total {plan.totalDisplay}</div>
 
                   <button
-                    className={`plan-switch-btn-v71 ${plan.isCurrent ? 'current-plan-v71' : ''}`}
+                    className={`plan-cta-v5 ${plan.isCurrent ? 'current' : ''}`}
                     disabled={plan.isCurrent}
                   >
-                    {plan.isCurrent ? 'Current Active Plan' : 'Switch Plan'}
+                    {plan.isCurrent ? 'Current Plan' : (idx > currentIdx ? 'Upgrade Plan' : 'Choose Plan')}
                   </button>
 
-                  <div className="plan-benefits-v71">
-                    <span className="benefits-label-v71">BENEFITS</span>
-                    <ul className="benefits-list-v71">
-                      {plan.benefits.map((benefit, idx) => (
-                        <li key={idx}>
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                          {benefit}
-                        </li>
-                      ))}
-                    </ul>
+                  <div className="plan-icon-benefits-v5">
+                    {plan.iconBenefits.map((benefit, bIdx) => (
+                      <div key={bIdx} className="icon-benefit-v5">
+                        <div className="icon-box-v5">
+                          {benefit.icon === 'trending-up' ? (
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+                          ) : (
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                          )}
+                        </div>
+                        <span className="benefit-text-v5">{benefit.text}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="plan-divider-v5">
+                    <span className="divider-line-v5"></span>
+                    <span className="divider-text-v5">{plan.dividerText}</span>
+                    <span className="divider-line-v5"></span>
+                  </div>
+
+                  <div className="plan-checklist-v5">
+                    {plan.features.map(feat => (
+                      <div key={feat} className="checklist-item-v5">
+                        <div className="check-icon-v5">
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                          </svg>
+                        </div>
+                        <span className="checklist-text-v5">{feat}</span>
+                      </div>
+                    ))}
                   </div>
                 </div>
               ))}
@@ -4861,8 +4893,33 @@ const MobileCreateMenuView = ({
                   <h4 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '800', color: '#1e293b' }}>{menuIdentity.name || 'Untitled Menu'}</h4>
                   <span className={`card-status-pill-v50 ${menuIdentity.dietType === 'Veg' ? 'info' : 'warning'}`} style={{ fontSize: '0.7rem' }}>{menuIdentity.dietType}</span>
                 </div>
-                <div style={{ fontSize: '0.9rem', color: '#64748b', fontWeight: '600', marginBottom: '12px' }}>
-                  {sections.length} Sections • {totalItems} Items
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '12px' }}>
+                  <div style={{ 
+                    display: 'inline-flex', 
+                    alignItems: 'center', 
+                    background: '#f1f5f9', 
+                    color: '#475569', 
+                    padding: '4px 10px', 
+                    borderRadius: '20px', 
+                    fontSize: '0.75rem', 
+                    fontWeight: '700'
+                  }}>
+                    {sections.length} Sec • {totalItems} Items
+                  </div>
+                  <div style={{ 
+                    display: 'inline-flex', 
+                    alignItems: 'center', 
+                    gap: '6px', 
+                    background: '#f1f5f9', 
+                    color: '#475569', 
+                    padding: '4px 10px', 
+                    borderRadius: '20px', 
+                    fontSize: '0.75rem', 
+                    fontWeight: '700'
+                  }}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                    <span>{menuIdentity.minMembers || 0} - {menuIdentity.maxMembers || 0} Guests</span>
+                  </div>
                 </div>
                 <div style={{ fontSize: '1.25rem', fontWeight: '800', color: '#0077ff' }}>₹{menuIdentity.price || '0'}<span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: '500' }}> /person</span></div>
               </div>
