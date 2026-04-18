@@ -1849,6 +1849,7 @@ const Settings = ({
               </div>
 
               <div className="active-plan-container-v4 main-display-v4 growth-premium">
+                <img src="/images/premium-card-bg.png" className="active-plan-bg-v4" alt="" />
                 <div className="plan-card-bg-v4">
                   <PlanAbstract />
                   <PlanSparkles />
@@ -1869,6 +1870,8 @@ const Settings = ({
                       <span className="plan-duration-v4">6 Months plan</span>
                     </div>
                   </div>
+
+                  <div className="active-plan-divider-v4" />
 
                   <div className="auto-renew-segment-v4 horizontal-layout-v4">
                     <div className="info-column-v4">
@@ -8248,6 +8251,7 @@ const SubscriptionPlanModal = ({ isOpen, onClose, onSelectPlan }: { isOpen: bool
       totalDisplay: '₹1,797 for 3 months',
       floatingBadge: 'Only ₹20/day',
       pillBadge: 'Standard',
+      savingsLabel: 'Perfect to get started',
       isActive: false,
       premiumClass: 'starter-premium',
       iconBenefits: [
@@ -8263,6 +8267,7 @@ const SubscriptionPlanModal = ({ isOpen, onClose, onSelectPlan }: { isOpen: bool
       totalDisplay: '₹3,294 for 6 months',
       floatingBadge: 'Only ₹18/day',
       pillBadge: 'Most Popular',
+      savingsLabel: 'Save ₹600/year vs Starter',
       isActive: true,
       premiumClass: 'growth-premium',
       iconBenefits: [
@@ -8278,6 +8283,7 @@ const SubscriptionPlanModal = ({ isOpen, onClose, onSelectPlan }: { isOpen: bool
       totalDisplay: '₹5,388 for 12 months',
       floatingBadge: 'Only ₹15/day',
       pillBadge: 'Best Value',
+      savingsLabel: 'Save ₹1,800/year vs Starter',
       isActive: false,
       premiumClass: 'saving-premium',
       iconBenefits: [
@@ -8325,6 +8331,9 @@ const SubscriptionPlanModal = ({ isOpen, onClose, onSelectPlan }: { isOpen: bool
                       </span>
                     )}
                   </div>
+                  {plan.savingsLabel && (
+                    <div className="plan-savings-tag-v5">{plan.savingsLabel}</div>
+                  )}
                 </div>
 
                 <div className="plan-pricing-v5">

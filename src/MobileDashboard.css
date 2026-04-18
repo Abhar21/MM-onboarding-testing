@@ -1685,14 +1685,10 @@
   gap: 20px;
 }
 
-/* 2-Row Filters */
 .mobile-revenue-filters-v50 {
   display: flex;
   flex-direction: column;
   gap: 10px;
-}
-
-.mobile-revenue-filters-v50 {
   margin-bottom: 8px;
 }
 
@@ -8369,6 +8365,13 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.active-plan-divider-v70 {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.12);
+  margin: 16px 20px;
+  width: calc(100% - 40px);
 }
 
 .plan-label-v70 {

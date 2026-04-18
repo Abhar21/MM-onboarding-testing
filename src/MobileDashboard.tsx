@@ -4062,6 +4062,7 @@ const MobileSettingsView = ({
             </button>
           </div>
           <div className="plan-card-v70">
+            <img src="/images/premium-card-bg.png" className="active-plan-bg-v4" alt="" />
             <div className="plan-sparkles-v70">
               <svg className="sparkle-v70-1" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" opacity="0.4"><path d="M12 1L14.39 8.26L22 9.27L16.5 14.14L18.18 21.02L12 17.77L5.82 21.02L7.5 14.14L2 9.27L9.61 8.26L12 1Z"></path></svg>
               <svg className="sparkle-v70-2" width="10" height="10" viewBox="0 0 24 24" fill="currentColor" opacity="0.3"><path d="M12 1L14.39 8.26L22 9.27L16.5 14.14L18.18 21.02L12 17.77L5.82 21.02L7.5 14.14L2 9.27L9.61 8.26L12 1Z"></path></svg>
@@ -4081,6 +4082,8 @@ const MobileSettingsView = ({
                 <span className="duration-v70">• 6 Months plan</span>
               </div>
             </div>
+
+            <div className="active-plan-divider-v70" />
 
             <div className="plan-footer-v70">
               <div className="next-billing-v70">
@@ -4177,6 +4180,7 @@ const MobileSettingsView = ({
         totalDisplay: '₹1,797 for 3 months',
         floatingBadge: 'Only ₹20/day',
         pillBadge: 'Standard',
+        savingsLabel: 'Perfect to get started',
         isCurrent: membershipStatus === 'active' && false,
         type: 'starter',
         iconBenefits: [
@@ -4192,6 +4196,7 @@ const MobileSettingsView = ({
         totalDisplay: '₹3,294 for 6 months',
         floatingBadge: 'Only ₹18/day',
         pillBadge: 'Most Popular',
+        savingsLabel: 'Save ₹600/year vs Starter',
         isCurrent: membershipStatus === 'active' || true,
         type: 'growth',
         iconBenefits: [
@@ -4207,6 +4212,7 @@ const MobileSettingsView = ({
         totalDisplay: '₹5,388 for 12 months',
         floatingBadge: 'Only ₹15/day',
         pillBadge: 'Best Value',
+        savingsLabel: 'Save ₹1,800/year vs Starter',
         isCurrent: false,
         type: 'saving',
         badge: 'Best Value',
