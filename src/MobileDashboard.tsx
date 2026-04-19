@@ -5065,6 +5065,19 @@ const MobileServiceSettingsView = ({
               </div>
             </div>
 
+            <div className="service-notice-box-v54" style={{ marginTop: '0.75rem', backgroundColor: '#fffbeb', borderColor: '#fde68a' }}>
+              <div className="notice-icon-v54" style={{ color: '#92400e' }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="16" x2="12" y2="12"></line>
+                  <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+              </div>
+              <div className="notice-text-v54" style={{ color: '#92400e' }}>
+                <strong>Note:</strong> Customers can book events up to your closing time. Please ensure you can serve events scheduled near your closing hours.
+              </div>
+            </div>
+
             <div className="form-grid-v54">
               <div className="form-group-v54">
                 <label>Start Time</label>

@@ -5644,6 +5644,29 @@ const Ratings = () => {
 
 /* ─────────────────── BOOKINGS MANAGEMENT ─────────────────── */
 
+const getHoursUntilEvent = (dateStr: string) => {
+  try {
+    if (!dateStr) return 999;
+    // Assume date format is '22 Apr 2026' or similar
+    const eventDate = new Date(dateStr);
+    const now = new Date();
+    const diffMs = eventDate.getTime() - now.getTime();
+    return diffMs / (1000 * 60 * 60);
+  } catch (e) {
+    return 999;
+  }
+};
+
+const getCancellationInfo = (booking: any) => {
+  if (booking.status !== 'Upcoming' && booking.status !== 'Live') return null;
+  if (booking.payoutStatus === 'Processed') return { state: 'LOCKED', text: 'Locked (Payout Done)', color: '#64748b' };
+  
+  const hoursRemaining = getHoursUntilEvent(booking.date);
+  if (hoursRemaining < 0) return { state: 'LOCKED', text: 'Event Started', color: '#64748b' };
+  if (hoursRemaining < 48) return { state: 'RESTRICTED', text: 'Cancellation Closed', color: '#94a3b8' };
+  return { state: 'ALLOWED', text: 'Cancellation Available', color: '#10b981' };
+};
+
 const BookingDetailModal = ({
   isOpen,
   onClose,
@@ -5686,8 +5709,11 @@ const BookingDetailModal = ({
         <div className="detail-modal-header-v7">
           <div className="header-left-v7">
             <span className="booking-id-tag-v7">{booking.id}</span>
-            <div className={`tax-badge-v24 ${booking.taxType === 'B2B' ? 'b2b' : 'b2c'}`}>
-              {booking.taxType || 'B2C'}
+            <div 
+              className={`tax-badge-v24 ${booking.taxType === 'B2B' ? 'b2b' : 'b2c'}`}
+              title={booking.taxType === 'B2B' ? "Business booking with GST invoice" : ""}
+            >
+              {booking.taxType === 'B2B' ? 'B2B' : 'B2C'}
             </div>
             <div className="status-badge-v7" style={{ backgroundColor: getStatusColor(booking.status) + '15', color: getStatusColor(booking.status) }}>
               <span className="dot" style={{ backgroundColor: getStatusColor(booking.status) }}></span>
@@ -5713,6 +5739,18 @@ const BookingDetailModal = ({
                 <label>Email</label>
                 <span>{booking.email || 'customer@example.com'}</span>
               </div>
+              {booking.taxType === 'B2B' && (
+                <>
+                  <div className="info-item-v7">
+                    <label>Business Name</label>
+                    <span style={{ fontWeight: 600 }}>{booking.businessName || 'Business Solutions Pvt Ltd'}</span>
+                  </div>
+                  <div className="info-item-v7">
+                    <label>GSTIN</label>
+                    <span style={{ fontFamily: 'monospace', letterSpacing: '1px', color: '#1e3a8a', fontWeight: 700 }}>{booking.gstin || '29AAAAA0000A1Z5'}</span>
+                  </div>
+                </>
+              )}
             </div>
           </div>
 
@@ -5768,19 +5806,25 @@ const BookingDetailModal = ({
               const commissionRate = 0.10;
               const gstRate = 0.18;
               const tdsRate = 0.001;
+              const isVendorCancelled = booking.status === 'Cancelled' && booking.cancelledBy === 'Vendor';
 
               // Refund/Retention logic for Cancelled bookings
-              const refundPercentage = booking.refundPercentage ?? 50;
-              const refundToCustomer = Math.round(booking.paid * (refundPercentage / 100));
-              const vendorRetain = booking.paid - refundToCustomer;
+              const refundPercentage = isVendorCancelled ? 100 : (booking.refundPercentage ?? 50);
+              const baseForRefund = isVendorCancelled ? booking.amount : booking.paid;
+              const refundToCustomer = Math.round(baseForRefund * (refundPercentage / 100));
+              const vendorRetain = booking.paid - (isVendorCancelled ? 0 : refundToCustomer); // Vendors keep 0 of advance if they cancel
+              
+              // If vendor cancels, they retain 0 and refund entire amount accountability
+              const displayVendorRetain = isVendorCancelled ? 0 : vendorRetain;
 
               // Platform Deductions (calculated ONLY on retained amount)
-              const commission = Math.round(vendorRetain * commissionRate);
-              const commissionGst = Math.round(commission * gstRate);
-              const tds = Math.round(vendorRetain * tdsRate);
+              // User rule: Platform Deductions are ₹0 for vendor cancellation
+              const commission = isVendorCancelled ? 0 : Math.round(displayVendorRetain * commissionRate);
+              const commissionGst = isVendorCancelled ? 0 : Math.round(commission * gstRate);
+              const tds = isVendorCancelled ? 0 : Math.round(displayVendorRetain * tdsRate);
               const totalDeductions = commission + commissionGst + tds;
 
-              const vendorPayoutFromPlatform = vendorRetain - totalDeductions;
+              const vendorPayoutFromPlatform = isVendorCancelled ? 0 : (displayVendorRetain - totalDeductions);
               const vendorPayout = booking.status === 'Cancelled' ? vendorPayoutFromPlatform : (booking.paid - (Math.round(booking.paid * commissionRate) + Math.round(Math.round(booking.paid * commissionRate) * gstRate) + Math.round(booking.paid * tdsRate)));
               const totalEarnings = booking.status === 'Cancelled' ? vendorPayout : (vendorPayout + (booking.amount - booking.paid));
 
@@ -5801,24 +5845,73 @@ const BookingDetailModal = ({
               return (
                 <div className="financial-breakdown-v30">
                   {booking.status === 'Cancelled' ? (
-                    <div style={{ backgroundColor: '#fff1f2', border: '1px solid #fecaca', borderRadius: '12px', padding: '16px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                        <h4 style={{ margin: 0, color: '#991b1b', fontSize: '1.1rem', fontWeight: 700 }}>Booking Cancelled</h4>
-                        <p style={{ margin: 0, color: '#b91c1c', fontSize: '0.85rem', fontWeight: 500 }}>Cancelled on {booking.cancelledAt || 'N/A'}</p>
-                        <p style={{ margin: 0, color: '#dc2626', fontSize: '0.8rem', opacity: 0.8 }}>Refund Policy Applied: {refundPercentage}%</p>
-                      </div>
-                      <div style={{
-                        padding: '6px 12px',
-                        borderRadius: '20px',
-                        fontSize: '0.85rem',
-                        fontWeight: 700,
-                        backgroundColor: refundPercentage === 100 ? '#f0fdf4' : refundPercentage === 50 ? '#fff7ed' : '#fef2f2',
-                        color: refundPercentage === 100 ? '#166534' : refundPercentage === 50 ? '#9a3412' : '#991b1b',
-                        border: `1px solid ${refundPercentage === 100 ? '#bbf7d0' : refundPercentage === 50 ? '#fed7aa' : '#fecaca'}`
-                      }}>
-                        {refundPercentage === 100 ? 'Full Refund' : refundPercentage === 50 ? 'Partial Refund' : 'No Refund'}
-                      </div>
-                    </div>
+                    (() => {
+                      const isVendor = booking.cancelledBy === 'Vendor';
+                      const isFullRefund = booking.refundPercentage === 100;
+
+                      return (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '24px' }}>
+                          {/* Top Cancellation Card */}
+                          <div style={{ 
+                            backgroundColor: isVendor ? '#fef2f2' : '#fff1f2', 
+                            border: `1px solid ${isVendor ? '#fecaca' : '#fecaca'}`, 
+                            borderRadius: '16px', 
+                            padding: '20px', 
+                            display: 'flex', 
+                            justifyContent: 'space-between', 
+                            alignItems: 'center' 
+                          }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                              <h4 style={{ margin: 0, color: '#991b1b', fontSize: '1.2rem', fontWeight: 800 }}>
+                                {isVendor ? 'Booking Cancelled by You' : 'Booking Cancelled'}
+                              </h4>
+                              <p style={{ margin: 0, color: '#b91c1c', fontSize: '0.9rem', fontWeight: 500 }}>
+                                Cancelled on {booking.cancelledAt || 'N/A'}
+                              </p>
+                            </div>
+                            <div style={{
+                              padding: '8px 16px',
+                              borderRadius: '24px',
+                              fontSize: '0.9rem',
+                              fontWeight: 700,
+                              backgroundColor: isFullRefund ? '#f0fdf4' : '#fff7ed',
+                              color: isFullRefund ? '#166534' : '#9a3412',
+                              border: `1px solid ${isFullRefund ? '#bbf7d0' : '#fed7aa'}`
+                            }}>
+                              {isFullRefund ? 'Full Refund Issued' : 'Refund Issued'}
+                            </div>
+                          </div>
+
+                          {/* Warning for Vendor Cancellation */}
+                          {isVendor && (
+                            <div style={{ 
+                              backgroundColor: '#fff7ed', 
+                              border: '1px solid #fed7aa', 
+                              borderRadius: '12px', 
+                              padding: '16px',
+                              display: 'flex',
+                              gap: '12px',
+                              alignItems: 'flex-start'
+                            }}>
+                              <div style={{ color: '#f97316', marginTop: '2px' }}>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                              </div>
+                              <p style={{ margin: 0, fontSize: '0.9rem', color: '#9a3412', lineHeight: 1.5, fontWeight: 500 }}>
+                                <b>You cancelled this booking.</b> The customer has been fully refunded. This may affect your account reliability.
+                              </p>
+                            </div>
+                          )}
+
+                          {/* Cancellation Reason Section */}
+                          <div style={{ padding: '0 4px' }}>
+                            <h4 style={{ margin: '0 0 8px 0', fontSize: '0.85rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Cancellation Reason</h4>
+                            <p style={{ margin: 0, fontSize: '1rem', fontWeight: 600, color: '#1e293b' }}>
+                              {booking.cancellationReason || 'Not available'}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })()
                   ) : (
                     <div className="section-header-row-v30" style={{ marginBottom: '8px' }}>
                       <h4 className="section-title-v7" style={{ margin: 0 }}>PAYMENT SUMMARY</h4>
@@ -5866,11 +5959,15 @@ const BookingDetailModal = ({
                         <div className="section-label-v30">2. Payment Split</div>
                         <div className="breakdown-row-v30">
                           <label>Platform Payment (Advance)</label>
-                          <span style={{ color: '#10b981' }}>₹{booking.paid.toLocaleString()}</span>
+                          <span style={{ color: booking.cancelledBy === 'Vendor' ? '#1e293b' : '#10b981', fontWeight: booking.cancelledBy === 'Vendor' ? 700 : 500 }}>
+                            {booking.cancelledBy === 'Vendor' ? `₹${booking.amount.toLocaleString()}` : `₹${booking.paid.toLocaleString()}`}
+                          </span>
                         </div>
                         <div className="breakdown-row-v30">
                           <label>Paid at Event (Remaining)</label>
-                          <span style={{ color: booking.status === 'Cancelled' ? '#94a3b8' : '#f59e0b' }}>₹{booking.status === 'Cancelled' ? '0' : (booking.amount - booking.paid).toLocaleString()}</span>
+                          <span style={{ color: booking.status === 'Cancelled' ? '#94a3b8' : '#f59e0b' }}>
+                            {booking.cancelledBy === 'Vendor' ? 'Not applicable' : (booking.status === 'Cancelled' ? '0' : `₹${(booking.amount - booking.paid).toLocaleString()}`)}
+                          </span>
                         </div>
                         <div className="breakdown-note-v30" style={{
                           backgroundColor: booking.status === 'Cancelled' ? '#f8fafc' : 'rgba(245, 158, 11, 0.05)',
@@ -5878,7 +5975,11 @@ const BookingDetailModal = ({
                           border: `1px solid ${booking.status === 'Cancelled' ? '#e2e8f0' : 'rgba(245, 158, 11, 0.15)'}`
                         }}>
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                          <span>{booking.status === 'Cancelled' ? 'Event was cancelled before final payment' : 'Remaining amount is collected directly from customer'}</span>
+                          <span>
+                            {booking.cancelledBy === 'Vendor' 
+                              ? 'Customer has been refunded fully due to vendor cancellation' 
+                              : (booking.status === 'Cancelled' ? 'Event was cancelled before final payment' : 'Remaining amount is collected directly from customer')}
+                          </span>
                         </div>
                       </div>
 
@@ -5890,9 +5991,9 @@ const BookingDetailModal = ({
                             <label>Refund to Customer ({refundPercentage}%)</label>
                             <span>-₹{refundToCustomer.toLocaleString()}</span>
                           </div>
-                          <div className="breakdown-row-v30" style={{ color: '#16a34a', borderTop: '1px solid #fed7aa', paddingTop: '8px', marginTop: '8px' }}>
+                          <div className="breakdown-row-v30" style={{ color: isVendorCancelled ? '#64748b' : '#166534', borderTop: '1px solid #fed7aa', paddingTop: '8px', marginTop: '8px' }}>
                             <label style={{ fontWeight: 700 }}>You Retain</label>
-                            <span style={{ fontWeight: 700 }}>₹{vendorRetain.toLocaleString()}</span>
+                            <span style={{ fontWeight: 700 }}>₹{displayVendorRetain.toLocaleString()}</span>
                           </div>
                           <div className="breakdown-note-v30" style={{ marginTop: '8px', color: '#9a3412', backgroundColor: 'transparent', border: 'none', padding: 0 }}>
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
@@ -5918,7 +6019,7 @@ const BookingDetailModal = ({
                         {(showCalculations || booking.status === 'Cancelled') && (
                           <div className="details-wrapper-v30">
                             <div className="deduction-item-v30">
-                              <span>Platform Commission (10% of {booking.status === 'Cancelled' ? 'retained amount' : 'advance'})</span>
+                              <span>Platform Commission (10% of {booking.cancelledBy === 'Vendor' ? 'Final Booking Value' : (booking.status === 'Cancelled' ? 'retained amount' : 'advance')})</span>
                               <span className="deduction-value">-₹{commission.toLocaleString()}</span>
                             </div>
                             <div className="deduction-item-v30">
@@ -5931,7 +6032,7 @@ const BookingDetailModal = ({
                             </div>
                             <div className="breakdown-note-v30" style={{ marginTop: '8px' }}>
                               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                              <span>Deductions are applied only on {booking.status === 'Cancelled' ? 'retained amount' : 'platform amount'}</span>
+                              <span>{booking.cancelledBy === 'Vendor' ? 'No deductions applied for vendor cancellation' : `Deductions are applied only on ${booking.status === 'Cancelled' ? 'retained amount' : 'platform amount'}`}</span>
                             </div>
                           </div>
                         )}
@@ -5939,13 +6040,38 @@ const BookingDetailModal = ({
                     </>
                   )}
 
-                  <div className="section-label-v30" style={{ marginTop: '0px', marginBottom: '4px' }}>{booking.status === 'Cancelled' ? 'Final Settlement' : 'Final Settlement'}</div>
+                      {/* Section 5: Account Impact (New for Vendor cancellation) */}
+                      {booking.cancelledBy === 'Vendor' && (
+                        <div className="breakdown-section-v30" style={{ borderLeft: '4px solid #f97316', paddingLeft: '20px' }}>
+                          <div className="section-label-v30" style={{ color: '#c2410c' }}>Account Impact</div>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                            <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+                              <span style={{ color: '#f97316', fontWeight: 800 }}>•</span>
+                              <span style={{ fontSize: '0.9rem', color: '#475569' }}>This cancellation has been recorded in your performance history</span>
+                            </div>
+                            <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+                              <span style={{ color: '#f97316', fontWeight: 800 }}>•</span>
+                              <span style={{ fontSize: '0.9rem', color: '#475569' }}>Repeated cancellations may reduce your profile visibility</span>
+                            </div>
+                            <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+                              <span style={{ color: '#f97316', fontWeight: 800 }}>•</span>
+                              <span style={{ fontSize: '0.9rem', color: '#475569' }}>Affect booking priority for future high-value leads</span>
+                            </div>
+                            <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+                              <span style={{ color: '#f97316', fontWeight: 800 }}>•</span>
+                              <span style={{ fontSize: '0.9rem', color: '#475569' }}>Lead to temporary suspension of your partner account</span>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                  <div className="section-label-v30" style={{ marginTop: '0px', marginBottom: '4px' }}>Final Settlement</div>
                   <div style={{
-                    backgroundColor: booking.status === 'Cancelled' && refundPercentage === 100 ? '#f8fafc' : 'rgba(16, 185, 129, 0.06)',
+                    backgroundColor: (booking.status === 'Cancelled' && (refundPercentage === 100 || booking.cancelledBy === 'Vendor')) ? '#f8fafc' : 'rgba(16, 185, 129, 0.06)',
                     borderRadius: '8px',
                     padding: '14px 12px',
-                    margin: '0 0 8px 0',
-                    border: `1px solid ${booking.status === 'Cancelled' && refundPercentage === 100 ? '#e2e8f0' : 'rgba(16, 185, 129, 0.15)'}`,
+                    margin: '0 0 16px 0',
+                    border: `1px solid ${(booking.status === 'Cancelled' && (refundPercentage === 100 || booking.cancelledBy === 'Vendor')) ? '#e2e8f0' : 'rgba(16, 185, 129, 0.15)'}`,
                     display: 'flex',
                     flexDirection: 'column',
                     gap: '8px'
@@ -5953,13 +6079,20 @@ const BookingDetailModal = ({
                     <div className="breakdown-row-v30" style={{ borderBottom: 'none', paddingBottom: 0, paddingTop: 0 }}>
                       <label style={{ fontWeight: 600, color: '#0f172a' }}>You Receive</label>
                       <span style={{
-                        color: booking.status === 'Cancelled' && refundPercentage === 100 ? '#64748b' : '#10b981',
+                        color: (booking.status === 'Cancelled' && (refundPercentage === 100 || booking.cancelledBy === 'Vendor')) ? '#64748b' : '#10b981',
                         fontSize: '1.25rem',
                         fontWeight: 700
                       }}>
-                        {booking.status === 'Cancelled' && refundPercentage === 100 ? 'No payout (fully refunded)' : `₹${vendorPayout.toLocaleString()}`}
+                        {(booking.status === 'Cancelled' && (refundPercentage === 100 || booking.cancelledBy === 'Vendor')) 
+                          ? '₹ 0' 
+                          : `₹${vendorPayout.toLocaleString()}`}
                       </span>
                     </div>
+                    {(booking.status === 'Cancelled' && (refundPercentage === 100 || booking.cancelledBy === 'Vendor')) && (
+                      <div className="breakdown-row-v30" style={{ paddingTop: 0, marginTop: -4, borderBottom: 'none' }}>
+                        <span style={{ color: '#94a3b8', fontSize: '0.85rem', fontWeight: 500 }}>No payout due to vendor cancellation</span>
+                      </div>
+                    )}
                     {booking.status !== 'Cancelled' && (
                       <div className="breakdown-row-v30" style={{ paddingTop: 0, marginTop: 0, borderBottom: 'none' }}>
                         <label style={{ color: '#047857', fontWeight: 500, fontSize: '0.9rem' }}>Estimate payout date</label>
@@ -5968,7 +6101,7 @@ const BookingDetailModal = ({
                     )}
                     <div className="breakdown-note-v30" style={{
                       marginTop: '4px',
-                      color: booking.status === 'Cancelled' && refundPercentage === 100 ? '#64748b' : '#059669',
+                      color: (booking.status === 'Cancelled' && (refundPercentage === 100 || booking.cancelledBy === 'Vendor')) ? '#64748b' : '#059669',
                       opacity: 0.9,
                       backgroundColor: 'transparent',
                       padding: 0,
@@ -5977,11 +6110,14 @@ const BookingDetailModal = ({
                       boxShadow: 'none'
                     }}>
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                      <span style={{ fontSize: '0.8rem' }}>{booking.status === 'Cancelled' ? 'Final settlement after refund and deductions' : 'Payout between 12–48 hrs before event'}</span>
+                      <span style={{ fontSize: '0.8rem' }}>
+                        {booking.cancelledBy === 'Vendor' 
+                          ? 'Full refund processed for this cancellation' 
+                          : (booking.status === 'Cancelled' ? 'Final settlement after refund and deductions' : 'Payout between 12–48 hrs before event')}
+                      </span>
                     </div>
                   </div>
 
-                  {/* Section 6: Total Earnings */}
                   <div className="total-earnings-card-v30" style={{ marginTop: '16px' }}>
                     <div className="earnings-label">
                       <label>{booking.status === 'Cancelled' ? 'TOTAL EARNINGS (Incl. GST)' : 'TOTAL EARNINGS'}</label>
@@ -5990,6 +6126,34 @@ const BookingDetailModal = ({
                       <div className="earnings-helper-v30">{booking.status === 'Cancelled' ? 'Includes retained amount after refund and platform deductions' : 'Includes Paid at Event + platform payout'}</div>
                     </div>
                   </div>
+
+                  {booking.taxType === 'B2B' && (
+                    <div className="detail-section-v7" style={{ marginTop: '24px' }}>
+                      <h4 className="section-title-v7">GST Details</h4>
+                      <div style={{ backgroundColor: '#f1f5f9', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                        <div>
+                          <label style={{ display: 'block', fontSize: '0.75rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>Business Name</label>
+                          <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>{booking.businessName || 'Business Solutions Pvt Ltd'}</span>
+                        </div>
+                        <div>
+                          <label style={{ display: 'block', fontSize: '0.75rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>Invoice Type</label>
+                          <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>B2B</span>
+                        </div>
+                        <div>
+                          <label style={{ display: 'block', fontSize: '0.75rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>Customer GSTIN</label>
+                          <span style={{ fontSize: '0.9rem', fontWeight: 600, fontFamily: 'monospace' }}>{booking.gstin || '29AAAAA0000A1Z5'}</span>
+                        </div>
+                        <div>
+                          <label style={{ display: 'block', fontSize: '0.75rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>Place of Supply</label>
+                          <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>{booking.location?.split(',').pop()?.trim() || 'Karnataka'}</span>
+                        </div>
+                        <div>
+                          <label style={{ display: 'block', fontSize: '0.75rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>GST Rate</label>
+                          <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>18%</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               );
             })()}
@@ -6004,6 +6168,17 @@ const BookingDetailModal = ({
                   <div className="doc-info-v12">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                     <span>Advance Receipt</span>
+                  </div>
+                  <button className="doc-action-v12" title="Download">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v2"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                  </button>
+                </div>
+              )}
+              {booking.taxType === 'B2B' && (
+                <div className="document-item-v12">
+                  <div className="doc-info-v12">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    <span>Tax Invoice (GST Invoice)</span>
                   </div>
                   <button className="doc-action-v12" title="Download">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v2"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
@@ -6056,16 +6231,30 @@ const BookingDetailModal = ({
           {(() => {
             if (booking.status === 'Completed' || booking.status === 'Cancelled' || booking.status === 'Pending') return null;
 
-            const eventDate = new Date(booking.date);
-            eventDate.setHours(0, 0, 0, 0);
-            const diffHrsToEvent = (eventDate.getTime() - new Date().getTime()) / (1000 * 60 * 60);
+            const info = getCancellationInfo(booking);
+            if (!info) return null;
 
-            const isPayoutProcessed = booking.status === 'Live' || booking.status === 'Completed' || (booking.status === 'Upcoming' && diffHrsToEvent < 48);
+            if (info.state === 'LOCKED') {
+              return (
+                <div style={{ backgroundColor: '#f1f5f9', padding: '12px 16px', borderRadius: '8px', color: '#64748b', fontSize: '0.85rem', fontWeight: 600, border: '1px solid #e2e8f0', flex: 1, textAlign: 'center' }}>
+                  Cancellation not allowed as payout has been processed
+                </div>
+              );
+            }
 
-            if (isPayoutProcessed) return null;
+            if (info.state === 'RESTRICTED') {
+              return (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 }}>
+                  <button className="btn-outline-v7 cancel" disabled style={{ opacity: 0.6, cursor: 'not-allowed', width: '100%' }}>Cancel Booking</button>
+                  <p style={{ margin: 0, fontSize: '0.75rem', color: '#94a3b8', textAlign: 'center' }}>
+                    Cancellation is allowed only up to 48 hours before the event. <a href="#" style={{ color: '#0066cc', fontWeight: 600, textDecoration: 'none' }}>Contact Support</a>
+                  </p>
+                </div>
+              );
+            }
 
             return (
-              <button className="btn-outline-v7 cancel" onClick={() => onUpdateStatus(booking.id, 'Cancelled')}>Cancel Booking</button>
+              <button className="btn-outline-v7 cancel" onClick={() => (window as any).showVendorCancelModal(booking.id)}>Cancel Booking</button>
             );
           })()}
           {nextAction && (
@@ -6367,6 +6556,129 @@ const Reports = () => {
   );
 };
 
+const VendorCancelModal = ({ 
+  isOpen, 
+  onClose, 
+  onConfirm 
+}: { 
+  isOpen: boolean; 
+  onClose: () => void; 
+  onConfirm: (reason: string) => void;
+}) => {
+  const [reason, setReason] = useState('');
+  if (!isOpen) return null;
+
+  return (
+    <div className="modal-overlay-v4" onClick={onClose} style={{ zIndex: 11000 }}>
+      <div className="modal-content-v4" onClick={e => e.stopPropagation()} style={{ maxWidth: '450px', padding: '28px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ 
+              width: '64px', 
+              height: '64px', 
+              backgroundColor: '#fef2f2', 
+              borderRadius: '50%', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              margin: '0 auto 16px'
+            }}>
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+            </div>
+            <h3 style={{ margin: 0, fontSize: '1.4rem', fontWeight: 800, color: '#0f172a' }}>Cancel this booking?</h3>
+            <p style={{ margin: '8px 0 0', color: '#64748b', lineHeight: 1.5, fontSize: '0.95rem' }}>
+              This action will significantly impact the customer and your account reliability.
+            </p>
+          </div>
+
+          <div style={{ 
+            backgroundColor: '#fff7ed', 
+            border: '1px solid #fed7aa', 
+            borderRadius: '12px', 
+            padding: '16px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '12px'
+          }}>
+            <h4 style={{ margin: 0, fontSize: '0.85rem', fontWeight: 700, color: '#9a3412', textTransform: 'uppercase' }}>This action will:</h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center', fontSize: '0.9rem', color: '#7c2d12' }}>
+                <span style={{ color: '#f97316' }}>•</span>
+                <span>Refund the customer <b>100% (Full Refund)</b></span>
+              </div>
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center', fontSize: '0.9rem', color: '#7c2d12' }}>
+                <span style={{ color: '#f97316' }}>•</span>
+                <span>Affect your <b>account reliability</b></span>
+              </div>
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center', fontSize: '0.9rem', color: '#7c2d12' }}>
+                <span style={{ color: '#f97316' }}>•</span>
+                <span>Be recorded in your cancellation history</span>
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <label style={{ fontSize: '0.9rem', fontWeight: 700, color: '#1e293b' }}>Reason for cancellation <span style={{ color: '#ef4444' }}>*</span></label>
+            <select 
+              value={reason} 
+              onChange={e => setReason(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '12px',
+                borderRadius: '10px',
+                border: '1px solid #e2e8f0',
+                backgroundColor: '#f8fafc',
+                fontSize: '0.95rem',
+                outline: 'none'
+              }}
+            >
+              <option value="">Select a reason</option>
+              <option value="Not available">Not available</option>
+              <option value="Staff issue">Staff issue</option>
+              <option value="Emergency">Emergency</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
+            <button 
+              onClick={onClose}
+              style={{ 
+                flex: 1, 
+                padding: '12px', 
+                borderRadius: '10px', 
+                border: '1px solid #e2e8f0', 
+                backgroundColor: 'white', 
+                fontWeight: 700, 
+                cursor: 'pointer' 
+              }}
+            >
+              Keep Booking
+            </button>
+            <button 
+              onClick={() => onConfirm(reason)}
+              disabled={!reason}
+              style={{ 
+                flex: 1.2, 
+                padding: '12px', 
+                borderRadius: '10px', 
+                border: 'none', 
+                backgroundColor: '#ef4444', 
+                color: 'white', 
+                fontWeight: 700, 
+                cursor: reason ? 'pointer' : 'not-allowed',
+                opacity: reason ? 1 : 0.6
+              }}
+            >
+              Cancel Booking
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const Bookings = () => {
   const [bookings, setBookings] = useState([
     {
@@ -6651,6 +6963,9 @@ const Bookings = () => {
   const [rangeShortcut, setRangeShortcut] = useState('Today & Upcoming');
   const [selectedBooking, setSelectedBooking] = useState<any>(null);
   const [showDetail, setShowDetail] = useState(false);
+  const [showVendorCancelConfirm, setShowVendorCancelConfirm] = useState(false);
+  const [targetCancelId, setTargetCancelId] = useState<string | null>(null);
+  const [orderTypeFilter, setOrderTypeFilter] = useState('All');
   const [bookingsPage, setBookingsPage] = useState(1);
   const bookingsPerPage = 5;
 
@@ -6699,6 +7014,9 @@ const Bookings = () => {
     if (dateRange.from && b.date < dateRange.from) return false;
     if (dateRange.to && b.date > dateRange.to) return false;
 
+    // 4. Order Type Filter
+    if (orderTypeFilter !== 'All' && b.taxType !== orderTypeFilter) return false;
+
     return true;
   }).sort((a, b) => {
     return new Date(a.date).getTime() - new Date(b.date).getTime();
@@ -6712,21 +7030,43 @@ const Bookings = () => {
   const bookingsStartEntry = filteredBookings.length > 0 ? (bookingsPage - 1) * bookingsPerPage + 1 : 0;
   const bookingsEndEntry = Math.min(bookingsPage * bookingsPerPage, filteredBookings.length);
 
-  const handleUpdateStatus = (id: string, newStatus: string) => {
+  const handleUpdateStatus = (id: string, newStatus: string, reason?: string) => {
     setBookings(prev => prev.map(b => {
       if (b.id === id) {
         const now = new Date();
         const timeStr = `${now.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}, ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
-        return {
+        
+        let updateObj: any = {
           ...b,
           status: newStatus,
-          timeline: [...b.timeline, { status: newStatus, time: timeStr }]
+          timeline: [...b.timeline, { status: newStatus, time: timeStr, role: newStatus === 'Vendor Cancelled' ? 'Vendor' : 'System' }]
         };
+
+        if (newStatus === 'Vendor Cancelled' || (newStatus === 'Cancelled' && reason)) {
+          updateObj.status = 'Cancelled';
+          updateObj.cancelledBy = 'Vendor';
+          updateObj.cancellationReason = reason || 'Not specified';
+          updateObj.refundPercentage = 100;
+          updateObj.cancelledAt = now.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+        }
+
+        return updateObj;
       }
       return b;
     }));
     setShowDetail(false);
+    setShowVendorCancelConfirm(false);
   };
+
+  const triggerVendorCancel = (id: string) => {
+    setTargetCancelId(id);
+    setShowVendorCancelConfirm(true);
+  };
+
+  // Expose to window for children modals for now or pass as prop
+  (window as any).showVendorCancelModal = triggerVendorCancel;
+
+
 
   const getDaysBadge = (booking: any) => {
     const today = new Date();
@@ -6866,6 +7206,20 @@ const Bookings = () => {
                 />
               </div>
               <div className="filter-box-v8">
+                <select 
+                  value={orderTypeFilter} 
+                  onChange={(e) => {
+                    setOrderTypeFilter(e.target.value);
+                    setBookingsPage(1);
+                  }}
+                  style={{ width: '130px' }}
+                >
+                  <option value="All">All Types</option>
+                  <option value="B2B">B2B Only</option>
+                  <option value="B2C">B2C Only</option>
+                </select>
+              </div>
+              <div className="filter-box-v8">
                 <select value={filter} onChange={(e) => {
                   setFilter(e.target.value);
                   setBookingsPage(1);
@@ -6988,7 +7342,13 @@ const Bookings = () => {
                     </div>
                   </td>
                   <td>
-                    <span className={`status-pill-v7 ${getStatusClass(b.status)}`}>{b.status}</span>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      {b.status === 'Cancelled' && b.cancelledBy === 'Vendor' ? (
+                        <span className="status-pill-v7 cancelled" style={{ backgroundColor: '#fef2f2', color: '#ef4444', border: '1px solid #fee2e2' }}>Cancelled</span>
+                      ) : (
+                        <span className={`status-pill-v7 ${getStatusClass(b.status)}`}>{b.status}</span>
+                      )}
+                    </div>
                   </td>
                   <td>
                     <div className="actions-cell-v24">
@@ -7040,6 +7400,16 @@ const Bookings = () => {
         onClose={() => setShowDetail(false)}
         booking={selectedBooking}
         onUpdateStatus={handleUpdateStatus}
+      />
+
+      <VendorCancelModal
+        isOpen={showVendorCancelConfirm}
+        onClose={() => setShowVendorCancelConfirm(false)}
+        onConfirm={(reason) => {
+          if (targetCancelId) {
+            handleUpdateStatus(targetCancelId, 'Vendor Cancelled', reason);
+          }
+        }}
       />
     </div >
   );
