@@ -2803,88 +2803,101 @@ const ServiceSettings = ({
     pauseUntil: '',
   });
 
-  // Leave Management State
+  // Leave Management State (Simplified V1)
   const [leaves, setLeaves] = useState([
-    { id: 1, date: '2026-03-15', reason: 'Festival Leave' },
-    { id: 2, date: '2026-03-22', reason: 'Personal Leave' }
+    { id: 1, date: '2026-03-15', blockedSlots: ['Breakfast', 'Lunch', 'Snacks', 'Dinner'], reason: 'Festival Leave' },
+    { id: 2, date: '2026-03-22', blockedSlots: ['Snacks', 'Dinner'], reason: 'Personal Leave' }
   ]);
   const [showLeaveModal, setShowLeaveModal] = useState(false);
-  const [newLeaveDate, setNewLeaveDate] = useState('');
-  const [newLeaveEndDate, setNewLeaveEndDate] = useState('');
-  const [newLeaveReason, setNewLeaveReason] = useState('Personal');
+  const [selectedDates, setSelectedDates] = useState<string[]>([]);
+  const [activeDate, setActiveDate] = useState<string | null>(null);
+  const [sessionBlockType, setSessionBlockType] = useState<'full' | 'specific'>('full');
+  const [sessionSelectedSlots, setSessionSelectedSlots] = useState<string[]>([]);
   const [leaveError, setLeaveError] = useState('');
+  const [calendarMonth, setCalendarMonth] = useState(new Date(2026, 3, 1)); // April 2026 for demo
   const [availabilitySubTab, setAvailabilitySubTab] = useState('schedule');
 
   // Simulate next confirmed booking
   const nextConfirmedBooking = '2026-03-24';
-  const hasActiveConflict = false; // Set true to simulate conflict scenario
+  const hasActiveConflict = false;
+
+  const allServiceSlots = ['Breakfast', 'Lunch', 'Snacks', 'Dinner'];
+  const maxCapacities = { Breakfast: 4, Lunch: 3, Snacks: 4, Dinner: 4 };
+
+  // Mock slot capacity data for demo purposes
+  const getSlotCapacityInfo = (date: string, slot: string) => {
+    // Return mock booked counts based on date/slot
+    const booked = (date === '2026-04-20' && slot === 'Lunch') ? 3 : 
+                   (date === '2026-04-22') ? 1 : 
+                   (date === '2026-04-25' && slot === 'Breakfast') ? 4 : 0;
+    
+    const max = maxCapacities[slot as keyof typeof maxCapacities];
+    
+    // Check if an entry exists for this date and slot specifically blocked
+    const leaveEntry = leaves.find(l => l.date === date);
+    const isBlocked = leaveEntry?.blockedSlots?.includes(slot);
+    
+    // Total available = 0 if blocked, else (max - booked)
+    const available = isBlocked ? 0 : Math.max(0, max - booked);
+    
+    return { 
+      max, 
+      booked, 
+      available, 
+      status: available === 0 ? 'fully-booked' : booked > 0 ? 'has-bookings' : 'available' 
+    };
+  };
+
+  const isDayFullyBooked = (date: string) => {
+    return allServiceSlots.every(slot => getSlotCapacityInfo(date, slot).status === 'fully-booked');
+  };
 
   const handlePauseToggle = () => {
     if (hasActiveConflict) return;
     setPauseBookings(prev => ({ ...prev, isPaused: !prev.isPaused, pauseUntil: prev.isPaused ? '' : prev.pauseUntil }));
   };
 
-  const handleSaveLeave = () => {
-    if (!newLeaveDate) {
-      setLeaveError('Please select a start date.');
+  const handleConfirmBlock = () => {
+    if (selectedDates.length === 0) {
+      setLeaveError('Please select at least one date.');
       return;
     }
 
-    const startDate = new Date(newLeaveDate);
-    const endDate = newLeaveEndDate ? new Date(newLeaveEndDate) : startDate;
+    const blockedSlots = sessionBlockType === 'full' 
+      ? ['Breakfast', 'Lunch', 'Snacks', 'Dinner'] 
+      : sessionSelectedSlots;
 
-    if (endDate < startDate) {
-      setLeaveError('End date cannot be before start date.');
+    if (sessionBlockType === 'specific' && blockedSlots.length === 0) {
+      setLeaveError('Please select at least one category to block.');
       return;
     }
 
-    // Calculate dates in range
-    const dateList: string[] = [];
-    let current = new Date(startDate);
-    while (current <= endDate) {
-      dateList.push(current.toISOString().split('T')[0]);
-      current.setDate(current.getDate() + 1);
-    }
+    setLeaves(prev => {
+      let updatedLeaves = [...prev];
+      selectedDates.forEach(dateStr => {
+        const existingIndex = updatedLeaves.findIndex(l => l.date === dateStr);
+        if (existingIndex > -1) {
+          // Replace blocked slots
+          updatedLeaves[existingIndex] = { 
+            ...updatedLeaves[existingIndex], 
+            blockedSlots: blockedSlots
+          };
+        } else {
+          updatedLeaves.push({
+            id: Date.now() + Math.random(),
+            date: dateStr,
+            blockedSlots: blockedSlots
+          });
+        }
+      });
+      return updatedLeaves.sort((a, b) => a.date.localeCompare(b.date));
+    });
 
-    if (dateList.length > 7) {
-      setLeaveError('Maximum 7 consecutive days allowed.');
-      return;
-    }
-
-    // Rule: Max 7 leaves per month
-    const selectedMonth = newLeaveDate.substring(0, 7); // YYYY-MM
-    const currentMonthLeaves = leaves.filter(l => l.date.startsWith(selectedMonth));
-
-    // Check for existing leaves in range
-    const overlapping = dateList.find(d => currentMonthLeaves.some(l => l.date === d));
-    if (overlapping) {
-      setLeaveError(`Leave already exists for ${overlapping}.`);
-      return;
-    }
-
-    if (currentMonthLeaves.length + dateList.length > 7) {
-      setLeaveError(`Adding these ${dateList.length} days would exceed 7 leaves for ${selectedMonth}.`);
-      return;
-    }
-
-    // Rule: Block if confirmed booking exists in range
-    const conflictDate = dateList.find(d => d === nextConfirmedBooking);
-    if (conflictDate) {
-      setLeaveError(`Leave unavailable; confirmed booking exists on ${conflictDate}.`);
-      return;
-    }
-
-    const newEntries = dateList.map((d, index) => ({
-      id: Date.now() + index,
-      date: d,
-      reason: newLeaveReason
-    }));
-
-    setLeaves(prev => [...prev, ...newEntries].sort((a, b) => a.date.localeCompare(b.date)));
     setShowLeaveModal(false);
-    setNewLeaveDate('');
-    setNewLeaveEndDate('');
-    setNewLeaveReason('Personal');
+    setSelectedDates([]);
+    setActiveDate(null);
+    setSessionBlockType('full');
+    setSessionSelectedSlots(['Breakfast', 'Lunch', 'Snacks', 'Dinner']);
     setLeaveError('');
   };
 
@@ -4160,7 +4173,7 @@ const ServiceSettings = ({
                         padding: '0.5rem 1rem',
                         fontSize: '0.85rem',
                         color: '#3b82f6',
-                        border: '1px solid #bfdbfe',
+                        border: '1px solid #93c5fd',
                         backgroundColor: 'white',
                         borderRadius: '6px',
                         fontWeight: '600',
@@ -4170,6 +4183,19 @@ const ServiceSettings = ({
                       Apply Mon to All
                     </button>
                   </h3>
+
+                  <div className="subscription-alert-v4 warning-v4" style={{ marginBottom: '2rem', border: '1px solid #fde68a', boxShadow: '0 2px 4px rgba(251, 191, 36, 0.05)' }}>
+                    <div className="alert-content-v4">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                      </svg>
+                      <span style={{ lineHeight: '1.5' }}>
+                        <strong>Note:</strong> Customers can book events up to your closing time. Please ensure you can serve events scheduled near your closing hours.
+                      </span>
+                    </div>
+                  </div>
 
                   <div className="availability-list" style={{ marginTop: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                     {weeklySchedule.map((day, index) => (
@@ -4306,30 +4332,46 @@ const ServiceSettings = ({
                     <div className="leave-list-v4" style={{ marginTop: '1.5rem' }}>
                       {leaves.length === 0 ? (
                         <div className="no-leaves-v4" style={{ padding: '24px', backgroundColor: '#f8fafc', borderRadius: '12px', textAlign: 'center', color: '#64748b' }}>
-                          No leaves scheduled for this month.
+                          No upcoming leaves scheduled.
                         </div>
                       ) : (
-                        leaves.map(leave => (
-                          <div key={leave.id} className="leave-item-v4" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px', borderBottom: '1px solid #f1f5f9' }}>
-                            <div className="leave-info-v4" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                              <span className="leave-date-v4" style={{ fontWeight: '600', color: '#1e293b' }}>{leave.date}</span>
-                              <span className="leave-reason-v4" style={{ padding: '2px 8px', backgroundColor: '#f1f5f9', borderRadius: '4px', fontSize: '0.75rem', color: '#64748b' }}>{leave.reason}</span>
+                        <div className="leave-grid-v4">
+                          {leaves.map(leave => (
+                            <div key={leave.id} className="leave-item-v4">
+                              <div className="leave-header-v4">
+                                <span className="leave-date-v4">{leave.date}</span>
+                                <button
+                                  className="leave-remove-v4"
+                                  onClick={() => handleDeleteLeave(leave.id)}
+                                >
+                                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>
+                                </button>
+                              </div>
+                              <div className="leave-info-v4">
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                                  {(() => {
+                                    const blocked = leave.blockedSlots || [];
+                                    const isAllBlocked = allServiceSlots.every(slot => blocked.includes(slot));
+                                    if (isAllBlocked) return <span className="slot-slot-pill-v4" style={{ fontSize: '0.7rem', padding: '4px 10px', backgroundColor: '#fff1f2', color: '#e11d48', border: '1px solid #fecaca', borderRadius: '6px', fontWeight: 600 }}>Full Day Blocked</span>;
+                                    
+                                    return blocked.map(slot => (
+                                      <span key={slot} className="slot-slot-pill-v4" style={{ fontSize: '0.7rem', padding: '3px 8px', backgroundColor: '#f0f9ff', color: '#0369a1', border: '1px solid #bae6fd', borderRadius: '6px', fontWeight: 500 }}>
+                                        {slot}
+                                      </span>
+                                    ));
+                                  })()}
+                                </div>
+                              </div>
                             </div>
-                            <button
-                              className="leave-remove-v4"
-                              style={{ border: 'none', background: 'transparent', color: '#ef4444', cursor: 'pointer', padding: '4px' }}
-                              onClick={() => handleDeleteLeave(leave.id)}
-                            >
-                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>
-                            </button>
-                          </div>
-                        ))
+                          ))}
+                        </div>
                       )}
                     </div>
 
                     <p className="leave-footer-v4" style={{ marginTop: '1.5rem', color: '#64748b', fontSize: '0.9rem' }}>
-                      Maximum 7 leaves allowed per month.
+                      Maximum 90 holidays allowed.
                     </p>
+
                   </div>
                 </div>
               )}
@@ -4339,54 +4381,224 @@ const ServiceSettings = ({
           {/* ── Add Leave Modal ─────────────────────────────────────── */}
           {showLeaveModal && (
             <div className="otp-popup-overlay-v4">
-              <div className="otp-popup-card-v4" style={{ maxWidth: '450px' }}>
-                <h3 className="otp-popup-title-v4">Add Leave</h3>
-                <p className="otp-popup-subtitle-v4" style={{ marginBottom: '1.5rem' }}>Select a date or range for your business leave.</p>
+              <div className="otp-popup-card-v4" style={{ maxWidth: '1100px', width: '95%', padding: '2.5rem' }}>
+                <div style={{ display: 'flex', gap: '3.5rem', alignItems: 'stretch' }}>
+                  
+                  {/* Left Column: Date Selection */}
+                  <div style={{ flex: '1.4', minWidth: '450px', display: 'flex', flexDirection: 'column' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+                      <h3 className="pane-title" style={{ textAlign: 'left', margin: 0, fontSize: '1.25rem', fontWeight: 700 }}>
+                        Select Dates
+                      </h3>
+                      <div className="dates-selected-count-v4">
+                        {selectedDates.length} dates selected
+                      </div>
+                    </div>
 
-                <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.25rem' }}>
-                  <div className="form-group" style={{ flex: 1 }}>
-                    <label className="input-label">Start Date</label>
-                    <input
-                      type="date"
-                      className="input-field"
-                      min={new Date().toISOString().split('T')[0]}
-                      value={newLeaveDate}
-                      onChange={(e) => setNewLeaveDate(e.target.value)}
-                    />
+                    <div style={{ marginBottom: '1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <h4 style={{ margin: 0, fontSize: '1.25rem', color: '#1e293b', fontWeight: 700 }}>
+                        {calendarMonth.toLocaleString('default', { month: 'long', year: 'numeric' })}
+                      </h4>
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <button className="btn btn-sm btn-outline" style={{ padding: '8px', minWidth: '40px' }} onClick={() => setCalendarMonth(new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() - 1, 1))}>
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m15 18-6-6 6-6"/></svg>
+                        </button>
+                        <button className="btn btn-sm btn-outline" style={{ padding: '8px', minWidth: '40px' }} onClick={() => setCalendarMonth(new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() + 1, 1))}>
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m9 18 6-6-6-6"/></svg>
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="custom-calendar-container-v4" style={{ display: 'flex', flexDirection: 'column' }}>
+                      <div className="calendar-grid-v4" style={{ gap: '8px' }}>
+                        {['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'].map(day => (
+                          <div key={day} className="calendar-day-header-v4">{day}</div>
+                        ))}
+                        {(() => {
+                          const daysInMonth = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() + 1, 0).getDate();
+                          const firstDay = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth(), 1).getDay();
+                          const days = [];
+                          
+                          const todayVal = new Date();
+                          todayVal.setHours(0, 0, 0, 0);
+                          const maxDateVal = new Date();
+                          maxDateVal.setDate(todayVal.getDate() + 90);
+                          maxDateVal.setHours(23, 59, 59, 999);
+
+                          for (let d = 0; d < firstDay; d++) days.push(<div key={`empty-${d}`} />);
+                          for (let d = 1; d <= daysInMonth; d++) {
+                            const dateStr = `${calendarMonth.getFullYear()}-${String(calendarMonth.getMonth() + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                            const currentDayDate = new Date(dateStr);
+                            const isDisabled = currentDayDate < todayVal || currentDayDate > maxDateVal;
+                            
+                            const isSelected = selectedDates.includes(dateStr);
+                            const isActive = activeDate === dateStr;
+                            const hasOverride = leaves.some(l => l.date === dateStr);
+
+                            days.push(
+                              <div 
+                                key={d} 
+                                className={`calendar-day-v4 ${isSelected ? 'selected' : ''} ${isActive ? 'active' : ''} ${isDisabled ? 'disabled' : ''}`}
+                                onClick={() => {
+                                  if (isDisabled) return;
+                                  setActiveDate(dateStr);
+                                  if (selectedDates.includes(dateStr)) {
+                                    setSelectedDates(prev => prev.filter(ds => ds !== dateStr));
+                                  } else {
+                                    setSelectedDates(prev => [...prev, dateStr]);
+                                  }
+                                }}
+                              >
+                                <span>{d}</span>
+                                <div className="calendar-indicators-v4">
+                                  {hasOverride && <div className="indicator-dot-v4" />}
+                                </div>
+                              </div>
+                            );
+                          }
+                          return days;
+                        })()}
+                      </div>
+                    </div>
+
+                    <p style={{ marginTop: '1.25rem', fontSize: '0.85rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                      Maximum 90 days leaves only allowed
+                    </p>
                   </div>
-                  <div className="form-group" style={{ flex: 1 }}>
-                    <label className="input-label">End Date (Optional)</label>
-                    <input
-                      type="date"
-                      className="input-field"
-                      min={newLeaveDate || new Date().toISOString().split('T')[0]}
-                      max={newLeaveDate ? (() => {
-                        const d = new Date(newLeaveDate);
-                        d.setDate(d.getDate() + 6); // Max 7 days range (Start + 6 days)
-                        return d.toISOString().split('T')[0];
-                      })() : undefined}
-                      value={newLeaveEndDate}
-                      onChange={(e) => setNewLeaveEndDate(e.target.value)}
-                    />
+
+                  {/* Vertical Divider */}
+                  <div style={{ width: '1px', alignSelf: 'stretch', backgroundColor: '#f1f5f9' }}></div>
+
+                  {/* Right Column: Configuration */}
+                  <div style={{ flex: '1.2', display: 'flex', flexDirection: 'column' }}>
+                    <div className="slot-mgmt-panel-v4" style={{ flex: 1 }}>
+                      {/* Block Type Section */}
+                      <div style={{ marginBottom: '2.5rem' }}>
+                        <h4 style={{ fontSize: '1rem', color: '#1e293b', margin: '0 0 12px 0', fontWeight: '600' }}>Block Type</h4>
+                        <div style={{ display: 'flex', gap: '16px' }}>
+                          <div 
+                            className={`block-type-card-v4 ${sessionBlockType === 'full' ? 'active' : ''}`}
+                            onClick={() => {
+                              setSessionBlockType('full');
+                              setSessionSelectedSlots(['Breakfast', 'Lunch', 'Snacks', 'Dinner']);
+                            }}
+                          >
+                            <span className="card-title-v4">Full Day</span>
+                            <span className="card-subtitle-v4">No bookings for entire day</span>
+                          </div>
+                          <div 
+                            className={`block-type-card-v4 ${sessionBlockType === 'specific' ? 'active' : ''}`}
+                            onClick={() => {
+                              setSessionBlockType('specific');
+                              setSessionSelectedSlots([]);
+                            }}
+                          >
+                            <span className="card-title-v4">Specific Category</span>
+                            <span className="card-subtitle-v4">Block only selected slots</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Categories Section */}
+                      {sessionBlockType === 'specific' ? (
+                        <div style={{ marginBottom: '2.5rem', animation: 'fadeIn 0.3s' }}>
+                          <h4 style={{ fontSize: '1rem', color: '#1e293b', margin: '0 0 12px 0', fontWeight: '600' }}>Categories</h4>
+                          <div className="category-pill-grid-v4">
+                            {['Breakfast', 'Lunch', 'Snacks', 'Dinner'].map(slot => (
+                              <div 
+                                key={slot} 
+                                className={`category-pill-v4 ${sessionSelectedSlots.includes(slot) ? 'active' : ''}`}
+                                onClick={() => {
+                                  if (sessionSelectedSlots.includes(slot)) {
+                                    setSessionSelectedSlots(prev => prev.filter(s => s !== slot));
+                                  } else {
+                                    setSessionSelectedSlots(prev => [...prev, slot]);
+                                  }
+                                }}
+                              >
+                                {slot}
+                              </div>
+                            ))}
+                          </div>
+
+                          <div className="inline-info-v4" style={{ marginTop: '1.25rem' }}>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: '2px' }}><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                            <p style={{ margin: 0 }}>
+                              Blocking will stop new bookings for selected slots. Existing bookings will not be affected.
+                            </p>
+                          </div>
+                        </div>
+                      ) : (
+                        <div style={{ marginBottom: '2.5rem' }}>
+                          <div className="inline-info-v4" style={{ padding: '0 0' }}>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: '2px', color: '#ef4444' }}><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                            <p style={{ margin: 0, color: '#ef4444', fontWeight: 500 }}>
+                              Full Day Blocked: No new bookings allowed for selected dates.
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Summary Section */}
+                      {selectedDates.length > 0 && (
+                        <div className="v1-summary-section-v4">
+                          <div className="summary-card-v4">
+                            <div className="summary-row-v4">
+                              <span>Selected Dates</span>
+                              <strong>{(() => {
+                                const sorted = [...selectedDates].sort();
+                                const sortedDates = sorted.map(d => new Date(d));
+                                
+                                if (sorted.length === 1) return sortedDates[0].toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+                                
+                                // Check continuity
+                                let isContinuous = true;
+                                for (let i = 0; i < sortedDates.length - 1; i++) {
+                                  // Time diff check (86400000 ms in a day)
+                                  const diff = sortedDates[i+1].getTime() - sortedDates[i].getTime();
+                                  if (diff !== 86400000) {
+                                    isContinuous = false;
+                                    break;
+                                  }
+                                }
+
+                                if (isContinuous) {
+                                  const start = sortedDates[0].toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+                                  const end = sortedDates[sortedDates.length - 1].toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+                                  return `${start} – ${end}`;
+                                } else {
+                                  // Non-continuous: Show count and list
+                                  const formatted = sortedDates.map(d => d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }));
+                                  if (formatted.length <= 2) {
+                                    return formatted.join(', ');
+                                  } else {
+                                    return `${formatted.slice(0, 2).join(', ')} +${formatted.length - 2} more`;
+                                  }
+                                }
+                              })()}</strong>
+                            </div>
+                            <div className="summary-row-v4" style={{ borderTop: '1px solid #f1f5f9', paddingTop: '8px', marginTop: '4px' }}>
+                              <span>Blocked Slots</span>
+                              <strong>{sessionBlockType === 'full' ? 'All Day' : (sessionSelectedSlots.length > 0 ? sessionSelectedSlots.join(', ') : 'None')}</strong>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {leaveError && (
+                      <div className="otp-error-v4" style={{ marginTop: '1.25rem' }}>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                        {leaveError}
+                      </div>
+                    )}
+
+                    <div style={{ display: 'flex', gap: '12px', marginTop: 'auto', paddingTop: '2.5rem', alignSelf: 'flex-end' }}>
+                      <button className="btn btn-outline" style={{ padding: '12px 24px' }} onClick={() => { setShowLeaveModal(false); setSelectedDates([]); setActiveDate(null); setSessionBlockType('full'); }}>Cancel</button>
+                      <button className="btn btn-primary-blue" style={{ padding: '12px 32px' }} onClick={handleConfirmBlock}>Block Availability</button>
+                    </div>
                   </div>
-                </div>
-
-                <div className="form-group" style={{ marginBottom: '1.5rem' }}>
-                  <label className="input-label">Reason (Optional)</label>
-                  <input
-                    type="text"
-                    className="input-field"
-                    placeholder="e.g. Festival, Personal"
-                    value={newLeaveReason}
-                    onChange={(e) => setNewLeaveReason(e.target.value)}
-                  />
-                </div>
-
-                {leaveError && <div className="otp-error-v4" style={{ marginBottom: '1rem' }}>{leaveError}</div>}
-
-                <div style={{ display: 'flex', gap: '12px', marginTop: '1rem' }}>
-                  <button className="btn btn-outline" style={{ flex: 1 }} onClick={() => { setShowLeaveModal(false); setLeaveError(''); }}>Cancel</button>
-                  <button className="btn btn-primary-blue" style={{ flex: 1 }} onClick={handleSaveLeave}>Save Leave</button>
                 </div>
               </div>
             </div>

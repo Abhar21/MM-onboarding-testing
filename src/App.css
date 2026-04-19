@@ -16403,6 +16403,292 @@ input:checked+.slider-v4:before {
   letter-spacing: 0.025em;
 }
 
+/* Slot-Based Leave Management Styles */
+.custom-calendar-container-v4 {
+  background: #f8fafc;
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.calendar-grid-v4 {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.calendar-day-header-v4 {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #64748b;
+  text-align: center;
+  padding: 12px 0;
+}
+
+.calendar-day-v4 {
+  padding: 12px;
+  border-radius: 12px;
+  background: white;
+  border: 1px solid #f1f5f9;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  aspect-ratio: 1;
+  font-weight: 500;
+  color: #1e293b;
+  position: relative;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+}
+
+.calendar-day-v4 span {
+  font-size: 1rem;
+  z-index: 2;
+}
+
+.calendar-day-v4.selected {
+  background: #f0f9ff;
+  color: #0ea5e9;
+  border: 1.5px solid #0ea5e9;
+  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.15);
+  font-weight: 700;
+}
+
+.calendar-day-v4:hover:not(.fully-booked) {
+  background: #f1f5f9;
+}
+
+.calendar-day-v4.disabled {
+  background: #f8fafc;
+  color: #cbd5e1;
+  cursor: not-allowed;
+  border-color: #f1f5f9;
+  box-shadow: none;
+  opacity: 0.6;
+}
+
+.calendar-day-v4.active {
+  background: white;
+  box-shadow: 0 0 0 2px #0ea5e9, 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
+
+.calendar-day-v4.fully-booked {
+  background: #f1f5f9;
+  color: #cbd5e1;
+  cursor: not-allowed;
+  text-decoration: line-through;
+}
+
+.calendar-indicators-v4 {
+  display: flex;
+  gap: 2px;
+  margin-top: 2px;
+  height: 4px;
+  align-items: center;
+  justify-content: center;
+}
+
+.indicator-dot-v4 {
+  width: 4px;
+  height: 4px;
+  background: #f97316;
+  border-radius: 50%;
+}
+
+.indicator-sparkle-v4 {
+  font-size: 8px;
+  line-height: 1;
+}
+
+/* Slot Quantity Management */
+.slot-quantity-row-v4 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+}
+
+.quantity-stepper-v4 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: white;
+  padding: 4px 8px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.quantity-stepper-v4 button {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  background: white;
+  color: #64748b;
+  cursor: pointer;
+  font-weight: 700;
+  transition: .2s;
+}
+
+.quantity-stepper-v4 button:hover:not(:disabled) {
+  background: #f1f5f9;
+  color: #1e293b;
+}
+
+.quantity-stepper-v4 button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.quantity-stepper-v4 span {
+  font-weight: 700;
+  color: #0f172a;
+  min-width: 12px;
+  text-align: center;
+}
+/* Modernized V1 Wizard Styles */
+.block-type-card-v4 {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 20px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  cursor: pointer;
+  background: white;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.block-type-card-v4:hover {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+  transform: translateY(-1px);
+}
+
+.block-type-card-v4.active {
+  border-color: #0ea5e9;
+  background: #f0f9ff;
+  box-shadow: 0 0 0 2px #0ea5e9;
+}
+
+.card-title-v4 {
+  font-weight: 700;
+  color: #1e293b;
+  font-size: 1rem;
+}
+
+.card-subtitle-v4 {
+  font-size: 0.8rem;
+  color: #64748b;
+  font-weight: 400;
+}
+
+.category-pill-grid-v4 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.category-pill-v4 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-radius: 100px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1.5px solid #e2e8f0;
+  background: white;
+  color: #475569;
+}
+
+.category-pill-v4:hover {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+}
+
+.category-pill-v4.active {
+  background: #0ea5e9;
+  border-color: #0ea5e9;
+  color: white;
+  box-shadow: 0 4px 10px rgba(14, 165, 233, 0.2);
+}
+
+.inline-info-v4 {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 4px 0;
+  color: #64748b;
+  font-size: 0.825rem;
+  line-height: 1.5;
+}
+
+.v1-summary-section-v4 {
+  background: #f8fafc;
+  padding: 20px;
+  border-radius: 16px;
+  border: 1px solid #f1f5f9;
+  margin-top: 1.5rem;
+}
+
+.summary-card-v4 {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: white;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.summary-row-v4 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+}
+
+.summary-row-v4 span {
+  color: #64748b;
+}
+
+.summary-row-v4 strong {
+  color: #1e293b;
+  font-weight: 700;
+}
+
+.dates-selected-count-v4 {
+  font-size: 0.85rem;
+  color: #0ea5e9;
+  font-weight: 700;
+  background: #f0f9ff;
+  padding: 4px 12px;
+  border-radius: 20px;
+  width: fit-content;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 /* Change Password & Security Tab Styles */
 .security-tab-v4 {
   animation: fadeIn 0.3s ease-out;
@@ -16973,6 +17259,76 @@ input:checked+.slider-v4:before {
   background-color: white;
   color: #475569;
   border: 1px solid #e2e8f0;
+}
+
+.leave-grid-v4 {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  margin-top: 1rem;
+}
+
+.leave-item-v4 {
+  background: white;
+  border: 1px solid #e2e8f0;
+  padding: 24px 20px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+  min-height: 120px;
+  justify-content: center;
+}
+
+.leave-item-v4:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.08);
+  border-color: #e2e8f0;
+}
+
+.leave-info-v4 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.leave-header-v4 {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.leave-date-v4 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1e293b;
+  text-align: center;
+}
+
+.leave-remove-v4 {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  border: none;
+  background: #fff1f2;
+  color: #e11d48;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.leave-remove-v4:hover {
+  background: #ffe4e6;
+  color: #be123c;
+  transform: scale(1.1);
 }
 
 .banner-btn-v4.secondary-v4:hover {
