@@ -20454,6 +20454,7 @@ input:checked+.slider-v4:before {
   position: relative;
   display: flex;
   align-items: center;
+  gap: 12px;
 }
 
 .notif-dropdown-v25 {

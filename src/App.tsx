@@ -2723,7 +2723,11 @@ const ServiceSettings = ({
   resetAddMenu,
   profileData,
   boostCredits,
-  setIsBoostSheetOpen
+  setIsBoostSheetOpen,
+  activeSettingsTab,
+  setActiveSettingsTab,
+  availabilitySubTab,
+  setAvailabilitySubTab
 }: any) => {
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -2766,7 +2770,6 @@ const ServiceSettings = ({
   };
 
 
-  const [activeSettingsTab, setActiveSettingsTab] = useState('services');
   const [weeklySchedule, setWeeklySchedule] = useState([
     { day: 'Monday', isOpen: true, openTime: '09:00', closeTime: '21:00' },
     { day: 'Tuesday', isOpen: true, openTime: '09:00', closeTime: '21:00' },
@@ -2798,10 +2801,6 @@ const ServiceSettings = ({
     });
   };
 
-  const [pauseBookings, setPauseBookings] = useState({
-    isPaused: false,
-    pauseUntil: '',
-  });
 
   // Leave Management State (Simplified V1)
   const [leaves, setLeaves] = useState<{ id: number; date: string; blockedSlots: string[]; }[]>([
@@ -2815,44 +2814,13 @@ const ServiceSettings = ({
   const [sessionSelectedSlots, setSessionSelectedSlots] = useState<string[]>([]);
   const [leaveError, setLeaveError] = useState('');
   const [calendarMonth, setCalendarMonth] = useState(new Date(2026, 3, 1)); // April 2026 for demo
-  const [availabilitySubTab, setAvailabilitySubTab] = useState('schedule');
 
-  // Simulate next confirmed booking
-  const nextConfirmedBooking = '2026-03-24';
-  const hasActiveConflict = false;
 
   const allServiceSlots = ['Breakfast', 'Lunch', 'Snacks', 'Dinner'];
-  const maxCapacities = { Breakfast: 4, Lunch: 3, Snacks: 4, Dinner: 4 };
-
-  // Mock slot capacity data for demo purposes
-  const getSlotCapacityInfo = (date: string, slot: string) => {
-    // Return mock booked counts based on date/slot
-    const booked = (date === '2026-04-20' && slot === 'Lunch') ? 3 : 
-                   (date === '2026-04-22') ? 1 : 
-                   (date === '2026-04-25' && slot === 'Breakfast') ? 4 : 0;
-    
-    const max = maxCapacities[slot as keyof typeof maxCapacities];
-    
-    // Check if an entry exists for this date and slot specifically blocked
-    const leaveEntry = leaves.find(l => l.date === date);
-    const isBlocked = leaveEntry?.blockedSlots?.includes(slot);
-    
-    // Total available = 0 if blocked, else (max - booked)
-    const available = isBlocked ? 0 : Math.max(0, max - booked);
-    
-    return { 
-      max, 
-      booked, 
-      available, 
-      status: available === 0 ? 'fully-booked' : booked > 0 ? 'has-bookings' : 'available' 
-    };
-  };
 
 
-  const handlePauseToggle = () => {
-    if (hasActiveConflict) return;
-    setPauseBookings(prev => ({ ...prev, isPaused: !prev.isPaused, pauseUntil: prev.isPaused ? '' : prev.pauseUntil }));
-  };
+
+
 
   const handleConfirmBlock = () => {
     if (selectedDates.length === 0) {
@@ -4260,63 +4228,6 @@ const ServiceSettings = ({
                 </>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}>
-                  {/* ── Temporary Pause Bookings section ─────────────────────── */}
-                  <div className="availability-section-v4">
-                    <h3 className="pane-title" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-                      Temporary Pause Bookings
-                      <label className={`service-switch ${hasActiveConflict ? 'disabled-switch' : ''}`} style={{ opacity: hasActiveConflict ? 0.5 : 1 }}>
-                        <input
-                          type="checkbox"
-                          checked={pauseBookings.isPaused}
-                          onChange={handlePauseToggle}
-                          disabled={hasActiveConflict}
-                        />
-                        <span className="service-slider round"></span>
-                      </label>
-                    </h3>
-
-                    <div className="pause-date-row-v4">
-                      <label className="pause-date-label-v4">Pause Until</label>
-                      <input
-                        type="date"
-                        className="input-field pause-date-input-v4"
-                        value={pauseBookings.pauseUntil}
-                        min={new Date().toISOString().split('T')[0]}
-                        max={nextConfirmedBooking}
-                        disabled={!pauseBookings.isPaused}
-                        onChange={(e) => setPauseBookings(prev => ({ ...prev, pauseUntil: e.target.value }))}
-                        style={{ border: '1px solid #e2e8f0', borderRadius: '8px', padding: '10px 12px' }}
-                      />
-                    </div>
-
-                    <p className="pause-note-v4" style={{ marginTop: '1.25rem', color: '#64748b' }}>
-                      Existing confirmed bookings remain active. Only new bookings will stop until selected date.
-                    </p>
-
-                    {/* Conflict Awareness Banner */}
-                    <div className="pause-banner-v4">
-                      <p className="pause-banner-text-v4">
-                        Pause can remain active until your next confirmed booking date.
-                      </p>
-                    </div>
-
-                    {/* Next Confirmed Booking Footer */}
-                    {nextConfirmedBooking && (
-                      <div className="pause-footer-v4">
-                        <span className="pause-footer-text-v4">
-                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
-                          Next confirmed booking: <strong>{(() => {
-                            const date = new Date(nextConfirmedBooking);
-                            return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-                          })()}</strong>
-                        </span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Visual Separator */}
-                  <div style={{ borderBottom: '1px solid #f1f5f9', margin: '1rem 0' }}></div>
-
                   {/* ── Leave Management section ────────────────────────────── */}
                   <div className="availability-section-v4">
                     <h3 className="pane-title" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -7169,13 +7080,22 @@ const CountdownTimer = ({ targetISO }: { targetISO: string }) => {
 
 const HomeView = ({
   setActiveTab,
+  setActiveSettingsTab,
+  setAvailabilitySubTab,
   boostCredits,
   setIsBoostSheetOpen
 }: {
   setActiveTab: (tab: string) => void,
+  setActiveSettingsTab: (tab: string) => void,
+  setAvailabilitySubTab: (tab: string) => void,
   boostCredits: number,
   setIsBoostSheetOpen: any
 }) => {
+  const handleGoToLeaveManagement = () => {
+    setActiveTab('service-settings');
+    setActiveSettingsTab('availability');
+    setAvailabilitySubTab('leaves');
+  };
   const todayDate = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
   const [showNotifications, setShowNotifications] = useState(false);
   const [activeNotifTab, setActiveNotifTab] = useState('all');
@@ -7246,6 +7166,28 @@ const HomeView = ({
           >
             <span className="boost-icon">📈</span>
             <span className="boost-text">{boostCredits > 0 ? `${boostCredits} Credits Available` : 'Boost'}</span>
+          </button>
+
+          <button
+            className="home-add-leave-btn-v25"
+            style={{ 
+              backgroundColor: '#0066cc', 
+              color: '#ffffff', 
+              border: 'none', 
+              borderRadius: '12px',
+              padding: '10px 20px',
+              fontWeight: '700',
+              fontSize: '0.9rem',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              transition: 'all 0.2s'
+            }}
+            onClick={handleGoToLeaveManagement}
+          >
+            <span style={{ fontSize: '1.2rem' }}>+</span>
+            <span>Add Leave</span>
           </button>
 
           <button className="notification-btn-v25" onClick={() => setShowNotifications(!showNotifications)}>
@@ -7660,6 +7602,8 @@ const Dashboard = ({
   const [editOtp, setEditOtp] = useState('');
 
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeSettingsTab, setActiveSettingsTab] = useState('services');
+  const [availabilitySubTab, setAvailabilitySubTab] = useState('schedule');
 
   const renderBannerOnDashboard = () => {
     if (activeTab === 'dashboard' && !isBannerDismissed && (membershipStatus === 'paused' || membershipStatus === 'cancelled_active')) {
@@ -7880,6 +7824,8 @@ const Dashboard = ({
           {activeTab === 'dashboard' && (
             <HomeView
               setActiveTab={setActiveTab}
+              setActiveSettingsTab={setActiveSettingsTab}
+              setAvailabilitySubTab={setAvailabilitySubTab}
               boostCredits={boostCredits}
               setIsBoostSheetOpen={setIsBoostSheetOpen}
             />
@@ -7905,6 +7851,10 @@ const Dashboard = ({
               setSectionEditingIndex={setSectionEditingIndex}
               boostCredits={boostCredits}
               setIsBoostSheetOpen={setIsBoostSheetOpen}
+              activeSettingsTab={activeSettingsTab}
+              setActiveSettingsTab={setActiveSettingsTab}
+              availabilitySubTab={availabilitySubTab}
+              setAvailabilitySubTab={setAvailabilitySubTab}
               menuActionId={menuActionId}
               setMenuActionId={setMenuActionId}
               selectedMenuAction={selectedMenuAction}
