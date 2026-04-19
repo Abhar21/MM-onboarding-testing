@@ -2804,9 +2804,9 @@ const ServiceSettings = ({
   });
 
   // Leave Management State (Simplified V1)
-  const [leaves, setLeaves] = useState([
-    { id: 1, date: '2026-03-15', blockedSlots: ['Breakfast', 'Lunch', 'Snacks', 'Dinner'], reason: 'Festival Leave' },
-    { id: 2, date: '2026-03-22', blockedSlots: ['Snacks', 'Dinner'], reason: 'Personal Leave' }
+  const [leaves, setLeaves] = useState<{ id: number; date: string; blockedSlots: string[]; }[]>([
+    { id: 1, date: '2026-03-15', blockedSlots: ['Breakfast', 'Lunch', 'Snacks', 'Dinner'] },
+    { id: 2, date: '2026-03-22', blockedSlots: ['Snacks', 'Dinner'] }
   ]);
   const [showLeaveModal, setShowLeaveModal] = useState(false);
   const [selectedDates, setSelectedDates] = useState<string[]>([]);
@@ -2848,9 +2848,6 @@ const ServiceSettings = ({
     };
   };
 
-  const isDayFullyBooked = (date: string) => {
-    return allServiceSlots.every(slot => getSlotCapacityInfo(date, slot).status === 'fully-booked');
-  };
 
   const handlePauseToggle = () => {
     if (hasActiveConflict) return;
