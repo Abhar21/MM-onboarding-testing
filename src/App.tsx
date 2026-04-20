@@ -8078,17 +8078,16 @@ const Dashboard = ({
           id: 'branch', label: 'Branch', icon: (
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
-              <line x1="9" y1="22" x2="9" y2="22"></line>
-              <line x1="15" y1="22" x2="15" y2="22"></line>
-              <line x1="8" y1="6" x2="8" y2="6"></line>
-              <line x1="12" y1="6" x2="12" y2="6"></line>
-              <line x1="16" y1="6" x2="16" y2="6"></line>
-              <line x1="8" y1="10" x2="8" y2="10"></line>
-              <line x1="12" y1="10" x2="12" y2="10"></line>
-              <line x1="16" y1="10" x2="16" y2="10"></line>
-              <line x1="8" y1="14" x2="8" y2="14"></line>
-              <line x1="12" y1="14" x2="12" y2="14"></line>
-              <line x1="16" y1="14" x2="16" y2="14"></line>
+              <path d="M9 22v-4h6v4"></path>
+              <path d="M8 6h.01"></path>
+              <path d="M16 6h.01"></path>
+              <path d="M12 6h.01"></path>
+              <path d="M12 10h.01"></path>
+              <path d="M12 14h.01"></path>
+              <path d="M16 10h.01"></path>
+              <path d="M16 14h.01"></path>
+              <path d="M8 10h.01"></path>
+              <path d="M8 14h.01"></path>
             </svg>
           )
         }
@@ -8294,9 +8293,14 @@ const Dashboard = ({
           {activeTab === 'bookings' && <Bookings />}
           {activeTab === 'reports' && <Reports />}
           {!['dashboard', 'tickets', 'documents', 'service-settings', 'profile', 'settings', 'ratings', 'coupons', 'bookings', 'reports'].includes(activeTab) && (
-            <div className="placeholder-screen">
+            <div className="placeholder-screen-v1000">
+              <img 
+                src="/Users/bhargav/.gemini/antigravity/brain/4b337f08-3b86-4af4-aa8a-aaf7a19b2861/branch_coming_soon_vector_1776662035671.png" 
+                alt="Coming Soon" 
+                className="placeholder-vector"
+              />
               <h2>{activeTab.charAt(0).toUpperCase() + activeTab.slice(1).replace('-', ' ')}</h2>
-              <p>This screen is coming soon.</p>
+              <p>This screen is currently under development. Stay tuned!</p>
             </div>
           )}
         </div>
