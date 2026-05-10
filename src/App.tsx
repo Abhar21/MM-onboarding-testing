@@ -26,6 +26,94 @@ import GSTCompliance from './GSTCompliance';
 import './MobileDashboard.css';
 import './App.css';
 import './ratings.css';
+import logoImg from './assets/Frame 1618874713.png';
+
+
+const CustomTimePicker = ({ value, onChange, disabled }: { value: string, onChange: (val: string) => void, disabled?: boolean }) => {
+  const [isOpen, setIsOpen] = React.useState(false);
+  const containerRef = React.useRef<HTMLDivElement>(null);
+
+  // Parse current value
+  const [h, m] = (value || "09:00").split(':');
+  const hoursInt = parseInt(h, 10);
+  const currentHour = (hoursInt % 12 || 12).toString().padStart(2, '0');
+  const currentMinute = m;
+  const currentAmpm = hoursInt >= 12 ? 'PM' : 'AM';
+
+  const hours = Array.from({ length: 12 }, (_, i) => (i + 1).toString().padStart(2, '0'));
+  const minutesList = ['00', '15', '30', '45'];
+  const ampms = ['AM', 'PM'];
+
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleSelect = (hStr: string, mStr: string, ampmStr: string) => {
+    let finalH = parseInt(hStr, 10);
+    if (ampmStr === 'PM' && finalH < 12) finalH += 12;
+    if (ampmStr === 'AM' && finalH === 12) finalH = 0;
+    const finalValue = `${finalH.toString().padStart(2, '0')}:${mStr}`;
+    onChange(finalValue);
+  };
+
+  return (
+    <div className="custom-time-picker-v4" ref={containerRef}>
+      <div 
+        className={`time-display-v4 ${disabled ? 'disabled' : ''}`} 
+        onClick={() => !disabled && setIsOpen(!isOpen)}
+      >
+        <span className="time-text-v4">{currentHour}:{currentMinute} {currentAmpm}</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2.5">
+          <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
+        </svg>
+      </div>
+      
+      {isOpen && (
+        <div className="time-picker-dropdown-v4">
+          <div className="picker-column-v4">
+            {hours.map(hr => (
+              <div 
+                key={hr} 
+                className={`picker-item-v4 ${hr === currentHour ? 'active' : ''}`}
+                onClick={() => handleSelect(hr, currentMinute, currentAmpm)}
+              >
+                {hr}
+              </div>
+            ))}
+          </div>
+          <div className="picker-column-v4">
+            {minutesList.map(min => (
+              <div 
+                key={min} 
+                className={`picker-item-v4 ${min === currentMinute ? 'active' : ''}`}
+                onClick={() => handleSelect(currentHour, min, currentAmpm)}
+              >
+                {min}
+              </div>
+            ))}
+          </div>
+          <div className="picker-column-v4">
+            {ampms.map(ap => (
+              <div 
+                key={ap} 
+                className={`picker-item-v4 ${ap === currentAmpm ? 'active' : ''}`}
+                onClick={() => handleSelect(currentHour, currentMinute, ap)}
+              >
+                {ap}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 const useIsMobile = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 767);
@@ -93,7 +181,7 @@ const Step1 = ({ formData, handleInputChange, showPassword, setShowPassword, sho
     <div className="form-group">
       <label className="input-label">Company Email ID</label>
       <input type="email" name="companyEmail" className="input-field" value={formData.companyEmail} onChange={handleInputChange} placeholder="hello@company.com" />
-      <p className="field-helper-text">⚠️ Please provide the correct email ID — invoices, credit notes and all communications will be sent to this email.</p>
+      <p className="field-helper-text">Please provide the correct email ID invoices, credit notes and all communications will be sent to this email.</p>
     </div>
     <div className="form-group">
       <label className="input-label">Password</label>
@@ -160,19 +248,18 @@ const Step1 = ({ formData, handleInputChange, showPassword, setShowPassword, sho
 
 const Step2 = ({ formData, handleInputChange, handleFileChange, handleRemoveFile }: StepProps) => (
   <div>
-    <h2 className="step-title">Business Details</h2>
-    <p className="step-description">Tell us more about your business services and location.</p>
-
     <div className="step-two-layout">
       <div className="step-two-form">
+    <h2 className="step-title">Business Details</h2>
+    <p className="step-description">Tell us more about your business services and location.</p>
         <div className="form-group">
           <label className="input-label">Business Service</label>
           <select name="businessService" className="input-field" value={formData.businessService} onChange={handleInputChange}>
             <option value="">Select Service</option>
             <option value="catering">Catering</option>
-            <option value="mehendi">Mehendi</option>
-            <option value="makeup">Makeup</option>
-            <option value="private_theaters">Private Theaters</option>
+            <option value="mehendi" disabled>Mehendi (Coming Soon)</option>
+            <option value="makeup" disabled>Makeup (Coming Soon)</option>
+            <option value="private_theaters" disabled>Private Theaters (Coming Soon)</option>
           </select>
         </div>
         <div className="form-group">
@@ -587,11 +674,7 @@ const AuthLayout = ({ children, currentScreen }: { children: React.ReactNode, cu
     <div className="login-panel-left">
       <div className="login-panel-content">
         <div className="login-brand">
-          <svg width="36" height="36" viewBox="0 0 24 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0 0H12L24 12V20L12 8H0V0Z" fill="white" />
-            <path d="M0 12H12L24 24V32L12 20H0V12Z" fill="white" fillOpacity="0.7" />
-          </svg>
-          <span className="login-brand-name">MyPartner</span>
+          <img src={logoImg} alt="MyPartner" style={{ height: '36px' }} />
         </div>
         <div className="login-panel-hero">
           <h2>{currentScreen === 'login' ? 'Grow your business with MyPartner' : 'Join the MyPartner community'}</h2>
@@ -616,11 +699,7 @@ const AuthLayout = ({ children, currentScreen }: { children: React.ReactNode, cu
     <div className="login-panel-right">
       <div className="login-right-inner">
         <div className="mobile-only mobile-login-branding">
-          <svg width="28" height="28" viewBox="0 0 24 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0 0H12L24 12V20L12 8H0V0Z" fill="#0077ff" />
-            <path d="M0 12H12L24 24V32L12 20H0V12Z" fill="#0077ff" fillOpacity="0.7" />
-          </svg>
-          <span className="onboarding-brand-name mobile-brand-name">MyPartner</span>
+          <img src={logoImg} alt="MyPartner" style={{ height: '28px' }} />
         </div>
         <div className="login-form-box">
           {children}
@@ -2822,14 +2901,20 @@ const ServiceSettings = ({
 
 
 
+
+
+
+
+
+
   const handleConfirmBlock = () => {
     if (selectedDates.length === 0) {
       setLeaveError('Please select at least one date.');
       return;
     }
 
-    const blockedSlots = sessionBlockType === 'full' 
-      ? ['Breakfast', 'Lunch', 'Snacks', 'Dinner'] 
+    const blockedSlots = sessionBlockType === 'full'
+      ? ['Breakfast', 'Lunch', 'Snacks', 'Dinner']
       : sessionSelectedSlots;
 
     if (sessionBlockType === 'specific' && blockedSlots.length === 0) {
@@ -2843,8 +2928,8 @@ const ServiceSettings = ({
         const existingIndex = updatedLeaves.findIndex(l => l.date === dateStr);
         if (existingIndex > -1) {
           // Replace blocked slots
-          updatedLeaves[existingIndex] = { 
-            ...updatedLeaves[existingIndex], 
+          updatedLeaves[existingIndex] = {
+            ...updatedLeaves[existingIndex],
             blockedSlots: blockedSlots
           };
         } else {
@@ -3122,36 +3207,15 @@ const ServiceSettings = ({
                   <div className="settings-grid-rows">
                     <div className="settings-row">
                       {(() => {
-                        const { startMin, endMax } = getTimingConstraints();
                         return (
                           <>
                             <div className="form-group">
                               <label className="input-label">Start Time</label>
-                              <div className="input-with-icon-v4">
-                                <input
-                                  type="time"
-                                  className="input-field"
-                                  value={currentSettings.startTime}
-                                  min={startMin}
-                                  disabled={!isEditingService}
-                                  onChange={(e) => updateSetting('startTime', e.target.value)}
-                                />
-                                {isEditingService && startMin && <p className="input-helper-v4">Available from {startMin}</p>}
-                              </div>
+                              <CustomTimePicker value={currentSettings.startTime} disabled={!isEditingService} onChange={(val) => updateSetting('startTime', val)} />
                             </div>
                             <div className="form-group">
                               <label className="input-label">End Time</label>
-                              <div className="input-with-icon-v4">
-                                <input
-                                  type="time"
-                                  className="input-field"
-                                  value={currentSettings.endTime}
-                                  max={endMax}
-                                  disabled={!isEditingService}
-                                  onChange={(e) => updateSetting('endTime', e.target.value)}
-                                />
-                                {isEditingService && endMax && <p className="input-helper-v4">Must end by {endMax}</p>}
-                              </div>
+                              <CustomTimePicker value={currentSettings.endTime} disabled={!isEditingService} onChange={(val) => updateSetting('endTime', val)} />
                             </div>
                           </>
                         );
@@ -3202,11 +3266,7 @@ const ServiceSettings = ({
                           <span className="style-name">Buffet Service</span>
                           <span className="style-desc">Self-service meal</span>
                         </div>
-                        {isEditingService && (
-                          <div className="style-checkbox">
-                            {currentSettings.style.includes('Buffet Service') && <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>}
-                          </div>
-                        )}
+
                       </div>
 
                       <div
@@ -3226,11 +3286,7 @@ const ServiceSettings = ({
                           <span className="style-name">Sit down Service</span>
                           <span className="style-desc">Table service</span>
                         </div>
-                        {isEditingService && (
-                          <div className="style-checkbox">
-                            {currentSettings.style.includes('Sit-down Service') && <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>}
-                          </div>
-                        )}
+
                       </div>
                     </div>
 
@@ -4179,47 +4235,13 @@ const ServiceSettings = ({
 
                         <div className="time-inputs-container-v4" style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flex: 1, opacity: day.isOpen ? 1 : 0.5 }}>
                           <div className={`time-input-group-v4 ${!day.isOpen ? 'disabled' : ''}`} style={{ flex: 1 }}>
-                            <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '1px solid #e2e8f0', borderRadius: '8px', backgroundColor: 'white', padding: '0.75rem 1rem', width: '100%' }}>
-                              <span style={{ fontSize: '1rem', color: '#1e293b', fontWeight: '500' }}>
-                                {day.openTime ? (() => {
-                                  const [h, m] = day.openTime.split(':');
-                                  const hours = parseInt(h, 10);
-                                  return `${(hours % 12 || 12).toString().padStart(2, '0')}:${m} ${hours >= 12 ? 'PM' : 'AM'}`;
-                                })() : '--:-- --'}
-                              </span>
-                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2.5" style={{ flexShrink: 0, pointerEvents: 'none' }}><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
-                              <input
-                                type="time"
-                                value={day.openTime}
-                                disabled={!day.isOpen}
-                                onChange={(e) => handleScheduleChange(index, 'openTime', e.target.value)}
-                                onClick={(e) => day.isOpen && typeof (e.target as any).showPicker === 'function' && (e.target as any).showPicker()}
-                                style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer' }}
-                              />
-                            </div>
+                            <CustomTimePicker value={day.openTime} disabled={!day.isOpen} onChange={(val) => handleScheduleChange(index, 'openTime', val)} />
                           </div>
 
                           <span className="time-separator-v4" style={{ color: '#94a3b8', fontSize: '1rem', fontWeight: '600', minWidth: '20px', textAlign: 'center' }}>to</span>
 
                           <div className={`time-input-group-v4 ${!day.isOpen ? 'disabled' : ''}`} style={{ flex: 1 }}>
-                            <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '1px solid #e2e8f0', borderRadius: '8px', backgroundColor: 'white', padding: '0.75rem 1rem', width: '100%' }}>
-                              <span style={{ fontSize: '1rem', color: '#1e293b', fontWeight: '500' }}>
-                                {day.closeTime ? (() => {
-                                  const [h, m] = day.closeTime.split(':');
-                                  const hours = parseInt(h, 10);
-                                  return `${(hours % 12 || 12).toString().padStart(2, '0')}:${m} ${hours >= 12 ? 'PM' : 'AM'}`;
-                                })() : '--:-- --'}
-                              </span>
-                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2.5" style={{ flexShrink: 0, pointerEvents: 'none' }}><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
-                              <input
-                                type="time"
-                                value={day.closeTime}
-                                disabled={!day.isOpen}
-                                onChange={(e) => handleScheduleChange(index, 'closeTime', e.target.value)}
-                                onClick={(e) => day.isOpen && typeof (e.target as any).showPicker === 'function' && (e.target as any).showPicker()}
-                                style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer' }}
-                              />
-                            </div>
+                            <CustomTimePicker value={day.closeTime} disabled={!day.isOpen} onChange={(val) => handleScheduleChange(index, 'closeTime', val)} />
                           </div>
                         </div>
                       </div>
@@ -4261,7 +4283,7 @@ const ServiceSettings = ({
                                     const blocked = leave.blockedSlots || [];
                                     const isAllBlocked = allServiceSlots.every(slot => blocked.includes(slot));
                                     if (isAllBlocked) return <span className="slot-slot-pill-v4" style={{ fontSize: '0.7rem', padding: '4px 10px', backgroundColor: '#fff1f2', color: '#e11d48', border: '1px solid #fecaca', borderRadius: '6px', fontWeight: 600 }}>Full Day Blocked</span>;
-                                    
+
                                     return blocked.map(slot => (
                                       <span key={slot} className="slot-slot-pill-v4" style={{ fontSize: '0.7rem', padding: '3px 8px', backgroundColor: '#f0f9ff', color: '#0369a1', border: '1px solid #bae6fd', borderRadius: '6px', fontWeight: 500 }}>
                                         {slot}
@@ -4291,7 +4313,7 @@ const ServiceSettings = ({
             <div className="otp-popup-overlay-v4">
               <div className="otp-popup-card-v4" style={{ maxWidth: '1100px', width: '95%', padding: '2.5rem' }}>
                 <div style={{ display: 'flex', gap: '3.5rem', alignItems: 'stretch' }}>
-                  
+
                   {/* Left Column: Date Selection */}
                   <div style={{ flex: '1.4', minWidth: '450px', display: 'flex', flexDirection: 'column' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
@@ -4309,10 +4331,10 @@ const ServiceSettings = ({
                       </h4>
                       <div style={{ display: 'flex', gap: '8px' }}>
                         <button className="btn btn-sm btn-outline" style={{ padding: '8px', minWidth: '40px' }} onClick={() => setCalendarMonth(new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() - 1, 1))}>
-                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m15 18-6-6 6-6"/></svg>
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m15 18-6-6 6-6" /></svg>
                         </button>
                         <button className="btn btn-sm btn-outline" style={{ padding: '8px', minWidth: '40px' }} onClick={() => setCalendarMonth(new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() + 1, 1))}>
-                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m9 18 6-6-6-6"/></svg>
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m9 18 6-6-6-6" /></svg>
                         </button>
                       </div>
                     </div>
@@ -4326,7 +4348,7 @@ const ServiceSettings = ({
                           const daysInMonth = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() + 1, 0).getDate();
                           const firstDay = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth(), 1).getDay();
                           const days = [];
-                          
+
                           const todayVal = new Date();
                           todayVal.setHours(0, 0, 0, 0);
                           const maxDateVal = new Date();
@@ -4338,14 +4360,14 @@ const ServiceSettings = ({
                             const dateStr = `${calendarMonth.getFullYear()}-${String(calendarMonth.getMonth() + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
                             const currentDayDate = new Date(dateStr);
                             const isDisabled = currentDayDate < todayVal || currentDayDate > maxDateVal;
-                            
+
                             const isSelected = selectedDates.includes(dateStr);
                             const isActive = activeDate === dateStr;
                             const hasOverride = leaves.some(l => l.date === dateStr);
 
                             days.push(
-                              <div 
-                                key={d} 
+                              <div
+                                key={d}
                                 className={`calendar-day-v4 ${isSelected ? 'selected' : ''} ${isActive ? 'active' : ''} ${isDisabled ? 'disabled' : ''}`}
                                 onClick={() => {
                                   if (isDisabled) return;
@@ -4370,7 +4392,7 @@ const ServiceSettings = ({
                     </div>
 
                     <p style={{ marginTop: '1.25rem', fontSize: '0.85rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="12" /><line x1="12" y1="8" x2="12.01" y2="8" /></svg>
                       Maximum 90 days leaves only allowed
                     </p>
                   </div>
@@ -4385,7 +4407,7 @@ const ServiceSettings = ({
                       <div style={{ marginBottom: '2.5rem' }}>
                         <h4 style={{ fontSize: '1rem', color: '#1e293b', margin: '0 0 12px 0', fontWeight: '600' }}>Block Type</h4>
                         <div style={{ display: 'flex', gap: '16px' }}>
-                          <div 
+                          <div
                             className={`block-type-card-v4 ${sessionBlockType === 'full' ? 'active' : ''}`}
                             onClick={() => {
                               setSessionBlockType('full');
@@ -4395,7 +4417,7 @@ const ServiceSettings = ({
                             <span className="card-title-v4">Full Day</span>
                             <span className="card-subtitle-v4">No bookings for entire day</span>
                           </div>
-                          <div 
+                          <div
                             className={`block-type-card-v4 ${sessionBlockType === 'specific' ? 'active' : ''}`}
                             onClick={() => {
                               setSessionBlockType('specific');
@@ -4414,8 +4436,8 @@ const ServiceSettings = ({
                           <h4 style={{ fontSize: '1rem', color: '#1e293b', margin: '0 0 12px 0', fontWeight: '600' }}>Categories</h4>
                           <div className="category-pill-grid-v4">
                             {['Breakfast', 'Lunch', 'Snacks', 'Dinner'].map(slot => (
-                              <div 
-                                key={slot} 
+                              <div
+                                key={slot}
                                 className={`category-pill-v4 ${sessionSelectedSlots.includes(slot) ? 'active' : ''}`}
                                 onClick={() => {
                                   if (sessionSelectedSlots.includes(slot)) {
@@ -4431,7 +4453,7 @@ const ServiceSettings = ({
                           </div>
 
                           <div className="inline-info-v4" style={{ marginTop: '1.25rem' }}>
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: '2px' }}><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: '2px' }}><circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="12" /><line x1="12" y1="8" x2="12.01" y2="8" /></svg>
                             <p style={{ margin: 0 }}>
                               Blocking will stop new bookings for selected slots. Existing bookings will not be affected.
                             </p>
@@ -4440,7 +4462,7 @@ const ServiceSettings = ({
                       ) : (
                         <div style={{ marginBottom: '2.5rem' }}>
                           <div className="inline-info-v4" style={{ padding: '0 0' }}>
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: '2px', color: '#ef4444' }}><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: '2px', color: '#ef4444' }}><circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="12" /><line x1="12" y1="8" x2="12.01" y2="8" /></svg>
                             <p style={{ margin: 0, color: '#ef4444', fontWeight: 500 }}>
                               Full Day Blocked: No new bookings allowed for selected dates.
                             </p>
@@ -4457,14 +4479,14 @@ const ServiceSettings = ({
                               <strong>{(() => {
                                 const sorted = [...selectedDates].sort();
                                 const sortedDates = sorted.map(d => new Date(d));
-                                
+
                                 if (sorted.length === 1) return sortedDates[0].toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
-                                
+
                                 // Check continuity
                                 let isContinuous = true;
                                 for (let i = 0; i < sortedDates.length - 1; i++) {
                                   // Time diff check (86400000 ms in a day)
-                                  const diff = sortedDates[i+1].getTime() - sortedDates[i].getTime();
+                                  const diff = sortedDates[i + 1].getTime() - sortedDates[i].getTime();
                                   if (diff !== 86400000) {
                                     isContinuous = false;
                                     break;
@@ -4497,7 +4519,7 @@ const ServiceSettings = ({
 
                     {leaveError && (
                       <div className="otp-error-v4" style={{ marginTop: '1.25rem' }}>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="12" /><line x1="12" y1="8" x2="12.01" y2="8" /></svg>
                         {leaveError}
                       </div>
                     )}
@@ -5660,7 +5682,7 @@ const getHoursUntilEvent = (dateStr: string) => {
 const getCancellationInfo = (booking: any) => {
   if (booking.status !== 'Upcoming' && booking.status !== 'Live') return null;
   if (booking.payoutStatus === 'Processed') return { state: 'LOCKED', text: 'Locked (Payout Done)', color: '#64748b' };
-  
+
   const hoursRemaining = getHoursUntilEvent(booking.date);
   if (hoursRemaining < 0) return { state: 'LOCKED', text: 'Event Started', color: '#64748b' };
   if (hoursRemaining < 48) return { state: 'RESTRICTED', text: 'Cancellation Closed', color: '#94a3b8' };
@@ -5709,7 +5731,7 @@ const BookingDetailModal = ({
         <div className="detail-modal-header-v7">
           <div className="header-left-v7">
             <span className="booking-id-tag-v7">{booking.id}</span>
-            <div 
+            <div
               className={`tax-badge-v24 ${booking.taxType === 'B2B' ? 'b2b' : 'b2c'}`}
               title={booking.taxType === 'B2B' ? "Business booking with GST invoice" : ""}
             >
@@ -5813,7 +5835,7 @@ const BookingDetailModal = ({
               const baseForRefund = isVendorCancelled ? booking.amount : booking.paid;
               const refundToCustomer = Math.round(baseForRefund * (refundPercentage / 100));
               const vendorRetain = booking.paid - (isVendorCancelled ? 0 : refundToCustomer); // Vendors keep 0 of advance if they cancel
-              
+
               // If vendor cancels, they retain 0 and refund entire amount accountability
               const displayVendorRetain = isVendorCancelled ? 0 : vendorRetain;
 
@@ -5852,14 +5874,14 @@ const BookingDetailModal = ({
                       return (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '24px' }}>
                           {/* Top Cancellation Card */}
-                          <div style={{ 
-                            backgroundColor: isVendor ? '#fef2f2' : '#fff1f2', 
-                            border: `1px solid ${isVendor ? '#fecaca' : '#fecaca'}`, 
-                            borderRadius: '16px', 
-                            padding: '20px', 
-                            display: 'flex', 
-                            justifyContent: 'space-between', 
-                            alignItems: 'center' 
+                          <div style={{
+                            backgroundColor: isVendor ? '#fef2f2' : '#fff1f2',
+                            border: `1px solid ${isVendor ? '#fecaca' : '#fecaca'}`,
+                            borderRadius: '16px',
+                            padding: '20px',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center'
                           }}>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                               <h4 style={{ margin: 0, color: '#991b1b', fontSize: '1.2rem', fontWeight: 800 }}>
@@ -5884,10 +5906,10 @@ const BookingDetailModal = ({
 
                           {/* Warning for Vendor Cancellation */}
                           {isVendor && (
-                            <div style={{ 
-                              backgroundColor: '#fff7ed', 
-                              border: '1px solid #fed7aa', 
-                              borderRadius: '12px', 
+                            <div style={{
+                              backgroundColor: '#fff7ed',
+                              border: '1px solid #fed7aa',
+                              borderRadius: '12px',
                               padding: '16px',
                               display: 'flex',
                               gap: '12px',
@@ -5976,8 +5998,8 @@ const BookingDetailModal = ({
                         }}>
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
                           <span>
-                            {booking.cancelledBy === 'Vendor' 
-                              ? 'Customer has been refunded fully due to vendor cancellation' 
+                            {booking.cancelledBy === 'Vendor'
+                              ? 'Customer has been refunded fully due to vendor cancellation'
                               : (booking.status === 'Cancelled' ? 'Event was cancelled before final payment' : 'Remaining amount is collected directly from customer')}
                           </span>
                         </div>
@@ -6040,30 +6062,30 @@ const BookingDetailModal = ({
                     </>
                   )}
 
-                      {/* Section 5: Account Impact (New for Vendor cancellation) */}
-                      {booking.cancelledBy === 'Vendor' && (
-                        <div className="breakdown-section-v30" style={{ borderLeft: '4px solid #f97316', paddingLeft: '20px' }}>
-                          <div className="section-label-v30" style={{ color: '#c2410c' }}>Account Impact</div>
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                            <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
-                              <span style={{ color: '#f97316', fontWeight: 800 }}>•</span>
-                              <span style={{ fontSize: '0.9rem', color: '#475569' }}>This cancellation has been recorded in your performance history</span>
-                            </div>
-                            <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
-                              <span style={{ color: '#f97316', fontWeight: 800 }}>•</span>
-                              <span style={{ fontSize: '0.9rem', color: '#475569' }}>Repeated cancellations may reduce your profile visibility</span>
-                            </div>
-                            <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
-                              <span style={{ color: '#f97316', fontWeight: 800 }}>•</span>
-                              <span style={{ fontSize: '0.9rem', color: '#475569' }}>Affect booking priority for future high-value leads</span>
-                            </div>
-                            <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
-                              <span style={{ color: '#f97316', fontWeight: 800 }}>•</span>
-                              <span style={{ fontSize: '0.9rem', color: '#475569' }}>Lead to temporary suspension of your partner account</span>
-                            </div>
-                          </div>
+                  {/* Section 5: Account Impact (New for Vendor cancellation) */}
+                  {booking.cancelledBy === 'Vendor' && (
+                    <div className="breakdown-section-v30" style={{ borderLeft: '4px solid #f97316', paddingLeft: '20px' }}>
+                      <div className="section-label-v30" style={{ color: '#c2410c' }}>Account Impact</div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+                          <span style={{ color: '#f97316', fontWeight: 800 }}>•</span>
+                          <span style={{ fontSize: '0.9rem', color: '#475569' }}>This cancellation has been recorded in your performance history</span>
                         </div>
-                      )}
+                        <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+                          <span style={{ color: '#f97316', fontWeight: 800 }}>•</span>
+                          <span style={{ fontSize: '0.9rem', color: '#475569' }}>Repeated cancellations may reduce your profile visibility</span>
+                        </div>
+                        <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+                          <span style={{ color: '#f97316', fontWeight: 800 }}>•</span>
+                          <span style={{ fontSize: '0.9rem', color: '#475569' }}>Affect booking priority for future high-value leads</span>
+                        </div>
+                        <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+                          <span style={{ color: '#f97316', fontWeight: 800 }}>•</span>
+                          <span style={{ fontSize: '0.9rem', color: '#475569' }}>Lead to temporary suspension of your partner account</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                   <div className="section-label-v30" style={{ marginTop: '0px', marginBottom: '4px' }}>Final Settlement</div>
                   <div style={{
@@ -6083,8 +6105,8 @@ const BookingDetailModal = ({
                         fontSize: '1.25rem',
                         fontWeight: 700
                       }}>
-                        {(booking.status === 'Cancelled' && (refundPercentage === 100 || booking.cancelledBy === 'Vendor')) 
-                          ? '₹ 0' 
+                        {(booking.status === 'Cancelled' && (refundPercentage === 100 || booking.cancelledBy === 'Vendor'))
+                          ? '₹ 0'
                           : `₹${vendorPayout.toLocaleString()}`}
                       </span>
                     </div>
@@ -6111,8 +6133,8 @@ const BookingDetailModal = ({
                     }}>
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
                       <span style={{ fontSize: '0.8rem' }}>
-                        {booking.cancelledBy === 'Vendor' 
-                          ? 'Full refund processed for this cancellation' 
+                        {booking.cancelledBy === 'Vendor'
+                          ? 'Full refund processed for this cancellation'
                           : (booking.status === 'Cancelled' ? 'Final settlement after refund and deductions' : 'Payout between 12–48 hrs before event')}
                       </span>
                     </div>
@@ -6556,13 +6578,13 @@ const Reports = () => {
   );
 };
 
-const VendorCancelModal = ({ 
-  isOpen, 
-  onClose, 
-  onConfirm 
-}: { 
-  isOpen: boolean; 
-  onClose: () => void; 
+const VendorCancelModal = ({
+  isOpen,
+  onClose,
+  onConfirm
+}: {
+  isOpen: boolean;
+  onClose: () => void;
   onConfirm: (reason: string) => void;
 }) => {
   const [reason, setReason] = useState('');
@@ -6573,13 +6595,13 @@ const VendorCancelModal = ({
       <div className="modal-content-v4" onClick={e => e.stopPropagation()} style={{ maxWidth: '450px', padding: '28px' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           <div style={{ textAlign: 'center' }}>
-            <div style={{ 
-              width: '64px', 
-              height: '64px', 
-              backgroundColor: '#fef2f2', 
-              borderRadius: '50%', 
-              display: 'flex', 
-              alignItems: 'center', 
+            <div style={{
+              width: '64px',
+              height: '64px',
+              backgroundColor: '#fef2f2',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
               justifyContent: 'center',
               margin: '0 auto 16px'
             }}>
@@ -6591,10 +6613,10 @@ const VendorCancelModal = ({
             </p>
           </div>
 
-          <div style={{ 
-            backgroundColor: '#fff7ed', 
-            border: '1px solid #fed7aa', 
-            borderRadius: '12px', 
+          <div style={{
+            backgroundColor: '#fff7ed',
+            border: '1px solid #fed7aa',
+            borderRadius: '12px',
             padding: '16px',
             display: 'flex',
             flexDirection: 'column',
@@ -6619,8 +6641,8 @@ const VendorCancelModal = ({
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             <label style={{ fontSize: '0.9rem', fontWeight: 700, color: '#1e293b' }}>Reason for cancellation <span style={{ color: '#ef4444' }}>*</span></label>
-            <select 
-              value={reason} 
+            <select
+              value={reason}
               onChange={e => setReason(e.target.value)}
               style={{
                 width: '100%',
@@ -6641,31 +6663,31 @@ const VendorCancelModal = ({
           </div>
 
           <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
-            <button 
+            <button
               onClick={onClose}
-              style={{ 
-                flex: 1, 
-                padding: '12px', 
-                borderRadius: '10px', 
-                border: '1px solid #e2e8f0', 
-                backgroundColor: 'white', 
-                fontWeight: 700, 
-                cursor: 'pointer' 
+              style={{
+                flex: 1,
+                padding: '12px',
+                borderRadius: '10px',
+                border: '1px solid #e2e8f0',
+                backgroundColor: 'white',
+                fontWeight: 700,
+                cursor: 'pointer'
               }}
             >
               Keep Booking
             </button>
-            <button 
+            <button
               onClick={() => onConfirm(reason)}
               disabled={!reason}
-              style={{ 
-                flex: 1.2, 
-                padding: '12px', 
-                borderRadius: '10px', 
-                border: 'none', 
-                backgroundColor: '#ef4444', 
-                color: 'white', 
-                fontWeight: 700, 
+              style={{
+                flex: 1.2,
+                padding: '12px',
+                borderRadius: '10px',
+                border: 'none',
+                backgroundColor: '#ef4444',
+                color: 'white',
+                fontWeight: 700,
                 cursor: reason ? 'pointer' : 'not-allowed',
                 opacity: reason ? 1 : 0.6
               }}
@@ -7035,7 +7057,7 @@ const Bookings = () => {
       if (b.id === id) {
         const now = new Date();
         const timeStr = `${now.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}, ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
-        
+
         let updateObj: any = {
           ...b,
           status: newStatus,
@@ -7206,8 +7228,8 @@ const Bookings = () => {
                 />
               </div>
               <div className="filter-box-v8">
-                <select 
-                  value={orderTypeFilter} 
+                <select
+                  value={orderTypeFilter}
                   onChange={(e) => {
                     setOrderTypeFilter(e.target.value);
                     setBookingsPage(1);
@@ -7540,10 +7562,10 @@ const HomeView = ({
 
           <button
             className="home-add-leave-btn-v25"
-            style={{ 
-              backgroundColor: '#0066cc', 
-              color: '#ffffff', 
-              border: 'none', 
+            style={{
+              backgroundColor: '#0066cc',
+              color: '#ffffff',
+              border: 'none',
               borderRadius: '12px',
               padding: '10px 20px',
               fontWeight: '700',
@@ -8294,9 +8316,9 @@ const Dashboard = ({
           {activeTab === 'reports' && <Reports />}
           {!['dashboard', 'tickets', 'documents', 'service-settings', 'profile', 'settings', 'ratings', 'coupons', 'bookings', 'reports'].includes(activeTab) && (
             <div className="placeholder-screen-v1000">
-              <img 
-                src="/Users/bhargav/.gemini/antigravity/brain/4b337f08-3b86-4af4-aa8a-aaf7a19b2861/branch_coming_soon_vector_1776662035671.png" 
-                alt="Coming Soon" 
+              <img
+                src="/Users/bhargav/.gemini/antigravity/brain/4b337f08-3b86-4af4-aa8a-aaf7a19b2861/branch_coming_soon_vector_1776662035671.png"
+                alt="Coming Soon"
                 className="placeholder-vector"
               />
               <h2>{activeTab.charAt(0).toUpperCase() + activeTab.slice(1).replace('-', ' ')}</h2>
@@ -9173,33 +9195,17 @@ const OnboardingPage = ({ currentStep, formData, handleInputChange, handleFileCh
   <div className="onboarding-layout">
     <div className="onboarding-sidebar">
       <div className="onboarding-logo-container">
-        <div className="onboarding-logo">
-          <svg width="24" height="24" viewBox="0 0 24 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0 0H12L24 12V20L12 8H0V0Z" fill="#0077ff" />
-            <path d="M0 12H12L24 24V32L12 20H0V12Z" fill="#0077ff" fillOpacity="0.7" />
-          </svg>
-        </div>
-        <span className="onboarding-logo-text">MyPartner</span>
+        <img src={logoImg} alt="MyPartner" className="onboarding-logo-img" />
       </div>
-
       <StepIndicator currentStep={currentStep} />
 
-      <div className="sidebar-footer">
-        <p>Already have an account? <span className="login-link" onClick={() => navigate('/login')}>Login</span></p>
-      </div>
     </div>
 
     <div className="onboarding-main-column">
       <div className="mobile-only-header">
         <div className="mobile-header-top">
           <div className="mobile-header-left">
-            <div className="mobile-logo">
-              <svg width="20" height="20" viewBox="0 0 24 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M0 0H12L24 12V20L12 8H0V0Z" fill="#0077ff" />
-                <path d="M0 12H12L24 24V32L12 20H0V12Z" fill="#0077ff" fillOpacity="0.7" />
-              </svg>
-            </div>
-            <span className="mobile-brand-name">MyPartner</span>
+            <img src={logoImg} alt="MyPartner" style={{ height: '32px' }} />
           </div>
           <button className="mobile-login-btn" onClick={() => navigate('/login')}>Login</button>
         </div>
