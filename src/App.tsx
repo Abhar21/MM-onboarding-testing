@@ -3034,45 +3034,7 @@ const ServiceSettings = ({
 
 
 
-  // Compute min/max time constraints based on other services' occupied ranges
-  const getTimingConstraints = () => {
-    // Gather all ranges from OTHER categories that have both times set
-    const otherRanges = Object.entries(settings)
-      .filter(([id, s]) => id !== activeCategory && s.startTime && s.endTime)
-      .map(([, s]) => ({ start: s.startTime, end: s.endTime }));
 
-    // For Start Time: the maximum it can be is the minimum start of any overlapping service
-    // Strategy: find the earliest END time among services whose start is >= current start (they block from above)
-    // More simply: startTime max = min of all other services' startTime if the current end would overlap them
-    // For simplicity we restrict: if other services exist, the startTime cannot enter another service's occupied range
-    let startMax: string | undefined = undefined;
-    let endMin: string | undefined = undefined;
-    let endMax: string | undefined = undefined;
-    let startMin: string | undefined = undefined;
-
-    const curStart = currentSettings.startTime;
-    const curEnd = currentSettings.endTime;
-
-    for (const range of otherRanges) {
-      // If other service's start time is after our current start (or we have no start),
-      // then our end time cannot exceed the other's start
-      if (!curStart || range.start > curStart) {
-        // The earliest such other service limits our end time
-        if (endMax === undefined || range.start < endMax) {
-          endMax = range.start;
-        }
-      }
-      // If other service's end time is before our current end (or we have no end),
-      // then our start time cannot be less than the other's end
-      if (!curEnd || range.end < curEnd) {
-        if (startMin === undefined || range.end > startMin) {
-          startMin = range.end;
-        }
-      }
-    }
-
-    return { startMin, startMax, endMin, endMax };
-  };
 
 
   const handleToggle = () => {
