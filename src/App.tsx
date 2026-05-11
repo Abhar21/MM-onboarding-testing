@@ -4192,18 +4192,7 @@ const ServiceSettings = ({
                     </button>
                   </h3>
 
-                  <div className="subscription-alert-v4 warning-v4" style={{ marginBottom: '2rem', border: '1px solid #fde68a', boxShadow: '0 2px 4px rgba(251, 191, 36, 0.05)' }}>
-                    <div className="alert-content-v4">
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <line x1="12" y1="16" x2="12" y2="12"></line>
-                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                      </svg>
-                      <span style={{ lineHeight: '1.5' }}>
-                        <strong>Note:</strong> Customers can book events up to your closing time. Please ensure you can serve events scheduled near your closing hours.
-                      </span>
-                    </div>
-                  </div>
+
 
                   <div className="availability-list" style={{ marginTop: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                     {weeklySchedule.map((day, index) => (

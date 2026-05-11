@@ -1,11 +1,11 @@
 /* MobileDashboard.tsx - Isolated components for Mobile Devices */
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  DndContext, 
-  closestCenter, 
-  KeyboardSensor, 
-  PointerSensor, 
-  useSensor, 
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
   useSensors,
   TouchSensor,
   type DragEndEvent
@@ -590,20 +590,20 @@ const MobileBookingDetailView = ({
                     </div>
                   </div>
                 ) : (
-                    <div style={{ backgroundColor: 'rgba(16, 185, 129, 0.06)', borderRadius: '8px', padding: '14px 12px', margin: '0 0 8px 0', border: '1px solid rgba(16, 185, 129, 0.15)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      <div className="breakdown-row-v30" style={{ borderBottom: 'none', paddingBottom: 0, paddingTop: 0 }}>
-                        <label style={{ fontWeight: 600, color: '#1e293b' }}>You Receive (Payout)</label>
-                        <span style={{ color: '#10b981', fontSize: '1.25rem', fontWeight: 700 }}>₹{vendorPayout.toLocaleString()}</span>
-                      </div>
-                      <div className="breakdown-row-v30" style={{ paddingTop: 0, marginTop: 0, borderBottom: 'none' }}>
-                        <label style={{ color: '#047857', fontWeight: 500, fontSize: '0.9rem' }}>Estimate payout date</label>
-                        <span style={{ color: '#047857', fontWeight: 600, fontSize: '0.9rem' }}>{estimateStr}</span>
-                      </div>
-                      <div className="breakdown-note-v30" style={{ marginTop: '4px', color: '#047857', opacity: 0.8, backgroundColor: 'rgba(16, 185, 129, 0.04)', padding: '8px', borderRadius: '6px' }}>
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                        <span style={{ fontSize: '0.8rem' }}>Payout between 12–48 hrs before event</span>
-                      </div>
+                  <div style={{ backgroundColor: 'rgba(16, 185, 129, 0.06)', borderRadius: '8px', padding: '14px 12px', margin: '0 0 8px 0', border: '1px solid rgba(16, 185, 129, 0.15)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <div className="breakdown-row-v30" style={{ borderBottom: 'none', paddingBottom: 0, paddingTop: 0 }}>
+                      <label style={{ fontWeight: 600, color: '#1e293b' }}>You Receive (Payout)</label>
+                      <span style={{ color: '#10b981', fontSize: '1.25rem', fontWeight: 700 }}>₹{vendorPayout.toLocaleString()}</span>
                     </div>
+                    <div className="breakdown-row-v30" style={{ paddingTop: 0, marginTop: 0, borderBottom: 'none' }}>
+                      <label style={{ color: '#047857', fontWeight: 500, fontSize: '0.9rem' }}>Estimate payout date</label>
+                      <span style={{ color: '#047857', fontWeight: 600, fontSize: '0.9rem' }}>{estimateStr}</span>
+                    </div>
+                    <div className="breakdown-note-v30" style={{ marginTop: '4px', color: '#047857', opacity: 0.8, backgroundColor: 'rgba(16, 185, 129, 0.04)', padding: '8px', borderRadius: '6px' }}>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                      <span style={{ fontSize: '0.8rem' }}>Payout between 12–48 hrs before event</span>
+                    </div>
+                  </div>
                 )}
 
 
@@ -4900,27 +4900,27 @@ const MobileCreateMenuView = ({
                   <span className={`card-status-pill-v50 ${menuIdentity.dietType === 'Veg' ? 'info' : 'warning'}`} style={{ fontSize: '0.7rem' }}>{menuIdentity.dietType}</span>
                 </div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '12px' }}>
-                  <div style={{ 
-                    display: 'inline-flex', 
-                    alignItems: 'center', 
-                    background: '#f1f5f9', 
-                    color: '#475569', 
-                    padding: '4px 10px', 
-                    borderRadius: '20px', 
-                    fontSize: '0.75rem', 
+                  <div style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    background: '#f1f5f9',
+                    color: '#475569',
+                    padding: '4px 10px',
+                    borderRadius: '20px',
+                    fontSize: '0.75rem',
                     fontWeight: '700'
                   }}>
                     {sections.length} Sec • {totalItems} Items
                   </div>
-                  <div style={{ 
-                    display: 'inline-flex', 
-                    alignItems: 'center', 
-                    gap: '6px', 
-                    background: '#f1f5f9', 
-                    color: '#475569', 
-                    padding: '4px 10px', 
-                    borderRadius: '20px', 
-                    fontSize: '0.75rem', 
+                  <div style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    background: '#f1f5f9',
+                    color: '#475569',
+                    padding: '4px 10px',
+                    borderRadius: '20px',
+                    fontSize: '0.75rem',
                     fontWeight: '700'
                   }}>
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
@@ -5065,18 +5065,7 @@ const MobileServiceSettingsView = ({
               </div>
             </div>
 
-            <div className="service-notice-box-v54" style={{ marginTop: '0.75rem', backgroundColor: '#fffbeb', borderColor: '#fde68a' }}>
-              <div className="notice-icon-v54" style={{ color: '#92400e' }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <line x1="12" y1="16" x2="12" y2="12"></line>
-                  <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                </svg>
-              </div>
-              <div className="notice-text-v54" style={{ color: '#92400e' }}>
-                <strong>Note:</strong> Customers can book events up to your closing time. Please ensure you can serve events scheduled near your closing hours.
-              </div>
-            </div>
+
 
             <div className="form-grid-v54">
               <div className="form-group-v54">
@@ -5356,8 +5345,8 @@ const MobileDashboard = (props: MobileDashboardProps) => {
         </div>
         <div className="mobile-bar-right-v50">
           {/* Boost Credits Chip */}
-          <button 
-            className="mobile-boost-pill-v25" 
+          <button
+            className="mobile-boost-pill-v25"
             onClick={() => setIsBoostSheetOpen(true)}
           >
             <span className="boost-icon">📈</span>
@@ -5571,7 +5560,7 @@ const MobileDashboard = (props: MobileDashboardProps) => {
         }}>
           <div className="mobile-boost-bottom-sheet-v25" onClick={e => e.stopPropagation()}>
             <div className="mobile-boost-sheet-header-v25 redesign single-row">
-              <button 
+              <button
                 className={`mobile-boost-back-btn-pill-v25 icon-only ${(!isCalendarView && !isUsageDetailsView) ? 'hidden' : ''}`}
                 onClick={() => {
                   if (isCalendarView) {
@@ -5583,7 +5572,7 @@ const MobileDashboard = (props: MobileDashboardProps) => {
               >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
               </button>
-              
+
               <h2 className="mobile-boost-sheet-title">
                 {isCalendarView ? 'Select Dates' : (isUsageDetailsView ? 'Usage Overview' : 'Boost Your Profile')}
               </h2>
@@ -5597,20 +5586,20 @@ const MobileDashboard = (props: MobileDashboardProps) => {
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
               </button>
             </div>
-            
+
             <div className="mobile-boost-sheet-content-v25">
               {isCalendarView ? (
                 <div className="mobile-calendar-view-container-v25">
                   <div className="mobile-calendar-month-header-v25">
                     <h3>April 2026</h3>
                   </div>
-                  
+
                   <div className="mobile-calendar-grid-v25">
                     {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, idx) => (
                       <div key={idx} className="mobile-calendar-weekday-v25">{day}</div>
                     ))}
                     {[null, null, null].map((_, i) => <div key={`empty-${i}`} className="mobile-calendar-day-empty-v25"></div>)}
-                    
+
                     {Array.from({ length: 30 }, (_, i) => {
                       const day = i + 1;
                       const dateStr = `2026-04-${day < 10 ? '0' + day : day}`;
@@ -5618,10 +5607,10 @@ const MobileDashboard = (props: MobileDashboardProps) => {
                       const isSelected = selectedBoostDates.includes(dateStr);
                       const isFull = status === 'full';
                       const isPast = day < 17; // Today is April 17, 2026
-                      
+
                       return (
-                        <div 
-                          key={day} 
+                        <div
+                          key={day}
                           className={`mobile-calendar-day-v25 state-${status} ${isSelected ? 'selected' : ''} ${isFull || isPast ? 'disabled' : ''}`}
                           onClick={() => {
                             if (isFull || isPast) return;
@@ -5652,7 +5641,7 @@ const MobileDashboard = (props: MobileDashboardProps) => {
                   </div>
 
                   <div className="mobile-boost-sheet-actions">
-                    <button 
+                    <button
                       className={`mobile-boost-now-btn-v25 ${selectedBoostDates.length === 0 ? 'disabled' : ''}`}
                       onClick={() => {
                         if (selectedBoostDates.length > 0) {
@@ -5719,7 +5708,7 @@ const MobileDashboard = (props: MobileDashboardProps) => {
                   </div>
 
                   <div className="mobile-boost-sheet-actions">
-                    <button 
+                    <button
                       className={`mobile-boost-now-btn-v25 ${boostCredits === 0 ? 'disabled' : ''}`}
                       onClick={() => {
                         setIsCalendarView(true);
@@ -5770,7 +5759,7 @@ const MobileDashboard = (props: MobileDashboardProps) => {
 
                   {/* Actions */}
                   <div className="mobile-boost-sheet-actions vertical">
-                    <button 
+                    <button
                       className={`mobile-boost-now-btn-v25 ${boostCredits === 0 ? 'disabled' : ''}`}
                       onClick={() => setIsCalendarView(true)}
                       disabled={boostCredits === 0}

@@ -4176,7 +4176,7 @@
 }
 
 .section-header-v54 h3 {
-  font-size: 1.2rem;
+  font-size: 1rem;
   font-weight: 800;
   color: #1e293b;
 }
@@ -4185,13 +4185,13 @@
   background: #0077ff;
   color: white;
   border: none;
-  padding: 8px 16px;
-  border-radius: 12px;
+  padding: 6px 12px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   font-weight: 700;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
 }
 
 .filter-chips-v54 {
@@ -4201,18 +4201,18 @@
 }
 
 .filter-chip-v54 {
-  padding: 8px 20px;
+  padding: 6px 14px;
   border-radius: 100px;
   background: white;
   border: 1px solid #e2e8f0;
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   font-weight: 700;
   color: #64748b;
   white-space: nowrap;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;
   transition: all 0.2s ease;
 }
 
@@ -4223,8 +4223,8 @@
 }
 
 .dot-v54 {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   flex-shrink: 0;
 }
