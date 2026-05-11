@@ -5249,33 +5249,27 @@ const MobileServiceSettingsView = ({
         <div className="mobile-sheet-overlay-v50" onClick={() => setIsViewMenuSheetOpen(false)} style={{ zIndex: 10000 }}>
           <div className="mobile-bottom-sheet-v50 menu-preview-sheet" onClick={e => e.stopPropagation()}>
             <div className="sheet-handle-v54"></div>
-            <div className="sheet-header-v54" style={{ padding: '24px 20px 10px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-              <h2 style={{ fontSize: '1.5rem', fontWeight: 800, margin: 0, color: '#1e293b' }}>Items</h2>
-              <p style={{ color: '#64748b', fontSize: '0.9rem', margin: '4px 0 0', fontWeight: 500 }}>Items are customisable and fixed</p>
-            </div>
-
-            <div className="sheet-body-v50 scrollable" style={{ padding: '0 20px 40px' }}>
-              {/* Category Pills */}
-              <div className="preview-categories-v54" style={{ display: 'flex', gap: '10px', overflowX: 'auto', padding: '16px 0', marginBottom: '8px' }}>
-                {['Salads', 'Rotis', 'North Indian Curry', 'South Indian Curry'].map((cat, i) => (
-                  <div key={cat} className={`preview-cat-pill ${i === 0 ? 'active' : ''}`} style={{
-                    padding: '10px 20px',
-                    borderRadius: '12px',
-                    background: i === 0 ? '#facc15' : 'white',
-                    border: '1px solid #e2e8f0',
-                    fontWeight: 700,
-                    fontSize: '0.9rem',
-                    whiteSpace: 'nowrap',
-                    color: '#1e293b'
-                  }}>
-                    {cat}
-                  </div>
-                ))}
+            
+            <div className="menu-preview-sticky-header">
+              <div className="sheet-header-v54">
+                <h2 className="preview-title-v54">Items</h2>
+                <p className="preview-subtitle-v54">Items are customisable and fixed</p>
               </div>
 
-              <div style={{ color: '#0077ff', fontWeight: 600, fontSize: '1rem', marginBottom: '20px' }}>Select any 2</div>
+              {/* Category Pills */}
+              <div className="preview-categories-v54">
+                {['Salads', 'Rotis', 'North Indian Curry', 'South Indian Curry'].map((cat, i) => (
+                  <button key={cat} className={`preview-cat-pill ${i === 0 ? 'active' : ''}`}>
+                    {cat}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-              <div className="preview-items-list-v54" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            <div className="sheet-body-v50 scrollable">
+              <div className="selection-info-v54">Select any 2</div>
+
+              <div className="preview-items-list-v54">
                 {[
                   { name: 'Idly', desc: 'Crispy grated carrots tossed with fresh coriander roasted peanuts, green......', img: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&q=80&w=200' },
                   { name: 'Dosa', desc: 'Crispy grated carrots tossed with fresh coriander roasted peanuts, green......', img: 'https://images.unsplash.com/photo-1547825407-2d060104b7f8?auto=format&fit=crop&q=80&w=200' },
@@ -5283,11 +5277,11 @@ const MobileServiceSettingsView = ({
                   { name: 'Puri', desc: 'Crispy grated carrots tossed with fresh coriander roasted peanuts, green......', img: 'https://images.unsplash.com/photo-1626132646529-500637532537?auto=format&fit=crop&q=80&w=200' },
                   { name: 'Upma', desc: 'Crispy grated carrots tossed with fresh coriander roasted peanuts, green......', img: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&q=80&w=200' },
                 ].map((item, idx) => (
-                  <div key={idx} style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
-                    <img src={item.img} alt={item.name} style={{ width: '80px', height: '80px', borderRadius: '16px', objectFit: 'cover' }} />
-                    <div style={{ flex: 1 }}>
-                      <h4 style={{ margin: '0 0 4px', fontSize: '1.1rem', fontWeight: 800, color: '#1e293b' }}>{item.name}</h4>
-                      <p style={{ margin: 0, fontSize: '0.85rem', color: '#94a3b8', lineHeight: '1.4' }}>{item.desc}</p>
+                  <div key={idx} className="preview-item-row-v54">
+                    <img src={item.img} alt={item.name} className="preview-item-img-v54" />
+                    <div className="preview-item-info-v54">
+                      <h4 className="preview-item-name-v54">{item.name}</h4>
+                      <p className="preview-item-desc-v54">{item.desc}</p>
                     </div>
                   </div>
                 ))}
