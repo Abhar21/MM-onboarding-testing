@@ -64,8 +64,8 @@ const CustomTimePicker = ({ value, onChange, disabled }: { value: string, onChan
 
   return (
     <div className="custom-time-picker-v4" ref={containerRef}>
-      <div 
-        className={`time-display-v4 ${disabled ? 'disabled' : ''}`} 
+      <div
+        className={`time-display-v4 ${disabled ? 'disabled' : ''}`}
         onClick={() => !disabled && setIsOpen(!isOpen)}
       >
         <span className="time-text-v4">{currentHour}:{currentMinute} {currentAmpm}</span>
@@ -73,13 +73,13 @@ const CustomTimePicker = ({ value, onChange, disabled }: { value: string, onChan
           <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
         </svg>
       </div>
-      
+
       {isOpen && (
         <div className="time-picker-dropdown-v4">
           <div className="picker-column-v4">
             {hours.map(hr => (
-              <div 
-                key={hr} 
+              <div
+                key={hr}
                 className={`picker-item-v4 ${hr === currentHour ? 'active' : ''}`}
                 onClick={() => handleSelect(hr, currentMinute, currentAmpm)}
               >
@@ -89,8 +89,8 @@ const CustomTimePicker = ({ value, onChange, disabled }: { value: string, onChan
           </div>
           <div className="picker-column-v4">
             {minutesList.map(min => (
-              <div 
-                key={min} 
+              <div
+                key={min}
                 className={`picker-item-v4 ${min === currentMinute ? 'active' : ''}`}
                 onClick={() => handleSelect(currentHour, min, currentAmpm)}
               >
@@ -100,8 +100,8 @@ const CustomTimePicker = ({ value, onChange, disabled }: { value: string, onChan
           </div>
           <div className="picker-column-v4">
             {ampms.map(ap => (
-              <div 
-                key={ap} 
+              <div
+                key={ap}
                 className={`picker-item-v4 ${ap === currentAmpm ? 'active' : ''}`}
                 onClick={() => handleSelect(currentHour, currentMinute, ap)}
               >
@@ -250,8 +250,8 @@ const Step2 = ({ formData, handleInputChange, handleFileChange, handleRemoveFile
   <div>
     <div className="step-two-layout">
       <div className="step-two-form">
-    <h2 className="step-title">Business Details</h2>
-    <p className="step-description">Tell us more about your business services and location.</p>
+        <h2 className="step-title">Business Details</h2>
+        <p className="step-description">Tell us more about your business services and location.</p>
         <div className="form-group">
           <label className="input-label">Business Service</label>
           <select name="businessService" className="input-field" value={formData.businessService} onChange={handleInputChange}>
@@ -999,7 +999,7 @@ const CouponCreateModal = ({
         selectedTargets: initialData.selectedTargets || (initialData.scope === 'all' ? ['Breakfast', 'Lunch', 'Snacks', 'Dinner'] : []),
         minAmount: initialData.minAmount || '',
         totalLimit: initialData.totalLimit || '',
-        isUnlimited: initialData.isUnlimited || (initialData.usage && initialData.usage.includes('∞')),
+        isUnlimited: initialData.isUnlimited || (initialData.usage && initialData.usage.includes('NA')),
         perUserLimit: initialData.perUserLimit || '1',
         validFrom: initialData.validFrom || '',
         validTo: initialData.validTo || '',
@@ -1119,7 +1119,13 @@ const CouponCreateModal = ({
                           type="number"
                           placeholder="0.00"
                           value={form.discountValue}
-                          onChange={(e) => setForm({ ...form, discountValue: e.target.value })}
+                          onChange={(e) => {
+                            let val = e.target.value;
+                            if (form.discountType === 'percentage' && parseFloat(val) > 100) {
+                              val = '100';
+                            }
+                            setForm({ ...form, discountValue: val });
+                          }}
                         />
                       </div>
                     </div>
@@ -1278,18 +1284,22 @@ const CouponCreateModal = ({
 
             <aside className="coupon-preview-panel-v4">
               <div className="preview-sticky-v4">
-                <h4 className="preview-title-v4">Coupon Preview</h4>
+                <div className="preview-header-row-v4">
+                  <h4 className="preview-title-v4">Coupon Preview</h4>
+                  <div className={`status-badge-v4 ${form.status.toLowerCase()}`}>
+                    <span className="dot"></span> {form.status}
+                  </div>
+                </div>
                 <div className="realtime-preview-card-v4 vendor-view hybrid">
                   <div className="preview-curve-v4 left"></div>
                   <div className="preview-curve-v4 right"></div>
 
                   <div className="preview-header-vendor">
-                    <div className={`status-badge ${form.status.toLowerCase()}`}>
-                      <span className="dot"></span> {form.status}
-                    </div>
                     <div className="preview-main-info">
                       <div className="preview-discount-badge highlighted">
-                        {form.discountValue || '0'}{form.discountType === 'percentage' ? '%' : '₹'} <span className="off-text">OFF</span>
+                        {form.discountType === 'percentage' ? 'Upto ' : 'FLAT '}
+                        {form.discountType === 'percentage' ? `${form.discountValue || '0'}%` : `₹${form.discountValue || '0'}`}
+                        <span className="off-text"> OFF</span>
                       </div>
                       <div className="preview-code-display">
                         <span className="label">CODE:</span>
@@ -1439,7 +1449,7 @@ const Coupons = () => {
     { id: '1', code: 'WELCOME10', type: 'Percentage', value: '10%', status: 'Active', usage: '45/100', validFrom: '2026-03-01', validTo: '2026-03-31', maxCap: '500', minAmount: '1000', source: 'vendor', applicability: 'orders' },
     { id: '2', code: 'FLAT500', type: 'Flat Amount', value: '₹500', status: 'Paused', usage: '12/50', validFrom: '2026-03-20', validTo: '2026-04-15', minAmount: '2000', source: 'vendor', applicability: 'orders' },
     { id: '3', code: 'PLATFORM25', type: 'Percentage', value: '25%', status: 'Active', usage: '1050/5000', validFrom: '2026-01-01', validTo: '2026-12-31', maxCap: '1000', minAmount: '2000', source: 'platform', applicability: 'subscription' },
-    { id: '4', code: 'HOLIDAY15', type: 'Percentage', value: '15%', status: 'Active', usage: '800/∞', validFrom: '2026-03-15', validTo: '2026-04-30', maxCap: '750', minAmount: '1500', source: 'platform', applicability: 'orders' },
+    { id: '4', code: 'HOLIDAY15', type: 'Percentage', value: '15%', status: 'Active', usage: '800/NA', validFrom: '2026-03-15', validTo: '2026-04-30', maxCap: '750', minAmount: '1500', source: 'platform', applicability: 'orders' },
   ]);
 
   const renderValidity = (validFrom: string, validTo: string) => {
@@ -1512,7 +1522,7 @@ const Coupons = () => {
           type: formData.discountType === 'percentage' ? 'Percentage' : 'Flat Amount',
           value: formData.discountType === 'percentage' ? `${formData.discountValue}%` : `₹${formData.discountValue}`,
           status: formData.status,
-          usage: `${c.usage.split('/')[0]}/${formData.isUnlimited ? '∞' : (formData.totalLimit || '∞')}`,
+          usage: `${c.usage.split('/')[0]}/${formData.isUnlimited ? 'NA' : (formData.totalLimit || 'NA')}`,
           validFrom: formData.validFrom || c.validFrom,
           validTo: formData.validTo,
           maxCap: formData.maxCap,
@@ -1526,7 +1536,7 @@ const Coupons = () => {
         type: formData.discountType === 'percentage' ? 'Percentage' : 'Flat Amount',
         value: formData.discountType === 'percentage' ? `${formData.discountValue}%` : `₹${formData.discountValue}`,
         status: 'Active',
-        usage: `0/${formData.isUnlimited ? '∞' : (formData.totalLimit || '∞')}`,
+        usage: `0/${formData.isUnlimited ? 'NA' : (formData.totalLimit || 'NA')}`,
         validFrom: formData.validFrom || new Date().toISOString().split('T')[0],
         validTo: formData.validTo,
         maxCap: formData.maxCap,
@@ -1586,6 +1596,7 @@ const Coupons = () => {
               <th>Type</th>
               <th>Value</th>
               <th>Validity</th>
+              <th>Usage</th>
               <th>Status</th>
               <th>Actions</th>
             </tr>
@@ -1611,10 +1622,20 @@ const Coupons = () => {
                 <td>{coupon.type}</td>
                 <td>{coupon.value}</td>
                 <td className="validity-container-cell-v5">{renderValidity(coupon.validFrom, coupon.validTo)}</td>
+                <td className="usage-cell-v4">
+                  <span className="usage-pill-v4">
+                    <span className="usage-used">{coupon.usage ? coupon.usage.split('/')[0] : '0'}</span>
+                    <span className="usage-sep">/</span>
+                    <span className="usage-total">{coupon.usage ? (coupon.usage.split('/')[1] === 'NA' ? 'NA' : coupon.usage.split('/')[1]) : 'NA'}</span>
+                  </span>
+                </td>
                 <td><span className={`status-tag-v4 ${coupon.status.toLowerCase()}`}>{coupon.status}</span></td>
                 <td className="actions-cell-v4">
                   {activeTab === 'vendor' ? (
                     <>
+                      <button className="icon-btn-v4" title="Preview Coupon" onClick={() => { setPreviewCoupon(coupon); setShowPreviewModal(true); }}>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                      </button>
                       <button className="icon-btn-v4" title={coupon.status === 'Active' ? 'Pause Coupon' : 'Resume Coupon'} onClick={() => toggleStatus(coupon.id)}>
                         {coupon.status === 'Active' ? (
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
@@ -2806,7 +2827,9 @@ const ServiceSettings = ({
   activeSettingsTab,
   setActiveSettingsTab,
   availabilitySubTab,
-  setAvailabilitySubTab
+  setAvailabilitySubTab,
+  menuPreviewId,
+  setMenuPreviewId
 }: any) => {
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -3200,7 +3223,6 @@ const ServiceSettings = ({
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
                     </div>
                     <span>
-                      <strong>Note:</strong>
                     </span>Customers can book this service at least 4 days in advance, due to refund policy & Live status.
                   </div>
 
@@ -3373,7 +3395,7 @@ const ServiceSettings = ({
                       }
 
                       return filtered.map((menu: any) => (
-                        <div key={menu.id} className={`menu-card-v2 ${menu.status !== 'Active' ? 'is-hidden' : ''}`}>
+                        <div key={menu.id} className={`menu-card-v2 menu-card-img1 ${menu.status !== 'Active' ? 'is-hidden' : ''}`}>
                           {/* Top Image Section */}
                           <div className="menu-image-section">
                             <div className={`live-status-badge ${menu.status !== 'Active' ? 'is-hidden' : ''}`}>
@@ -3386,7 +3408,6 @@ const ServiceSettings = ({
                                 <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
                               </div>
                             )}
-
                             {/* Float Actions */}
                             <div className="card-actions-v2">
                               <button
@@ -3420,34 +3441,28 @@ const ServiceSettings = ({
                             </div>
                           </div>
 
-                          {/* Content Section */}
+                          {/* Content Section - Image 1 Style */}
                           <div className="menu-details-section">
-                            <h4 className="menu-title-v2">{menu.name}</h4>
-                            <div className="menu-meta-row-v2">
-                              <div className="menu-members-row">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
-                                <span>min {menu.minMembers} - max {menu.maxMembers}</span>
-                              </div>
-
-                              <div className={`diet-badge-v2 ${menu.dietType === 'Veg' ? 'veg' : 'non-veg'}`}>
-                                <svg width="8" height="8" viewBox="0 0 12 12" fill="none"><rect x="0.5" y="0.5" width="11" height="11" rx="1.5" stroke="currentColor" strokeWidth="2" /><circle cx="6" cy="6" r="3" fill="currentColor" /></svg>
-                                {menu.dietType}
+                            {/* Row 1: Name + Veg/Non-veg dots */}
+                            <div className="menu-name-dots-row">
+                              <h4 className="menu-title-v2">{menu.name}</h4>
+                              <div className="diet-dots-row">
+                                <span className={`diet-dot ${menu.dietType === 'Veg' || menu.dietType === 'Both' ? 'dot-veg' : 'dot-inactive'}`}></span>
+                                <span className={`diet-dot ${menu.dietType === 'Non-Veg' || menu.dietType === 'Both' ? 'dot-nonveg' : 'dot-inactive'}`}></span>
                               </div>
                             </div>
 
                             <hr className="menu-divider-dashed" />
-                          </div>
 
-                          {/* Price Footer Box */}
-                          <div className="menu-price-footer">
-                            <div className="price-box-v2">
+                            {/* Row 4: Price row + MENU button */}
+                            <div className="menu-price-menu-row">
                               <div className="price-left-v2">
                                 <span className="price-label-v2">Starting</span>
-                                <div className="price-main-v2">
-                                  <span className="current-price">₹{menu.price}</span>
-                                  <span className="price-unit">/ Person</span>
+                                <div className="price-img1-row">
+                                  <span className="price-pill-img1">₹{menu.price} <span className="price-pill-unit">/ Plate</span></span>
                                 </div>
                               </div>
+                              <button className="menu-btn-img1" onClick={() => setMenuPreviewId(menu.id)}>MENU &rsaquo;</button>
                             </div>
                           </div>
                         </div>
@@ -4535,6 +4550,109 @@ const ServiceSettings = ({
           )}
         </div>
       )}
+
+      {/* ── Menu Preview Sidebar ── */}
+      {menuPreviewId !== null && (() => {
+        const pm = menus.find((m: any) => m.id === menuPreviewId);
+        if (!pm) return null;
+        return (
+          <MenuPreviewSidebar
+            menu={pm}
+            onClose={() => setMenuPreviewId(null)}
+          />
+        );
+      })()}
+    </div>
+  );
+};
+
+const MenuPreviewSidebar = ({ menu, onClose }: { menu: any; onClose: () => void }) => {
+  const [activeSection, setActiveSection] = React.useState<string>(menu.sections[0]?.name ?? '');
+  const currentSec = menu.sections.find((s: any) => s.name === activeSection);
+
+  return (
+    <div className="mprev-overlay" onClick={onClose}>
+      <div className="mprev-drawer" onClick={(e) => e.stopPropagation()}>
+        {/* Header */}
+        <div className="mprev-header">
+          {menu.image && <img src={menu.image} alt={menu.name} className="mprev-hero-img" />}
+          <div className="mprev-header-content">
+            <div className="mprev-title-row">
+              <h2 className="mprev-title">{menu.name}</h2>
+              <button className="mprev-close-btn" onClick={onClose}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
+            </div>
+            <div className="mprev-meta-row">
+              <span className="mprev-meta-item">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                {menu.minMembers}–{menu.maxMembers} pax
+              </span>
+              <span className={`mprev-diet-badge ${menu.dietType === 'Veg' ? 'veg' : 'non-veg'}`}>
+                <svg width="8" height="8" viewBox="0 0 12 12" fill="none"><rect x="0.5" y="0.5" width="11" height="11" rx="1.5" stroke="currentColor" strokeWidth="2" /><circle cx="6" cy="6" r="3" fill="currentColor" /></svg>
+                {menu.dietType}
+              </span>
+              <span className="mprev-price-badge">₹{menu.price} / Plate</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Body */}
+        <div className="mprev-body">
+          {menu.sections.length === 0 ? (
+            <div className="mprev-empty">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="1.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+              <p>No sections added to this menu yet.</p>
+            </div>
+          ) : (
+            <>
+              <div className="mprev-sections-label">
+                <span className="mprev-label-title">Items</span>
+                <span className="mprev-label-sub">Items are customisable and fixed</span>
+              </div>
+
+              {/* Section tabs */}
+              <div className="mprev-section-tabs">
+                {menu.sections.map((sec: any) => (
+                  <button
+                    key={sec.name}
+                    className={`mprev-sec-tab ${activeSection === sec.name ? 'active' : ''}`}
+                    onClick={() => setActiveSection(sec.name)}
+                  >
+                    {sec.name}
+                  </button>
+                ))}
+              </div>
+
+              {/* Select limit label */}
+              {currentSec && currentSec.type !== 'All Included' && currentSec.limit > 0 && (
+                <p className="mprev-select-label">Select any {currentSec.limit}</p>
+              )}
+
+              {/* Items list - no Add/Remove buttons */}
+              <div className="mprev-items-list">
+                {currentSec?.items?.map((item: any, idx: number) => (
+                  <div key={idx} className="mprev-item-row">
+                    <div className="mprev-item-img">
+                      {item.image ? (
+                        <img src={item.image} alt={item.name} />
+                      ) : (
+                        <div className="mprev-img-placeholder">
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                        </div>
+                      )}
+                    </div>
+                    <div className="mprev-item-info">
+                      <span className="mprev-item-name">{item.name || 'Unnamed item'}</span>
+                      {item.description && <span className="mprev-item-desc">{item.description}</span>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      </div>
     </div>
   );
 };
@@ -4686,7 +4804,7 @@ const VendorProfile = ({
                         Personal Details
                       </div>
                       <div className="group-content-v4">
-                        <div className="summary-item-v4">
+                        <div className="summary-item-v4 readonly">
                           <label>Owner Name</label>
                           <span>{profileData.owner.name}</span>
                           <div className="verification-source-v4">verified from PAN</div>
@@ -4711,16 +4829,16 @@ const VendorProfile = ({
                         Business Details
                       </div>
                       <div className="group-content-v4">
-                        <div className="summary-item-v4">
+                        <div className="summary-item-v4 readonly">
                           <label>Business Name</label>
                           <span>{profileData.header.name}</span>
                           <div className="verification-source-v4">verified from FSSAI</div>
                         </div>
-                        <div className="summary-item-v4">
+                        <div className="summary-item-v4 readonly">
                           <label>Service Category</label>
                           <span>{profileData.business.category}</span>
                         </div>
-                        <div className="summary-item-v4">
+                        <div className="summary-item-v4 readonly">
                           <label>Address</label>
                           <span>{profileData.business.address}</span>
                           <div className="verification-source-v4">verified from FSSAI</div>
@@ -7853,6 +7971,7 @@ const Dashboard = ({
   const [selectedMenuAction, setSelectedMenuAction] = useState<'hide' | 'delete' | null>(null);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [menuEditingId, setMenuEditingId] = useState<number | null>(null);
+  const [menuPreviewId, setMenuPreviewId] = useState<number | null>(null);
 
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -8281,6 +8400,8 @@ const Dashboard = ({
               handleSaveSection={handleSaveSection}
               resetAddMenu={resetAddMenu}
               profileData={profileData}
+              menuPreviewId={menuPreviewId}
+              setMenuPreviewId={setMenuPreviewId}
             />
           )}
           {activeTab === 'ratings' && <Ratings />}
