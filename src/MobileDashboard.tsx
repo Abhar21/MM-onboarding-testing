@@ -5203,26 +5203,26 @@ const MobileServiceSettingsView = ({
 
                 {/* Content Section */}
                 <div className="item-content-body-v54">
-                  <h3 className="item-title-v54-new">{item.name}</h3>
-                  <div className="item-meta-row-v54">
-                    <div className="guest-capacity-v54">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                      <span>min {item.minMembers || '20'} - max {item.maxMembers || '100'}</span>
+                  <div className="item-title-row-v54">
+                    <h3 className="item-title-v54-new">{item.name}</h3>
+                    <div className={`diet-indicator-v54 ${item.dietType?.toLowerCase().includes('non') ? 'nonveg' : 'veg'}`}>
+                      <span className="dot"></span>
                     </div>
-                    <span className={`diet-badge-v54 ${item.dietType?.toLowerCase() || 'veg'}`}>
-                      <span className="dot">▣</span>
-                      {item.dietType || 'Veg'}
-                    </span>
                   </div>
 
-                  <div className="item-divider-v54"></div>
+                  <div className="item-divider-v54 dashed"></div>
 
-                  {/* Price Box */}
-                  <div className="item-price-card-v54">
-                    <label>Starting</label>
-                    <div className="price-value-v54">
-                      ₹{item.price} <span>/ Person</span>
+                  <div className="item-footer-v54">
+                    <div className="price-section-v54">
+                      <label>Starting</label>
+                      <div className="price-pill-v54">
+                        ₹{item.price} <span className="unit-v54">/ Plate</span>
+                      </div>
                     </div>
+                    
+                    <button className="menu-action-btn-v54">
+                      MENU <span className="arrow-v54">›</span>
+                    </button>
                   </div>
                 </div>
               </div>

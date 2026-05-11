@@ -4245,7 +4245,7 @@
 
 .menu-item-card-v54 {
   background: white;
-  border-radius: 20px;
+  border-radius: 40px;
   border: 1px solid #f1f5f9;
   display: flex;
   flex-direction: column;
@@ -4257,14 +4257,16 @@
 .item-image-header-v54 {
   position: relative;
   width: 100%;
-  aspect-ratio: 3 / 1;
-  background: #f8fafc;
+  aspect-ratio: 4 / 1;
+  background: white;
+  padding: 10px 10px 0 10px;
 }
 
 .header-img-v54 {
   width: 100%;
-  height: 100%;
+  height: 220px;
   object-fit: cover;
+  border-radius: 16px;
 }
 
 .placeholder-img-v54 {
@@ -4277,9 +4279,9 @@
 
 .live-status-badge-v54 {
   position: absolute;
-  top: 12px;
-  left: 12px;
-  background: #10b981;
+  top: 18px;
+  left: 18px;
+  background: #ff3b3b !important;
   color: white;
   padding: 6px 14px;
   border-radius: 6px;
@@ -4291,8 +4293,8 @@
 
 .header-actions-v54 {
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: 18px;
+  right: 18px;
   display: flex;
   gap: 8px;
 }
@@ -4475,16 +4477,16 @@
 }
 
 .service-title-v54 {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: 800;
   color: #0f172a;
-  margin: 0 0 20px;
+  margin: 0 0 16px;
   letter-spacing: -0.5px;
 }
 
 .service-tabs-nav-v54 {
   display: flex;
-  gap: 28px;
+  gap: 20px;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
@@ -4497,7 +4499,7 @@
   background: none;
   border: none;
   padding: 0 0 12px;
-  font-size: 1.05rem;
+  font-size: 0.92rem;
   font-weight: 700;
   color: #94a3b8;
   white-space: nowrap;
@@ -4794,7 +4796,7 @@
 
 .mobile-section-card-v55.dragging {
   opacity: 0.5;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
   border-color: #0077ff;
   border-style: dashed;
   background: #f8fafc;
@@ -7591,7 +7593,7 @@
   font-weight: 800;
   color: #475569;
   cursor: pointer;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .settings-field-row-v64 {
@@ -9684,6 +9686,7 @@
   color: #059669;
   flex-shrink: 0;
 }
+
 /* ─────────────────── BOOST CREDITS FEATURE (v25) ─────────────────── */
 
 .mobile-boost-pill-v25 {
@@ -9734,8 +9737,13 @@
 }
 
 @keyframes mobileSlideUp-v25 {
-  from { transform: translateY(100%); }
-  to { transform: translateY(0); }
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
+    transform: translateY(0);
+  }
 }
 
 .mobile-boost-sheet-header-v25 {
@@ -9870,13 +9878,27 @@
 }
 
 @keyframes mobileToastIn-v25 {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 @keyframes mobileToastOut-v25 {
-  from { transform: translateY(0); opacity: 1; }
-  to { transform: translateY(-10px); opacity: 0; }
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  to {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
 }
 
 .mobile-boost-toast-v25 .toast-icon {
@@ -10185,10 +10207,24 @@
   border-radius: 2px;
 }
 
-.mobile-swatch.state-available { background: white; border: 1px solid #e2e8f0; }
-.mobile-swatch.state-full { background: #f1f5f9; }
-.mobile-swatch.state-partial { background: white; border: 1.5px solid #fef3c7; }
-.mobile-swatch.state-recommended { background: white; border: 1.5px solid #bae6fd; }
+.mobile-swatch.state-available {
+  background: white;
+  border: 1px solid #e2e8f0;
+}
+
+.mobile-swatch.state-full {
+  background: #f1f5f9;
+}
+
+.mobile-swatch.state-partial {
+  background: white;
+  border: 1.5px solid #fef3c7;
+}
+
+.mobile-swatch.state-recommended {
+  background: white;
+  border: 1.5px solid #bae6fd;
+}
 
 
 /* --- Mobile Boost Usage Details Styles (v25) --- */
@@ -10349,15 +10385,23 @@
 }
 
 @keyframes mobileFadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 
 /* --- Mobile Interactivity Fixes (v25) --- */
 
 .mobile-boost-sheet-content-v25 {
-  padding-bottom: 30px; /* Ensure space at bottom for actions */
+  padding-bottom: 30px;
+  /* Ensure space at bottom for actions */
 }
 
 .mobile-boost-sheet-actions {
@@ -10491,8 +10535,15 @@
 }
 
 @keyframes fadeInMobile {
-  from { opacity: 0; transform: scale(0.98); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 /* --- Mobile Boost Header Redesign (v25) --- */
@@ -10664,4 +10715,108 @@
 .menu-builder-card-v54 .item-price-card-v54 {
   background: white !important;
   border: 1px solid #e2e8f0 !important;
+}
+
+/* Updated Menu Card Styles for Mobile Dashboard */
+.live-status-badge-v54 {
+  background: #ff3b3b !important;
+  /* Red/Orange for LIVE */
+  box-shadow: 0 4px 10px rgba(255, 59, 59, 0.3) !important;
+}
+
+.item-title-row-v54 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.diet-indicator-v54 {
+  width: 20px;
+  height: 20px;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.diet-indicator-v54.veg {
+  border-color: #22c55e;
+}
+
+.diet-indicator-v54.nonveg {
+  border-color: #ef4444;
+}
+
+.diet-indicator-v54 .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.diet-indicator-v54.veg .dot {
+  background: #22c55e;
+}
+
+.diet-indicator-v54.nonveg .dot {
+  background: #ef4444;
+}
+
+.item-divider-v54.dashed {
+  border-top: 1.5px dashed #e2e8f0;
+  height: 1px;
+  margin: 16px 0;
+}
+
+.item-footer-v54 {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.price-section-v54 label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #94a3b8;
+  margin-bottom: 6px;
+}
+
+.price-pill-v54 {
+  background: #fff0f9;
+  color: #ff35e0;
+  padding: 8px 16px;
+  border-radius: 12px;
+  font-weight: 800;
+  font-size: 1.1rem;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.price-pill-v54 .unit-v54 {
+  font-size: 0.85rem;
+  font-weight: 700;
+  opacity: 0.8;
+}
+
+.menu-action-btn-v54 {
+  background: #facc15;
+  /* Yellow/Orange */
+  color: #1e293b;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 100px;
+  font-weight: 800;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 4px 12px rgba(250, 204, 21, 0.2);
+}
+
+.menu-action-btn-v54 .arrow-v54 {
+  font-size: 1.2rem;
+  line-height: 1;
 }
