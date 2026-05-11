@@ -7090,10 +7090,10 @@ const Bookings = () => {
   const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
 
   const stats = {
-    total: bookings.length,
-    today: bookings.filter(b => b.date === today).length,
-    upcoming: bookings.filter(b => b.date > today && b.status !== 'Cancelled').length,
-    completed: bookings.filter(b => b.status === 'Completed' || (b.date === yesterday && b.status !== 'Cancelled')).length
+    total: bookings.filter(b => b.taxType !== 'B2B').length,
+    today: bookings.filter(b => b.date === today && b.taxType !== 'B2B').length,
+    upcoming: bookings.filter(b => b.date > today && b.status !== 'Cancelled' && b.taxType !== 'B2B').length,
+    completed: bookings.filter(b => (b.status === 'Completed' || (b.date === yesterday && b.status !== 'Cancelled')) && b.taxType !== 'B2B').length
   };
 
   const filteredBookings = bookings.filter(b => {
@@ -7115,7 +7115,8 @@ const Bookings = () => {
     if (dateRange.from && b.date < dateRange.from) return false;
     if (dateRange.to && b.date > dateRange.to) return false;
 
-    // 4. Order Type Filter
+    // 4. Order Type Filter (Now only B2C allowed)
+    if (b.taxType === 'B2B') return false;
     if (orderTypeFilter !== 'All' && b.taxType !== orderTypeFilter) return false;
 
     return true;
@@ -7316,7 +7317,6 @@ const Bookings = () => {
                   style={{ width: '130px' }}
                 >
                   <option value="All">All Types</option>
-                  <option value="B2B">B2B Only</option>
                   <option value="B2C">B2C Only</option>
                 </select>
               </div>
@@ -7388,7 +7388,6 @@ const Bookings = () => {
                 <th>Customer</th>
                 <th>Event Date</th>
                 <th>Event</th>
-                <th>Type</th>
                 <th>Advance Payout</th>
                 <th>Balance</th>
                 <th>Status</th>
@@ -7414,14 +7413,9 @@ const Bookings = () => {
                     </div>
                   </td>
                   <td>
-                    <div className="booking-type-cell-v11">
-                      <span className="type-category-v11">{(b as any).serviceCategory}</span>
-                      <span className="type-menu-v11">{(b as any).menuName}</span>
-                    </div>
-                  </td>
-                  <td>
-                    <div className="tax-type-badge-container-v24">
-                      <span className={`tax-type-badge-v24 ${(b as any).taxType?.toLowerCase()}`}>{(b as any).taxType}</span>
+                    <div className="event-info-v7">
+                      <span className="event-type-v7">{b.category}</span>
+                      <span className="menu-name-v7">{b.menuName}</span>
                     </div>
                   </td>
                   <td>
