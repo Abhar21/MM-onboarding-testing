@@ -5135,7 +5135,7 @@ const MobileServiceSettingsView = ({
         </div>
 
         {/* Menu Builder */}
-        <div className="menu-builder-section-v54">
+        <div className="settings-card-v54 menu-builder-card-v54">
           <div className="section-header-v54">
             <h3>Menu Builder</h3>
             <button className="add-menu-btn-v54" onClick={() => setIsAddingMenu(true)}>

@@ -4240,7 +4240,7 @@
 .menu-item-stack-v54 {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
 }
 
 .menu-item-card-v54 {
@@ -10631,3 +10631,37 @@
   margin: 0 !important;
 }
 
+
+/* Nested card styling for Menu Builder frame */
+.menu-builder-card-v54 {
+  margin-top: 24px;
+  padding: 20px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 20px !important;
+}
+
+.menu-builder-card-v54 .filter-chips-v54 {
+  margin-bottom: 4px;
+}
+
+.menu-builder-card-v54 .menu-item-card-v54 {
+  box-shadow: none !important;
+  border: 1px solid #e2e8f0 !important;
+  background: #f8fafc !important;
+  border-radius: 16px !important;
+  margin-bottom: 16px !important;
+}
+
+.menu-builder-card-v54 .item-content-body-v54 {
+  padding: 12px 16px 16px !important;
+}
+
+.menu-builder-card-v54 .item-title-v54-new {
+  font-size: 1.1rem !important;
+}
+
+.menu-builder-card-v54 .item-price-card-v54 {
+  background: white !important;
+  border: 1px solid #e2e8f0 !important;
+}
