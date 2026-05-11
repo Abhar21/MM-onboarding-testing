@@ -1366,7 +1366,12 @@ const CouponPreviewModal = ({ isOpen, onClose, couponData }: { isOpen: boolean, 
       <div className="coupon-modal-container-v4 preview-only-v6" onClick={e => e.stopPropagation()}>
         <div className="modal-header-v4">
           <div className="header-left-v4">
-            <h2 className="modal-title-v4">Coupon Preview</h2>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <h2 className="modal-title-v4">Coupon Preview</h2>
+              <div className={`status-badge-v4 ${couponData.status.toLowerCase()}`}>
+                <span className="dot"></span> {couponData.status}
+              </div>
+            </div>
             <p className="modal-subtitle-v4">Full visibility of the platform reward structure</p>
           </div>
           <button className="close-btn-v4" onClick={onClose}>
@@ -1380,12 +1385,11 @@ const CouponPreviewModal = ({ isOpen, onClose, couponData }: { isOpen: boolean, 
             <div className="preview-curve-v4 right"></div>
 
             <div className="preview-header-vendor">
-              <div className={`status-badge active`}>
-                <span className="dot"></span> ACTIVE
-              </div>
               <div className="preview-main-info">
                 <div className="preview-discount-badge highlighted">
-                  {displayValue}{isPercentage ? '%' : '₹'} <span className="off-text">OFF</span>
+                  {isPercentage ? 'Upto ' : 'FLAT '}
+                  {isPercentage ? `${displayValue}%` : `₹${displayValue}`}
+                  <span className="off-text"> OFF</span>
                 </div>
                 <div className="preview-code-display">
                   <span className="label">CODE:</span>
