@@ -1414,13 +1414,14 @@ const CouponPreviewModal = ({ isOpen, onClose, couponData }: { isOpen: boolean, 
                 </>
               )}
 
-              <div className="detail-item full-width">
-                <div className="detail-label">Applicability</div>
-                <div className="detail-value">
-                  {couponData.applicability === 'subscription'
-                    ? 'Starter, Growth & Savings plans'
-                    : 'All Menu Categories'}
-                </div>
+              <div className="detail-item">
+                <div className="detail-label">Total Usage Limit</div>
+                <div className="detail-value">{couponData.usage?.split('/')[1] || 'NA'}</div>
+              </div>
+
+              <div className="detail-item">
+                <div className="detail-label">Per User Limit</div>
+                <div className="detail-value">{couponData.perUserLimit || '1'}</div>
               </div>
 
               <div className="detail-item full-width">
@@ -1431,9 +1432,14 @@ const CouponPreviewModal = ({ isOpen, onClose, couponData }: { isOpen: boolean, 
                   {new Date(couponData.validTo).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                 </div>
               </div>
+
               <div className="detail-item full-width">
-                <div className="detail-label">Coupon Source</div>
-                <div className="detail-value text-capitalize">{couponData.source} Managed</div>
+                <div className="detail-label">Applicability</div>
+                <div className="detail-value">
+                  {couponData.applicability === 'subscription'
+                    ? 'Starter, Growth & Savings plans'
+                    : 'All Menu Categories'}
+                </div>
               </div>
             </div>
           </div>
