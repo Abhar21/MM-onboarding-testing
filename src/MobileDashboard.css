@@ -3983,7 +3983,7 @@
 .settings-card-v54 {
   background: white;
   padding: 20px;
-  border-radius: 20px;
+  border-radius: 28px;
   border: 1px solid #f1f5f9;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
 }
@@ -10819,4 +10819,24 @@
 .menu-action-btn-v54 .arrow-v54 {
   font-size: 1.2rem;
   line-height: 1;
+}
+.menu-preview-sheet {
+  border-radius: 32px 32px 0 0 !important;
+  max-height: 90vh !important;
+}
+
+.sheet-handle-v54 {
+  width: 40px;
+  height: 4px;
+  background: #e2e8f0;
+  border-radius: 10px;
+  margin: 12px auto 0;
+}
+
+.preview-cat-pill.active {
+  box-shadow: 0 4px 10px rgba(250, 204, 21, 0.3);
+}
+
+.preview-categories-v54::-webkit-scrollbar {
+  display: none;
 }
