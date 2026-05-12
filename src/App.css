@@ -13224,7 +13224,7 @@ input:checked+.slider-v4:before {
 }
 
 .bscp-card-v25.dark {
-  background: #2c3545;
+  background: #0077ff;
   color: white;
   border: none;
 }
@@ -13242,7 +13242,8 @@ input:checked+.slider-v4:before {
 }
 
 .bscp-card-v25.dark .bscp-label {
-  color: #94a3b8;
+  color: #ffffff;
+  opacity: 0.9;
 }
 
 .bscp-card-v25.light .bscp-label {
@@ -13270,7 +13271,7 @@ input:checked+.slider-v4:before {
 }
 
 .bscp-card-v25.dark .bscp-sub.green {
-  color: #10b981;
+  color: #ffffff;
 }
 
 .bscp-card-v25.light .bscp-sub {
@@ -13301,7 +13302,7 @@ input:checked+.slider-v4:before {
   border: 1px solid #fef3c7;
   border-radius: 12px;
   padding: 0.6rem 1.25rem;
-  margin: 0 1.5rem 1rem;
+  margin: 1.5rem 1.5rem 1rem;
   display: flex;
   gap: 1rem;
   align-items: center;
@@ -13367,10 +13368,23 @@ input:checked+.slider-v4:before {
   border: 1px solid #e2e8f0;
 }
 
+.customer-info-card-v11 {
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  padding: 1.25rem;
+  margin-top: 0.5rem;
+}
+
 .menu-section-card-v11 {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
 }
 
 .section-header-v11 {
@@ -13928,7 +13942,7 @@ input:checked+.slider-v4:before {
 
 .detail-modal-body-v7 {
   padding: 2rem;
-  overflow: hidden;
+  overflow-y: auto;
   flex: 1;
 }
 
@@ -26028,4 +26042,24 @@ input:checked+.slider-v4:before {
   .hide-on-mobile {
     display: none !important;
   }
+}
+
+.past-badge-v11 {
+  background: #f1f5f9;
+  color: #64748b;
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 8px;
+  text-transform: uppercase;
+}
+
+.customer-phone-v11 {
+  display: block;
+  font-size: 0.8rem;
+  color: #64748b;
+  opacity: 0.65;
+  margin-top: 2px;
+  font-weight: 500;
 }

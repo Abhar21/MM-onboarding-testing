@@ -5827,79 +5827,105 @@ const BookingDetailModal = ({
         <div className="detail-modal-body-v7">
           <div className="detail-section-v7">
             <h4 className="section-title-v7">Customer Information</h4>
-            <div className="info-grid-v7">
-              <div className="info-item-v7">
-                <label>Name</label>
-                <span>{booking.customer}</span>
+            <div className="customer-info-card-v11">
+              <div className="info-grid-v7">
+                <div className="info-item-v7">
+                  <label>Name</label>
+                  <span>{booking.customer}</span>
+                </div>
+                <div className="info-item-v7">
+                  <label>Phone</label>
+                  <span>{booking.phone || '+91 91234 56789'}</span>
+                </div>
+                <div className="info-item-v7">
+                  <label>Email</label>
+                  <span>{booking.email || 'customer@example.com'}</span>
+                </div>
+                <div className="info-item-v7" style={{ gridColumn: 'span 2' }}>
+                  <label>Address</label>
+                  <span>{booking.address || '402, Skyline Residency, Sector 44, Bengaluru'}</span>
+                </div>
+                {booking.taxType === 'B2B' && (
+                  <>
+                    <div className="info-item-v7">
+                      <label>Business Name</label>
+                      <span style={{ fontWeight: 600 }}>{booking.businessName || 'Business Solutions Pvt Ltd'}</span>
+                    </div>
+                    <div className="info-item-v7">
+                      <label>GSTIN</label>
+                      <span style={{ fontFamily: 'monospace', letterSpacing: '1px', color: '#1e3a8a', fontWeight: 700 }}>{booking.gstin || '29AAAAA0000A1Z5'}</span>
+                    </div>
+                  </>
+                )}
               </div>
-              <div className="info-item-v7">
-                <label>Phone</label>
-                <span>{booking.phone || '+91 91234 56789'}</span>
-              </div>
-              <div className="info-item-v7">
-                <label>Email</label>
-                <span>{booking.email || 'customer@example.com'}</span>
-              </div>
-              {booking.taxType === 'B2B' && (
-                <>
-                  <div className="info-item-v7">
-                    <label>Business Name</label>
-                    <span style={{ fontWeight: 600 }}>{booking.businessName || 'Business Solutions Pvt Ltd'}</span>
-                  </div>
-                  <div className="info-item-v7">
-                    <label>GSTIN</label>
-                    <span style={{ fontFamily: 'monospace', letterSpacing: '1px', color: '#1e3a8a', fontWeight: 700 }}>{booking.gstin || '29AAAAA0000A1Z5'}</span>
-                  </div>
-                </>
-              )}
             </div>
           </div>
 
           <div className="detail-section-v7">
             <h4 className="section-title-v7">Event Details</h4>
-            <div className="info-grid-v7">
-              <div className="info-item-v7">
-                <label>Event Date</label>
-                <span>{new Date(booking.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
-              </div>
-              <div className="info-item-v7">
-                <label>Category</label>
-                <span>{booking.serviceCategory}</span>
-              </div>
-              <div className={`info-item-v7 menu-clickable-v11 ${showMenuDetail ? 'active' : ''}`} onClick={() => setShowMenuDetail(!showMenuDetail)}>
-                <label>Menu Name</label>
-                <div className="menu-name-wrapper-v11">
-                  <span>{booking.menuName}</span>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="chevron-icon">
-                    <polyline points={showMenuDetail ? "18 15 12 9 6 15" : "6 9 12 15 18 9"}></polyline>
-                  </svg>
+            <div className="customer-info-card-v11">
+              <div className="info-grid-v7">
+                <div className="info-item-v7">
+                  <label>Event Date</label>
+                  <span>{new Date(booking.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                </div>
+                <div className="info-item-v7">
+                  <label>Category</label>
+                  <span>{booking.serviceCategory}</span>
+                </div>
+                <div className="info-item-v7">
+                  <label>Time</label>
+                  <span>{(() => {
+                    if (!booking.time) return '08:00 - 08:15';
+                    const clean = booking.time.replace(/\s*[AP]M/i, '');
+                    const parts = clean.split(':');
+                    if (parts.length < 2) return clean;
+                    const h = parseInt(parts[0]);
+                    const m = parseInt(parts[1]);
+                    const endM = (m + 15) % 60;
+                    const endH = h + Math.floor((m + 15) / 60);
+                    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')} - ${endH.toString().padStart(2, '0')}:${endM.toString().padStart(2, '0')}`;
+                  })()}</span>
+                </div>
+                <div className="info-item-v7">
+                  <label>Service Type</label>
+                  <span>{booking.serviceType || 'Buffet'}</span>
+                </div>
+                <div className={`info-item-v7 menu-clickable-v11 ${showMenuDetail ? 'active' : ''}`} onClick={() => setShowMenuDetail(!showMenuDetail)}>
+                  <label>Menu Name</label>
+                  <div className="menu-name-wrapper-v11">
+                    <span>{booking.menuName}</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="chevron-icon">
+                      <polyline points={showMenuDetail ? "18 15 12 9 6 15" : "6 9 12 15 18 9"}></polyline>
+                    </svg>
+                  </div>
+                </div>
+                <div className="info-item-v7">
+                  <label>Guest Count</label>
+                  <span>{booking.guests} Guests</span>
                 </div>
               </div>
-              <div className="info-item-v7">
-                <label>Guest Count</label>
-                <span>{booking.guests} Guests</span>
-              </div>
-            </div>
 
-            {showMenuDetail && booking.menuSelection && (
-              <div className="menu-selection-breakdown-v11">
-                {booking.menuSelection.map((section: any, idx: number) => (
-                  <div key={idx} className="menu-section-card-v11">
-                    <div className="section-header-v11">
-                      <span className="section-name-v11">{section.name}</span>
-                      <span className={`section-type-badge-v11 ${section.type === 'All Items' ? 'all' : 'selected'}`}>
-                        {section.type === 'All Items' ? 'All Items Included' : 'Customer Selected'}
-                      </span>
+              {showMenuDetail && booking.menuSelection && (
+                <div className="menu-selection-inner-v11" style={{ marginTop: '1.25rem' }}>
+                  {booking.menuSelection.map((section: any, idx: number) => (
+                    <div key={idx} className="menu-section-card-v11">
+                      <div className="section-header-v11">
+                        <span className="section-name-v11">{section.name}</span>
+                        <span className={`section-type-badge-v11 ${section.type === 'All Items' ? 'all' : 'selected'}`}>
+                          {section.type === 'All Items' ? 'All Items Included' : 'Customer Selected'}
+                        </span>
+                      </div>
+                      <div className="section-items-grid-v11">
+                        {section.items.map((item: string, i: number) => (
+                          <span key={i} className="menu-item-pill-v11">{item}</span>
+                        ))}
+                      </div>
                     </div>
-                    <div className="section-items-grid-v11">
-                      {section.items.map((item: string, i: number) => (
-                        <span key={i} className="menu-item-pill-v11">{item}</span>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="detail-section-v7">
@@ -6131,10 +6157,10 @@ const BookingDetailModal = ({
                               <span>TDS (0.1%)</span>
                               <span className="deduction-value">-₹{tds.toLocaleString()}</span>
                             </div>
-                            <div className="breakdown-note-v30" style={{ marginTop: '8px' }}>
-                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                              <span>{booking.cancelledBy === 'Vendor' ? 'No deductions applied for vendor cancellation' : `Deductions are applied only on ${booking.status === 'Cancelled' ? 'retained amount' : 'platform amount'}`}</span>
-                            </div>
+                             <div className="breakdown-note-v30" style={{ marginTop: '8px' }}>
+                               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                               <span>{booking.cancelledBy === 'Vendor' ? 'No deductions applied for vendor cancellation' : 'GST and TDS are claimable, T&C apply'}</span>
+                             </div>
                           </div>
                         )}
                       </div>
@@ -6376,7 +6402,7 @@ const revenueHeights = [45, 60, 55, 75, 85, 70, 90, 80, 65, 95, 88, 100];
 
 
 
-const Reports = () => {
+function Reports() {
   const [activeReportTab, setActiveReportTab] = useState('Revenue');
 
   const monthlyTdsData = [
@@ -6655,9 +6681,9 @@ const Reports = () => {
       </div>
     </div>
   );
-};
+}
 
-const VendorCancelModal = ({
+function VendorCancelModal({
   isOpen,
   onClose,
   onConfirm
@@ -6665,7 +6691,7 @@ const VendorCancelModal = ({
   isOpen: boolean;
   onClose: () => void;
   onConfirm: (reason: string) => void;
-}) => {
+}) {
   const [reason, setReason] = useState('');
   if (!isOpen) return null;
 
@@ -6754,24 +6780,23 @@ const VendorCancelModal = ({
                 cursor: 'pointer'
               }}
             >
-              Keep Booking
+              Back
             </button>
             <button
               onClick={() => onConfirm(reason)}
               disabled={!reason}
               style={{
-                flex: 1.2,
+                flex: 1,
                 padding: '12px',
                 borderRadius: '10px',
                 border: 'none',
-                backgroundColor: '#ef4444',
-                color: 'white',
+                backgroundColor: reason ? '#ef4444' : '#f1f5f9',
+                color: reason ? 'white' : '#94a3b8',
                 fontWeight: 700,
-                cursor: reason ? 'pointer' : 'not-allowed',
-                opacity: reason ? 1 : 0.6
+                cursor: reason ? 'pointer' : 'not-allowed'
               }}
             >
-              Cancel Booking
+              Confirm Cancellation
             </button>
           </div>
         </div>
@@ -6780,7 +6805,7 @@ const VendorCancelModal = ({
   );
 };
 
-const Bookings = () => {
+function Bookings() {
   const [bookings, setBookings] = useState([
     {
       id: 'BK-12401',
@@ -6788,9 +6813,9 @@ const Bookings = () => {
       date: new Date().toISOString().split('T')[0],
       time: '12:30 PM',
       type: 'Wedding Catering',
-      serviceCategory: 'Lunch',
-      category: 'Lunch',
-      menuName: 'Premium Sadhya Menu',
+      serviceCategory: 'Breakfast',
+      category: 'Breakfast',
+      menuName: 'Breakfast Menu 1',
       guests: 200,
       amount: 145000,
       originalAmount: 160000,
@@ -6824,9 +6849,9 @@ const Bookings = () => {
       date: new Date(Date.now() + 48 * 3600000).toISOString().split('T')[0], // Exactly 2 days away
       time: '07:30 PM',
       type: 'Corporate Gala',
-      serviceCategory: 'Dinner',
-      category: 'Dinner',
-      menuName: 'Executive Buffet',
+      serviceCategory: 'Breakfast',
+      category: 'Breakfast',
+      menuName: 'Breakfast Menu 2',
       guests: 150,
       amount: 418000,
       originalAmount: 450000,
@@ -6849,69 +6874,6 @@ const Bookings = () => {
         { status: 'Pending', time: '18 Mar, 11:15 AM' },
         { status: 'Confirmed', time: '18 Mar, 05:00 PM' }
       ],
-      taxType: 'B2B'
-    },
-    {
-      id: 'BK-12398',
-      customer: 'Ananya Pandey',
-      date: new Date(Date.now() - 24 * 3600000).toISOString().split('T')[0], // Yesterday
-      time: '04:30 PM',
-      type: 'Engagement Party',
-      serviceCategory: 'Snacks',
-      category: 'Snacks',
-      menuName: 'High Tea Special',
-      guests: 80,
-      amount: 45000,
-      originalAmount: 50000,
-      discount: 5000,
-      payout: 12825,
-      paid: 13500,
-      status: 'Completed',
-      address: 'No. 34, 1st Cross, Indiranagar 2nd Stage',
-      menuSelection: [
-        { name: 'Breakfast', type: 'All Items', items: ['Samosa', 'Chai', 'Sandwich'] }
-      ],
-      menuDetails: {
-        categories: [
-          { name: 'Snacks', items: ['Samosa', 'Chai', 'Sandwich'], status: 'All Included' }
-        ]
-      },
-      timeline: [
-        { status: 'Pending', time: '10 Mar, 10:00 AM' },
-        { status: 'Confirmed', time: '10 Mar, 12:00 PM' },
-        { status: 'Live', time: '19 Mar, 09:00 AM' },
-        { status: 'Completed', time: '20 Mar, 11:00 PM' }
-      ],
-      taxType: 'B2B'
-    },
-    {
-      id: 'BK-12410',
-      customer: 'Varun Dhawan',
-      date: new Date(Date.now() + 120 * 3600000).toISOString().split('T')[0], // 5 days away
-      time: '08:00 PM',
-      type: 'Private Dinner',
-      serviceCategory: 'Dinner',
-      category: 'Dinner',
-      menuName: 'Romantic Four-Course',
-      guests: 12,
-      amount: 15000,
-      originalAmount: 18000,
-      discount: 3000,
-      payout: 4275,
-      paid: 4500,
-      status: 'Upcoming',
-      address: 'Flat 4A, Green Meadows Appts, Koramangala',
-      menuSelection: [
-        { name: 'Dinner', type: 'Selected', items: ['Salad', 'Soup', 'Main Course'] }
-      ],
-      menuDetails: {
-        categories: [
-          { name: 'Dinner', items: ['Soup', 'Main Course'], status: 'All Included' }
-        ]
-      },
-      timeline: [
-        { status: 'Pending', time: '21 Mar, 08:30 AM' }
-      ],
       taxType: 'B2C'
     },
     {
@@ -6920,8 +6882,9 @@ const Bookings = () => {
       date: new Date(Date.now() + 48 * 3600000).toISOString().split('T')[0], // 2 days from now
       time: '08:00 PM',
       type: 'Anniversary Dinner',
-      serviceCategory: 'Dinner',
-      menuName: 'Premium Feast',
+      serviceCategory: 'Lunch',
+      category: 'Lunch',
+      menuName: 'Lunch Menu 1',
       guests: 30,
       amount: 45000,
       originalAmount: 50000,
@@ -6947,9 +6910,9 @@ const Bookings = () => {
       date: new Date(Date.now() + 96 * 3600000).toISOString().split('T')[0], // 4 days from now
       time: '01:30 PM',
       type: 'Birthday Kids',
-      serviceCategory: 'Lunch',
-      category: 'Lunch',
-      menuName: 'Kids Special Menu',
+      serviceCategory: 'Dinner',
+      category: 'Dinner',
+      menuName: 'Dinner Menu 2',
       guests: 40,
       amount: 25000,
       originalAmount: 28000,
@@ -6959,40 +6922,60 @@ const Bookings = () => {
       status: 'Cancelled',
       cancelledBy: 'Vendor',
       refundPercentage: 50,
-      cancelledAt: '14 Apr 2026',
+      cancelledAt: '16 Apr 2026',
       menuSelection: [
-        { name: 'Lunch', type: 'Selected', items: ['Mini Pizza', 'Pasta', 'Fries'] }
+        { name: 'Lunch', type: 'Selected', items: ['Pizza', 'Burger', 'Fries'] }
       ],
-      menuDetails: {
-        categories: [
-          { name: 'Lunch', items: ['Mini Pizza', 'Pasta', 'Fries'], status: 'All Included' }
-        ]
-      },
       timeline: [
-        { status: 'Pending', time: '10 Mar, 10:00 AM' },
-        { status: 'Cancelled', time: '11 Mar, 02:00 PM' }
+        { status: 'Pending', time: '21 Mar, 09:00 AM' },
+        { status: 'Cancelled', time: `${new Date(Date.now() - 6 * 3600000).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}, 11:00 AM` }
       ],
       taxType: 'B2C'
     },
     {
-      id: 'BK-12435',
-      customer: 'Sia Kapoor',
-      date: new Date(Date.now() - 72 * 3600000).toISOString().split('T')[0],
-      time: '08:30 PM',
+      id: 'BK-12410',
+      customer: 'Varun Dhawan',
+      date: new Date(Date.now() + 120 * 3600000).toISOString().split('T')[0], // 5 days away
+      time: '08:00 PM',
       type: 'Private Dinner',
-      serviceCategory: 'Dinner',
-      category: 'Dinner',
-      menuName: 'Gourmet Italian',
-      guests: 15,
-      amount: 35000,
-      originalAmount: 38000,
+      serviceCategory: 'Snacks',
+      category: 'Snacks',
+      menuName: 'Snacks Menu 4',
+      guests: 12,
+      amount: 15000,
+      originalAmount: 18000,
       discount: 3000,
-      payout: 9975,
-      paid: 10500,
+      payout: 4275,
+      paid: 4500,
+      status: 'Upcoming',
+      address: 'Flat 4A, Green Meadows Appts, Koramangala',
+      menuSelection: [
+        { name: 'Dinner', type: 'Selected', items: ['Salad', 'Soup', 'Main Course'] }
+      ],
+      menuDetails: {
+        categories: [
+          { name: 'Dinner', items: ['Soup', 'Main Course'], status: 'All Included' }
+        ]
+      },
+      timeline: [
+        { status: 'Pending', time: '21 Mar, 08:30 AM' }
+      ],
+      taxType: 'B2C'
+    },
+    {
+      id: 'BK-12422',
+      customer: 'Siddharth Varma',
+      date: '2026-04-13',
+      time: '08:00 PM',
+      type: 'Dinner Party',
+      guests: 40,
+      amount: 25000,
+      originalAmount: 28000,
+      discount: 3000,
+      payout: 22500,
+      paid: 25000,
       status: 'Cancelled',
-      cancelledBy: 'Customer',
-      refundPercentage: 0,
-      cancelledAt: '13 Apr 2026',
+      address: 'Skyline Apts, Gachibowli',
       menuSelection: [
         { name: 'Dinner', type: 'Selected', items: ['Antipasti', 'Risotto'] }
       ],
@@ -7053,6 +7036,60 @@ const Bookings = () => {
         { status: 'Pending', time: '15 Mar, 09:30 AM' },
         { status: 'Confirmed', time: '18 Mar, 11:15 AM' }
       ],
+      taxType: 'B2C'
+    },
+    {
+      id: 'BK-12395',
+      customer: 'Anjali Gupta',
+      date: '2026-05-01',
+      time: '07:00 PM',
+      type: 'Dinner',
+      serviceCategory: 'Dinner',
+      category: 'Dinner',
+      menuName: 'Standard Dinner',
+      guests: 80,
+      amount: 45000,
+      payout: 13500,
+      paid: 13500,
+      status: 'Completed',
+      address: 'HSR Layout, Sector 2, Bengaluru',
+      timeline: [{ status: 'Completed', time: '01 May, 10:00 PM' }],
+      taxType: 'B2C'
+    },
+    {
+      id: 'BK-12390',
+      customer: 'Karan Mehra',
+      date: '2026-04-25',
+      time: '12:00 PM',
+      type: 'Lunch',
+      serviceCategory: 'Lunch',
+      category: 'Lunch',
+      menuName: 'Lunch Special',
+      guests: 150,
+      amount: 95000,
+      payout: 28500,
+      paid: 28500,
+      status: 'Completed',
+      address: 'Koramangala 4th Block, Bengaluru',
+      timeline: [{ status: 'Completed', time: '25 Apr, 03:00 PM' }],
+      taxType: 'B2C'
+    },
+    {
+      id: 'BK-12385',
+      customer: 'Megha Roy',
+      date: '2026-04-10',
+      time: '08:30 PM',
+      type: 'Anniversary',
+      serviceCategory: 'Dinner',
+      category: 'Dinner',
+      menuName: 'Anniversary Special',
+      guests: 40,
+      amount: 30000,
+      payout: 9000,
+      paid: 9000,
+      status: 'Completed',
+      address: 'Jayanagar 9th Block, Bengaluru',
+      timeline: [{ status: 'Completed', time: '10 Apr, 11:30 PM' }],
       taxType: 'B2C'
     }
   ]);
@@ -7170,24 +7207,26 @@ const Bookings = () => {
 
 
   const getDaysBadge = (booking: any) => {
+    if (booking.status === 'Completed') return null;
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const eventDate = new Date(booking.date);
     eventDate.setHours(0, 0, 0, 0);
 
     const diffTime = eventDate.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
 
     if (diffDays === 0) return <span className="urgent-badge-v7">TODAY</span>;
-    if (diffDays > 0 && booking.status === 'Upcoming') {
+    if (diffDays > 0) {
       return <span className="upcoming-badge-v11">IN {diffDays} {diffDays === 1 ? 'DAY' : 'DAYS'}</span>;
     }
-    return null;
+    const absDays = Math.abs(diffDays);
+    return <span className="past-badge-v11">{absDays} {absDays === 1 ? 'DAY' : 'DAYS'} AGO</span>;
   };
 
   const getPayoutDisplayInfo = (booking: any) => {
     let amountText = `₹ ${booking.paid.toLocaleString()}`;
-    let statusText = 'Processing';
+    let statusText = '';
     let statusClass = 'pending';
 
     const today = new Date();
@@ -7199,17 +7238,17 @@ const Bookings = () => {
     const diffDaysToEvent = Math.ceil(diffHrsToEvent / 24);
 
     if (booking.status === 'Live' || booking.status === 'Completed') {
-      statusText = 'Payout processed';
+      statusText = '';
       statusClass = 'credited';
       return { amountText, statusText, statusClass };
     }
 
     if (booking.status === 'Upcoming') {
       if (diffDaysToEvent <= 2) {
-        statusText = 'Payout processed';
+        statusText = '';
         statusClass = 'credited';
       } else {
-        statusText = `Payout in ${Math.max(1, diffDaysToEvent)}d`;
+        statusText = '';
         statusClass = 'pending';
       }
       return { amountText, statusText, statusClass };
@@ -7248,7 +7287,7 @@ const Bookings = () => {
 
       const vendorPct = 100 - refundPct;
       amountText = `₹ ${(booking.paid * (vendorPct / 100)).toLocaleString()}`;
-      statusText = `${refundPct}% refund`;
+      statusText = '';
       statusClass = 'review';
 
       return { amountText, statusText, statusClass };
@@ -7307,24 +7346,12 @@ const Bookings = () => {
                 />
               </div>
 
-              <div className="filter-box-v8">
-                <select value={filter} onChange={(e) => {
-                  setFilter(e.target.value);
-                  setBookingsPage(1);
-                }}>
-                  <option value="All">All Bookings</option>
-                  <option value="Upcoming">Upcoming</option>
-                  <option value="Live">Live</option>
-                  <option value="Completed">Completed</option>
-                  <option value="Cancelled">Cancelled</option>
-                </select>
-              </div>
+
             </div>
           </div>
 
           <div className="secondary-filters-v11">
             <div className="status-group-v11">
-              <h3 className="section-title-v10">Status</h3>
               <div className="shortcut-pills-v9">
                 {['Today & Upcoming', 'This Month'].map(s => (
                   <button
@@ -7358,12 +7385,12 @@ const Bookings = () => {
           </div>
         </div>
 
-        <div className="bookings-policy-notice-v11">
+        <div className="bookings-policy-notice-v11" style={{ marginTop: '24px' }}>
           <div className="notice-icon-v11">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
           </div>
           <div className="notice-text-v11">
-            <p><strong>Note:</strong> Collect balance amount directly from the customer after event completion or on event day. Invoice generated after balance amount successfully taken from the user. <strong>myMooment is not responsible for the balance amount.</strong></p>
+            <p style={{ fontSize: '0.85rem' }}><strong>Note:</strong> Collect balance amount directly from the customer after event completion or on event day. Invoice generated after balance amount successfully taken from the user. <strong>myMooment is not responsible for the balance amount.</strong></p>
           </div>
         </div>
 
@@ -7373,8 +7400,8 @@ const Bookings = () => {
               <tr>
                 <th>Booking ID</th>
                 <th>Customer</th>
-                <th>Event Date</th>
-                <th>Event</th>
+                <th>Event Details</th>
+                <th>Category</th>
                 <th>Advance Payout</th>
                 <th>Balance</th>
                 <th>Status</th>
@@ -7390,7 +7417,8 @@ const Bookings = () => {
                   </td>
                   <td>
                     <div className="customer-cell-v7">
-                      <span className="name">{b.customer}</span>
+                      <span className="name" style={{ fontWeight: 500 }}>{b.customer}</span>
+                      <span className="customer-phone-v11" style={{ fontSize: '0.75rem', opacity: 0.6, marginTop: '2px', display: 'block' }}>{(b as any).phone || '+91 98765 43210'}</span>
                     </div>
                   </td>
                   <td>
@@ -7401,8 +7429,7 @@ const Bookings = () => {
                   </td>
                   <td>
                     <div className="event-info-v7">
-                      <span className="event-type-v7">{b.category}</span>
-                      <span className="menu-name-v7">{b.menuName}</span>
+                      <span className="event-type-v7" style={{ fontWeight: 500 }}>{b.category}</span>
                     </div>
                   </td>
                   <td>
@@ -7411,16 +7438,18 @@ const Bookings = () => {
                       return (
                         <div className="amount-cell-v7">
                           <span className="total">{payoutInfo.amountText}</span>
-                          <span className={`payout ${payoutInfo.statusClass}`}>
-                            {payoutInfo.statusText}
-                          </span>
+                          {payoutInfo.statusText && (
+                            <span className={`payout ${payoutInfo.statusClass}`}>
+                              {payoutInfo.statusText}
+                            </span>
+                          )}
                         </div>
                       );
                     })()}
                   </td>
                   <td>
                     <div className="balance-cell-v11">
-                      <span className="balance-value-v11">₹ {(b.amount - b.paid).toLocaleString()}</span>
+                      <span className="balance-value-v11">₹ {b.status === 'Cancelled' ? '0' : (b.amount - b.paid).toLocaleString()}</span>
                     </div>
                   </td>
                   <td>
@@ -7495,7 +7524,7 @@ const Bookings = () => {
       />
     </div >
   );
-};
+}
 
 /* ─────────────────── HOME VIEW ─────────────────── */
 /* ─────────────────── OPERATIONAL UTILS ─────────────────── */
@@ -7530,7 +7559,7 @@ const CountdownTimer = ({ targetISO }: { targetISO: string }) => {
   return <span>Starts in {timeLeft}</span>;
 }
 
-const HomeView = ({
+function HomeView({
   setActiveTab,
   setActiveSettingsTab,
   setAvailabilitySubTab,
@@ -7542,7 +7571,7 @@ const HomeView = ({
   setAvailabilitySubTab: (tab: string) => void,
   boostCredits: number,
   setIsBoostSheetOpen: any
-}) => {
+}) {
   const handleGoToLeaveManagement = () => {
     setActiveTab('service-settings');
     setActiveSettingsTab('availability');
@@ -7815,7 +7844,7 @@ const HomeView = ({
 };
 
 /* ─────────────────── DASHBOARD ─────────────────── */
-const Dashboard = ({
+function Dashboard({
   navigate,
   membershipStatus,
   setMembershipStatus,
@@ -7827,7 +7856,7 @@ const Dashboard = ({
   setMembershipStatus: any,
   isBannerDismissed: any,
   setIsBannerDismissed: any
-}) => {
+}) {
   const isMobile = useIsMobile();
 
   // Boost Feature State (Lifted for mobile parity)
@@ -8610,28 +8639,32 @@ const SuccessPage = ({ onBackToHome }: { onBackToHome: () => void }) => (
   </div>
 );
 
-const PlanAbstract = () => (
-  <div className="plan-abstract-v4">
-    <svg width="60" height="60" viewBox="0 0 100 100" fill="currentColor">
-      <circle cx="80" cy="20" r="40" opacity="0.1" />
-      <circle cx="90" cy="10" r="25" opacity="0.05" />
-    </svg>
-  </div>
-);
+function PlanAbstract() {
+  return (
+    <div className="plan-abstract-v4">
+      <svg width="60" height="60" viewBox="0 0 100 100" fill="currentColor">
+        <circle cx="80" cy="20" r="40" opacity="0.1" />
+        <circle cx="90" cy="10" r="25" opacity="0.05" />
+      </svg>
+    </div>
+  );
+}
 
-const PlanSparkles = () => (
-  <div className="plan-sparkles-v4">
-    <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" className="sparkle-1">
-      <path d="M12 0l3 9 9 3-9 3-3 9-3-9-9-3 9-3z" />
-    </svg>
-    <svg width="6" height="6" viewBox="0 0 24 24" fill="currentColor" className="sparkle-2">
-      <path d="M12 0l3 9 9 3-9 3-3 9-3-9-9-3 9-3z" />
-    </svg>
-    <svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor" className="sparkle-3">
-      <path d="M12 0l3 9 9 3-9 3-3 9-3-9-9-3 9-3z" />
-    </svg>
-  </div>
-);
+function PlanSparkles() {
+  return (
+    <div className="plan-sparkles-v4">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" className="sparkle-1">
+        <path d="M12 0l3 9 9 3-9 3-3 9-3-9-9-3 9-3z" />
+      </svg>
+      <svg width="6" height="6" viewBox="0 0 24 24" fill="currentColor" className="sparkle-2">
+        <path d="M12 0l3 9 9 3-9 3-3 9-3-9-9-3 9-3z" />
+      </svg>
+      <svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor" className="sparkle-3">
+        <path d="M12 0l3 9 9 3-9 3-3 9-3-9-9-3 9-3z" />
+      </svg>
+    </div>
+  );
+}
 
 const CheckoutModal = ({ isOpen, plan, onClose }: { isOpen: boolean, plan: any, onClose: () => void }) => {
   const [couponCode, setCouponCode] = useState('');
@@ -9572,7 +9605,7 @@ function App() {
 
 /* ─────────────────── REVENUE & ANALYTICS SCREEN ─────────────────── */
 
-const RevenueAnalytics = ({
+function RevenueAnalytics({
   externalMonth,
   onMonthChange,
   isStandalone = false
@@ -9580,7 +9613,7 @@ const RevenueAnalytics = ({
   externalMonth?: string;
   onMonthChange?: (month: string) => void;
   isStandalone?: boolean;
-}) => {
+}) {
   const [selectedMonth, setSelectedMonth] = useState(externalMonth || 'Mar');
 
   useEffect(() => {
@@ -9871,7 +9904,7 @@ const RevenueAnalytics = ({
       </div>
     </div>
   );
-};
+}
 
 
 
