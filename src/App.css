@@ -13300,24 +13300,26 @@ input:checked+.slider-v4:before {
   background: #fffbeb;
   border: 1px solid #fef3c7;
   border-radius: 12px;
-  padding: 1rem 1.5rem;
-  margin: 0 1.5rem 1.5rem;
+  padding: 0.6rem 1.25rem;
+  margin: 0 1.5rem 1rem;
   display: flex;
-  gap: 1.25rem;
-  align-items: flex-start;
+  gap: 1rem;
+  align-items: center;
 }
 
 .notice-icon-v11 {
   color: #d97706;
-  margin-top: 3px;
+  margin-top: 0;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
 }
 
 .notice-text-v11 p {
   margin: 0;
-  font-size: 0.9rem;
+  font-size: 0.82rem;
   color: #451a03;
-  line-height: 1.6;
+  line-height: 1.5;
 }
 
 .notice-text-v11 p strong {

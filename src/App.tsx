@@ -7066,7 +7066,7 @@ const Bookings = () => {
   const [showDetail, setShowDetail] = useState(false);
   const [showVendorCancelConfirm, setShowVendorCancelConfirm] = useState(false);
   const [targetCancelId, setTargetCancelId] = useState<string | null>(null);
-  const [orderTypeFilter, setOrderTypeFilter] = useState('All');
+
   const [bookingsPage, setBookingsPage] = useState(1);
   const bookingsPerPage = 5;
 
@@ -7115,9 +7115,8 @@ const Bookings = () => {
     if (dateRange.from && b.date < dateRange.from) return false;
     if (dateRange.to && b.date > dateRange.to) return false;
 
-    // 4. Order Type Filter (Now only B2C allowed)
+    // 4. Order Type Filter (B2B excluded)
     if (b.taxType === 'B2B') return false;
-    if (orderTypeFilter !== 'All' && b.taxType !== orderTypeFilter) return false;
 
     return true;
   }).sort((a, b) => {
@@ -7307,19 +7306,7 @@ const Bookings = () => {
                   }}
                 />
               </div>
-              <div className="filter-box-v8">
-                <select
-                  value={orderTypeFilter}
-                  onChange={(e) => {
-                    setOrderTypeFilter(e.target.value);
-                    setBookingsPage(1);
-                  }}
-                  style={{ width: '130px' }}
-                >
-                  <option value="All">All Types</option>
-                  <option value="B2C">B2C Only</option>
-                </select>
-              </div>
+
               <div className="filter-box-v8">
                 <select value={filter} onChange={(e) => {
                   setFilter(e.target.value);
@@ -7339,7 +7326,7 @@ const Bookings = () => {
             <div className="status-group-v11">
               <h3 className="section-title-v10">Status</h3>
               <div className="shortcut-pills-v9">
-                {['All', 'Today & Upcoming', 'This Month'].map(s => (
+                {['Today & Upcoming', 'This Month'].map(s => (
                   <button
                     key={s}
                     className={`shortcut-btn-v9 ${rangeShortcut === s ? 'active' : ''}`}
@@ -7373,7 +7360,7 @@ const Bookings = () => {
 
         <div className="bookings-policy-notice-v11">
           <div className="notice-icon-v11">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
           </div>
           <div className="notice-text-v11">
             <p><strong>Note:</strong> Collect balance amount directly from the customer after event completion or on event day. Invoice generated after balance amount successfully taken from the user. <strong>myMooment is not responsible for the balance amount.</strong></p>
