@@ -7094,7 +7094,7 @@ function Bookings() {
     }
   ]);
 
-  const [filter, setFilter] = useState('All');
+  const [filter] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
   const todayStr = new Date().toISOString().split('T')[0];
   const [dateRange, setDateRange] = useState({ from: todayStr, to: '' });
