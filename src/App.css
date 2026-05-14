@@ -4275,7 +4275,7 @@ input:checked+.service-slider:before {
 
 .side-drawer-container .modal-content {
   padding: 2rem;
-  overflow: hidden;
+  overflow-y: auto;
   flex-grow: 1;
 }
 
@@ -4450,7 +4450,7 @@ input:checked+.service-slider:before {
 
 .modal-content {
   padding: 2rem;
-  overflow: hidden;
+  overflow-y: auto;
   flex: 1;
 }
 
